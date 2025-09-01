@@ -419,6 +419,14 @@ typedef struct WEIRD2U8
     const uint8_t* r;
     } WEIRD2U8;
 
+/// FFI buffer for Wire data transfer
+typedef struct WIREBUFFER
+    {
+    const uint8_t* data;
+    int32_t len;
+    int32_t capacity;
+    } WIREBUFFER;
+
 /// A pointer to an array of data someone else owns which may not be modified.
 typedef struct SLICEUSECSTRPTR
     {
@@ -853,6 +861,8 @@ typedef int64_t (*interoptopus_string_destroy)(UTF8STRING);
 
 typedef int64_t (*interoptopus_string_clone)(const UTF8STRING*, UTF8STRING*);
 
+typedef void (*interoptopus_wire_destroy)(uint8_t*, int32_t, int32_t);
+
 typedef int64_t (*interoptopus_vec_create_6849152863081469284)(const void*, uint64_t, VECU8*);
 
 typedef int64_t (*interoptopus_vec_destroy_9353420175730321243)(VECU8);
@@ -1119,6 +1129,8 @@ typedef VECVEC3F32 (*pattern_vec_6)(VECVEC3F32);
 typedef void (*pattern_vec_7)(USESLICEANDVEC);
 
 typedef USESLICEANDVEC (*pattern_vec_8)(USESLICEANDVEC);
+
+typedef void (*wire_accept_string_2)(void *);
 
 ///  Destroys the given instance.
 /// 

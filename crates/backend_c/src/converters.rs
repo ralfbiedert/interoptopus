@@ -59,8 +59,8 @@ pub fn to_type_specifier(g: &Interop, x: &Type) -> String {
         Type::Enum(x) => enum_to_typename(g, x),
         Type::Opaque(x) => opaque_to_typename(g, x),
         Type::Composite(x) => composite_to_typename(g, x),
-        Type::Wire(_) => todo!(),
-        Type::WirePayload(_) => todo!(),
+        Type::Wire(_) => "void *".to_string(),        // TODO
+        Type::WirePayload(_) => "void *".to_string(), // TODO
         Type::ReadPointer(x) => format!("const {}*", to_type_specifier(g, x)),
         Type::ReadWritePointer(x) => format!("{}*", to_type_specifier(g, x)),
         Type::FnPointer(x) => fnpointer_to_typename(g, x),

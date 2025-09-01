@@ -43,6 +43,7 @@ def init_lib(path):
     c_lib.interoptopus_vec_destroy_13145557392013674812.argtypes = [VecUtf8String]
     c_lib.interoptopus_vec_destroy_4854562680055612543.argtypes = [VecEnumPayload]
     c_lib.interoptopus_vec_destroy_9353420175730321243.argtypes = [VecU8]
+    c_lib.interoptopus_wire_destroy.argtypes = [ctypes.POINTER(ctypes.c_uint8), ctypes.c_int32, ctypes.c_int32]
     c_lib.meta_ambiguous_1.argtypes = [Vec1]
     c_lib.meta_ambiguous_2.argtypes = [Vec2]
     c_lib.meta_ambiguous_3.argtypes = [Vec1, Vec2]
@@ -211,6 +212,7 @@ def init_lib(path):
     c_lib.struct1.argtypes = [Tupled]
     c_lib.struct2.argtypes = [Vec3f32, ctypes.POINTER(Tupled)]
     c_lib.struct3.argtypes = [BoolField]
+    c_lib.wire_accept_string_2.argtypes = [todo]
     c_lib.alignment_1.restype = Packed2
     c_lib.array_1.restype = ctypes.c_uint8
     c_lib.array_2.restype = Array
@@ -245,6 +247,7 @@ def init_lib(path):
     c_lib.interoptopus_vec_destroy_13145557392013674812.restype = ctypes.c_int64
     c_lib.interoptopus_vec_destroy_4854562680055612543.restype = ctypes.c_int64
     c_lib.interoptopus_vec_destroy_9353420175730321243.restype = ctypes.c_int64
+    c_lib.interoptopus_wire_destroy.restype = 
     c_lib.meta_ambiguous_1.restype = Vec1
     c_lib.meta_ambiguous_2.restype = Vec2
     c_lib.meta_ambiguous_3.restype = ctypes.c_bool
@@ -413,6 +416,7 @@ def init_lib(path):
     c_lib.struct1.restype = Tupled
     c_lib.struct2.restype = ResultError
     c_lib.struct3.restype = ctypes.c_bool
+    c_lib.wire_accept_string_2.restype = 
 
 
 def interoptopus_string_create(utf8: ctypes.c_void_p, len: int, rval: ctypes.POINTER(Utf8String)) -> int:
@@ -423,6 +427,9 @@ def interoptopus_string_destroy(utf8) -> int:
 
 def interoptopus_string_clone(utf8: ctypes.POINTER(Utf8String), rval: ctypes.POINTER(Utf8String)) -> int:
     return c_lib.interoptopus_string_clone(utf8, rval)
+
+def interoptopus_wire_destroy(data: ctypes.POINTER(ctypes.c_uint8), len: int, capacity: int):
+    return c_lib.interoptopus_wire_destroy(data, len, capacity)
 
 def interoptopus_vec_create_6849152863081469284(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecU8)) -> int:
     return c_lib.interoptopus_vec_create_6849152863081469284(data, len, rval)
@@ -907,6 +914,9 @@ def pattern_vec_7(ignored: UseSliceAndVec):
 
 def pattern_vec_8(v: UseSliceAndVec) -> UseSliceAndVec:
     return c_lib.pattern_vec_8(v)
+
+def wire_accept_string_2(input):
+    return c_lib.wire_accept_string_2(input)
 
 
 
@@ -2224,6 +2234,49 @@ class Weird2u8(ctypes.Structure):
     @r.setter
     def r(self, value: ctypes.POINTER(ctypes.c_uint8)):
         return ctypes.Structure.__set__(self, "r", value)
+
+
+class WireBuffer(ctypes.Structure):
+    """FFI buffer for Wire data transfer"""
+
+    # These fields represent the underlying C data layout
+    _fields_ = [
+        ("data", ctypes.POINTER(ctypes.c_uint8)),
+        ("len", ctypes.c_int32),
+        ("capacity", ctypes.c_int32),
+    ]
+
+    def __init__(self, data: ctypes.POINTER(ctypes.c_uint8) = None, len: int = None, capacity: int = None):
+        if data is not None:
+            self.data = data
+        if len is not None:
+            self.len = len
+        if capacity is not None:
+            self.capacity = capacity
+
+    @property
+    def data(self) -> ctypes.POINTER(ctypes.c_uint8):
+        return ctypes.Structure.__get__(self, "data")
+
+    @data.setter
+    def data(self, value: ctypes.POINTER(ctypes.c_uint8)):
+        return ctypes.Structure.__set__(self, "data", value)
+
+    @property
+    def len(self) -> int:
+        return ctypes.Structure.__get__(self, "len")
+
+    @len.setter
+    def len(self, value: int):
+        return ctypes.Structure.__set__(self, "len", value)
+
+    @property
+    def capacity(self) -> int:
+        return ctypes.Structure.__get__(self, "capacity")
+
+    @capacity.setter
+    def capacity(self, value: int):
+        return ctypes.Structure.__set__(self, "capacity", value)
 
 
 class SliceUseCStrPtr(ctypes.Structure):
