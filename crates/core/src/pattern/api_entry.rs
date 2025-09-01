@@ -53,6 +53,8 @@ macro_rules! api_entry {
 
 
         unsafe impl interoptopus::lang::TypeInfo for $struct {
+            const RAW_SAFE: bool = true;
+
             fn type_info() -> interoptopus::lang::Type {
                 let mut fields = Vec::new();
 

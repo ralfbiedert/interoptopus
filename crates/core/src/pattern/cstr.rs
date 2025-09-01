@@ -25,10 +25,10 @@
 //! void call_with_string(uint8_t* s);
 //! ```
 //!
+use crate::Error;
 use crate::lang::Type;
 use crate::lang::TypeInfo;
 use crate::pattern::TypePattern;
-use crate::Error;
 use std::ffi::CStr;
 use std::marker::PhantomData;
 use std::option::Option::None;

@@ -1,6 +1,6 @@
 //! Like a regular [`String`](std::string::String), but FFI safe.
 
-use crate::lang::{Composite, Docs, Field, Meta, Primitive, Representation, Type, NAMESPACE_COMMON};
+use crate::lang::{Composite, Docs, Field, Meta, NAMESPACE_COMMON, Primitive, Representation, Type};
 use crate::lang::{Layout, TypeInfo};
 use crate::pattern::TypePattern;
 use std::mem::forget;
