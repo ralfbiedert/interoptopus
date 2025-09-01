@@ -10,6 +10,18 @@ pub struct Attributes {
     #[darling(default)]
     debug: bool,
 
+    /// A function marked `export_unique` will be exported with a unique name. This is useful
+    /// with generic functions inside macros, that need to be exported in multiple flavors,
+    /// once per instantiated type.
+    ///
+    /// For example
+    ///
+    /// ```ignore
+    /// #[ffi_function(export_unique)]
+    /// fn vec_destroy(v: ffi::Vec<u32>) { ... }
+    ///```
+    ///
+    /// might be exported as `vec_destroy_12831`.
     #[darling(default)]
     export_unique: bool,
 
