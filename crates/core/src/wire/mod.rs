@@ -9,22 +9,7 @@ pub use error::WireError;
 pub use serde::{De, Ser};
 
 use crate::lang::{Composite, Docs, Field, Meta, Type, TypeInfo, WireInfo};
-use std::io::{Read, Write};
 use std::marker::PhantomData;
-
-/// This is exposed to C# to deallocate memory from C# side (in `WireOfT`'s Dispose).
-///
-/// # Safety
-///
-/// If you pass wrong values here, everything will blow up. For use only by generated `WireOfT` wrappers.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn deallocate_wire_buffer_storage(data: *mut u8, len: i32, capacity: i32) {
-    if capacity <= 0 {
-        // If the buffer was borrowed or allocated on the opposite FFI side, cannot deallocate it.
-        return;
-    }
-    let _ = unsafe { Vec::from_raw_parts(data, usize::try_from(len).expect("Invalid vec length"), usize::try_from(capacity).expect("Invalid vec capacity")) };
-}
 
 /// Create a Wire from a type, either by allocating or by taking an external buffer.
 pub trait Wireable
@@ -260,3 +245,30 @@ where
 // }
 
 // Wire<Input>::de(buf_slice)->Input
+
+/// Emits helper functions used by [`Wire`](crate::wire::Wire).
+#[macro_export]
+macro_rules! builtins_wire {
+    () => {{
+        use ::interoptopus::lang::FunctionInfo;
+
+        #[$crate::ffi_function]
+        pub unsafe extern "C" fn interoptopus_wire_destroy(data: *mut u8, len: i32, capacity: i32) {
+            if capacity <= 0 {
+                // If the buffer was borrowed or allocated on the opposite FFI side, cannot deallocate it.
+                return;
+            }
+            let _ = unsafe { Vec::from_raw_parts(data, usize::try_from(len).expect("Invalid vec length"), usize::try_from(capacity).expect("Invalid vec capacity")) };
+        }
+
+        // #[$crate::ffi_function]
+        // pub fn interoptopus_string_destroy(utf8: $crate::pattern::string::String) -> i64 {
+        //     0
+        // }
+
+        let items = vec![interoptopus_wire_destroy::function_info()];
+        let builtins = $crate::pattern::builtins::Builtins::new(items);
+        let pattern = $crate::pattern::LibraryPattern::Builtins(builtins);
+        $crate::inventory::Symbol::Pattern(pattern)
+    }};
+}

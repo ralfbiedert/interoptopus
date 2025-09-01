@@ -22,7 +22,7 @@ impl<'a> WireBuffer<'a> {
         let len = i32::try_from(vec.len()).expect("Too large Wire buffer!");
         let capacity = i32::try_from(vec.capacity()).expect("Too large Wire buffer!");
 
-        std::mem::forget(vec); // LEAKS the vec here, must use deallocate_wire_buffer_storage() to free it
+        std::mem::forget(vec); // LEAKS the vec here, must use interoptopus_wire_destroy() to free it
 
         WireBuffer { data, len, capacity, _phantom: PhantomData }
     }

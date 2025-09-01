@@ -19,10 +19,10 @@
 //!    nested custom types (e.g., if `MyStruct` contains `AnotherCustomType`, both
 //!    get wire wrappers).
 
-use crate::Interop;
 use crate::converter::{field_name, field_to_type, wire_suffix};
+use crate::Interop;
 use interoptopus::lang::{Composite, Enum, Type, VariantKind, Visibility, WirePayload};
-use interoptopus_backend_utils::{Error, IndentWriter, render};
+use interoptopus_backend_utils::{render, Error, IndentWriter};
 
 pub fn write_wire_helpers(_i: &Interop, w: &mut IndentWriter) -> Result<(), Error> {
     // Add single copy of shared serialization helpers.
@@ -43,6 +43,7 @@ pub fn write_type_definition_wired_enum(i: &Interop, w: &mut IndentWriter, the_t
     }
 
     i.debug(w, "write_type_definition_wired_enum")?;
+
     let name = the_type.rust_name();
 
     let variants = the_type

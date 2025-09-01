@@ -414,19 +414,26 @@ namespace My.Company
     /// Mirrors the Rust Wire&lt;Return&gt; structure layout.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct WireOfReturn
+    public unsafe partial struct WireOfReturn
     {
         /// <summary>Pointer to buffer data</summary>
-        public byte* Data;
+        byte* Data;
 
         /// <summary>Length of valid data in buffer</summary>
-        public int Length;
+        int Length;
 
         /// <summary>
         /// Encoded capacity: 0=borrowed, >0=Rust-allocated, <0=C#-allocated (abs value = actual capacity)
         /// </summary>
-        public int Capacity;
+        int Capacity;
+    }
 
+    /// <summary>
+    /// FFI-safe wire representation for Return.
+    /// Mirrors the Rust Wire&lt;Return&gt; structure layout.
+    /// </summary>
+    public unsafe partial struct WireOfReturn
+    {
         /// <summary>
         /// Create a Wire from a managed Return object with owned buffer
         /// </summary>
@@ -496,7 +503,7 @@ namespace My.Company
             {
                 if (IsOwned) {
                     if (Capacity > 0) {
-                        WireInterop.deallocate_wire_buffer_storage((IntPtr)Data, Length, Capacity);
+                        WireInterop.interoptopus_wire_destroy((IntPtr)Data, Length, Capacity);
                     } else {
                         Marshal.FreeHGlobal((IntPtr)Data);
                     }
@@ -654,19 +661,26 @@ namespace My.Company
     /// Mirrors the Rust Wire&lt;Something&gt; structure layout.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct WireOfSomething
+    public unsafe partial struct WireOfSomething
     {
         /// <summary>Pointer to buffer data</summary>
-        public byte* Data;
+        byte* Data;
 
         /// <summary>Length of valid data in buffer</summary>
-        public int Length;
+        int Length;
 
         /// <summary>
         /// Encoded capacity: 0=borrowed, >0=Rust-allocated, <0=C#-allocated (abs value = actual capacity)
         /// </summary>
-        public int Capacity;
+        int Capacity;
+    }
 
+    /// <summary>
+    /// FFI-safe wire representation for Something.
+    /// Mirrors the Rust Wire&lt;Something&gt; structure layout.
+    /// </summary>
+    public unsafe partial struct WireOfSomething
+    {
         /// <summary>
         /// Create a Wire from a managed Something object with owned buffer
         /// </summary>
@@ -736,7 +750,7 @@ namespace My.Company
             {
                 if (IsOwned) {
                     if (Capacity > 0) {
-                        WireInterop.deallocate_wire_buffer_storage((IntPtr)Data, Length, Capacity);
+                        WireInterop.interoptopus_wire_destroy((IntPtr)Data, Length, Capacity);
                     } else {
                         Marshal.FreeHGlobal((IntPtr)Data);
                     }
@@ -1348,9 +1362,9 @@ namespace My.Company
     }
 
     public partial class WireInterop {
-        [LibraryImport(Interop.NativeLib, EntryPoint = "deallocate_wire_buffer_storage")]
+        [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_wire_destroy")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void deallocate_wire_buffer_storage(IntPtr data, int len, int capacity);
+        public static partial void interoptopus_wire_destroy(IntPtr data, int len, int capacity);
 
         #region Serialization Helpers
         #nullable enable
