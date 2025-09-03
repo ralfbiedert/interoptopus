@@ -7,7 +7,7 @@ pub(crate) mod core;
 pub(crate) mod forbidden;
 
 use crate::lang::Function;
-pub use core::{Inventory, InventoryBuilder, InventoryItem, Symbol};
+pub use core::{Inventory, InventoryBuilder, InventoryItem, OwnedInventoryItem, Symbol};
 
 /// Returns all functions not belonging to a [`service`](crate::pattern::service) pattern.
 ///

@@ -186,6 +186,18 @@ pub enum InventoryItem<'a> {
     ExternType(String),
 }
 
+/// An owned variation of InventoryItem for use in filter_map.
+#[derive(Clone, Debug, PartialEq)]
+pub enum OwnedInventoryItem {
+    Function(Function),
+    CType(Type),
+    WireType(Type),
+    Constant(Constant),
+    Pattern(LibraryPattern),
+    Namespace(String),
+    ExternType(String),
+}
+
 fn dedup<T: std::hash::Hash + Eq>(v: Vec<T>) -> Vec<T> {
     v.into_iter().collect::<HashSet<T>>().into_iter().collect::<Vec<T>>()
 }
@@ -379,49 +391,49 @@ impl Inventory {
     /// propagating into a definition.
     ///
     /// ```rust
-    /// # use interoptopus::inventory::{Inventory, InventoryItem};
+    /// # use interoptopus::inventory::{Inventory, OwnedInventoryItem};
     /// #
     /// # let inventory = Inventory::default();
     /// #
     /// let replaced = inventory.filter_map(|item| {
     ///     match item {
-    ///       InventoryItem::CType(t) if t.name_within_lib() == "error_t" => {
-    ///         Some(InventoryItem::ExternType(t.name_within_lib()))
+    ///       OwnedInventoryItem::CType(t) if t.name_within_lib() == "error_t" => {
+    ///         Some(OwnedInventoryItem::ExternType(t.name_within_lib()))
     ///       }
     ///       _ => Some(item)
     ///     }
     /// });
     /// ```
     #[must_use]
-    pub fn filter_map<P: FnMut(InventoryItem<'_>) -> Option<InventoryItem<'_>>>(self, mut predicate: P) -> Self {
+    pub fn filter_map<P: FnMut(OwnedInventoryItem) -> Option<OwnedInventoryItem>>(self, mut predicate: P) -> Self {
         // Iterate over all items collecting them into a new vector if the predicate returns Some.
         // Remap the items back into an Inventory since they may have changed type.
         let mut result = Self::default();
 
-        self.functions.into_iter().for_each(|f| result.insert(predicate(InventoryItem::Function(&f))));
-        self.c_types.into_iter().for_each(|t| result.insert(predicate(InventoryItem::CType(&t))));
-        self.wire_types.into_iter().for_each(|t| result.insert(predicate(InventoryItem::WireType(&t))));
-        self.constants.into_iter().for_each(|c| result.insert(predicate(InventoryItem::Constant(&c))));
-        self.patterns.into_iter().for_each(|p| result.insert(predicate(InventoryItem::Pattern(&p))));
-        self.namespaces.iter().for_each(|n| result.insert(predicate(InventoryItem::Namespace(n))));
+        self.functions.into_iter().for_each(|f| result.insert(predicate(OwnedInventoryItem::Function(f))));
+        self.c_types.into_iter().for_each(|t| result.insert(predicate(OwnedInventoryItem::CType(t))));
+        self.wire_types.into_iter().for_each(|t| result.insert(predicate(OwnedInventoryItem::WireType(t))));
+        self.constants.into_iter().for_each(|c| result.insert(predicate(OwnedInventoryItem::Constant(c))));
+        self.patterns.into_iter().for_each(|p| result.insert(predicate(OwnedInventoryItem::Pattern(p))));
+        self.namespaces.into_iter().for_each(|n| result.insert(predicate(OwnedInventoryItem::Namespace(n))));
         self.extern_types
-            .iter()
-            .for_each(|et| result.insert(predicate(InventoryItem::ExternType(et.clone()))));
+            .into_iter()
+            .for_each(|et| result.insert(predicate(OwnedInventoryItem::ExternType(et))));
 
         result
     }
 
-    /// Internal helper to remap an InventoryItem back into an owned item.
-    fn insert(&mut self, item: Option<InventoryItem<'_>>) {
+    /// Internal helper to remap an OwnedInventoryItem back into an owned item.
+    fn insert(&mut self, item: Option<OwnedInventoryItem>) {
         if let Some(item) = item {
             match item {
-                InventoryItem::Function(f) => self.functions.push(f.clone()),
-                InventoryItem::CType(t) => self.c_types.push(t.clone()),
-                InventoryItem::WireType(t) => self.wire_types.push(t.clone()),
-                InventoryItem::Constant(c) => self.constants.push(c.clone()),
-                InventoryItem::Pattern(p) => self.patterns.push(p.clone()),
-                InventoryItem::Namespace(n) => self.namespaces.push(n.to_string()),
-                InventoryItem::ExternType(et) => self.extern_types.push(et.to_string()),
+                OwnedInventoryItem::Function(f) => self.functions.push(f),
+                OwnedInventoryItem::CType(t) => self.c_types.push(t),
+                OwnedInventoryItem::WireType(t) => self.wire_types.push(t),
+                OwnedInventoryItem::Constant(c) => self.constants.push(c),
+                OwnedInventoryItem::Pattern(p) => self.patterns.push(p),
+                OwnedInventoryItem::Namespace(n) => self.namespaces.push(n),
+                OwnedInventoryItem::ExternType(et) => self.extern_types.push(et),
             }
         }
     }
