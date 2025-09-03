@@ -40,6 +40,7 @@ pub fn field_to_type(x: &Type) -> String {
         Type::Array(a) => format!("{}[]", field_to_type(a.the_type())),
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(_) => "IntPtr".to_string(),
+        Type::ExternType(name) => name.clone(),
         Type::Composite(x) => x.rust_name().to_string(),
         Type::Wire(x) => x.rust_name().to_string(),
         Type::WirePayload(dom) => match dom {
@@ -79,6 +80,7 @@ pub fn field_to_type_unmanaged(x: &Type) -> String {
         Type::Array(x) => field_to_type(x.the_type()),
         Type::Enum(x) => format!("{}.Unmanaged", x.rust_name()),
         Type::Opaque(_) => "TODO".to_string(),
+        Type::ExternType(_) => "TODO".to_string(),
         Type::Composite(x) => format!("{}.Unmanaged", x.rust_name()),
         Type::Wire(x) => format!("WireOf{}", x.rust_name()),
         Type::WirePayload(_) => todo!(),
@@ -128,6 +130,7 @@ pub fn param_to_type(x: &Type) -> String {
         Type::Array(_) => todo!(),
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(_) => "IntPtr".to_string(),
+        Type::ExternType(name) => name.clone(),
         Type::Composite(x) => x.rust_name().to_string(),
         Type::Wire(x) => format!("WireOf{}", x.rust_name()),
         Type::WirePayload(_) => todo!(),
@@ -240,6 +243,7 @@ pub fn rval_to_type_sync(x: &Type) -> String {
         Type::Array(_) => todo!(),
         Type::Enum(x) => x.rust_name().to_string(),
         Type::Opaque(_) => "IntPtr".to_string(),
+        Type::ExternType(name) => name.clone(),
         Type::Composite(x) => x.rust_name().to_string(),
         Type::Wire(x) => format!("WireOf{}", x.rust_name()),
         Type::WirePayload(_) => todo!(),
@@ -357,6 +361,7 @@ pub fn is_reusable(t: &Type) -> bool {
         }
         Type::FnPointer(_) => true,
         Type::Opaque(_) => false,
+        Type::ExternType(_) => false,
         Type::Primitive(_) => true,
         Type::ReadPointer(_) => true,
         Type::ReadWritePointer(_) => true,
@@ -406,6 +411,7 @@ pub fn has_dispose(t: &Type) -> bool {
         }
         Type::FnPointer(_) => false,
         Type::Opaque(_) => false,
+        Type::ExternType(_) => false, // extern types are never disposed
         Type::Primitive(_) => false,
         Type::ReadPointer(_) => false,
         Type::ReadWritePointer(_) => false,

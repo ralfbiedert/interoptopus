@@ -13,6 +13,9 @@ pub enum Symbol {
     Constant(Constant),
     Type(Type),
     Pattern(LibraryPattern),
+    /// An externally defined type.  Will not be defined within this file.
+    /// Used when you want to insert includes rather than having local definitions.
+    ExternType(String),
 }
 
 /// Produces an [`Inventory`] inside your inventory function, **start here**.🔥
@@ -58,13 +61,21 @@ pub struct InventoryBuilder {
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     allow_reserved_names: bool,
+    extern_types: Vec<String>,
 }
 
 impl InventoryBuilder {
     /// Start creating a new library.
     #[must_use]
     const fn new() -> Self {
-        Self { functions: Vec::new(), extra_types: Vec::new(), /*wire_types: Vec::new(),*/ constants: Vec::new(), patterns: Vec::new(), allow_reserved_names: false }
+        Self {
+            functions: Vec::new(),
+            extra_types: Vec::new(),
+            /*wire_types: Vec::new(),*/ constants: Vec::new(),
+            patterns: Vec::new(),
+            allow_reserved_names: false,
+            extern_types: Vec::new(),
+        }
     }
 
     /// Registers a symbol.
@@ -90,6 +101,7 @@ impl InventoryBuilder {
                 }
                 self.patterns.push(x);
             }
+            Symbol::ExternType(et) => self.extern_types.push(et),
         }
 
         self
@@ -138,7 +150,7 @@ impl InventoryBuilder {
     /// Produce the [`Inventory`].
     #[must_use]
     pub fn build(self) -> Inventory {
-        Inventory::new(self.functions, self.constants, self.patterns, self.extra_types.as_slice())
+        Inventory::new(self.functions, self.constants, self.patterns, self.extra_types.as_slice(), self.extern_types)
     }
 }
 
@@ -155,6 +167,8 @@ pub struct Inventory {
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     namespaces: Vec<String>,
+    /// Types that are not to be defined within the output, but rather included via headers.
+    extern_types: Vec<String>,
 }
 
 /// References to items contained within an [`Inventory`].
@@ -169,6 +183,7 @@ pub enum InventoryItem<'a> {
     Constant(&'a Constant),
     Pattern(&'a LibraryPattern),
     Namespace(&'a str),
+    ExternType(String),
 }
 
 fn dedup<T: std::hash::Hash + Eq>(v: Vec<T>) -> Vec<T> {
@@ -185,7 +200,7 @@ impl Inventory {
     /// Produce a new inventory for the given functions, constants and patterns.
     ///
     /// Type information will be automatically derived from the used fields and parameters.
-    pub(crate) fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>, extra_types: &[Type]) -> Self {
+    pub(crate) fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>, extra_types: &[Type], mut extern_types: Vec<String>) -> Self {
         let mut c_types = types_from_functions_types(&functions, extra_types);
         let mut namespaces = HashSet::new();
 
@@ -205,7 +220,9 @@ impl Inventory {
         c_types.sort();
         // constants.sort(); TODO: do sort constants (issue with Ord and float values ...)
 
-        Self { functions, c_types, wire_types, constants, patterns, namespaces }
+        extern_types.sort();
+
+        Self { functions, c_types, wire_types, constants, patterns, namespaces, extern_types }
     }
 
     /// Helper to debug the inventory.
@@ -303,6 +320,12 @@ impl Inventory {
         &self.patterns
     }
 
+    /// Return all registered extern types.
+    #[must_use]
+    pub fn extern_types(&self) -> &[String] {
+        &self.extern_types
+    }
+
     /// Return a new [`Inventory`] filtering items by a predicate.
     ///
     /// Useful for removing duplicate symbols when generating bindings split across multiple files.
@@ -331,8 +354,76 @@ impl Inventory {
         let constants: Vec<Constant> = self.constants.iter().filter(|x| predicate(InventoryItem::Constant(x))).cloned().collect();
         let patterns: Vec<LibraryPattern> = self.patterns.iter().filter(|x| predicate(InventoryItem::Pattern(x))).cloned().collect();
         let namespaces: Vec<String> = self.namespaces.iter().filter(|x| predicate(InventoryItem::Namespace(x))).cloned().collect();
+        let extern_types: Vec<String> = self
+            .extern_types
+            .iter()
+            .filter(|x| predicate(InventoryItem::ExternType((*x).clone())))
+            .cloned()
+            .collect();
 
-        Self { functions, c_types, wire_types, constants, patterns, namespaces }
+        Self { functions, c_types, wire_types, constants, patterns, namespaces, extern_types }
+    }
+
+    /// Return a new [`Inventory`] after filtering and modifying items.
+    ///
+    /// Used mostly in order to deal with items you wish to be undefined within the output.
+    /// A potential use case is to have a single file for an error type enum shared by multiple
+    /// generated headers which will include the error type rather than redefining it in each header.
+    /// As such, you would remap the enum definition to a `Extern` type.
+    ///
+    /// # Examples
+    ///
+    /// Here we will look for `error_t` enum types and remap them to `Extern` types to prevent
+    /// them from being defined in the output.  Note: the functions still have the entire enum
+    /// declaration embedded within the signatures.  But the Extern type will prevent them from
+    /// propagating into a definition.
+    ///
+    /// ```rust
+    /// # use interoptopus::inventory::{Inventory, InventoryItem};
+    /// #
+    /// # let inventory = Inventory::default();
+    /// #
+    /// let replaced = inventory.filter_map(|item| {
+    ///     match item {
+    ///       InventoryItem::CType(t) if t.name_within_lib() == "error_t" => {
+    ///         Some(InventoryItem::ExternType(t.name_within_lib()))
+    ///       }
+    ///       _ => Some(item)
+    ///     }
+    /// });
+    /// ```
+    #[must_use]
+    pub fn filter_map<P: FnMut(InventoryItem<'_>) -> Option<InventoryItem<'_>>>(self, mut predicate: P) -> Self {
+        // Iterate over all items collecting them into a new vector if the predicate returns Some.
+        // Remap the items back into an Inventory since they may have changed type.
+        let mut result = Self::default();
+
+        self.functions.into_iter().for_each(|f| result.insert(predicate(InventoryItem::Function(&f))));
+        self.c_types.into_iter().for_each(|t| result.insert(predicate(InventoryItem::CType(&t))));
+        self.wire_types.into_iter().for_each(|t| result.insert(predicate(InventoryItem::WireType(&t))));
+        self.constants.into_iter().for_each(|c| result.insert(predicate(InventoryItem::Constant(&c))));
+        self.patterns.into_iter().for_each(|p| result.insert(predicate(InventoryItem::Pattern(&p))));
+        self.namespaces.iter().for_each(|n| result.insert(predicate(InventoryItem::Namespace(n))));
+        self.extern_types
+            .iter()
+            .for_each(|et| result.insert(predicate(InventoryItem::ExternType(et.clone()))));
+
+        result
+    }
+
+    /// Internal helper to remap an InventoryItem back into an owned item.
+    fn insert(&mut self, item: Option<InventoryItem<'_>>) {
+        if let Some(item) = item {
+            match item {
+                InventoryItem::Function(f) => self.functions.push(f.clone()),
+                InventoryItem::CType(t) => self.c_types.push(t.clone()),
+                InventoryItem::WireType(t) => self.wire_types.push(t.clone()),
+                InventoryItem::Constant(c) => self.constants.push(c.clone()),
+                InventoryItem::Pattern(p) => self.patterns.push(p.clone()),
+                InventoryItem::Namespace(n) => self.namespaces.push(n.to_string()),
+                InventoryItem::ExternType(et) => self.extern_types.push(et.to_string()),
+            }
+        }
     }
 }
 

@@ -31,6 +31,9 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type,
         Type::Opaque(o) => {
             write_type_definition_opaque(i, w, o)?;
         }
+        Type::ExternType(_) => {
+            // Extern types are assumed to be defined elsewhere.
+        }
         Type::Composite(c) => {
             write_type_definition_composite(i, w, c)?;
             w.newline()?;

@@ -57,6 +57,8 @@ pub enum Type {
     /// Special patterns with primitives existing on C-level but special semantics.
     /// useful to higher level languages.
     Pattern(TypePattern),
+    /// A type only known by name expected to be defined elsewhere and included.
+    ExternType(String),
 }
 
 /// The type contained inside a [`Wire`](crate::wire::Wire).
@@ -148,6 +150,7 @@ impl Type {
                 _ => x.fallback_type().name_within_lib(),
             },
             Self::Array(x) => x.rust_name(),
+            Self::ExternType(name) => name.clone(),
         }
     }
 
@@ -177,6 +180,7 @@ impl Type {
             Self::ReadWritePointer(x) => Some(x.as_ref()),
             Self::Pattern(_) => None,
             Self::Array(_) => None,
+            Self::ExternType(_) => None,
         }
     }
 
