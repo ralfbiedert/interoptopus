@@ -354,7 +354,7 @@ impl Interop {
             Type::Array(_) => false,
             Type::Enum(x) => self.should_emit_by_meta(x.meta()),
             Type::Opaque(x) => self.should_emit_by_meta(x.meta()),
-            Type::ExternType(_) => false, // extern types are never emitted
+            Type::Included(_) => false, // included types are never emitted
             Type::Composite(x) => self.should_emit_by_meta(x.meta()),
             Type::Wire(x) => self.should_emit_by_meta(x.meta()),
             Type::WirePayload(dom) => match dom {

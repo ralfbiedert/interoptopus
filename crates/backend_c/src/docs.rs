@@ -35,7 +35,7 @@ impl<'a> Markdown<'a> {
             Type::Array(_) => return Ok(()),
             Type::Enum(e) => e.meta(),
             Type::Opaque(o) => o.meta(),
-            Type::ExternType(_) => return Ok(()),
+            Type::Included(_) => return Ok(()),
             Type::Composite(c) => c.meta(),
             Type::Wire(_) => todo!(),
             Type::WirePayload(_) => todo!(),

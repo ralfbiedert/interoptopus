@@ -1,6 +1,6 @@
 use crate::inventory::forbidden::FORBIDDEN_NAMES;
 use crate::lang::util::{extract_namespaces_from_types, extract_wire_types_from_functions, holds_opaque_without_ref, types_from_functions_types};
-use crate::lang::{Constant, Function, Type};
+use crate::lang::{Constant, Function, Included, Type};
 use crate::pattern::LibraryPattern;
 use std::collections::HashSet;
 
@@ -13,9 +13,9 @@ pub enum Symbol {
     Constant(Constant),
     Type(Type),
     Pattern(LibraryPattern),
-    /// An externally defined type.  Will not be defined within this file.
+    /// An included type.  Will not be defined within this file.
     /// Used when you want to insert includes rather than having local definitions.
-    ExternType(String),
+    Included(Included),
 }
 
 /// Produces an [`Inventory`] inside your inventory function, **start here**.🔥
@@ -61,7 +61,7 @@ pub struct InventoryBuilder {
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     allow_reserved_names: bool,
-    extern_types: Vec<String>,
+    included_types: Vec<Included>,
 }
 
 impl InventoryBuilder {
@@ -74,7 +74,7 @@ impl InventoryBuilder {
             /*wire_types: Vec::new(),*/ constants: Vec::new(),
             patterns: Vec::new(),
             allow_reserved_names: false,
-            extern_types: Vec::new(),
+            included_types: Vec::new(),
         }
     }
 
@@ -101,7 +101,7 @@ impl InventoryBuilder {
                 }
                 self.patterns.push(x);
             }
-            Symbol::ExternType(et) => self.extern_types.push(et),
+            Symbol::Included(et) => self.included_types.push(et),
         }
 
         self
@@ -150,7 +150,7 @@ impl InventoryBuilder {
     /// Produce the [`Inventory`].
     #[must_use]
     pub fn build(self) -> Inventory {
-        Inventory::new(self.functions, self.constants, self.patterns, self.extra_types.as_slice(), self.extern_types)
+        Inventory::new(self.functions, self.constants, self.patterns, self.extra_types.as_slice(), self.included_types)
     }
 }
 
@@ -168,7 +168,7 @@ pub struct Inventory {
     patterns: Vec<LibraryPattern>,
     namespaces: Vec<String>,
     /// Types that are not to be defined within the output, but rather included via headers.
-    extern_types: Vec<String>,
+    included_types: Vec<Included>,
 }
 
 /// References to items contained within an [`Inventory`].
@@ -183,7 +183,7 @@ pub enum InventoryItem<'a> {
     Constant(&'a Constant),
     Pattern(&'a LibraryPattern),
     Namespace(&'a str),
-    ExternType(String),
+    IncludedType(&'a Included),
 }
 
 /// An owned variation of InventoryItem for use in filter_map.
@@ -195,7 +195,7 @@ pub enum OwnedInventoryItem {
     Constant(Constant),
     Pattern(LibraryPattern),
     Namespace(String),
-    ExternType(String),
+    Included(Included),
 }
 
 fn dedup<T: std::hash::Hash + Eq>(v: Vec<T>) -> Vec<T> {
@@ -212,7 +212,13 @@ impl Inventory {
     /// Produce a new inventory for the given functions, constants and patterns.
     ///
     /// Type information will be automatically derived from the used fields and parameters.
-    pub(crate) fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>, extra_types: &[Type], mut extern_types: Vec<String>) -> Self {
+    pub(crate) fn new(
+        functions: Vec<Function>,
+        constants: Vec<Constant>,
+        patterns: Vec<LibraryPattern>,
+        extra_types: &[Type],
+        mut included_types: Vec<Included>,
+    ) -> Self {
         let mut c_types = types_from_functions_types(&functions, extra_types);
         let mut namespaces = HashSet::new();
 
@@ -232,9 +238,9 @@ impl Inventory {
         c_types.sort();
         // constants.sort(); TODO: do sort constants (issue with Ord and float values ...)
 
-        extern_types.sort();
+        included_types.sort();
 
-        Self { functions, c_types, wire_types, constants, patterns, namespaces, extern_types }
+        Self { functions, c_types, wire_types, constants, patterns, namespaces, included_types }
     }
 
     /// Helper to debug the inventory.
@@ -334,8 +340,8 @@ impl Inventory {
 
     /// Return all registered extern types.
     #[must_use]
-    pub fn extern_types(&self) -> &[String] {
-        &self.extern_types
+    pub fn extern_types(&self) -> &[Included] {
+        &self.included_types
     }
 
     /// Return a new [`Inventory`] filtering items by a predicate.
@@ -366,14 +372,9 @@ impl Inventory {
         let constants: Vec<Constant> = self.constants.iter().filter(|x| predicate(InventoryItem::Constant(x))).cloned().collect();
         let patterns: Vec<LibraryPattern> = self.patterns.iter().filter(|x| predicate(InventoryItem::Pattern(x))).cloned().collect();
         let namespaces: Vec<String> = self.namespaces.iter().filter(|x| predicate(InventoryItem::Namespace(x))).cloned().collect();
-        let extern_types: Vec<String> = self
-            .extern_types
-            .iter()
-            .filter(|x| predicate(InventoryItem::ExternType((*x).clone())))
-            .cloned()
-            .collect();
+        let included_types: Vec<Included> = self.included_types.iter().filter(|x| predicate(InventoryItem::IncludedType(x))).cloned().collect();
 
-        Self { functions, c_types, wire_types, constants, patterns, namespaces, extern_types }
+        Self { functions, c_types, wire_types, constants, patterns, namespaces, included_types }
     }
 
     /// Return a new [`Inventory`] after filtering and modifying items.
@@ -391,14 +392,14 @@ impl Inventory {
     /// propagating into a definition.
     ///
     /// ```rust
-    /// # use interoptopus::inventory::{Inventory, OwnedInventoryItem};
+    /// # use interoptopus::inventory::{Inventory, Included, OwnedInventoryItem};
     /// #
     /// # let inventory = Inventory::default();
     /// #
     /// let replaced = inventory.filter_map(|item| {
     ///     match item {
     ///       OwnedInventoryItem::CType(t) if t.name_within_lib() == "error_t" => {
-    ///         Some(OwnedInventoryItem::ExternType(t.name_within_lib()))
+    ///         Some(OwnedInventoryItem::Included(Included::new(t.name_within_lib(), t.meta())))
     ///       }
     ///       _ => Some(item)
     ///     }
@@ -416,9 +417,9 @@ impl Inventory {
         self.constants.into_iter().for_each(|c| result.insert(predicate(OwnedInventoryItem::Constant(c))));
         self.patterns.into_iter().for_each(|p| result.insert(predicate(OwnedInventoryItem::Pattern(p))));
         self.namespaces.into_iter().for_each(|n| result.insert(predicate(OwnedInventoryItem::Namespace(n))));
-        self.extern_types
+        self.included_types
             .into_iter()
-            .for_each(|et| result.insert(predicate(OwnedInventoryItem::ExternType(et))));
+            .for_each(|et| result.insert(predicate(OwnedInventoryItem::Included(et))));
 
         result
     }
@@ -433,7 +434,7 @@ impl Inventory {
                 OwnedInventoryItem::Constant(c) => self.constants.push(c),
                 OwnedInventoryItem::Pattern(p) => self.patterns.push(p),
                 OwnedInventoryItem::Namespace(n) => self.namespaces.push(n),
-                OwnedInventoryItem::ExternType(et) => self.extern_types.push(et),
+                OwnedInventoryItem::Included(et) => self.included_types.push(et),
             }
         }
     }

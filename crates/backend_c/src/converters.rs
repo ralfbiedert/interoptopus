@@ -58,7 +58,7 @@ pub fn to_type_specifier(g: &Interop, x: &Type) -> String {
         Type::Primitive(x) => primitive_to_typename(*x),
         Type::Enum(x) => enum_to_typename(g, x),
         Type::Opaque(x) => opaque_to_typename(g, x),
-        Type::ExternType(name) => name.clone(),
+        Type::Included(included) => included.name().to_string(),
         Type::Composite(x) => composite_to_typename(g, x),
         Type::Wire(_) => "void *".to_string(),        // TODO
         Type::WirePayload(_) => "void *".to_string(), // TODO

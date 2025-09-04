@@ -38,7 +38,7 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type)
             w.newline()?;
         }
         Type::Opaque(_) => {}
-        Type::ExternType(_) => {} // Extern types are never emitted
+        Type::Included(_) => {} // Included types are never emitted
         Type::Composite(c) => {
             write_type_definition_composite(i, w, c)?;
             w.newline()?;
