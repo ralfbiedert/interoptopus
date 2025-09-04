@@ -1,6 +1,6 @@
 use crate::inventory::forbidden::FORBIDDEN_NAMES;
 use crate::lang::util::{extract_namespaces_from_types, extract_wire_types_from_functions, holds_opaque_without_ref, types_from_functions_types};
-use crate::lang::{Constant, Function, Included, Parameter, Signature, Type};
+use crate::lang::{Constant, Function, Included, Meta, Opaque, Parameter, Signature, Type};
 use crate::pattern::LibraryPattern;
 use std::collections::HashSet;
 
@@ -442,6 +442,17 @@ impl Inventory {
                 }
             }
         }
+    }
+
+    /// Replace a composite type with an opaque one.
+    /// This is used in combination with `Included` types to prevent redefinitions of
+    /// structures which will be included.  In this case, we want them forward referenced
+    /// rather than completely ignored.
+    ///
+    /// TODO: should we also replace in functions?  Seems to be happy without that.
+    pub fn replace_with_opaque(self, name: &str) -> Self {
+        let new_type = Type::Opaque(Opaque::new(name.to_string(), Meta::default()));
+        self.replace_type(name, new_type)
     }
 
     /// Replace the named type with a new one.
