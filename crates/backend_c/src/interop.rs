@@ -90,7 +90,7 @@ impl ToNamingStyle for &str {
             NameCase::UpperCamel => self.to_upper_camel_case(),
             NameCase::Snake => self.to_snake_case(),
             NameCase::ShoutySnake => self.to_shouty_snake_case(),
-            NameCase::Original => self.to_string(),
+            NameCase::Original => (*self).to_string(),
         }
     }
 }
