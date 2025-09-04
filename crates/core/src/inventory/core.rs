@@ -465,8 +465,8 @@ impl Inventory {
     #[must_use]
     pub fn replace_type(mut self, name: &str, new_type: &Type) -> Self {
         /* TODO: ? Any other types that could contain references ? */
-        self.replace_in_types(name, &new_type);
-        self.replace_in_functions(name, &new_type);
+        self.replace_in_types(name, new_type);
+        self.replace_in_functions(name, new_type);
         self
     }
 
