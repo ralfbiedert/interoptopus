@@ -536,5 +536,4 @@ mod test {
         assert_eq!(Prettifier::from_rust_lower("hello_world").to_camel_case(), "HelloWorld");
         assert_eq!(Prettifier::from_rust_lower("single").to_camel_case(), "Single");
     }
-
 }
