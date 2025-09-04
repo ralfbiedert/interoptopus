@@ -508,7 +508,7 @@ pub fn is_global_type(t: &Type) -> bool {
             TypePattern::Utf8String(_) => true,
             TypePattern::Vec(x) => is_global_type(x.t()),
         },
-        Type::Included(_) => false,
+        Type::Included(_) => true,
     }
 }
 
