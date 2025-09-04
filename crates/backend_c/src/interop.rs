@@ -67,6 +67,8 @@ pub enum NameCase {
     Snake,
     /// Names in upper case with '_' as spacing e.g. '`THE_TYPE_NAME`'
     ShoutySnake,
+    /// Names in original form, no conversion applied.
+    Original,
 }
 
 pub trait ToNamingStyle {
@@ -88,6 +90,7 @@ impl ToNamingStyle for &str {
             NameCase::UpperCamel => self.to_upper_camel_case(),
             NameCase::Snake => self.to_snake_case(),
             NameCase::ShoutySnake => self.to_shouty_snake_case(),
+            NameCase::Original => self.to_string(),
         }
     }
 }

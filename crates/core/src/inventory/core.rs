@@ -448,8 +448,6 @@ impl Inventory {
     /// This is used in combination with `Included` types to prevent redefinitions of
     /// structures which will be included.  In this case, we want them forward referenced
     /// rather than completely ignored.
-    ///
-    /// TODO: should we also replace in functions?  Seems to be happy without that.
     pub fn mark_opaque(self, name: &str) -> Self {
         let new_type = Type::Opaque(Opaque::new(name.to_string(), Meta::default()));
         self.replace_type(name, new_type)
