@@ -1,6 +1,6 @@
 use crate::inventory::forbidden::FORBIDDEN_NAMES;
 use crate::lang::util::{extract_namespaces_from_types, extract_wire_types_from_functions, holds_opaque_without_ref, types_from_functions_types};
-use crate::lang::{Constant, Function, Included, Type};
+use crate::lang::{Constant, Function, Included, Parameter, Signature, Type};
 use crate::pattern::LibraryPattern;
 use std::collections::HashSet;
 
@@ -392,14 +392,15 @@ impl Inventory {
     /// propagating into a definition.
     ///
     /// ```rust
-    /// # use interoptopus::inventory::{Inventory, Included, OwnedInventoryItem};
+    /// # use interoptopus::inventory::{Inventory, OwnedInventoryItem};
+    /// # use interoptopus::lang::{Included, Meta};
     /// #
     /// # let inventory = Inventory::default();
     /// #
     /// let replaced = inventory.filter_map(|item| {
     ///     match item {
     ///       OwnedInventoryItem::CType(t) if t.name_within_lib() == "error_t" => {
-    ///         Some(OwnedInventoryItem::Included(Included::new(t.name_within_lib(), t.meta())))
+    ///         Some(OwnedInventoryItem::Included(Included::new(t.name_within_lib(), Meta::default())))
     ///       }
     ///       _ => Some(item)
     ///     }
@@ -411,31 +412,91 @@ impl Inventory {
         // Remap the items back into an Inventory since they may have changed type.
         let mut result = Self::default();
 
-        self.functions.into_iter().for_each(|f| result.insert(predicate(OwnedInventoryItem::Function(f))));
-        self.c_types.into_iter().for_each(|t| result.insert(predicate(OwnedInventoryItem::CType(t))));
-        self.wire_types.into_iter().for_each(|t| result.insert(predicate(OwnedInventoryItem::WireType(t))));
-        self.constants.into_iter().for_each(|c| result.insert(predicate(OwnedInventoryItem::Constant(c))));
-        self.patterns.into_iter().for_each(|p| result.insert(predicate(OwnedInventoryItem::Pattern(p))));
-        self.namespaces.into_iter().for_each(|n| result.insert(predicate(OwnedInventoryItem::Namespace(n))));
+        self.functions.into_iter().for_each(|f| result.insert([predicate(OwnedInventoryItem::Function(f))]));
+        self.c_types.into_iter().for_each(|t| result.insert([predicate(OwnedInventoryItem::CType(t))]));
+        self.wire_types.into_iter().for_each(|t| result.insert([predicate(OwnedInventoryItem::WireType(t))]));
+        self.constants.into_iter().for_each(|c| result.insert([predicate(OwnedInventoryItem::Constant(c))]));
+        self.patterns.into_iter().for_each(|p| result.insert([predicate(OwnedInventoryItem::Pattern(p))]));
+        self.namespaces.into_iter().for_each(|n| result.insert([predicate(OwnedInventoryItem::Namespace(n))]));
         self.included_types
             .into_iter()
-            .for_each(|et| result.insert(predicate(OwnedInventoryItem::Included(et))));
+            .for_each(|et| result.insert([predicate(OwnedInventoryItem::Included(et))]));
 
         result
     }
 
-    /// Internal helper to remap an OwnedInventoryItem back into an owned item.
-    fn insert(&mut self, item: Option<OwnedInventoryItem>) {
-        if let Some(item) = item {
-            match item {
-                OwnedInventoryItem::Function(f) => self.functions.push(f),
-                OwnedInventoryItem::CType(t) => self.c_types.push(t),
-                OwnedInventoryItem::WireType(t) => self.wire_types.push(t),
-                OwnedInventoryItem::Constant(c) => self.constants.push(c),
-                OwnedInventoryItem::Pattern(p) => self.patterns.push(p),
-                OwnedInventoryItem::Namespace(n) => self.namespaces.push(n),
-                OwnedInventoryItem::Included(et) => self.included_types.push(et),
+    /// Add items to the inventory manually from OwnedInventoryItems.
+    /// The primary purpose of this method is to replace items in the inventory with
+    /// modified and/or changed items.
+    pub fn insert(&mut self, items: impl IntoIterator<Item = Option<OwnedInventoryItem>>) {
+        for item in items.into_iter() {
+            if let Some(item) = item {
+                match item {
+                    OwnedInventoryItem::Function(f) => self.functions.push(f),
+                    OwnedInventoryItem::CType(t) => self.c_types.push(t),
+                    OwnedInventoryItem::WireType(t) => self.wire_types.push(t),
+                    OwnedInventoryItem::Constant(c) => self.constants.push(c),
+                    OwnedInventoryItem::Pattern(p) => self.patterns.push(p),
+                    OwnedInventoryItem::Namespace(n) => self.namespaces.push(n),
+                    OwnedInventoryItem::Included(et) => self.included_types.push(et),
+                }
             }
+        }
+    }
+
+    /// Replace the named type with a new one.
+    /// If, for instance, you want to tell interoptopus that a certain item is going to be
+    /// included rather than defined, this will take care of finding it in types and also in
+    /// function signatures.
+    pub fn replace_type(mut self, name: &str, new_type: Type) -> Self {
+        /* TODO: ? Any other types that could contain references ? */
+        self.replace_in_types(name, &new_type);
+        self.replace_in_functions(name, &new_type);
+        self
+    }
+
+    /// Replace the named item in the c_types.
+    fn replace_in_types(&mut self, name: &str, new_type: &Type) {
+        let mut replaced = Vec::new();
+        std::mem::swap(&mut replaced, &mut self.c_types);
+
+        for t in replaced.into_iter() {
+            if t.name_within_lib() == name {
+                self.c_types.push(new_type.clone());
+            } else {
+                self.c_types.push(t);
+            }
+        }
+    }
+
+    /// Find any parameters or return values matching the name and replace them.
+    fn replace_in_functions(&mut self, name: &str, new_type: &Type) {
+        let mut replaced = Vec::new();
+        std::mem::swap(&mut replaced, &mut self.functions);
+
+        for f in replaced.into_iter() {
+            let fname = f.name().to_string();
+            let meta = f.meta().clone();
+            let mut signature = f.signature().clone();
+            let domain_types = f.domain_types();
+
+            // Modify the rval if needed.
+            if signature.rval().name_within_lib() == name {
+                signature = Signature::new(signature.params().to_vec(), new_type.clone());
+            }
+
+            // Modify any parameters if needed.
+            let mut params = Vec::new();
+            for p in signature.params().iter() {
+                if p.the_type().name_within_lib() == name {
+                    params.push(Parameter::new(p.name().to_string(), new_type.clone()));
+                } else {
+                    params.push(p.clone());
+                }
+            }
+            signature = Signature::new(params, signature.rval().clone());
+
+            self.functions.push(Function::new(fname, signature, meta, domain_types))
         }
     }
 }
