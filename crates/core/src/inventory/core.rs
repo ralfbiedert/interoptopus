@@ -457,14 +457,7 @@ impl Inventory {
 
     /// Mark (replace) a composite or enum type with an included one.
     pub fn mark_included(self, name: &str) -> Self {
-        self.filter_map(|item| {
-            match item {
-                OwnedInventoryItem::CType(t) if t.name_within_lib() == name => {
-                    Some(OwnedInventoryItem::Included(Included::new(t.name_within_lib(), Meta::default())))
-                }
-                _ => Some(item),
-            }
-        })
+        self.replace_type(name, Type::Included(Included::new(name.to_string(), Meta::default())))
     }
 
     /// Replace the named type with a new one.
