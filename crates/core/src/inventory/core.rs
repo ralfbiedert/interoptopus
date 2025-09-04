@@ -444,15 +444,27 @@ impl Inventory {
         }
     }
 
-    /// Replace a composite type with an opaque one.
+    /// Mark (replace) a composite type with an opaque one.
     /// This is used in combination with `Included` types to prevent redefinitions of
     /// structures which will be included.  In this case, we want them forward referenced
     /// rather than completely ignored.
     ///
     /// TODO: should we also replace in functions?  Seems to be happy without that.
-    pub fn replace_with_opaque(self, name: &str) -> Self {
+    pub fn mark_opaque(self, name: &str) -> Self {
         let new_type = Type::Opaque(Opaque::new(name.to_string(), Meta::default()));
         self.replace_type(name, new_type)
+    }
+
+    /// Mark (replace) a composite or enum type with an included one.
+    pub fn mark_included(self, name: &str) -> Self {
+        self.filter_map(|item| {
+            match item {
+                OwnedInventoryItem::CType(t) if t.name_within_lib() == name => {
+                    Some(OwnedInventoryItem::Included(Included::new(t.name_within_lib(), Meta::default())))
+                }
+                _ => Some(item),
+            }
+        })
     }
 
     /// Replace the named type with a new one.
