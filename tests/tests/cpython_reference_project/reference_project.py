@@ -38,10 +38,12 @@ def init_lib(path):
     c_lib.interoptopus_vec_create_12058709700293828778.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecEnumPayload)]
     c_lib.interoptopus_vec_create_17163327104750939811.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecUtf8String)]
     c_lib.interoptopus_vec_create_1781563852271199874.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecVec3f32)]
+    c_lib.interoptopus_vec_create_6754850874721651329.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecSliceU8)]
     c_lib.interoptopus_vec_create_6849152863081469284.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(VecU8)]
     c_lib.interoptopus_vec_destroy_12107015372467426116.argtypes = [VecVec3f32]
     c_lib.interoptopus_vec_destroy_13145557392013674812.argtypes = [VecUtf8String]
     c_lib.interoptopus_vec_destroy_4854562680055612543.argtypes = [VecEnumPayload]
+    c_lib.interoptopus_vec_destroy_5722710969548806095.argtypes = [VecSliceU8]
     c_lib.interoptopus_vec_destroy_9353420175730321243.argtypes = [VecU8]
     c_lib.interoptopus_wire_destroy.argtypes = [ctypes.POINTER(ctypes.c_uint8), ctypes.c_int32, ctypes.c_int32]
     c_lib.meta_ambiguous_1.argtypes = [Vec1]
@@ -242,10 +244,12 @@ def init_lib(path):
     c_lib.interoptopus_vec_create_12058709700293828778.restype = ctypes.c_int64
     c_lib.interoptopus_vec_create_17163327104750939811.restype = ctypes.c_int64
     c_lib.interoptopus_vec_create_1781563852271199874.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_create_6754850874721651329.restype = ctypes.c_int64
     c_lib.interoptopus_vec_create_6849152863081469284.restype = ctypes.c_int64
     c_lib.interoptopus_vec_destroy_12107015372467426116.restype = ctypes.c_int64
     c_lib.interoptopus_vec_destroy_13145557392013674812.restype = ctypes.c_int64
     c_lib.interoptopus_vec_destroy_4854562680055612543.restype = ctypes.c_int64
+    c_lib.interoptopus_vec_destroy_5722710969548806095.restype = ctypes.c_int64
     c_lib.interoptopus_vec_destroy_9353420175730321243.restype = ctypes.c_int64
     c_lib.interoptopus_wire_destroy.restype = 
     c_lib.meta_ambiguous_1.restype = Vec1
@@ -454,6 +458,12 @@ def interoptopus_vec_create_12058709700293828778(data: ctypes.c_void_p, len: int
 
 def interoptopus_vec_destroy_4854562680055612543(ignored) -> int:
     return c_lib.interoptopus_vec_destroy_4854562680055612543(ignored)
+
+def interoptopus_vec_create_6754850874721651329(data: ctypes.c_void_p, len: int, rval: ctypes.POINTER(VecSliceU8)) -> int:
+    return c_lib.interoptopus_vec_create_6754850874721651329(data, len, rval)
+
+def interoptopus_vec_destroy_5722710969548806095(ignored) -> int:
+    return c_lib.interoptopus_vec_destroy_5722710969548806095(ignored)
 
 def alignment_1(a: Packed1) -> Packed2:
     return c_lib.alignment_1(a)

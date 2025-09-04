@@ -894,6 +894,10 @@ int64_t interoptopus_vec_create_12058709700293828778(const void* DATA, uint64_t 
 
 int64_t interoptopus_vec_destroy_4854562680055612543(VECENUMPAYLOAD IGNORED);
 
+int64_t interoptopus_vec_create_6754850874721651329(const void* DATA, uint64_t LEN, VECSLICEU8* RVAL);
+
+int64_t interoptopus_vec_destroy_5722710969548806095(VECSLICEU8 IGNORED);
+
 PACKED2 alignment_1(PACKED1 A);
 
 uint8_t array_1(ARRAY X);

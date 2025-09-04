@@ -58,6 +58,7 @@ pub fn ffi_inventory() -> Inventory {
         .register(builtins_vec!(ffi::String))
         .register(builtins_vec!(types::basic::Vec3f32))
         .register(builtins_vec!(types::enums::EnumPayload))
+        .register(builtins_vec!(ffi::Slice<u8>))
         .register(function!(functions::alignment::alignment_1))
         .register(function!(functions::array::array_1))
         .register(function!(functions::array::array_2))

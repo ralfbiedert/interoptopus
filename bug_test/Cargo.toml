@@ -1,0 +1,13 @@
+[package]
+name = "bug_test"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+interoptopus = { path = "../crates/core", features = ["derive"] }
+interoptopus_backend_csharp = { path = "../crates/backend_csharp" }
+
+[lib]
+crate-type = ["cdylib", "rlib"]
