@@ -141,7 +141,7 @@ mod tests {
             // Change the type to be `Included` instead of `Enum`.
             // If the user wants to follow interoptopus renaming from the configuration, they should
             // run the name conversion on their own.
-            .replace_type("included_t", Type::Included(Included::new("included_t".into(), Meta::default())));
+            .replace_type("included_t", &Type::Included(Included::new("included_t".into(), Meta::default())));
 
         let config = Interop::builder().inventory(inventory).build().unwrap();
         let content = config.to_string().unwrap();

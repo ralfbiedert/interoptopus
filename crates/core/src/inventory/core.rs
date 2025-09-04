@@ -186,7 +186,7 @@ pub enum InventoryItem<'a> {
     IncludedType(&'a Included),
 }
 
-/// An owned variation of InventoryItem for use in filter_map.
+/// An owned variation of `InventoryItem` for use in `filter_map`.
 #[derive(Clone, Debug, PartialEq)]
 pub enum OwnedInventoryItem {
     Function(Function),
@@ -425,21 +425,19 @@ impl Inventory {
         result
     }
 
-    /// Add items to the inventory manually from OwnedInventoryItems.
+    /// Add items to the inventory manually from `OwnedInventoryItems`.
     /// The primary purpose of this method is to replace items in the inventory with
     /// modified and/or changed items.
     pub fn insert(&mut self, items: impl IntoIterator<Item = Option<OwnedInventoryItem>>) {
-        for item in items.into_iter() {
-            if let Some(item) = item {
-                match item {
-                    OwnedInventoryItem::Function(f) => self.functions.push(f),
-                    OwnedInventoryItem::CType(t) => self.c_types.push(t),
-                    OwnedInventoryItem::WireType(t) => self.wire_types.push(t),
-                    OwnedInventoryItem::Constant(c) => self.constants.push(c),
-                    OwnedInventoryItem::Pattern(p) => self.patterns.push(p),
-                    OwnedInventoryItem::Namespace(n) => self.namespaces.push(n),
-                    OwnedInventoryItem::Included(et) => self.included_types.push(et),
-                }
+        for item in items.into_iter().flatten() {
+            match item {
+                OwnedInventoryItem::Function(f) => self.functions.push(f),
+                OwnedInventoryItem::CType(t) => self.c_types.push(t),
+                OwnedInventoryItem::WireType(t) => self.wire_types.push(t),
+                OwnedInventoryItem::Constant(c) => self.constants.push(c),
+                OwnedInventoryItem::Pattern(p) => self.patterns.push(p),
+                OwnedInventoryItem::Namespace(n) => self.namespaces.push(n),
+                OwnedInventoryItem::Included(et) => self.included_types.push(et),
             }
         }
     }
@@ -448,33 +446,36 @@ impl Inventory {
     /// This is used in combination with `Included` types to prevent redefinitions of
     /// structures which will be included.  In this case, we want them forward referenced
     /// rather than completely ignored.
+    #[must_use]
     pub fn mark_opaque(self, name: &str) -> Self {
         let new_type = Type::Opaque(Opaque::new(name.to_string(), Meta::default()));
-        self.replace_type(name, new_type)
+        self.replace_type(name, &new_type)
     }
 
     /// Mark (replace) a composite or enum type with an included one.
+    #[must_use]
     pub fn mark_included(self, name: &str) -> Self {
-        self.replace_type(name, Type::Included(Included::new(name.to_string(), Meta::default())))
+        self.replace_type(name, &Type::Included(Included::new(name.to_string(), Meta::default())))
     }
 
     /// Replace the named type with a new one.
     /// If, for instance, you want to tell interoptopus that a certain item is going to be
     /// included rather than defined, this will take care of finding it in types and also in
     /// function signatures.
-    pub fn replace_type(mut self, name: &str, new_type: Type) -> Self {
+    #[must_use]
+    pub fn replace_type(mut self, name: &str, new_type: &Type) -> Self {
         /* TODO: ? Any other types that could contain references ? */
         self.replace_in_types(name, &new_type);
         self.replace_in_functions(name, &new_type);
         self
     }
 
-    /// Replace the named item in the c_types.
+    /// Replace the named item in the `c_types`.
     fn replace_in_types(&mut self, name: &str, new_type: &Type) {
         let mut replaced = Vec::new();
         std::mem::swap(&mut replaced, &mut self.c_types);
 
-        for t in replaced.into_iter() {
+        for t in replaced {
             if t.name_within_lib() == name {
                 self.c_types.push(new_type.clone());
             } else {
@@ -488,7 +489,7 @@ impl Inventory {
         let mut replaced = Vec::new();
         std::mem::swap(&mut replaced, &mut self.functions);
 
-        for f in replaced.into_iter() {
+        for f in replaced {
             let fname = f.name().to_string();
             let meta = f.meta().clone();
             let mut signature = f.signature().clone();
@@ -501,7 +502,7 @@ impl Inventory {
 
             // Modify any parameters if needed.
             let mut params = Vec::new();
-            for p in signature.params().iter() {
+            for p in signature.params() {
                 if p.the_type().name_within_lib() == name {
                     params.push(Parameter::new(p.name().to_string(), new_type.clone()));
                 } else {
@@ -510,7 +511,7 @@ impl Inventory {
             }
             signature = Signature::new(params, signature.rval().clone());
 
-            self.functions.push(Function::new(fname, signature, meta, domain_types))
+            self.functions.push(Function::new(fname, signature, meta, domain_types));
         }
     }
 }
