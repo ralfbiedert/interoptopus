@@ -1,3 +1,31 @@
+/// Indents each line in the given text with the specified prefix.
+pub fn indent_all_with(prefix: impl AsRef<str>, text: impl AsRef<str>) -> String {
+    if text.as_ref().is_empty() {
+        return text.as_ref().to_string();
+    }
+
+    let ends_with_newline = text.as_ref().ends_with('\n');
+    let lines: Vec<&str> = text.as_ref().lines().collect();
+
+    let indented: Vec<String> = lines
+        .iter()
+        .map(|line| {
+            if line.is_empty() {
+                (*line).to_string()
+            } else {
+                format!("{}{}", prefix.as_ref(), line)
+            }
+        })
+        .collect();
+
+    let mut result = indented.join("\n");
+    if ends_with_newline && !result.ends_with('\n') {
+        result.push('\n');
+    }
+
+    result
+}
+
 /// Create a templated codegen engine for backends.
 ///
 /// This utilizes templates stored in the `$CARGO_MANIFEST_DIR/templates` directory
@@ -35,7 +63,7 @@ macro_rules! render {
         {
             let context = tera::Context::new();
             let template = crate::TEMPLATES.render($template, &context).map_err($crate::Error::Templating)?;
-            let indented = indent::indent_all_with($writer.indent_prefix(), template);
+            let indented = $crate::indent_all_with($writer.indent_prefix(), template);
             write!($writer.writer(), "{}", indented).map_err($crate::Error::Io)
         }
     };
@@ -46,7 +74,7 @@ macro_rules! render {
                 context.insert($key, $value);
             )*
             let template = crate::TEMPLATES.render($template, &context).map_err($crate::Error::Templating)?;
-            let indented = indent::indent_all_with($writer.indent_prefix(), template);
+            let indented = $crate::indent_all_with($writer.indent_prefix(), template);
             write!($writer.writer(), "{}", indented).map_err($crate::Error::Io)
         }
     };

@@ -371,7 +371,6 @@ namespace My.Company
             writer.Write(this.field);
 
 
-
         }
 
         /// <summary>
