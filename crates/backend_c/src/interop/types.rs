@@ -31,6 +31,9 @@ pub fn write_type_definition(i: &Interop, w: &mut IndentWriter, the_type: &Type,
         Type::Opaque(o) => {
             write_type_definition_opaque(i, w, o)?;
         }
+        Type::Included(_) => {
+            // Included types are assumed to be `included` via headers.
+        }
         Type::Composite(c) => {
             write_type_definition_composite(i, w, c)?;
             w.newline()?;
