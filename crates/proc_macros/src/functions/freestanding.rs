@@ -214,6 +214,8 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
     let mut item_fn = syn::parse2::<ItemFn>(input).expect("Must be a function.");
     let docs = extract_doc_lines(&item_fn.attrs);
 
+    let vis = item_fn.vis.clone();
+
     let signature = fn_signature_type(&item_fn.sig);
     let rval = rval_tokens(&item_fn.sig.output);
 
@@ -241,7 +243,7 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
 
         #[allow(non_camel_case_types)]
         #[allow(clippy::redundant_pub_crate, clippy::forget_non_drop)]
-        pub(crate) struct #function_ident #generic_params { #phantom_fields }
+        #vis struct #function_ident #generic_params { #phantom_fields }
 
         unsafe impl #generic_params ::interoptopus::lang::FunctionInfo for #function_ident #generic_params {
             type Signature = #signature;
@@ -269,8 +271,6 @@ pub fn ffi_function_freestanding(ffi_attributes: &Attributes, input: TokenStream
 
                 ::interoptopus::lang::Function::new(#export_name.to_string(), sig, meta, domain_types)
             }
-
-            // #wire_info
         }
     }
 }
