@@ -11,4 +11,4 @@ pub struct MyString {
 }
 
 #[ffi_function]
-fn wire_accept_string_2(_input: Wire<MyString>) {}
+pub fn wire_accept_string_2(_input: Wire<MyString>) {}
