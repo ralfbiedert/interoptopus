@@ -1,6 +1,6 @@
 use crate::inventory::forbidden::FORBIDDEN_NAMES;
 use crate::lang::util::{extract_namespaces_from_types, extract_wire_types_from_functions, holds_opaque_without_ref, types_from_functions_types};
-use crate::lang::{Constant, Function, Type};
+use crate::lang::{Constant, Function, Included, Meta, Opaque, Parameter, Signature, Type};
 use crate::pattern::LibraryPattern;
 use std::collections::HashSet;
 
@@ -13,6 +13,9 @@ pub enum Symbol {
     Constant(Constant),
     Type(Type),
     Pattern(LibraryPattern),
+    /// An included type.  Will not be defined within this file.
+    /// Used when you want to insert includes rather than having local definitions.
+    Included(Included),
 }
 
 /// Produces an [`Inventory`] inside your inventory function, **start here**.🔥
@@ -58,13 +61,21 @@ pub struct InventoryBuilder {
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     allow_reserved_names: bool,
+    included_types: Vec<Included>,
 }
 
 impl InventoryBuilder {
     /// Start creating a new library.
     #[must_use]
     const fn new() -> Self {
-        Self { functions: Vec::new(), extra_types: Vec::new(), /*wire_types: Vec::new(),*/ constants: Vec::new(), patterns: Vec::new(), allow_reserved_names: false }
+        Self {
+            functions: Vec::new(),
+            extra_types: Vec::new(),
+            /*wire_types: Vec::new(),*/ constants: Vec::new(),
+            patterns: Vec::new(),
+            allow_reserved_names: false,
+            included_types: Vec::new(),
+        }
     }
 
     /// Registers a symbol.
@@ -90,6 +101,7 @@ impl InventoryBuilder {
                 }
                 self.patterns.push(x);
             }
+            Symbol::Included(et) => self.included_types.push(et),
         }
 
         self
@@ -138,7 +150,7 @@ impl InventoryBuilder {
     /// Produce the [`Inventory`].
     #[must_use]
     pub fn build(self) -> Inventory {
-        Inventory::new(self.functions, self.constants, self.patterns, self.extra_types.as_slice())
+        Inventory::new(self.functions, self.constants, self.patterns, self.extra_types.as_slice(), self.included_types)
     }
 }
 
@@ -155,6 +167,8 @@ pub struct Inventory {
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
     namespaces: Vec<String>,
+    /// Types that are not to be defined within the output, but rather included via headers.
+    included_types: Vec<Included>,
 }
 
 /// References to items contained within an [`Inventory`].
@@ -169,6 +183,19 @@ pub enum InventoryItem<'a> {
     Constant(&'a Constant),
     Pattern(&'a LibraryPattern),
     Namespace(&'a str),
+    IncludedType(&'a Included),
+}
+
+/// An owned variation of `InventoryItem` for use in `filter_map`.
+#[derive(Clone, Debug, PartialEq)]
+pub enum OwnedInventoryItem {
+    Function(Function),
+    CType(Type),
+    WireType(Type),
+    Constant(Constant),
+    Pattern(LibraryPattern),
+    Namespace(String),
+    Included(Included),
 }
 
 fn dedup<T: std::hash::Hash + Eq>(v: Vec<T>) -> Vec<T> {
@@ -185,7 +212,13 @@ impl Inventory {
     /// Produce a new inventory for the given functions, constants and patterns.
     ///
     /// Type information will be automatically derived from the used fields and parameters.
-    pub(crate) fn new(functions: Vec<Function>, constants: Vec<Constant>, patterns: Vec<LibraryPattern>, extra_types: &[Type]) -> Self {
+    pub(crate) fn new(
+        functions: Vec<Function>,
+        constants: Vec<Constant>,
+        patterns: Vec<LibraryPattern>,
+        extra_types: &[Type],
+        mut included_types: Vec<Included>,
+    ) -> Self {
         let mut c_types = types_from_functions_types(&functions, extra_types);
         let mut namespaces = HashSet::new();
 
@@ -205,7 +238,9 @@ impl Inventory {
         c_types.sort();
         // constants.sort(); TODO: do sort constants (issue with Ord and float values ...)
 
-        Self { functions, c_types, wire_types, constants, patterns, namespaces }
+        included_types.sort();
+
+        Self { functions, c_types, wire_types, constants, patterns, namespaces, included_types }
     }
 
     /// Helper to debug the inventory.
@@ -303,6 +338,12 @@ impl Inventory {
         &self.patterns
     }
 
+    /// Return all registered extern types.
+    #[must_use]
+    pub fn extern_types(&self) -> &[Included] {
+        &self.included_types
+    }
+
     /// Return a new [`Inventory`] filtering items by a predicate.
     ///
     /// Useful for removing duplicate symbols when generating bindings split across multiple files.
@@ -331,8 +372,147 @@ impl Inventory {
         let constants: Vec<Constant> = self.constants.iter().filter(|x| predicate(InventoryItem::Constant(x))).cloned().collect();
         let patterns: Vec<LibraryPattern> = self.patterns.iter().filter(|x| predicate(InventoryItem::Pattern(x))).cloned().collect();
         let namespaces: Vec<String> = self.namespaces.iter().filter(|x| predicate(InventoryItem::Namespace(x))).cloned().collect();
+        let included_types: Vec<Included> = self.included_types.iter().filter(|x| predicate(InventoryItem::IncludedType(x))).cloned().collect();
 
-        Self { functions, c_types, wire_types, constants, patterns, namespaces }
+        Self { functions, c_types, wire_types, constants, patterns, namespaces, included_types }
+    }
+
+    /// Return a new [`Inventory`] after filtering and modifying items.
+    ///
+    /// Used mostly in order to deal with items you wish to be undefined within the output.
+    /// A potential use case is to have a single file for an error type enum shared by multiple
+    /// generated headers which will include the error type rather than redefining it in each header.
+    /// As such, you would remap the enum definition to a `Extern` type.
+    ///
+    /// # Examples
+    ///
+    /// Here we will look for `error_t` enum types and remap them to `Extern` types to prevent
+    /// them from being defined in the output.  Note: the functions still have the entire enum
+    /// declaration embedded within the signatures.  But the Extern type will prevent them from
+    /// propagating into a definition.
+    ///
+    /// ```rust
+    /// # use interoptopus::inventory::{Inventory, OwnedInventoryItem};
+    /// # use interoptopus::lang::{Included, Meta};
+    /// #
+    /// # let inventory = Inventory::default();
+    /// #
+    /// let replaced = inventory.filter_map(|item| {
+    ///     match item {
+    ///       OwnedInventoryItem::CType(t) if t.name_within_lib() == "error_t" => {
+    ///         Some(OwnedInventoryItem::Included(Included::new(t.name_within_lib(), Meta::default())))
+    ///       }
+    ///       _ => Some(item)
+    ///     }
+    /// });
+    /// ```
+    #[must_use]
+    pub fn filter_map<P: FnMut(OwnedInventoryItem) -> Option<OwnedInventoryItem>>(self, mut predicate: P) -> Self {
+        // Iterate over all items collecting them into a new vector if the predicate returns Some.
+        // Remap the items back into an Inventory since they may have changed type.
+        let mut result = Self::default();
+
+        self.functions.into_iter().for_each(|f| result.insert([predicate(OwnedInventoryItem::Function(f))]));
+        self.c_types.into_iter().for_each(|t| result.insert([predicate(OwnedInventoryItem::CType(t))]));
+        self.wire_types.into_iter().for_each(|t| result.insert([predicate(OwnedInventoryItem::WireType(t))]));
+        self.constants.into_iter().for_each(|c| result.insert([predicate(OwnedInventoryItem::Constant(c))]));
+        self.patterns.into_iter().for_each(|p| result.insert([predicate(OwnedInventoryItem::Pattern(p))]));
+        self.namespaces.into_iter().for_each(|n| result.insert([predicate(OwnedInventoryItem::Namespace(n))]));
+        self.included_types
+            .into_iter()
+            .for_each(|et| result.insert([predicate(OwnedInventoryItem::Included(et))]));
+
+        result
+    }
+
+    /// Add items to the inventory manually from `OwnedInventoryItems`.
+    /// The primary purpose of this method is to replace items in the inventory with
+    /// modified and/or changed items.
+    pub fn insert(&mut self, items: impl IntoIterator<Item = Option<OwnedInventoryItem>>) {
+        for item in items.into_iter().flatten() {
+            match item {
+                OwnedInventoryItem::Function(f) => self.functions.push(f),
+                OwnedInventoryItem::CType(t) => self.c_types.push(t),
+                OwnedInventoryItem::WireType(t) => self.wire_types.push(t),
+                OwnedInventoryItem::Constant(c) => self.constants.push(c),
+                OwnedInventoryItem::Pattern(p) => self.patterns.push(p),
+                OwnedInventoryItem::Namespace(n) => self.namespaces.push(n),
+                OwnedInventoryItem::Included(et) => self.included_types.push(et),
+            }
+        }
+    }
+
+    /// Mark (replace) a composite type with an opaque one.
+    /// This is used in combination with `Included` types to prevent redefinitions of
+    /// structures which will be included.  In this case, we want them forward referenced
+    /// rather than completely ignored.
+    #[must_use]
+    pub fn mark_opaque(self, name: &str) -> Self {
+        let new_type = Type::Opaque(Opaque::new(name.to_string(), Meta::default()));
+        self.replace_type(name, &new_type)
+    }
+
+    /// Mark (replace) a composite or enum type with an included one.
+    #[must_use]
+    pub fn mark_included(self, name: &str) -> Self {
+        self.replace_type(name, &Type::Included(Included::new(name.to_string(), Meta::default())))
+    }
+
+    /// Replace the named type with a new one.
+    /// If, for instance, you want to tell interoptopus that a certain item is going to be
+    /// included rather than defined, this will take care of finding it in types and also in
+    /// function signatures.
+    #[must_use]
+    pub fn replace_type(mut self, name: &str, new_type: &Type) -> Self {
+        /* TODO: ? Any other types that could contain references ? */
+        self.replace_in_types(name, new_type);
+        self.replace_in_functions(name, new_type);
+        self
+    }
+
+    /// Replace the named item in the `c_types`.
+    fn replace_in_types(&mut self, name: &str, new_type: &Type) {
+        let mut replaced = Vec::new();
+        std::mem::swap(&mut replaced, &mut self.c_types);
+
+        for t in replaced {
+            if t.name_within_lib() == name {
+                self.c_types.push(new_type.clone());
+            } else {
+                self.c_types.push(t);
+            }
+        }
+    }
+
+    /// Find any parameters or return values matching the name and replace them.
+    fn replace_in_functions(&mut self, name: &str, new_type: &Type) {
+        let mut replaced = Vec::new();
+        std::mem::swap(&mut replaced, &mut self.functions);
+
+        for f in replaced {
+            let fname = f.name().to_string();
+            let meta = f.meta().clone();
+            let mut signature = f.signature().clone();
+            let domain_types = f.domain_types();
+
+            // Modify the rval if needed.
+            if signature.rval().name_within_lib() == name {
+                signature = Signature::new(signature.params().to_vec(), new_type.clone());
+            }
+
+            // Modify any parameters if needed.
+            let mut params = Vec::new();
+            for p in signature.params() {
+                if p.the_type().name_within_lib() == name {
+                    params.push(Parameter::new(p.name().to_string(), new_type.clone()));
+                } else {
+                    params.push(p.clone());
+                }
+            }
+            signature = Signature::new(params, signature.rval().clone());
+
+            self.functions.push(Function::new(fname, signature, meta, domain_types));
+        }
     }
 }
 

@@ -7,7 +7,7 @@ pub(crate) mod core;
 pub(crate) mod forbidden;
 
 use crate::lang::Function;
-pub use core::{Inventory, InventoryBuilder, InventoryItem, Symbol};
+pub use core::{Inventory, InventoryBuilder, InventoryItem, OwnedInventoryItem, Symbol};
 
 /// Returns all functions not belonging to a [`service`](crate::pattern::service) pattern.
 ///
@@ -60,13 +60,15 @@ pub fn merge_inventories(inventories: &[Inventory]) -> Inventory {
     let mut constants = Vec::new();
     let mut patterns = Vec::new();
     let mut types = Vec::new();
+    let mut extern_types = Vec::new();
 
     for inventory in inventories {
         functions.extend_from_slice(inventory.functions());
         constants.extend_from_slice(inventory.constants());
         patterns.extend_from_slice(inventory.patterns());
         types.extend_from_slice(inventory.c_types());
+        extern_types.extend_from_slice(inventory.extern_types());
     }
 
-    Inventory::new(functions, constants, patterns, types.as_slice())
+    Inventory::new(functions, constants, patterns, types.as_slice(), extern_types)
 }
