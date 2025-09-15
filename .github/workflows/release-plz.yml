@@ -37,7 +37,7 @@ jobs:
         if: steps.release-plz.outputs.releases != '[]'
         run: |
           git checkout master
-          git cherry-pick --allow-empty --empty=keep -x origin/release
+          git pull --ff-only origin release
           git push origin master
 
   release-plz-pr:
