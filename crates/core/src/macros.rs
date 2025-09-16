@@ -141,3 +141,41 @@ macro_rules! constant {
         $crate::inventory::Symbol::Constant(info)
     }};
 }
+
+/// Generate FFI plugin structure and functions.
+///
+/// This macro parses plugin definitions with functions and traits.
+/// You can fill in the implementation details as needed.
+///
+/// # Example
+///
+/// ```rust
+/// use interoptopus::{ffi_plugin, ffi};
+///
+/// ffi_plugin!(Blah {
+///     fn foo(x: Something) -> ffi::String;
+///
+///     trait Foo {
+///         fn bar(&self) -> ffi::String;
+///         fn bar(&self) -> ffi::String;
+///     }
+/// });
+/// ```
+#[macro_export]
+macro_rules! ffi_plugin {
+    ($plugin_name:ident {
+        $(fn $fn_name:ident($($param:ident: $param_type:ty),*) -> $ret_type:ty;)*
+        
+        $(trait $trait_name:ident {
+            $(fn $method_name:ident(&self$(, $method_param:ident: $method_param_type:ty)*) -> $method_ret_type:ty;)*
+        })*
+    }) => {
+        // TODO: Add your implementation here
+        // The macro successfully parses:
+        // - Plugin name: $plugin_name
+        // - Functions: $fn_name with params and return types
+        // - Traits: $trait_name with methods
+        
+        // compile_error!("ffi_plugin! macro shell - implement your logic here");
+    };
+}
