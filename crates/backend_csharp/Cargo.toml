@@ -21,4 +21,5 @@ include_dir = { workspace = true }
 interoptopus = { workspace = true }
 interoptopus_backend_utils = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+netcorehost = "0.18.0"
 tera = { workspace = true }
