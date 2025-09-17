@@ -79,7 +79,6 @@ use crate::pattern::vec::VecType;
 use std::ffi::c_char;
 
 #[doc(hidden)]
-pub mod api_entry;
 pub mod api_guard;
 pub mod asynk;
 pub mod builtins;

@@ -43,8 +43,8 @@
 //!
 use crate::inventory::Inventory;
 use crate::lang::Type;
-use crate::lang::TypeInfo;
-use crate::pattern::TypePattern;
+use crate::lang2::meta::{Docs, Emission, Visibility};
+use crate::lang2::types::{TypeId, TypeKind, TypePattern, WireOnly};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
@@ -71,9 +71,29 @@ impl ApiVersion {
     }
 }
 
-unsafe impl TypeInfo for ApiVersion {
+impl crate::lang2::TypeInfo for ApiVersion {
+    fn id() -> TypeId {
+        TypeId::new(0xA6B162106C410FCAD91327A85E3FE14E)
+    }
+}
+
+impl crate::lang2::Register for ApiVersion {
+    fn register(inventory: &mut crate::inventory2::Inventory) {
+        let type_ = crate::lang2::types::Type {
+            emission: Emission::Common,
+            docs: Docs::empty(),
+            visibility: Visibility::Public,
+            name: "ApiVersion".to_string(),
+            kind: TypeKind::TypePattern(TypePattern::APIVersion),
+        };
+
+        inventory.register_type(<Self as crate::lang2::TypeInfo>::id(), type_);
+    }
+}
+
+unsafe impl crate::lang::TypeInfo for ApiVersion {
     fn type_info() -> Type {
-        Type::Pattern(TypePattern::APIVersion)
+        Type::Pattern(crate::pattern::TypePattern::APIVersion)
     }
 }
 
@@ -158,5 +178,23 @@ macro_rules! api_guard {
         use $crate::lang::FunctionInfo;
         let info = __api_guard::function_info();
         $crate::inventory::Symbol::Function(info)
+    }};
+}
+
+#[macro_export]
+macro_rules! api_guard2 {
+    ($f:tt) => {{
+        #[$crate::ffi_function]
+        pub fn __api_guard() -> $crate::pattern::api_guard::ApiVersion {
+            $f().into()
+        }
+
+        use $crate::lang2::Register;
+
+        |x: &mut $crate::inventory2::Inventory| {
+            // TODO
+            // - register __api_guard (this should automatically register the ApiGuard type)
+            todo ...
+        }
     }};
 }
