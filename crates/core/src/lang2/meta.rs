@@ -7,9 +7,11 @@ pub enum Visibility {
 
 /// Where an item definition should be placed in generated files.
 pub enum Emission {
-    /// This is a built-in type (e.g., `f32` <-> `float`) and does not need to be defined.
+    /// This is a built-in type (e.g., `f32` <-> `float`) and does not need to be defined. Also
+    /// used for "std" like builtins, `String` <-> `string`.
     Builtin,
-    /// This is a 'common' built-in type (like Slice<u8>)
+    /// This is a 'common' type (like Slice<u8>) that needs to be emitted, is not a builtin,
+    /// but not specific to any customer project.
     Common,
     /// The type should be placed in the given module / file. Backends decide how to handle this.
     Module(String),

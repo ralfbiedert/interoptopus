@@ -48,7 +48,7 @@ macro_rules! impl_primitive {
                 let type_id = Self::id();
                 let type_ = $crate::lang2::types::Type {
                     emission: $crate::lang2::meta::Emission::Builtin,
-                    docs: Default::default(),
+                    docs: $crate::lang2::meta::Docs::empty(),
                     visibility: $crate::lang2::meta::Visibility::Public,
                     name: $t_str.to_string(),
                     kind: $crate::lang2::types::TypeKind::Primitive($primitive),
@@ -75,6 +75,7 @@ macro_rules! impl_const_value_primitive {
 
 impl_primitive!((), "()", Primitive::Void, 0x6D87F0180F529932F56D3B4800145193);
 impl_primitive!(bool, "bool", Primitive::Bool, 0xCA37AD739D5997FE7F9E1B0B2CCBACE1);
+
 impl_primitive!(u8, "u8", Primitive::U8, 0x71B959DF6819BA4F2D20FBC7DF5D714D);
 impl_primitive!(u16, "u16", Primitive::U16, 0x230B6DE211C8701AB64CB312C739A3DF);
 impl_primitive!(u32, "u32", Primitive::U32, 0xEFB9E4EA19FBA8FEA6C796DF520821DF);
@@ -87,6 +88,30 @@ impl_primitive!(i64, "i64", Primitive::I64, 0xE8D0CA92F0E58E054DE9861583451238);
 impl_primitive!(isize, "isize", Primitive::Isize, 0xDBFDABF4E0551C776CCA5FB7D7A57006);
 impl_primitive!(f32, "f32", Primitive::F32, 0xCFF64C33A5D10D6817AC52138D18F407);
 impl_primitive!(f64, "f64", Primitive::F64, 0xBAF8C417793FA35FF706A32A7D61DBD1);
+
+// These IDs must match the ones above as they collapse to the same type
+impl_primitive!(std::num::NonZeroU8, "u8", Primitive::U8, 0x71B959DF6819BA4F2D20FBC7DF5D714D);
+impl_primitive!(std::num::NonZeroU16, "u16", Primitive::U16, 0x230B6DE211C8701AB64CB312C739A3DF);
+impl_primitive!(std::num::NonZeroU32, "u32", Primitive::U32, 0xEFB9E4EA19FBA8FEA6C796DF520821DF);
+impl_primitive!(std::num::NonZeroU64, "u64", Primitive::U64, 0xFB257E060F594616544A2AF2AB61C963);
+impl_primitive!(std::num::NonZeroUsize, "usize", Primitive::Usize, 0x2EC966CAEA7C18435B0323E7C2B382FB);
+impl_primitive!(std::num::NonZeroI8, "i8", Primitive::I8, 0x10D7EB99A0957C5C5EC0007F3BBE1B40);
+impl_primitive!(std::num::NonZeroI16, "i16", Primitive::I16, 0x1044CC231AE1F904F9B9F7448D4A3F12);
+impl_primitive!(std::num::NonZeroI32, "i32", Primitive::I32, 0xDC2383EC7347146B940073226EA63AF1);
+impl_primitive!(std::num::NonZeroI64, "i64", Primitive::I64, 0xE8D0CA92F0E58E054DE9861583451238);
+impl_primitive!(std::num::NonZeroIsize, "isize", Primitive::Isize, 0xDBFDABF4E0551C776CCA5FB7D7A57006);
+
+// These IDs must match the ones above as they collapse to the same type
+impl_primitive!(Option<std::num::NonZeroU8>, "u8", Primitive::U8, 0x71B959DF6819BA4F2D20FBC7DF5D714D);
+impl_primitive!(Option<std::num::NonZeroU16>, "u16", Primitive::U16, 0x230B6DE211C8701AB64CB312C739A3DF);
+impl_primitive!(Option<std::num::NonZeroU32>, "u32", Primitive::U32, 0xEFB9E4EA19FBA8FEA6C796DF520821DF);
+impl_primitive!(Option<std::num::NonZeroU64>, "u64", Primitive::U64, 0xFB257E060F594616544A2AF2AB61C963);
+impl_primitive!(Option<std::num::NonZeroUsize>, "usize", Primitive::Usize, 0x2EC966CAEA7C18435B0323E7C2B382FB);
+impl_primitive!(Option<std::num::NonZeroI8>, "i8", Primitive::I8, 0x10D7EB99A0957C5C5EC0007F3BBE1B40);
+impl_primitive!(Option<std::num::NonZeroI16>, "i16", Primitive::I16, 0x1044CC231AE1F904F9B9F7448D4A3F12);
+impl_primitive!(Option<std::num::NonZeroI32>, "i32", Primitive::I32, 0xDC2383EC7347146B940073226EA63AF1);
+impl_primitive!(Option<std::num::NonZeroI64>, "i64", Primitive::I64, 0xE8D0CA92F0E58E054DE9861583451238);
+impl_primitive!(Option<std::num::NonZeroIsize>, "isize", Primitive::Isize, 0xDBFDABF4E0551C776CCA5FB7D7A57006);
 
 impl_const_value_primitive!(u8, PrimitiveValue::U8);
 impl_const_value_primitive!(u16, PrimitiveValue::U16);
