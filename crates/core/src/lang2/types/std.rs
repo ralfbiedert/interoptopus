@@ -95,13 +95,13 @@ impl<T: Register + TypeInfo> Register for Vec<T> {
     }
 }
 
-impl<K: TypeInfo, V: TypeInfo> TypeInfo for HashMap<K, V> {
+impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap<K, V, S> {
     fn id() -> TypeId {
         TypeId::new(0xB55DC9DFF8B775E03D34267E9F1DABE5).derive_id(K::id()).derive_id(V::id())
     }
 }
 
-impl<K: Register + TypeInfo, V: Register + TypeInfo> Register for HashMap<K, V> {
+impl<K: Register + TypeInfo, V: Register + TypeInfo, S: ::std::hash::BuildHasher> Register for HashMap<K, V, S> {
     fn register(inventory: &mut Inventory) {
         // Ensure base types are registered.
         K::register(inventory);
