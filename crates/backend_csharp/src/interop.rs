@@ -263,7 +263,7 @@ impl Interop {
         })
     }
 
-    /// Given a Domain type in `c_types`, look up a corresponding Wire type in `wire_types` and return it if it exists.
+    /// Given a wire payload type in `c_types`, look up a corresponding Wire type in `wire_types` and return it if it exists.
     #[must_use]
     fn wired_counterpart(&self, kind: &Type) -> Option<Type> {
         let kind_name = kind.name_within_lib();

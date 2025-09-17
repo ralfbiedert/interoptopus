@@ -25,7 +25,7 @@ pub struct Function {
     name: String,
     meta: Meta,
     signature: Signature,
-    /// Domain types extracted from `Wire<T>` arguments or return value, if any.
+    /// Wire payload types extracted from `Wire<T>` arguments or return value, if any.
     domain_types: Vec<Type>,
 }
 
