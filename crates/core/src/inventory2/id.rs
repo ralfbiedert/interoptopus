@@ -40,7 +40,7 @@ macro_rules! new_id {
             }
 
             pub const fn derive_id(self, x: Self) -> Self {
-                self.0.derive_id(x.0)
+                Self(self.0.derive_id(x.0))
             }
         }
     };
