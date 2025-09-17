@@ -384,7 +384,7 @@ pub fn has_dispose(t: &Type) -> bool {
         Type::Composite(x) => x.fields().iter().any(|x| has_dispose(x.the_type())),
         Type::Wire(_) => true, // Wired types may own native memory and need disposal
         Type::WirePayload(dom) => match dom {
-            WirePayload::Composite(_) => false, // Domain types are plain C# classes
+            WirePayload::Composite(_) => false, // Payload types are plain C# classes
             WirePayload::String => todo!(),
             WirePayload::Enum(_) => todo!(),
             WirePayload::Option(_) => todo!(),

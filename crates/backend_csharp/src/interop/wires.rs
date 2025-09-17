@@ -99,7 +99,7 @@ pub fn write_type_definitions_domain_wired(i: &Interop, w: &mut IndentWriter, wi
 
     render!(
         w,
-        "wire/domain_type.cs",
+        "wire/payload_type.cs",
         ("type", type_name),
         ("visibility", visibility),
         ("self_kind", self_kind),
@@ -111,7 +111,7 @@ pub fn write_type_definitions_domain_wired(i: &Interop, w: &mut IndentWriter, wi
     )
 }
 
-// Domain type kinds
+// WirePayload type kinds
 #[derive(serde::Serialize, Default, Copy, Clone)]
 #[serde(rename_all = "snake_case")]
 enum Kind {
@@ -137,7 +137,7 @@ impl From<&Type> for Kind {
             Type::WirePayload(WirePayload::Enum(_)) => Self::Enum,
             Type::WirePayload(WirePayload::Option(_)) => Self::Optional,
             Type::WirePayload(WirePayload::Composite(_)) => Self::Composite,
-            _ => panic!("Unsupported domain type kind {value:?}"),
+            _ => panic!("Unsupported wire payload type kind {value:?}"),
         }
     }
 }

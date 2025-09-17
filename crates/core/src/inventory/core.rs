@@ -146,11 +146,11 @@ impl InventoryBuilder {
 #[derive(Clone, Debug, PartialOrd, PartialEq, Default)]
 pub struct Inventory {
     functions: Vec<Function>,
-    /// FFI types and Domain types.
+    /// FFI types and wire payload types.
     c_types: Vec<Type>,
     /// These are the types explicitly marked as `Wire<T>` in function declarations, we extract them here so we can
     /// rebuild the chain of custody and generate all appropriate types.
-    /// Other wired types contained within these listed ones are already added to `c_types` as `Domain` types.
+    /// Other wired types contained within these listed ones are already added to `c_types` as `WirePayload` types.
     wire_types: Vec<Type>,
     constants: Vec<Constant>,
     patterns: Vec<LibraryPattern>,
@@ -263,7 +263,7 @@ impl Inventory {
         &self.wire_types
     }
 
-    /// Returns domain wire types; this includes types `T` directly and indirectly used in `Wire<T>` function parameters.
+    /// Returns wire payload types; this includes types `T` directly and indirectly used in `Wire<T>` function parameters.
     #[must_use]
     #[allow(clippy::redundant_closure_for_method_calls)]
     pub fn wire_domain_types(&self) -> Vec<Type> {
