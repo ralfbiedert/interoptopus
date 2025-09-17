@@ -1,11 +1,12 @@
 /// The visibility of an item when written. Not all backends support all visibility levels.
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Visibility {
     Public,
     Private,
 }
 
 /// Where an item definition should be placed in generated files.
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Emission {
     /// This is a built-in type (e.g., `f32` <-> `float`) and does not need to be defined. Also
     /// used for "std" like builtins, `String` <-> `string`.
