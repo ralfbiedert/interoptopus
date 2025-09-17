@@ -1,24 +1,21 @@
-/// Doesn't exist in C, but other languages can benefit from accidentally using 'private' fields.
+/// The visibility of an item when written. Not all backends support all visibility levels.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Visibility {
     Public,
     Private,
 }
 
-pub struct Namespace {
-    name: String,
-}
-
-impl Namespace {
-    #[must_use]
-    pub fn new(name: String) -> Self {
-        Self { name }
-    }
-
-    #[must_use]
-    pub fn name(&self) -> &str {
-        &self.name
-    }
+/// Where an item definition should be placed in generated files.
+pub enum Emission {
+    /// This is a built-in type (e.g., `f32` <-> `float`) and does not need to be defined.
+    Builtin,
+    /// This is a 'common' built-in type (like Slice<u8>)
+    Common,
+    /// The type should be placed in the given module / file. Backends decide how to handle this.
+    Module(String),
+    /// The backend will _use_ the type as if it were auto-generated, but it is up to the user
+    /// to actually provide it.
+    External,
 }
 
 /// Markdown generated from the `///` you put on Rust code.
@@ -29,14 +26,14 @@ pub struct Docs {
 
 impl Docs {
     #[must_use]
-    pub fn new() -> Self {
+    pub fn empty() -> Self {
         Self::default()
     }
 
     #[must_use]
     pub fn from_line(joined_line: &str) -> Self {
         if joined_line.is_empty() {
-            Self::new()
+            Self::empty()
         } else {
             Self { lines: joined_line.split('\n').map(std::string::ToString::to_string).collect() }
         }
