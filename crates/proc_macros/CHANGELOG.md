@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0-alpha.16](https://github.com/ralfbiedert/interoptopus/compare/interoptopus_proc-v0.15.0-alpha.15...interoptopus_proc-v0.15.0-alpha.16)
+
+### ⚙️ Miscellaneous
+
+
+- Streamline workspace dependencies - ([2a23a99](https://github.com/ralfbiedert/interoptopus/commit/2a23a9975a5235703ac5ffc1df46c8d27763fb3d))
+
+
 ## [0.15.0-alpha.15](https://github.com/ralfbiedert/interoptopus/compare/interoptopus_proc-v0.15.0-alpha.14...interoptopus_proc-v0.15.0-alpha.15)
 
 ### 🐛 Bug Fixes
