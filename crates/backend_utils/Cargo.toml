@@ -15,7 +15,5 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-interoptopus.workspace = true
+interoptopus = { workspace = true }
 tera = { workspace = true }
-
-

@@ -14,9 +14,8 @@ repository.workspace = true
 [lints]
 workspace = true
 
-
 [dependencies]
-interoptopus.workspace = true
-interoptopus_backend_utils.workspace = true
-heck = { workspace = true }
 derive_builder = { workspace = true }
+heck = { workspace = true }
+interoptopus = { workspace = true }
+interoptopus_backend_utils = { workspace = true }
