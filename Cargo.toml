@@ -56,3 +56,4 @@ missing_const_for_fn = "allow"
 missing_errors_doc = "allow"
 missing_panics_doc = "allow"
 default_constructed_unit_structs = "allow"
+unreadable_literal = "allow" # For the hex IDs
