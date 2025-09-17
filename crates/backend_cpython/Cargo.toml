@@ -15,8 +15,8 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-interoptopus.workspace = true
-interoptopus_backend_utils.workspace = true
 derive_builder = { workspace = true }
-tera.workspace = true
-include_dir.workspace = true
+include_dir = { workspace = true }
+interoptopus = { workspace = true }
+interoptopus_backend_utils = { workspace = true }
+tera = { workspace = true }
