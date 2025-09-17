@@ -5,6 +5,7 @@ use crate::lang2::types::TypeId;
 
 pub mod constant;
 pub mod function;
+pub mod libpattern;
 pub mod meta;
 pub mod types;
 

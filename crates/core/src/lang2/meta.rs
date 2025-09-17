@@ -8,16 +8,17 @@ pub enum Visibility {
 /// Where an item definition should be placed in generated files.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Emission {
-    /// This is a built-in type (e.g., `f32` <-> `float`) and does not need to be defined. Also
-    /// used for "std" like builtins, `String` <-> `string`.
+    /// This is a built-in type (e.g., `f32` <-> `float`) and does not need to be defined (emitted
+    /// in generated interop code). Also used for "std" like builtins, `String` <-> `string`.
     Builtin,
-    /// This is a 'common' type (like Slice<u8>) that needs to be emitted, is not a builtin,
-    /// but not specific to any customer project.
+    /// This is a 'common' type (like Slice<u8>) that needs to be emitted in some interop file,
+    /// is not a builtin, but not specific to any customer project.
     Common,
-    /// The type should be placed in the given module / file. Backends decide how to handle this.
+    /// The type should be placed in the given module / file. Backends decide how to handle this
+    /// string based on user configuration.
     Module(String),
     /// The backend will _use_ the type as if it were auto-generated, but it is up to the user
-    /// to actually provide it.
+    /// to actually provide it. Its definition will not be emitted.
     External,
 }
 
