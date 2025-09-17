@@ -1,5 +1,6 @@
 mod array;
 mod enums;
+mod pattern;
 mod primitive;
 mod std;
 mod structs;
@@ -8,10 +9,10 @@ mod wire;
 use crate::lang2::function::Signature;
 use crate::lang2::meta::{Docs, Emission, Visibility};
 use crate::new_id;
-use crate::pattern::TypePattern;
 
 pub use array::Array;
 pub use enums::{Enum, Variant};
+pub use pattern::TypePattern;
 pub use primitive::{Primitive, PrimitiveValue};
 pub use structs::{Field, Struct};
 pub use wire::WireOnly;
@@ -29,7 +30,7 @@ pub enum TypeKind {
     Opaque,
     /// A type that can only appear inside a `Wire<T>`
     WireOnly(WireOnly),
-    Pattern(TypePattern),
+    TypePattern(TypePattern),
 }
 
 pub struct Type {
