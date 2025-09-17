@@ -278,6 +278,7 @@ fn types_from_type_recursive_inner(start: &Type, types: &mut HashSet<Type>, choi
             TypePattern::APIVersion => {}
             TypePattern::Utf8String(_) => {}
         },
+        Type::Included(_) => { /* Nothing to do */ }
     }
 }
 
@@ -361,6 +362,7 @@ pub(crate) fn extract_namespaces_from_types(types: &[Type], into: &mut HashSet<S
                     into.insert(x.meta().module().to_string());
                 }
             },
+            Type::Included(_) => { /* Nothing to do */ }
         }
     }
 }
@@ -420,6 +422,7 @@ pub(crate) fn holds_opaque_without_ref(typ: &Type) -> bool {
             TypePattern::AsyncCallback(_) => false,
             TypePattern::Vec(x) => holds_opaque_without_ref(x.t()),
         },
+        Type::Included(_) => true, /* TODO: ? think so ? */
     }
 }
 
@@ -505,6 +508,7 @@ pub fn is_global_type(t: &Type) -> bool {
             TypePattern::Utf8String(_) => true,
             TypePattern::Vec(x) => is_global_type(x.t()),
         },
+        Type::Included(_) => true,
     }
 }
 
