@@ -1,4 +1,4 @@
-use crate::lang2::meta::{Emission, Visibility};
+use crate::lang2::meta::{Docs, Emission, Visibility};
 use crate::lang2::types::{Type, TypeId, TypeKind};
 use crate::lang2::{Register, TypeInfo};
 
@@ -27,7 +27,7 @@ where
 
         let type_ = Type {
             emission: Emission::Builtin,
-            docs: Default::default(),
+            docs: Docs::empty(),
             visibility: Visibility::Public,
             name: "[T; N]".to_string(),
             kind: TypeKind::Array(Array { ty: T::id(), len: N }),

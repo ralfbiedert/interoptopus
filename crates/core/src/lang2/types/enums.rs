@@ -8,12 +8,12 @@ pub enum VariantKind {
 }
 
 pub struct Variant {
-    name: String,
-    docs: Docs,
-    kind: VariantKind,
+    pub name: String,
+    pub docs: Docs,
+    pub kind: VariantKind,
 }
 
 pub struct Enum {
-    variants: Vec<Variant>,
-    repr: Repr,
+    pub variants: Vec<Variant>,
+    pub repr: Repr,
 }

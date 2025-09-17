@@ -17,6 +17,10 @@ impl Id {
         result ^= result >> 64;
         Id(result)
     }
+
+    pub const fn derive_id(self, x: Self) -> Self {
+        self.derive(x.0)
+    }
 }
 
 #[doc(hidden)]
@@ -33,6 +37,10 @@ macro_rules! new_id {
 
             pub const fn derive(self, x: u128) -> Self {
                 Self(self.0.derive(x))
+            }
+
+            pub const fn derive_id(self, x: Self) -> Self {
+                self.0.derive_id(x.0)
             }
         }
     };
