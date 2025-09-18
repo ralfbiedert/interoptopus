@@ -8,6 +8,12 @@ pub struct Field {
     pub ty: TypeId,
 }
 
+impl Field {
+    pub fn new(name: impl AsRef<str>, ty: TypeId) -> Self {
+        Self { name: name.as_ref().to_string(), docs: Default::default(), visibility: Visibility::Public, ty }
+    }
+}
+
 pub struct Struct {
     pub fields: Vec<Field>,
     pub repr: Repr,

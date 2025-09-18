@@ -295,10 +295,10 @@ macro_rules! callback {
         impl $crate::lang2::Register for $name {
             fn register(inventory: &mut $crate::inventory2::Inventory) {
                 // Register contained types
-                <$rval>::register(inventory);
-                $(<$ty>::register(inventory);)*
-                <*const ::std::ffi::c_void>::register(inventory);
-                <extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>::register(inventory);
+                // <$rval>::register(inventory);
+                // $(<$ty>::register(inventory);)*
+                // <*const ::std::ffi::c_void>::register(inventory);
+                // <extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>::register(inventory);
 
                 // T::register(inventory);
 

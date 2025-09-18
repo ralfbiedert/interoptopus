@@ -28,9 +28,13 @@
 //! }
 //! ```
 
+use crate::inventory2::{Inventory, TypeId};
 use crate::lang::util::capitalize_first_letter;
 use crate::lang::{Docs, Enum, Layout, Meta, Primitive, Representation, Type, Variant};
 use crate::lang::{TypeInfo, VariantKind};
+use crate::lang2::Register;
+use crate::lang2::meta::{Emission, Visibility};
+use crate::lang2::types::{TypeInfo as _, TypeKind};
 use crate::pattern::TypePattern;
 use std::any::Any;
 use std::fmt::Debug;
@@ -142,6 +146,33 @@ where
         let the_enum = Enum::new(name, variants, meta, repr);
         let result_enum = ResultType::new(the_enum);
         Type::Pattern(TypePattern::Result(result_enum))
+    }
+}
+
+impl<T: crate::lang2::types::TypeInfo, E: crate::lang2::types::TypeInfo> crate::lang2::types::TypeInfo for Result<T, E> {
+    fn id() -> TypeId {
+        TypeId::new(0x9BCBD2325F73A8CBDAE991B5BB8EB6FC).derive_id(T::id())
+    }
+}
+
+impl<T: crate::lang2::types::TypeInfo + Register, E: crate::lang2::types::TypeInfo + Register> Register for Result<T, E> {
+    fn register(inventory: &mut Inventory) {
+        // Ensure base types are registered.
+        T::register(inventory);
+        E::register(inventory);
+
+        let t = &inventory.types[&T::id()];
+        let e = &inventory.types[&E::id()];
+
+        let type_ = crate::lang2::types::Type {
+            emission: Emission::Common,
+            docs: crate::lang2::meta::Docs::empty(),
+            visibility: Visibility::Public,
+            name: format!("Result<{}, {}>", t.name, e.name),
+            kind: TypeKind::TypePattern(crate::lang2::types::TypePattern::Result(T::id(), E::id())),
+        };
+
+        inventory.register_type(Self::id(), type_);
     }
 }
 
