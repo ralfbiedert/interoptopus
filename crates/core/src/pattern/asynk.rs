@@ -1,11 +1,10 @@
 //! Transparent `async fn` support over FFI.
 
 use crate::inventory2::{Inventory, TypeId};
-use crate::lang::TypeInfo;
+use crate::lang::TypeInfo as _;
 use crate::lang::{Docs, FnPointer, Meta, Parameter, Primitive, Signature, Type};
-use crate::lang2::types::TypeKind;
-use crate::lang2::TypeInfo as _;
-use crate::lang2::Visibility;
+use crate::lang2::meta::Visibility;
+use crate::lang2::types::{TypeInfo, TypeKind};
 use crate::pattern;
 use crate::pattern::TypePattern;
 use std::ffi::c_void;
@@ -24,7 +23,7 @@ pub struct AsyncCallback<T>(Option<extern "C" fn(&T, *const c_void) -> ()>, *con
 unsafe impl<T> Send for AsyncCallback<T> {}
 unsafe impl<T> Sync for AsyncCallback<T> {}
 
-impl<T: TypeInfo> AsyncCallback<T> {
+impl<T: crate::lang::TypeInfo> AsyncCallback<T> {
     ///   Creates a new instance of the callback using  `extern "C" fn`
     pub fn new(func: extern "C" fn(&T, *const c_void)) -> Self {
         Self(Some(func), null())
@@ -58,9 +57,9 @@ impl<T: TypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(&T, *const c_v
     }
 }
 
-unsafe impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
+unsafe impl<T: crate::lang::TypeInfo> crate::lang::TypeInfo for AsyncCallback<T> {
     fn type_info() -> Type {
-        let rval = <() as TypeInfo>::type_info();
+        let rval = <() as crate::lang::TypeInfo>::type_info();
 
         let params = vec![
             Parameter::new("value_ptr".to_string(), Type::ReadPointer(Box::new(T::type_info()))),
@@ -77,13 +76,13 @@ unsafe impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
     }
 }
 
-impl<T: crate::lang2::TypeInfo> crate::lang2::TypeInfo for AsyncCallback<T> {
+impl<T: crate::lang2::types::TypeInfo> crate::lang2::types::TypeInfo for AsyncCallback<T> {
     fn id() -> TypeId {
         T::id().derive(0x3BA866E612BB2BEA769699B3476994B8)
     }
 }
 
-impl<T: crate::lang2::Register + crate::lang2::TypeInfo> crate::lang2::Register for AsyncCallback<T> {
+impl<T: crate::lang2::Register + crate::lang2::types::TypeInfo> crate::lang2::Register for AsyncCallback<T> {
     fn register(inventory: &mut Inventory) {
         // Ensure base type is registered.
         T::register(inventory);
@@ -92,7 +91,7 @@ impl<T: crate::lang2::Register + crate::lang2::TypeInfo> crate::lang2::Register 
 
         let type_ = crate::lang2::types::Type {
             emission: t.emission.clone(),
-            docs: crate::lang2::Docs::empty(),
+            docs: crate::lang2::meta::Docs::empty(),
             visibility: Visibility::Public,
             name: format!("AsyncCallback<{}>", t.name),
             kind: TypeKind::TypePattern(crate::lang2::types::TypePattern::AsyncCallback(T::id())),

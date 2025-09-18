@@ -1,5 +1,9 @@
-use crate::inventory2::TypeId;
+use crate::inventory2::{FunctionId, TypeId};
 use crate::lang2::meta::{Docs, Emission, Visibility};
+
+pub trait FunctionInfo {
+    fn id() -> FunctionId;
+}
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Argument {

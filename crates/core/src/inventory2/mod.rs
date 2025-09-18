@@ -4,10 +4,10 @@ mod macros;
 
 pub use id::{hash_str, ConstantId, FunctionId, Id, ServiceId, TypeId};
 
+use crate::lang2::constant::Constant;
+use crate::lang2::function::Function;
+use crate::lang2::service::Service;
 use crate::lang2::types::Type;
-use crate::lang2::Constant;
-use crate::lang2::Function;
-use crate::lang2::Service;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::mem::swap;

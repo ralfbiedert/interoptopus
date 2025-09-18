@@ -285,12 +285,12 @@ macro_rules! callback {
             }
         }
 
-
-        impl $crate::lang2::TypeInfo for $name {
-            fn id() -> $crate::inventory2::TypeId {
-                $crate::type_id!($name)
-            }
-        }
+        //
+        // impl $crate::lang2::types::TypeInfo for $name {
+        //     fn id() -> $crate::inventory2::TypeId {
+        //         $crate::type_id!($name)
+        //     }
+        // }
 
         impl $crate::lang2::Register for $name {
             fn register(inventory: &mut $crate::inventory2::Inventory) {

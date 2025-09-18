@@ -44,8 +44,8 @@
 use crate::inventory::Inventory;
 use crate::inventory2::TypeId;
 use crate::lang::Type;
+use crate::lang2::meta::{Docs, Emission, Visibility};
 use crate::lang2::types::{TypeKind, TypePattern};
-use crate::lang2::{Docs, Emission, Visibility};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
@@ -72,7 +72,7 @@ impl ApiVersion {
     }
 }
 
-impl crate::lang2::TypeInfo for ApiVersion {
+impl crate::lang2::types::TypeInfo for ApiVersion {
     fn id() -> TypeId {
         TypeId::new(0xA6B162106C410FCAD91327A85E3FE14E)
     }
@@ -88,7 +88,7 @@ impl crate::lang2::Register for ApiVersion {
             kind: TypeKind::TypePattern(TypePattern::APIVersion),
         };
 
-        inventory.register_type(<Self as crate::lang2::TypeInfo>::id(), type_);
+        inventory.register_type(<Self as crate::lang2::types::TypeInfo>::id(), type_);
     }
 }
 

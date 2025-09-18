@@ -18,6 +18,10 @@ pub use primitive::{Primitive, PrimitiveValue};
 pub use structs::{Field, Struct};
 pub use wire::WireOnly;
 
+pub trait TypeInfo {
+    fn id() -> TypeId;
+}
+
 pub enum TypeKind {
     Array(Array),
     Primitive(Primitive),

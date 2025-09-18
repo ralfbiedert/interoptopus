@@ -1,6 +1,6 @@
 use crate::lang2::meta::{Docs, Emission, Visibility};
-use crate::lang2::types::{Type, TypeId, TypeKind};
-use crate::lang2::{Register, TypeInfo};
+use crate::lang2::types::{Type, TypeId, TypeInfo, TypeKind};
+use crate::lang2::Register;
 
 pub struct Array {
     pub ty: TypeId,
