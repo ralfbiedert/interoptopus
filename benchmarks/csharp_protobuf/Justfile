@@ -1,0 +1,2 @@
+run:
+    dotnet run -v n -c Release --project WireBenchy/WireBenchy.csproj

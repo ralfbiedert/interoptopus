@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -26,28 +26,28 @@
     </ItemGroup>
     <ItemGroup>
         <Protobuf
-            Include="models\*.proto"
+            Include="..\models\*.proto"
             GrpcServices="None"
             AdditionalImportDirs="models"
         />
     </ItemGroup>
-    <Target Name="RustBuild" BeforeTargets="BeforeBuild;Rebuild">
+    <Target Name="RustBuild" BeforeTargets="PreBuildEvent">
         <Exec Command="echo 'Configuration: $(Configuration)'" />
         <Exec
             Condition="'$(Configuration)' == 'Release'"
             Command="cargo build --release"
-            WorkingDirectory="./"
+            WorkingDirectory="../ffi_build"
         />
         <Exec
             Condition="'$(Configuration)' != 'Release'"
             Command="cargo build"
-            WorkingDirectory="./"
+            WorkingDirectory="../ffi_build"
         />
     </Target>
     <ItemGroup>
         <!-- This won't work on Linux because Configuration resolves to Release or Debug (case-sensitive) -->
         <None
-            Include="$(MSBuildThisFileDirectory)\target\$(Configuration)\*proto_benchy*"
+            Include="$(MSBuildThisFileDirectory)\..\ffi_build\target\$(Configuration)\*proto_benchy*"
         >
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Visible>True</Visible>

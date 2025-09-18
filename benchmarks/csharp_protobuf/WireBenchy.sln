@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForCSharp", "ForCSharp.csproj", "{98017479-7478-4A8A-96DA-FD027FEAF256}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WireBenchy", "WireBenchy/WireBenchy.csproj", "{98017479-7478-4A8A-96DA-FD027FEAF256}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,3 +1,6 @@
+pub use ffi::ffi::FfiRustClient;
+pub use ffi::wire::WireRustClient;
+
 // This is proto_benchy.dll doing three variants of the API:
 // - one is Protobuf ser/de based
 // - one is interoptopus::ffi based
@@ -6,6 +9,4 @@
 // solely using Rust types.
 
 pub mod ffi;
-mod protobuf;
-mod protobuf_models;
 pub mod wire;

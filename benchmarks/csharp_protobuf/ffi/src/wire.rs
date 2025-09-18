@@ -1,11 +1,11 @@
 use interoptopus::{
     ffi_function, ffi_type,
-    lang::{Wire, Wireable},
+    wire::{Wire, Wireable},
 };
 use std::collections::HashMap;
 
 /// Main benchmark entry point for wire based interop.
-#[ffi_function(namespace = "wire", debug)]
+#[ffi_function(namespace = "wire")] //, debug
 fn WireRustClient(mut wire_input: Wire<WInput>) -> Wire<WOutputs> {
     let input = wire_input.unwire().unwrap();
     let output = rust_client_impl(input);
@@ -20,7 +20,7 @@ fn rust_client_impl(_input: WInput) -> WOutputs {
     WOutputs { response: WResponse { results: results }, data: WData { items: WItems { items }, errors: None } }
 }
 
-#[ffi_type(wired, namespace = "wire", debug)]
+#[ffi_type(wired, namespace = "wire")] //, debug
 pub struct WInput {
     pub context: WContext,
     pub value: WTable,
@@ -54,7 +54,7 @@ pub struct WConfiguration {
     pub response_size: u64, // controls N in benchmarks
 }
 
-#[ffi_type(wired, namespace = "wire", debug)]
+#[ffi_type(wired, namespace = "wire")] //, debug
 pub struct WOutputs {
     pub response: WResponse,
     pub data: WData,
