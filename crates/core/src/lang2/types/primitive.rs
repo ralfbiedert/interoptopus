@@ -35,15 +35,15 @@ pub enum PrimitiveValue {
 
 macro_rules! impl_primitive {
     ($t:ty, $t_str:expr, $primitive:expr, $id:expr) => {
-        impl $crate::lang2::TypeInfo for $t {
-            fn id() -> $crate::lang2::TypeId {
-                $crate::lang2::TypeId::new($id)
+        impl $crate::lang2::types::TypeInfo for $t {
+            fn id() -> $crate::inventory2::TypeId {
+                $crate::inventory2::TypeId::new($id)
             }
         }
 
         impl $crate::lang2::Register for $t {
             fn register(inventory: &mut $crate::inventory2::Inventory) {
-                use $crate::lang2::TypeInfo;
+                use $crate::lang2::types::TypeInfo;
 
                 let type_id = Self::id();
                 let type_ = $crate::lang2::types::Type {

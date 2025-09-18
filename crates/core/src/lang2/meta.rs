@@ -48,3 +48,11 @@ impl Docs {
         Self { lines }
     }
 }
+
+pub fn common_or_module_emission(x: &[Emission]) -> Emission {
+    if x.into_iter().all(|x| matches!(x, Emission::Builtin | Emission::Common)) {
+        Emission::Common
+    } else {
+        Emission::Module(String::new())
+    }
+}
