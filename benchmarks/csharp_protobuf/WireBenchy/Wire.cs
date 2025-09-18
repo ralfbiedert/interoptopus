@@ -1,8 +1,8 @@
 using System;
 using Gen.Wire;
-using Gen.ForCSharp; // @todo
+using Gen.Benchy;
 
-namespace ForCSharp;
+namespace Benchy;
 
 public class InteropWire
 {

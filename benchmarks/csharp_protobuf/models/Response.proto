@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package Models;
-option csharp_namespace = "ForCSharp.Protobuf";
+option csharp_namespace = "Benchy.Protobuf";
 
 message Result  {
     string item_id = 1;

@@ -1,23 +1,21 @@
 [workspace]
 
 [package]
-name = "proto_benchy"
+name = "ffi_build"
 version = "0.1.0"
 edition = "2024"
 publish = false
 
 [lib]
+name = "proto_benchy"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-prost = "0.8"
-prost-types = "0.8"
 ffi = { path = "../ffi" }
 interoptopus = { path = "../../../crates/core" }
 anyhow = "1"
 
 [build-dependencies]
-prost-build = "0.8"
 ffi = { path = "../ffi" }
 interoptopus = { path = "../../../crates/core" }
 interoptopus_backend_csharp = { path = "../../../crates/backend_csharp" }

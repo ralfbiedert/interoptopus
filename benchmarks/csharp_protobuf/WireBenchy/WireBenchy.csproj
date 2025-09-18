@@ -28,7 +28,7 @@
         <Protobuf
             Include="..\models\*.proto"
             GrpcServices="None"
-            AdditionalImportDirs="models"
+            AdditionalImportDirs="..\models"
         />
     </ItemGroup>
     <Target Name="RustBuild" BeforeTargets="PreBuildEvent">

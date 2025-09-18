@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Google.Protobuf;
 
-namespace ForCSharp;
+namespace Benchy;
 
 public class InteropProtobuf
 {
@@ -18,7 +18,7 @@ public class InteropProtobuf
     [DllImport(DllName)]
     //[MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static extern unsafe void FreeRustResultMemory(byte* rustPtr, uint len);
-    
+
     public static Protobuf.Outputs ExecuteRustClient(Protobuf.Input input)
     {
         try

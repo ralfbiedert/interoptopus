@@ -2,11 +2,11 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using System;
 using System.Collections.Generic;
-using Gen.ForCSharp;
+using Gen.Benchy;
 using Gen.Wire;
 using Gen.Ffi;
 
-namespace ForCSharp;
+namespace Benchy;
 
 // Benchmark setup:
 // This benchmark measures interop speed of a real-life-like structures
@@ -80,12 +80,12 @@ public class BenchyBase
     protected static FInput populateFfiInput(int n)
     {
         var input = new FInput();
-    
+
         input.configuration = new FConfiguration();
         input.value = new FTable();
         input.value.metadata = new FTableMetadata();
         input.context = new FContext();
-    
+
         // input.configuration.host (String) = from "" to "verylonghostname" (4096 chars)
         input.configuration.host = "127.0.0.1".Utf8();
         input.configuration.response_size = (ulong)n;
@@ -98,7 +98,7 @@ public class BenchyBase
         var arr = new byte[n];
         // fixed (var x = new byte[n]) // try with memory pinned from the start
         // {
-            input.value.byte_array = SliceU8.From(arr); // from 0 bytes to 1Mb}
+        input.value.byte_array = SliceU8.From(arr); // from 0 bytes to 1Mb}
         // }
         // input.context.things = from 0 strings to 1,000,000 strings "thingX"
         var things = new Utf8String[n];
@@ -106,7 +106,7 @@ public class BenchyBase
         {
             things[i] = $"Thing-{i}".Utf8();
         }
-    
+
         input.context.things = things.Slice();
         // NB: FFI does not support HashMaps interop
         // input.context.headers = from 0 headers to 1,000,000 "key"=>"value" pairs
@@ -114,7 +114,7 @@ public class BenchyBase
         //{
         //    input.context.headers.Add($"Header-{i}", $"Value-{i}");
         //}
-    
+
         return input;
     }
 
@@ -186,36 +186,36 @@ public class JustTest : BenchyBase
 [MaxIterationCount(15)]
 public class HotBenchy : BenchyBase
 {
-/*    [Benchmark]
-    public void Protobuf_0_hot()
-    {
-        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(SMALL));
-    }
+    /*    [Benchmark]
+        public void Protobuf_0_hot()
+        {
+            var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(SMALL));
+        }
 
-    [Benchmark]
-    public void Protobuf_10_hot()
-    {
-        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(10));
-    }
+        [Benchmark]
+        public void Protobuf_10_hot()
+        {
+            var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(10));
+        }
 
-    [Benchmark]
-    public void Protobuf_50_hot()
-    {
-        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(50));
-    }
+        [Benchmark]
+        public void Protobuf_50_hot()
+        {
+            var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(50));
+        }
 
-    [Benchmark]
-    public void Protobuf_100_hot()
-    {
-        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(100));
-    }
+        [Benchmark]
+        public void Protobuf_100_hot()
+        {
+            var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(100));
+        }
 
-    [Benchmark]
-    public void Protobuf_500_hot()
-    {
-        var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(500));
-    }
-*/
+        [Benchmark]
+        public void Protobuf_500_hot()
+        {
+            var outputs = InteropProtobuf.ExecuteRustClient(populateProtobufInput(500));
+        }
+    */
 
     [Benchmark]
     public void Protobuf_1k_hot()
@@ -287,7 +287,7 @@ public class HotBenchy : BenchyBase
     {
         var outputs = InteropWire.ExecuteRustClient(populateWireInput(SMALL));
     }*/
-    
+
     [Benchmark]
     public void Wire_1k_hot()
     {
