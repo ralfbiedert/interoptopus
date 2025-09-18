@@ -1,4 +1,4 @@
-#[derive(Copy, Clone, Debug, PartialOrd, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialOrd, PartialEq, Eq, Hash)]
 pub enum Primitive {
     Void,
     Bool,

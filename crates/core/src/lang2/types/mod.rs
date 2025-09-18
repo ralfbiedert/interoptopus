@@ -46,19 +46,25 @@ pub struct Type {
 }
 
 /// How a struct or enum is laid out in memory.
-#[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Layout {
     C,
     Transparent,
     Packed,
     Opaque,
     /// For use with enum discriminant.
-    Primitive(crate::lang::Primitive),
+    Primitive(Primitive),
 }
 
 /// How a type is represented in memory.
-#[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Repr {
-    layout: crate::lang::Layout,
+    layout: Layout,
     alignment: Option<usize>,
+}
+
+impl Repr {
+    fn c() -> Self {
+        Self { layout: Layout::C, alignment: None }
+    }
 }

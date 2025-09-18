@@ -15,10 +15,16 @@
 //! ```
 //!
 
+use crate::inventory2::{Inventory, TypeId};
 use crate::lang::util::capitalize_first_letter;
 use crate::lang::{Docs, Enum, Meta, Representation, Type, Variant, VariantKind};
 use crate::lang::{Layout, TypeInfo};
+use crate::lang2::Register;
+use crate::lang2::meta::{Emission, Visibility};
+use crate::lang2::types::TypeInfo as _;
+use crate::lang2::types::{TypeKind, WireOnly};
 use crate::pattern::TypePattern;
+
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -128,6 +134,31 @@ where
         let the_enum = Enum::new(name, variants, meta, repr);
         let option_enum = OptionType::new(the_enum);
         Type::Pattern(TypePattern::Option(option_enum))
+    }
+}
+
+impl<T: crate::lang2::types::TypeInfo> crate::lang2::types::TypeInfo for Option<T> {
+    fn id() -> TypeId {
+        TypeId::new(0xF613EA2C1CDBE74FFFAC69753255D6DE).derive_id(T::id())
+    }
+}
+
+impl<T: crate::lang2::types::TypeInfo + Register> Register for Option<T> {
+    fn register(inventory: &mut Inventory) {
+        // Ensure base type is registered.
+        T::register(inventory);
+
+        let t = &inventory.types[&T::id()];
+
+        let type_ = crate::lang2::types::Type {
+            emission: Emission::Common,
+            docs: crate::lang2::meta::Docs::empty(),
+            visibility: Visibility::Public,
+            name: format!("Option<{}>", t.name),
+            kind: TypeKind::TypePattern(crate::lang2::types::TypePattern::Option(T::id())),
+        };
+
+        inventory.register_type(Self::id(), type_);
     }
 }
 
