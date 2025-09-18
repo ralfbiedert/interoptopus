@@ -1,7 +1,11 @@
 //! Transparent `async fn` support over FFI.
 
+use crate::inventory2::{Inventory, TypeId};
 use crate::lang::TypeInfo;
 use crate::lang::{Docs, FnPointer, Meta, Parameter, Primitive, Signature, Type};
+use crate::lang2::types::TypeKind;
+use crate::lang2::TypeInfo as _;
+use crate::lang2::Visibility;
 use crate::pattern;
 use crate::pattern::TypePattern;
 use std::ffi::c_void;
@@ -70,6 +74,31 @@ unsafe impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
         let named_callback = pattern::AsyncCallback::with_meta(fn_pointer, meta);
 
         Type::Pattern(TypePattern::AsyncCallback(named_callback))
+    }
+}
+
+impl<T: crate::lang2::TypeInfo> crate::lang2::TypeInfo for AsyncCallback<T> {
+    fn id() -> TypeId {
+        T::id().derive(0x3BA866E612BB2BEA769699B3476994B8)
+    }
+}
+
+impl<T: crate::lang2::Register + crate::lang2::TypeInfo> crate::lang2::Register for AsyncCallback<T> {
+    fn register(inventory: &mut Inventory) {
+        // Ensure base type is registered.
+        T::register(inventory);
+
+        let t = &inventory.types[&T::id()];
+
+        let type_ = crate::lang2::types::Type {
+            emission: t.emission.clone(),
+            docs: crate::lang2::Docs::empty(),
+            visibility: Visibility::Public,
+            name: format!("AsyncCallback<{}>", t.name),
+            kind: TypeKind::TypePattern(crate::lang2::types::TypePattern::AsyncCallback(T::id())),
+        };
+
+        inventory.register_type(Self::id(), type_);
     }
 }
 

@@ -83,11 +83,13 @@ impl<T: Register + TypeInfo> Register for Vec<T> {
         // Ensure base type is registered.
         T::register(inventory);
 
+        let t = &inventory.types[&T::id()];
+
         let type_ = Type {
             emission: Emission::Builtin,
             docs: Docs::empty(),
             visibility: Visibility::Public,
-            name: "Vec<T>".to_string(),
+            name: format!("Vec<{}>", t.name),
             kind: TypeKind::WireOnly(WireOnly::Vec(T::id())),
         };
 
@@ -107,11 +109,14 @@ impl<K: Register + TypeInfo, V: Register + TypeInfo, S: ::std::hash::BuildHasher
         K::register(inventory);
         V::register(inventory);
 
+        let k = &inventory.types[&K::id()];
+        let v = &inventory.types[&V::id()];
+
         let type_ = Type {
             emission: Emission::Builtin,
             docs: Docs::empty(),
             visibility: Visibility::Public,
-            name: "HashMap<K, V>".to_string(),
+            name: format!("HashMap<{}, {}>", k.name, v.name),
             kind: TypeKind::WireOnly(WireOnly::Map(K::id(), V::id())),
         };
 

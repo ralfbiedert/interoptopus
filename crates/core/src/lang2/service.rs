@@ -1,8 +1,4 @@
-use crate::lang2::function::FunctionId;
-use crate::lang2::types::TypeId;
-use crate::new_id;
-
-new_id!(ServiceId);
+use crate::inventory2::{FunctionId, TypeId};
 
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

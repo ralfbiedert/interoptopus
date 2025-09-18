@@ -25,11 +25,13 @@ where
         // Ensure base type is registered.
         T::register(inventory);
 
+        let t = &inventory.types[&T::id()];
+
         let type_ = Type {
             emission: Emission::Builtin,
             docs: Docs::empty(),
             visibility: Visibility::Public,
-            name: "[T; N]".to_string(),
+            name: format!("[{}; {N}]", t.name),
             kind: TypeKind::Array(Array { ty: T::id(), len: N }),
         };
 

@@ -1,8 +1,5 @@
+use crate::inventory2::TypeId;
 use crate::lang2::meta::{Docs, Emission, Visibility};
-use crate::lang2::types::TypeId;
-use crate::new_id;
-
-new_id!(FunctionId);
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Argument {
