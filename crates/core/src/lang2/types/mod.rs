@@ -30,6 +30,7 @@ pub enum TypeKind {
     FnPointer(Signature),
     ReadPointer(TypeId),
     ReadWritePointer(TypeId),
+    /// A type that may only be observed behind a pointer.
     Opaque,
     /// A type that can only appear inside a `Wire<T>`
     WireOnly(WireOnly),
