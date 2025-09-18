@@ -338,8 +338,8 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
 
     let wires = if attributes.wired {
         quote! {
-            impl #param_param ::interoptopus::lang::wire::Ser for #name_ident #param_struct #param_where {
-                fn ser(&self, output: &mut impl ::std::io::Write) -> ::std::result::Result<(), ::interoptopus::lang::wire::WireError> {
+            impl #param_param ::interoptopus::wire::Ser for #name_ident #param_struct #param_where {
+                fn ser(&self, output: &mut impl ::std::io::Write) -> ::std::result::Result<(), ::interoptopus::wire::WireError> {
                     match self {
                         #(#ser_arms)*
                     }
@@ -353,15 +353,15 @@ pub fn ffi_type_enum(attributes: &Attributes, _input: TokenStream, mut item: Ite
                 }
             }
 
-            impl #param_param ::interoptopus::lang::wire::De for #name_ident #param_struct #param_where {
-                fn de(input: &mut impl ::std::io::Read) -> ::std::result::Result<Self, ::interoptopus::lang::wire::WireError>
+            impl #param_param ::interoptopus::wire::De for #name_ident #param_struct #param_where {
+                fn de(input: &mut impl ::std::io::Read) -> ::std::result::Result<Self, ::interoptopus::wire::WireError>
                 where
                     Self: Sized
                 {
-                    let discriminant: usize = ::interoptopus::lang::wire::De::de(input)?;
+                    let discriminant: usize = ::interoptopus::wire::De::de(input)?;
                     match discriminant {
                         #(#de_arms)*
-                        _ => Err(::interoptopus::lang::wire::WireError::InvalidDiscriminant(#name.to_string(), discriminant)),
+                        _ => Err(::interoptopus::wire::WireError::InvalidDiscriminant(#name.to_string(), discriminant)),
                     }
                 }
             }
