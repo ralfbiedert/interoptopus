@@ -1,3 +1,4 @@
 target/
 bin/
 obj/
+BenchmarkDotNet.Artifacts/

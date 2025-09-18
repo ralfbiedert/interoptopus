@@ -1,8 +1,9 @@
-use interoptopus::{builtins_string, builtins_vec, function, inventory::Inventory};
+use interoptopus::{builtins_string, builtins_vec, builtins_wire, function, inventory::Inventory};
 
 pub fn ffi_inventory() -> Inventory {
     let inventory = Inventory::builder()
         .register(builtins_string!())
+        .register(builtins_wire!())
         .register(builtins_vec!(u8))
         .register(builtins_vec!(interoptopus::ffi::String))
         .register(function!(crate::ffi::FfiRustClient))
