@@ -1,8 +1,6 @@
+use crate::inventory2::TypeId;
 use crate::lang2::meta::{Docs, Emission, Visibility};
-use crate::lang2::types::{PrimitiveValue, TypeId};
-use crate::new_id;
-
-new_id!(ConstantId);
+use crate::lang2::types::PrimitiveValue;
 
 /// The value of a constant.
 #[derive(Clone, Debug, PartialOrd, PartialEq)]

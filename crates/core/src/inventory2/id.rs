@@ -27,7 +27,6 @@ impl Id {
 }
 
 #[doc(hidden)]
-#[macro_export]
 macro_rules! new_id {
     ($t:ident) => {
         #[derive(Hash, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -50,4 +49,22 @@ macro_rules! new_id {
             }
         }
     };
+}
+
+new_id!(TypeId);
+new_id!(ConstantId);
+new_id!(FunctionId);
+new_id!(ServiceId);
+
+#[doc(hidden)]
+pub const fn hash_str(s: &str) -> u128 {
+    let bytes = s.as_bytes();
+    let mut hash = 0xcbf29ce484222325u128;
+    let mut i = 0;
+    while i < bytes.len() {
+        hash ^= bytes[i] as u128;
+        hash = hash.wrapping_mul(0x100000001b3u128);
+        i += 1;
+    }
+    hash
 }

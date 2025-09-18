@@ -42,9 +42,10 @@
 //! - might even react to documentation changes (subject to change; feedback welcome).
 //!
 use crate::inventory::Inventory;
+use crate::inventory2::TypeId;
 use crate::lang::Type;
-use crate::lang2::meta::{Docs, Emission, Visibility};
-use crate::lang2::types::{TypeId, TypeKind, TypePattern, WireOnly};
+use crate::lang2::types::{TypeKind, TypePattern};
+use crate::lang2::{Docs, Emission, Visibility};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 

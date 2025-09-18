@@ -1,14 +1,15 @@
-use crate::inventory2::Inventory;
-use crate::lang2::constant::ConstantId;
-use crate::lang2::function::FunctionId;
-use crate::lang2::service::ServiceId;
-use crate::lang2::types::TypeId;
+use crate::inventory2::{ConstantId, FunctionId, Inventory, ServiceId, TypeId};
 
-pub mod constant;
-pub mod function;
-pub mod meta;
-pub mod service;
+mod constant;
+mod function;
+mod meta;
+mod service;
 pub mod types;
+
+pub use constant::{Constant, ConstantValue};
+pub use function::{Argument, Function, Signature};
+pub use meta::{Docs, Emission, Visibility};
+pub use service::Service;
 
 pub trait TypeInfo {
     fn id() -> TypeId;
@@ -35,4 +36,19 @@ pub trait ServiceInfo {
 
 pub trait Register {
     fn register(inventory: &mut Inventory);
+}
+
+#[macro_export]
+macro_rules! type_id {
+    ($t:ty) => {{
+        use $crate::inventory2::hash_str;
+
+        let t_name = ::std::any::type_name::<$t>();
+        let base = $crate::inventory2::TypeId::new(hash_str(t_name));
+        let crate_hash = hash_str(env!("CARGO_PKG_NAME"));
+        let file_hash = hash_str(file!());
+        let line_hash = line!() as u128;
+
+        base.derive(crate_hash).derive(file_hash).derive(line_hash)
+    }};
 }

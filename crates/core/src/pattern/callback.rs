@@ -285,6 +285,34 @@ macro_rules! callback {
             }
         }
 
+
+        impl $crate::lang2::TypeInfo for $name {
+            fn id() -> $crate::inventory2::TypeId {
+                $crate::type_id!($name)
+            }
+        }
+
+        impl $crate::lang2::Register for $name {
+            fn register(inventory: &mut $crate::inventory2::Inventory) {
+                todo!()
+                // // Ensure base type is registered.
+                // T::register(inventory);
+                //
+                // let t = &inventory.types[&T::id()];
+                //
+                // let type_ = crate::lang2::types::Type {
+                //     emission: t.emission.clone(),
+                //     docs: crate::lang2::meta::Docs::empty(),
+                //     visibility: Visibility::Public,
+                //     name: format!("AsyncCallback<{}>", t.name),
+                //     kind: TypeKind::TypePattern(crate::lang2::types::TypePattern::AsyncCallback(T::id())),
+                // };
+                //
+                // inventory.register_type(Self::id(), type_);
+            }
+        }
+
+
         #[allow(unused_mut)]
         unsafe impl $crate::lang::TypeInfo for $name {
             fn type_info() -> $crate::lang::Type {

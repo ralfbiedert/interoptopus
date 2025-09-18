@@ -1,5 +1,6 @@
 mod array;
 mod enums;
+mod fnptr;
 mod pattern;
 mod primitive;
 mod std;
@@ -8,16 +9,14 @@ mod wire;
 
 use crate::lang2::function::Signature;
 use crate::lang2::meta::{Docs, Emission, Visibility};
-use crate::new_id;
 
+use crate::inventory2::TypeId;
 pub use array::Array;
 pub use enums::{Enum, Variant};
 pub use pattern::TypePattern;
 pub use primitive::{Primitive, PrimitiveValue};
 pub use structs::{Field, Struct};
 pub use wire::WireOnly;
-
-new_id!(TypeId);
 
 pub enum TypeKind {
     Array(Array),
