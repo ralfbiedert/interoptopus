@@ -285,19 +285,23 @@ macro_rules! callback {
             }
         }
 
-        //
-        // impl $crate::lang2::types::TypeInfo for $name {
-        //     fn id() -> $crate::inventory2::TypeId {
-        //         $crate::type_id!($name)
-        //     }
-        // }
+
+        impl $crate::lang2::types::TypeInfo for $name {
+            fn id() -> $crate::inventory2::TypeId {
+                $crate::type_id!($name)
+            }
+        }
 
         impl $crate::lang2::Register for $name {
             fn register(inventory: &mut $crate::inventory2::Inventory) {
-                todo!()
-                // // Ensure base type is registered.
+                // Register contained types
+                <$rval>::register(inventory);
+                $(<$ty>::register(inventory);)*
+                <*const ::std::ffi::c_void>::register(inventory);
+                <extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>::register(inventory);
+
                 // T::register(inventory);
-                //
+
                 // let t = &inventory.types[&T::id()];
                 //
                 // let type_ = crate::lang2::types::Type {
@@ -309,6 +313,7 @@ macro_rules! callback {
                 // };
                 //
                 // inventory.register_type(Self::id(), type_);
+                todo!()
             }
         }
 

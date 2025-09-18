@@ -14,6 +14,8 @@ pub enum TypePattern {
     Result(TypeId, TypeId),
     Bool,
     CChar,
+    /// Rust's `c_void` type, which is not the same as `()` in return positions.
+    CVoid,
     NamedCallback(Signature),
     AsyncCallback(TypeId),
     Vec(TypeId),

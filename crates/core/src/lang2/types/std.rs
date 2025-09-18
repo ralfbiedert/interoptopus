@@ -1,6 +1,6 @@
 use crate::inventory2::Inventory;
 use crate::lang2::meta::{Docs, Emission, Visibility};
-use crate::lang2::types::{Type, TypeId, TypeInfo, TypeKind, WireOnly};
+use crate::lang2::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
 use crate::lang2::Register;
 use std::collections::HashMap;
 use std::mem::MaybeUninit;
@@ -118,6 +118,26 @@ impl<K: Register + TypeInfo, V: Register + TypeInfo, S: ::std::hash::BuildHasher
             visibility: Visibility::Public,
             name: format!("HashMap<{}, {}>", k.name, v.name),
             kind: TypeKind::WireOnly(WireOnly::Map(K::id(), V::id())),
+        };
+
+        inventory.register_type(Self::id(), type_);
+    }
+}
+
+impl TypeInfo for ::std::ffi::c_void {
+    fn id() -> TypeId {
+        TypeId::new(0x34E7C243AFCBE5D699605695ACF663B5)
+    }
+}
+
+impl Register for ::std::ffi::c_void {
+    fn register(inventory: &mut Inventory) {
+        let type_ = Type {
+            emission: Emission::Builtin,
+            docs: Docs::empty(),
+            visibility: Visibility::Public,
+            name: "c_void".to_string(),
+            kind: TypeKind::TypePattern(TypePattern::CVoid),
         };
 
         inventory.register_type(Self::id(), type_);
