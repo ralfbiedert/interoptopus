@@ -4,5 +4,6 @@ mod inventory {
 }
 
 mod proc_macros {
+    mod fn_basic;
     mod ty_basic;
 }

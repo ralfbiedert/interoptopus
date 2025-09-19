@@ -10,8 +10,14 @@ use std::marker::PhantomData;
 //     assert!(Z::WIRE_SAFE);
 // };
 
+#[ffi_type]
+struct ThisShouldFail;
+
+#[ffi_type(opaque)]
+struct ThisShouldWork;
+
 #[ffi_type(debug)]
-struct EmptyStruct {}
+struct EmptyStructShouldFailToo {}
 
 #[ffi_type(packed)]
 pub struct Packed1 {
