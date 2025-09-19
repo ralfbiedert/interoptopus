@@ -89,7 +89,7 @@ pub struct UseCStrPtr<'a> {
 }
 
 #[ffi_type]
-pub struct Weird1<T: Clone>
+pub struct Weird1<T: TypeInfo + Clone>
 where
     T: Copy + Copy,
 {
@@ -97,7 +97,7 @@ where
 }
 
 #[ffi_type]
-pub struct Weird2<'a, T: Clone, const N: usize>
+pub struct Weird2<'a, T: TypeInfo + Clone, const N: usize>
 where
     T: Copy + Copy + 'a,
     T: Debug,
