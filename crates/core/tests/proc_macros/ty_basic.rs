@@ -150,7 +150,7 @@ pub struct Vec2 {
     pub z: f64,
 }
 
-#[ffi_type(opaque, transparent)]
+#[ffi_type(opaque)]
 pub struct Opaque {
     _internal: *const Packed1,
     _unused: (),
