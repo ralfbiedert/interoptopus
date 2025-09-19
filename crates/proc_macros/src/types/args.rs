@@ -14,25 +14,43 @@ pub struct FfiTypeArgs {
 impl Parse for FfiTypeArgs {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let mut args = FfiTypeArgs::default();
-        
+
         if input.is_empty() {
             return Ok(args);
         }
 
         let parsed = Punctuated::<FfiTypeArg, Token![,]>::parse_terminated(input)?;
-        
+
+        let mut opaque_span = None;
+        let mut transparent_span = None;
+
         for arg in parsed {
             match arg {
                 FfiTypeArg::Packed => args.packed = true,
-                FfiTypeArg::Transparent => args.transparent = true,
-                FfiTypeArg::Opaque => args.opaque = true,
+                FfiTypeArg::Transparent(span) => {
+                    args.transparent = true;
+                    transparent_span = Some(span);
+                }
+                FfiTypeArg::Opaque(span) => {
+                    args.opaque = true;
+                    opaque_span = Some(span);
+                }
                 FfiTypeArg::Service => args.service = true,
                 FfiTypeArg::Debug => args.debug = true,
                 FfiTypeArg::Name(name) => args.name = Some(name),
                 FfiTypeArg::Module(module) => args.module = Some(module),
             }
         }
-        
+
+        // Validate conflicting attributes
+        if args.opaque && args.transparent {
+            let span = transparent_span.or(opaque_span).unwrap_or(proc_macro2::Span::call_site());
+            return Err(syn::Error::new(
+                span,
+                "Cannot use both 'opaque' and 'transparent' attributes together"
+            ));
+        }
+
         Ok(args)
     }
 }
@@ -40,8 +58,8 @@ impl Parse for FfiTypeArgs {
 #[derive(Debug, Clone)]
 enum FfiTypeArg {
     Packed,
-    Transparent,
-    Opaque,
+    Transparent(proc_macro2::Span),
+    Opaque(proc_macro2::Span),
     Service,
     Debug,
     Name(String),
@@ -51,11 +69,12 @@ enum FfiTypeArg {
 impl Parse for FfiTypeArg {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let ident: Ident = input.parse()?;
-        
+        let span = ident.span();
+
         match ident.to_string().as_str() {
             "packed" => Ok(FfiTypeArg::Packed),
-            "transparent" => Ok(FfiTypeArg::Transparent),
-            "opaque" => Ok(FfiTypeArg::Opaque),
+            "transparent" => Ok(FfiTypeArg::Transparent(span)),
+            "opaque" => Ok(FfiTypeArg::Opaque(span)),
             "service" => Ok(FfiTypeArg::Service),
             "debug" => Ok(FfiTypeArg::Debug),
             "name" => {
