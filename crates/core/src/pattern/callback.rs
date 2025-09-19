@@ -186,24 +186,26 @@ macro_rules! callback {
 
 
         impl $crate::lang::types::TypeInfo for $name {
+            const WIRE_SAFE: bool = <$rval>::WIRE_SAFE $(&& <$ty>::WIRE_SAFE)*;
+            const RAW_SAFE: bool = <$rval>::RAW_SAFE $(&& <$ty>::RAW_SAFE)*;
+
             fn id() -> $crate::inventory::TypeId {
                 $crate::type_id!($name)
             }
-        }
 
-        impl $crate::lang::Register for $name {
-            fn register(inventory: &mut $crate::inventory::Inventory) {
-                use $crate::lang::types::TypeKind;
-                use $crate::lang::Register;
+            fn kind() -> $crate::lang::types::TypeKind {
+                let sig = $crate::lang::function::Signature {
+                    arguments: vec![
+                        $($crate::lang::function::Argument::new(stringify!($param), <$ty>::id()),)*
+                    ],
+                    rval: <$rval>::id(),
+                };
+                $crate::lang::types::TypeKind::TypePattern($crate::lang::types::TypePattern::NamedCallback(sig))
+            }
 
-                // Register contained types
-                <$rval>::register(inventory);
-                $(<$ty>::register(inventory);)*
-                <*const ::std::ffi::c_void>::register(inventory);
-                <extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>::register(inventory);
-
-                let r = &inventory.types[&<$rval>::id()];
-                $(let $param = &inventory.types[&<$ty>::id()];)*
+            fn ty() -> $crate::lang::types::Type {
+                let r = <$rval>::ty();
+                $(let $param = <$ty>::ty();)*
 
                 let emissision = [
                     r.emission.clone(),
@@ -217,15 +219,23 @@ macro_rules! callback {
                     rval: <$rval>::id(),
                 };
 
-                let type_ = $crate::lang::types::Type {
+                $crate::lang::types::Type {
                     emission: $crate::lang::meta::common_or_module_emission(&emissision),
                     docs: $crate::lang::meta::Docs::empty(),
                     visibility: $crate::lang::meta::Visibility::Public,
                     name: stringify!($name).to_string(),
-                    kind: TypeKind::TypePattern($crate::lang::types::TypePattern::NamedCallback(sig)),
-                };
+                    kind: $crate::lang::types::TypeKind::TypePattern($crate::lang::types::TypePattern::NamedCallback(sig)),
+                }
+            }
 
-                inventory.register_type(Self::id(), type_);
+            fn register(inventory: &mut $crate::inventory::Inventory) {
+                // Register contained types
+                <$rval>::register(inventory);
+                $(<$ty>::register(inventory);)*
+                <*const ::std::ffi::c_void>::register(inventory);
+                <extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>::register(inventory);
+
+                inventory.register_type(Self::id(), Self::ty());
             }
         }
     };
