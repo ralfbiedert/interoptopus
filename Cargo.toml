@@ -1,9 +1,18 @@
 [workspace]
 members = [
     "crates/*",
-    "examples/hello_world",
-    "examples/real_project_layout/*",
-    "tests",
+    # TODO: DELETE THIS SECTION - Excluded for now while refactoring
+    # "examples/real_project_layout/*",
+    # "tests",
+]
+
+# TODO: DELETE THIS SECTION - Excluded for now while refactoring
+exclude = [
+    "crates/backend_csharp",
+    "crates/backend_c",
+    "crates/backend_cpython",
+    "crates/backend_utils",
+    "crates/reference_project",
 ]
 resolver = "2"
 

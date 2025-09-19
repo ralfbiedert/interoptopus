@@ -167,9 +167,7 @@ pub use interoptopus_proc::{ffi_constant, ffi_function, ffi_service, ffi_service
 mod error;
 pub mod ffi;
 pub mod inventory;
-pub mod inventory2;
 pub mod lang;
-pub mod lang2;
 mod macros;
 pub mod pattern;
 pub mod wire;

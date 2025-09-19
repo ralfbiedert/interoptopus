@@ -7,10 +7,10 @@ mod std;
 mod structs;
 mod wire;
 
-use crate::lang2::function::Signature;
-use crate::lang2::meta::{Docs, Emission, Visibility};
+use crate::lang::function::Signature;
+use crate::lang::meta::{Docs, Emission, Visibility};
 
-use crate::inventory2::TypeId;
+use crate::inventory::TypeId;
 pub use array::Array;
 pub use enums::{Enum, Variant};
 pub use pattern::TypePattern;
@@ -19,7 +19,13 @@ pub use structs::{Field, Struct};
 pub use wire::WireOnly;
 
 pub trait TypeInfo {
+    // const WIRE_SAFE: bool;
+    // const RAW_SAFE: bool;
     fn id() -> TypeId;
+    // fn kind() -> TypeKind;
+    // fn ty() -> Type;
+    // TODO: Should register itself? (And also impl. `Register` forwarding to this?)
+    // fn register(inventory: &mut Inventory);
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

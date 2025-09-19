@@ -1,8 +1,5 @@
 //! Additional support for primitives like `bool`.
 
-use crate::lang::Type;
-use crate::lang::TypeInfo;
-use crate::pattern::TypePattern;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::ops::Not;
@@ -32,12 +29,6 @@ impl Bool {
     #[must_use]
     pub const fn is_strange(self) -> bool {
         self.value > 1
-    }
-}
-
-unsafe impl TypeInfo for Bool {
-    fn type_info() -> Type {
-        Type::Pattern(TypePattern::Bool)
     }
 }
 
@@ -74,12 +65,6 @@ pub struct CChar {
 impl CChar {
     pub const MAX: Self = Self { value: c_char::MAX };
     pub const MIN: Self = Self { value: c_char::MIN };
-}
-
-unsafe impl TypeInfo for CChar {
-    fn type_info() -> Type {
-        Type::Pattern(TypePattern::CChar)
-    }
 }
 
 impl From<c_char> for CChar {

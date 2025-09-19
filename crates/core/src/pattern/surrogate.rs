@@ -46,10 +46,11 @@
 //! Surrogates are a niche feature to save you some implementation overhead in certain situations.
 //! In most cases the right things to do is defining your own FFI types and export these instead.
 
-use crate::lang::Type;
-use crate::lang::TypeInfo;
+use crate::inventory::{Inventory, TypeId};
+use crate::lang::types::TypeInfo;
 use std::marker::PhantomData;
-use std::mem::{ManuallyDrop, transmute};
+use std::mem::{transmute, ManuallyDrop};
+use crate::lang::Register;
 
 /// A marker trait for types that are surrogates for other types.
 ///
@@ -64,15 +65,20 @@ pub unsafe trait CorrectSurrogate<T> {}
 
 /// A type mapper at the FFI boundary.
 #[repr(transparent)]
-pub struct Surrogate<T, L: TypeInfo> {
+pub struct Surrogate<T, L> {
     inner: T,
     _marker: PhantomData<L>,
 }
 
-unsafe impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
-    fn type_info() -> Type {
-        assert_eq!(size_of::<T>(), size_of::<L>());
-        L::type_info()
+impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
+    fn id() -> TypeId {
+        L::id()
+    }
+}
+
+impl<T, L: TypeInfo + Register + CorrectSurrogate<T>> Register for Surrogate<T, L> {
+    fn register(inventory: &mut Inventory) {
+        L::register(inventory);
     }
 }
 

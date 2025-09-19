@@ -1,66 +1,44 @@
-/// Doesn't exist in C, but other languages can benefit from accidentally using 'private' fields.
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+/// The visibility of an item when written. Not all backends support all visibility levels.
+#[derive(Clone, Copy, Default, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Visibility {
+    #[default]
     Public,
     Private,
 }
 
-/// Additional information for user-defined types.
-#[derive(Clone, Debug, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct Meta {
-    docs: Docs,
-    module: String,
-}
-
-impl Meta {
-    #[must_use]
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    #[must_use]
-    pub const fn with_module_docs(module: String, docs: Docs) -> Self {
-        Self { docs, module }
-    }
-
-    #[must_use]
-    pub const fn with_docs(docs: Docs) -> Self {
-        Self::with_module_docs(String::new(), docs)
-    }
-
-    #[must_use]
-    pub const fn docs(&self) -> &Docs {
-        &self.docs
-    }
-
-    #[must_use]
-    pub fn module(&self) -> &str {
-        &self.module
-    }
-
-    /// Convenience method used in generators
-    #[must_use]
-    pub fn is_module(&self, module: &str) -> bool {
-        self.module == module
-    }
+/// Where an item definition should be placed in generated files.
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum Emission {
+    /// This is a built-in type (e.g., `f32` <-> `float`) and does not need to be defined (emitted
+    /// in generated interop code). Also used for "std" like builtins, `String` <-> `string`.
+    Builtin,
+    /// This is a 'common' type (like Slice<u8>) that needs to be emitted in some interop file,
+    /// is not a builtin, but not specific to any customer project.
+    Common,
+    /// The type should be placed in the given module / file. Backends decide how to handle this
+    /// string based on user configuration.
+    Module(String),
+    /// The backend will _use_ the type as if it were auto-generated, but it is up to the user
+    /// to actually provide it. Its definition will not be emitted.
+    External,
 }
 
 /// Markdown generated from the `///` you put on Rust code.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Default)]
 pub struct Docs {
-    lines: Vec<String>,
+    pub lines: Vec<String>,
 }
 
 impl Docs {
     #[must_use]
-    pub fn new() -> Self {
+    pub fn empty() -> Self {
         Self::default()
     }
 
     #[must_use]
     pub fn from_line(joined_line: &str) -> Self {
         if joined_line.is_empty() {
-            Self::new()
+            Self::empty()
         } else {
             Self { lines: joined_line.split('\n').map(std::string::ToString::to_string).collect() }
         }
@@ -70,9 +48,13 @@ impl Docs {
     pub const fn from_lines(lines: Vec<String>) -> Self {
         Self { lines }
     }
+}
 
-    #[must_use]
-    pub fn lines(&self) -> &[String] {
-        &self.lines
+#[must_use]
+pub fn common_or_module_emission(x: &[Emission]) -> Emission {
+    if x.iter().all(|x| matches!(x, Emission::Builtin | Emission::Common)) {
+        Emission::Common
+    } else {
+        Emission::Module(String::new())
     }
 }

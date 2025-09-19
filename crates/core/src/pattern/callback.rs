@@ -97,107 +97,6 @@
 //! }
 //! ```
 
-use crate::lang::{FnPointer, Meta, Type};
-
-/// Internal helper naming a generated callback type wrapper.
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct NamedCallback {
-    fnpointer: FnPointer,
-    meta: Meta,
-}
-
-impl NamedCallback {
-    /// Creates a new named callback.
-    #[must_use]
-    pub fn new(callback: FnPointer) -> Self {
-        Self::with_meta(callback, Meta::new())
-    }
-
-    /// Creates a new named callback with the given meta.
-    ///
-    /// # Panics
-    ///
-    /// The provided pointer must have a name.
-    #[must_use]
-    pub fn with_meta(callback: FnPointer, meta: Meta) -> Self {
-        assert!(callback.name().is_some(), "The pointer provided to a named callback must have a name.");
-        Self { fnpointer: callback, meta }
-    }
-
-    /// Gets the type name of this callback.
-    ///
-    /// # Panics
-    ///
-    /// Assumes the given pointer has a name.
-    #[must_use]
-    pub fn name(&self) -> &str {
-        self.fnpointer.name().unwrap()
-    }
-
-    /// Gets the type's meta.
-    #[must_use]
-    pub const fn meta(&self) -> &Meta {
-        &self.meta
-    }
-
-    /// Returns the function pointer type.
-    #[must_use]
-    pub const fn fnpointer(&self) -> &FnPointer {
-        &self.fnpointer
-    }
-}
-
-/// Helper naming a (hidden) async callback trampoline.
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct AsyncCallback {
-    fnpointer: FnPointer,
-    meta: Meta,
-}
-
-impl AsyncCallback {
-    /// Creates a new async callback.
-    #[must_use]
-    pub fn new(callback: FnPointer) -> Self {
-        Self::with_meta(callback, Meta::new())
-    }
-
-    /// Creates a new async callback with the given meta.
-    ///
-    /// # Panics
-    ///
-    /// The provided pointer must have a name.
-    #[must_use]
-    pub fn with_meta(callback: FnPointer, meta: Meta) -> Self {
-        assert!(callback.name().is_some(), "The pointer provided to a named callback must have a name.");
-        Self { fnpointer: callback, meta }
-    }
-
-    /// Gets the async type's target.
-    #[must_use]
-    pub fn t(&self) -> &Type {
-        self.fnpointer
-            .signature()
-            .params()
-            .first()
-            .expect("Must have a first parameter")
-            .the_type()
-            .pointer_target()
-            .expect("Paramter must be a pointer")
-    }
-
-    /// Gets the type's meta.
-    #[must_use]
-    pub const fn meta(&self) -> &Meta {
-        &self.meta
-    }
-
-    /// Returns the function pointer type.
-    #[must_use]
-    pub const fn fnpointer(&self) -> &FnPointer {
-        &self.fnpointer
-    }
-}
-
 /// Defines a callback type, akin to a `fn f(T) -> R` wrapped in an [`Option`](std::option).
 ///
 /// A named delegate will be emitted in languages supporting them, otherwise a regular
@@ -286,16 +185,16 @@ macro_rules! callback {
         }
 
 
-        impl $crate::lang2::types::TypeInfo for $name {
-            fn id() -> $crate::inventory2::TypeId {
+        impl $crate::lang::types::TypeInfo for $name {
+            fn id() -> $crate::inventory::TypeId {
                 $crate::type_id!($name)
             }
         }
 
-        impl $crate::lang2::Register for $name {
-            fn register(inventory: &mut $crate::inventory2::Inventory) {
-                use $crate::lang2::types::TypeKind;
-                use $crate::lang2::Register;
+        impl $crate::lang::Register for $name {
+            fn register(inventory: &mut $crate::inventory::Inventory) {
+                use $crate::lang::types::TypeKind;
+                use $crate::lang::Register;
 
                 // Register contained types
                 <$rval>::register(inventory);
@@ -311,51 +210,22 @@ macro_rules! callback {
                     $($param.emission.clone(),)*
                 ];
 
-                let sig = $crate::lang2::function::Signature {
+                let sig = $crate::lang::function::Signature {
                     arguments: vec![
-                        $($crate::lang2::function::Argument::new(stringify!($param), <$ty>::id()),)*
+                        $($crate::lang::function::Argument::new(stringify!($param), <$ty>::id()),)*
                     ],
                     rval: <$rval>::id(),
                 };
 
-                let type_ = $crate::lang2::types::Type {
-                    emission: $crate::lang2::meta::common_or_module_emission(&emissision),
-                    docs: $crate::lang2::meta::Docs::empty(),
-                    visibility: ::interoptopus::lang2::meta::Visibility::Public,
+                let type_ = $crate::lang::types::Type {
+                    emission: $crate::lang::meta::common_or_module_emission(&emissision),
+                    docs: $crate::lang::meta::Docs::empty(),
+                    visibility: $crate::lang::meta::Visibility::Public,
                     name: stringify!($name).to_string(),
-                    kind: TypeKind::TypePattern(::interoptopus::lang2::types::TypePattern::NamedCallback(sig)),
+                    kind: TypeKind::TypePattern($crate::lang::types::TypePattern::NamedCallback(sig)),
                 };
 
                 inventory.register_type(Self::id(), type_);
-            }
-        }
-
-
-        #[allow(unused_mut)]
-        unsafe impl $crate::lang::TypeInfo for $name {
-            fn type_info() -> $crate::lang::Type {
-                use $crate::lang::{TypeInfo, Type, Meta, Docs, Primitive, Parameter, Signature, FnPointer};
-
-                let rval = < $rval as TypeInfo >::type_info();
-
-                let params = vec![
-                $(
-                    Parameter::new(stringify!($param).to_string(), < $ty as TypeInfo >::type_info()),
-                )*
-                    Parameter::new("callback_data".to_string(), Type::ReadPointer(Box::new(Type::Primitive(Primitive::Void)))),
-                ];
-
-                let mut namespace = ::std::string::String::new();
-                $(
-                    namespace = ::std::string::String::from($ns);
-                )*
-
-                let meta = Meta::with_module_docs(namespace, Docs::new());
-                let sig = Signature::new(params, rval);
-                let fn_pointer = FnPointer::new_named(sig, stringify!($name).to_string());
-                let named_callback = $crate::pattern::callback::NamedCallback::with_meta(fn_pointer, meta);
-
-                Type::Pattern($crate::pattern::TypePattern::NamedCallback(named_callback))
             }
         }
     };

@@ -1,4 +1,4 @@
-use crate::lang2::types::TypeId;
+use crate::lang::types::TypeId;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum WireOnly {

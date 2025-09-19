@@ -25,13 +25,10 @@
 //! void call_with_string(uint8_t* s);
 //! ```
 //!
+use crate::inventory::{Inventory, TypeId};
+use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
 use crate::Error;
-use crate::inventory2::{Inventory, TypeId};
-use crate::lang::Type;
-use crate::lang::TypeInfo;
-use crate::lang2::meta::{Docs, Emission, Visibility};
-use crate::lang2::types::TypeKind;
-use crate::pattern::TypePattern;
 use std::ffi::CStr;
 use std::marker::PhantomData;
 use std::option::Option::None;
@@ -124,29 +121,23 @@ impl<'a> CStrPtr<'a> {
     }
 }
 
-unsafe impl TypeInfo for CStrPtr<'_> {
-    fn type_info() -> Type {
-        Type::Pattern(TypePattern::CStrPointer)
-    }
-}
-
-impl crate::lang2::types::TypeInfo for CStrPtr<'_> {
+impl TypeInfo for CStrPtr<'_> {
     fn id() -> TypeId {
         TypeId::new(0xDE450364E9ADDBA5DC9A6C5BBEC7759F)
     }
 }
 
-impl crate::lang2::Register for CStrPtr<'_> {
+impl crate::lang::Register for CStrPtr<'_> {
     fn register(inventory: &mut Inventory) {
-        let type_ = crate::lang2::types::Type {
+        let type_ = Type {
             emission: Emission::Common,
             docs: Docs::empty(),
             visibility: Visibility::Public,
             name: "CStrPtr".to_string(),
-            kind: TypeKind::TypePattern(crate::lang2::types::TypePattern::CStrPointer),
+            kind: TypeKind::TypePattern(TypePattern::CStrPointer),
         };
 
-        inventory.register_type(<Self as crate::lang2::types::TypeInfo>::id(), type_);
+        inventory.register_type(<Self as TypeInfo>::id(), type_);
     }
 }
 

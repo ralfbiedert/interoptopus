@@ -1,7 +1,7 @@
-use crate::inventory2::Inventory;
-use crate::lang2::meta::{Docs, Emission, Visibility};
-use crate::lang2::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
-use crate::lang2::Register;
+use crate::inventory::Inventory;
+use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
+use crate::lang::Register;
 use std::collections::HashMap;
 use std::mem::MaybeUninit;
 

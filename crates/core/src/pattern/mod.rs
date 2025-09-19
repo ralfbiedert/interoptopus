@@ -68,20 +68,10 @@
 //! Due to a lack of expressiveness in other languages, patterns usually compose without issues in Rust, but
 //! not in all backends. For example, something like `Slice<Result<Option<String>, Error>>` is supported in
 //! Rust without issues, but its UX might suffer in Python.
-use crate::lang::{Composite, Primitive, Type, TypeInfo};
-use crate::pattern::builtins::Builtins;
-use crate::pattern::callback::{AsyncCallback, NamedCallback};
-use crate::pattern::option::OptionType;
-use crate::pattern::result::ResultType;
-use crate::pattern::service::ServiceDefinition;
-use crate::pattern::slice::SliceType;
-use crate::pattern::vec::VecType;
-use std::ffi::c_char;
 
 #[doc(hidden)]
 pub mod api_guard;
 pub mod asynk;
-pub mod builtins;
 pub mod callback;
 pub mod cstr;
 pub mod option;
@@ -92,66 +82,3 @@ pub mod slice;
 pub mod string;
 pub mod surrogate;
 pub mod vec;
-
-/// A pattern on a library level, usually involving both methods and types.
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-#[non_exhaustive]
-#[allow(clippy::large_enum_variant)]
-pub enum LibraryPattern {
-    Service(ServiceDefinition),
-    Builtins(Builtins),
-}
-
-/// Used mostly internally and provides pattern info for auto generated structs.
-#[doc(hidden)]
-pub trait LibraryPatternInfo {
-    fn pattern_info() -> LibraryPattern;
-}
-
-impl From<ServiceDefinition> for LibraryPattern {
-    fn from(x: ServiceDefinition) -> Self {
-        Self::Service(x)
-    }
-}
-
-/// A pattern on a type level.
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-#[allow(clippy::large_enum_variant)]
-pub enum TypePattern {
-    CStrPointer,
-    Utf8String(Composite),
-    APIVersion,
-    Slice(SliceType),
-    SliceMut(SliceType),
-    Option(OptionType),
-    Result(ResultType),
-    Bool,
-    CChar,
-    NamedCallback(NamedCallback),
-    AsyncCallback(AsyncCallback),
-    Vec(VecType),
-}
-
-impl TypePattern {
-    /// For languages like C that don't care about these patterns, give the
-    /// C-equivalent fallback type.
-    ///
-    /// This function will never return a [`Type::Pattern`] variant.
-    #[must_use]
-    pub fn fallback_type(&self) -> Type {
-        match self {
-            Self::CStrPointer => Type::ReadPointer(Box::new(Type::Pattern(Self::CChar))),
-            Self::Slice(x) => Type::Composite(x.composite_type().clone()),
-            Self::SliceMut(x) => Type::Composite(x.composite_type().clone()),
-            Self::Option(x) => x.the_enum().to_type(),
-            Self::Result(x) => x.the_enum().to_type(),
-            Self::NamedCallback(x) => Type::FnPointer(x.fnpointer().clone()),
-            Self::Bool => Type::Primitive(Primitive::U8),
-            Self::CChar => c_char::type_info(),
-            Self::APIVersion => Type::Primitive(Primitive::U64),
-            Self::AsyncCallback(x) => Type::FnPointer(x.fnpointer().clone()),
-            Self::Utf8String(x) => Type::Composite(x.clone()),
-            Self::Vec(x) => Type::Composite(x.composite_type().clone()),
-        }
-    }
-}

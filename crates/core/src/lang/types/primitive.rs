@@ -1,3 +1,5 @@
+use std::hash::{Hash, Hasher};
+
 #[derive(Copy, Clone, Debug, PartialOrd, PartialEq, Eq, Hash)]
 pub enum Primitive {
     Void,
@@ -33,25 +35,45 @@ pub enum PrimitiveValue {
     F64(f64),
 }
 
+impl Hash for PrimitiveValue {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        match self {
+            Self::Bool(v) => v.hash(state),
+            Self::U8(v) => v.hash(state),
+            Self::U16(v) => v.hash(state),
+            Self::U32(v) => v.hash(state),
+            Self::U64(v) => v.hash(state),
+            Self::Usize(v) => v.hash(state),
+            Self::I8(v) => v.hash(state),
+            Self::I16(v) => v.hash(state),
+            Self::I32(v) => v.hash(state),
+            Self::I64(v) => v.hash(state),
+            Self::Isize(v) => v.hash(state),
+            Self::F32(v) => v.to_bits().hash(state),
+            Self::F64(v) => v.to_bits().hash(state),
+        }
+    }
+}
+
 macro_rules! impl_primitive {
     ($t:ty, $t_str:expr, $primitive:expr, $id:expr) => {
-        impl $crate::lang2::types::TypeInfo for $t {
-            fn id() -> $crate::inventory2::TypeId {
-                $crate::inventory2::TypeId::new($id)
+        impl $crate::lang::types::TypeInfo for $t {
+            fn id() -> $crate::inventory::TypeId {
+                $crate::inventory::TypeId::new($id)
             }
         }
 
-        impl $crate::lang2::Register for $t {
-            fn register(inventory: &mut $crate::inventory2::Inventory) {
-                use $crate::lang2::types::TypeInfo;
+        impl $crate::lang::Register for $t {
+            fn register(inventory: &mut $crate::inventory::Inventory) {
+                use $crate::lang::types::TypeInfo;
 
                 let type_id = Self::id();
-                let type_ = $crate::lang2::types::Type {
-                    emission: $crate::lang2::meta::Emission::Builtin,
-                    docs: $crate::lang2::meta::Docs::empty(),
-                    visibility: $crate::lang2::meta::Visibility::Public,
+                let type_ = $crate::lang::types::Type {
+                    emission: $crate::lang::meta::Emission::Builtin,
+                    docs: $crate::lang::meta::Docs::empty(),
+                    visibility: $crate::lang::meta::Visibility::Public,
                     name: $t_str.to_string(),
-                    kind: $crate::lang2::types::TypeKind::Primitive($primitive),
+                    kind: $crate::lang::types::TypeKind::Primitive($primitive),
                 };
 
                 _ = inventory.register_type(type_id, type_)
@@ -65,7 +87,7 @@ macro_rules! impl_const_value_primitive {
         $rust_type:ty,
         $x:path
     ) => {
-        impl From<$rust_type> for $crate::lang2::constant::ConstantValue {
+        impl From<$rust_type> for $crate::lang::constant::ConstantValue {
             fn from(x: $rust_type) -> Self {
                 Self::Primitive($x(x))
             }

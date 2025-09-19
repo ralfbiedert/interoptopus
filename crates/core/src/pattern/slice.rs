@@ -37,10 +37,6 @@
 //! ```
 //!
 
-use crate::lang::util::capitalize_first_letter;
-use crate::lang::{Composite, Docs, Field, Meta, Primitive, Representation, Type, Visibility};
-use crate::lang::{Layout, TypeInfo};
-use crate::pattern::TypePattern;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::ptr::{null, null_mut};
@@ -116,30 +112,6 @@ impl<T> Deref for Slice<'_, T> {
 
     fn deref(&self) -> &Self::Target {
         self.as_slice()
-    }
-}
-
-unsafe impl<T> TypeInfo for Slice<'_, T>
-where
-    T: TypeInfo,
-{
-    #[rustfmt::skip]
-    fn type_info() -> Type {
-        let doc_data = Docs::from_line("Pointer to start of immutable data.");
-        let doc_len = Docs::from_line("Number of elements.");
-
-        let fields = vec![
-            Field::with_docs("data".to_string(), Type::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
-            Field::with_docs("len".to_string(), Type::Primitive(Primitive::U64), Visibility::Private, doc_len),
-        ];
-
-        let doc = Docs::from_line("A pointer to an array of data someone else owns which may not be modified.");
-        let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_module_docs(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
-        let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
-        let composite = Composite::with_meta_repr(format!("Slice{name}"), fields, meta, repr);
-        let slice = SliceType::new(composite, T::type_info());
-        Type::Pattern(TypePattern::Slice(slice))
     }
 }
 
@@ -222,67 +194,6 @@ impl<T> Deref for SliceMut<'_, T> {
 impl<T> DerefMut for SliceMut<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.as_slice_mut()
-    }
-}
-
-unsafe impl<T> TypeInfo for SliceMut<'_, T>
-where
-    T: TypeInfo,
-{
-    #[rustfmt::skip]
-    fn type_info() -> Type {
-        let doc_data = Docs::from_line("Pointer to start of mutable data.");
-        let doc_len = Docs::from_line("Number of elements.");
-        let fields = vec![
-            Field::with_docs("data".to_string(), Type::ReadPointer(Box::new(T::type_info())), Visibility::Private, doc_data),
-            Field::with_docs("len".to_string(), Type::Primitive(Primitive::U64), Visibility::Private, doc_len),
-        ];
-
-        let doc = Docs::from_line("A pointer to an array of data someone else owns which may be modified.");
-        let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_module_docs(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
-        let name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
-        let composite = Composite::with_meta_repr(format!("SliceMut{name}"), fields, meta, repr);
-        let slice = SliceType::new(composite, T::type_info());
-        Type::Pattern(TypePattern::SliceMut(slice))
-    }
-}
-
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct SliceType {
-    composite_type: Composite,
-    target_type: Box<Type>,
-}
-
-impl SliceType {
-    #[must_use]
-    pub fn new(composite_type: Composite, target_type: Type) -> Self {
-        Self { composite_type, target_type: Box::new(target_type) }
-    }
-
-    #[must_use]
-    pub fn rust_name(&self) -> &str {
-        self.composite_type.rust_name()
-    }
-
-    #[must_use]
-    pub fn meta(&self) -> &Meta {
-        self.composite_type.meta()
-    }
-
-    #[must_use]
-    pub fn composite_type(&self) -> &Composite {
-        &self.composite_type
-    }
-
-    #[must_use]
-    pub fn t(&self) -> &Type {
-        &self.target_type
-    }
-
-    #[must_use]
-    pub fn to_type(&self) -> Type {
-        Type::Pattern(TypePattern::Slice(self.clone()))
     }
 }
 

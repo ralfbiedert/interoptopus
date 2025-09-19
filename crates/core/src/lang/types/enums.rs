@@ -1,6 +1,6 @@
-use crate::inventory2::TypeId;
-use crate::lang2::meta::Docs;
-use crate::lang2::types::Repr;
+use crate::inventory::TypeId;
+use crate::lang::meta::Docs;
+use crate::lang::types::Repr;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum VariantKind {
