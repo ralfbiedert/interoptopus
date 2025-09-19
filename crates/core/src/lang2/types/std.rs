@@ -38,6 +38,14 @@ impl_ptr!(&'_ T, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01FD5E);
 impl_ptr!(*const T, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01FD5E);
 impl_ptr!(Option<&'_ T>, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01FD5E);
 
+pub fn ptr_typeid(x: TypeId) -> TypeId {
+    x.derive(0x20973BD3D67EF4E0323195B99A01FD5E)
+}
+
+pub fn ptr_mut_typeid(x: TypeId) -> TypeId {
+    x.derive(0x7EE1DB481C7FEAD63EB329E9812A2F68)
+}
+
 impl<T: TypeInfo> TypeInfo for MaybeUninit<T> {
     fn id() -> TypeId {
         // Same as base type

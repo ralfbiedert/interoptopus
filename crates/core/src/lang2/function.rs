@@ -7,8 +7,14 @@ pub trait FunctionInfo {
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Argument {
-    pub string: String,
+    pub name: String,
     pub ty: TypeId,
+}
+
+impl Argument {
+    pub fn new(name: impl AsRef<str>, ty: TypeId) -> Self {
+        Self { name: name.as_ref().to_string(), ty }
+    }
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

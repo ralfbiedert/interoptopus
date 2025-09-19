@@ -1,10 +1,9 @@
-use crate::inventory2::Inventory;
-use crate::lang2::function::Signature;
-use crate::lang2::meta::{Emission, Visibility};
-use crate::lang2::types::{Field, Repr, Struct, Type, TypeId, TypeInfo, TypeKind};
-use std::ffi::c_char;
-use std::process::id;
-use std::u64;
+use crate::lang2::function::{Argument, Signature};
+use crate::lang2::types::enums::VariantKind;
+use crate::lang2::types::fnptr::fnptr_typeid;
+use crate::lang2::types::std::{ptr_mut_typeid, ptr_typeid};
+use crate::lang2::types::{Enum, Field, Primitive, Repr, Struct, TypeId, TypeInfo, TypeKind, Variant};
+use std::ffi::{c_char, c_void};
 
 /// A pattern on a type level.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -33,17 +32,37 @@ pub fn fallback_type(pattern: &TypePattern) -> TypeKind {
             fields: vec![Field::new("ptr", <*mut u8>::id()), Field::new("len", u64::id()), Field::new("capacity", u64::id())],
             repr: Repr::c(),
         }),
-        // TODO next
-        TypePattern::APIVersion => {}
-        TypePattern::Slice(_) => {}
-        TypePattern::SliceMut(_) => {}
-        TypePattern::Option(_) => {}
-        TypePattern::Result(t, e) => {}
-        TypePattern::Bool => {}
-        TypePattern::CChar => {}
-        TypePattern::CVoid => {}
-        TypePattern::NamedCallback(_) => {}
-        TypePattern::AsyncCallback(_) => {}
-        TypePattern::Vec(_) => {}
+        TypePattern::APIVersion => TypeKind::Primitive(Primitive::U64),
+        TypePattern::Slice(t) => TypeKind::Struct(Struct { fields: vec![Field::new("ptr", ptr_typeid(*t)), Field::new("len", u64::id())], repr: Repr::c() }),
+        TypePattern::SliceMut(t) => TypeKind::Struct(Struct { fields: vec![Field::new("ptr", ptr_mut_typeid(*t)), Field::new("len", u64::id())], repr: Repr::c() }),
+        TypePattern::Option(t) => {
+            TypeKind::Enum(Enum { variants: vec![Variant::new("Some", VariantKind::Tuple(*t)), Variant::new("None", VariantKind::Unit(1))], repr: Repr::u32() })
+        }
+        TypePattern::Result(t, e) => TypeKind::Enum(Enum {
+            variants: vec![
+                Variant::new("Ok", VariantKind::Tuple(*t)),
+                Variant::new("Err", VariantKind::Tuple(*e)),
+                Variant::new("Panic", VariantKind::Unit(2)),
+                Variant::new("Null", VariantKind::Unit(3)),
+            ],
+            repr: Repr::u32(),
+        }),
+        TypePattern::Bool => TypeKind::Primitive(Primitive::Bool),
+        TypePattern::CChar => TypeKind::Primitive(Primitive::I8),
+        TypePattern::CVoid => TypeKind::Primitive(Primitive::Void),
+        TypePattern::NamedCallback(x) => {
+            let mut sig_with_voidptr = x.clone();
+            sig_with_voidptr.arguments.push(Argument::new("data", <*const c_void>::id()));
+
+            TypeKind::Struct(Struct { fields: vec![Field::new("fnptr", fnptr_typeid(&sig_with_voidptr)), Field::new("data", <*const c_void>::id())], repr: Repr::c() })
+        }
+        TypePattern::AsyncCallback(x) => {
+            let sig = Signature { arguments: vec![Argument::new("ref", ptr_typeid(*x)), Argument::new("data", <*const c_void>::id())], rval: <()>::id() };
+            TypeKind::Struct(Struct { fields: vec![Field::new("fnptr", fnptr_typeid(&sig)), Field::new("data", <*const c_void>::id())], repr: Repr::c() })
+        }
+        TypePattern::Vec(t) => TypeKind::Struct(Struct {
+            fields: vec![Field::new("ptr", ptr_mut_typeid(*t)), Field::new("len", u64::id()), Field::new("capacity", u64::id())],
+            repr: Repr::c(),
+        }),
     }
 }

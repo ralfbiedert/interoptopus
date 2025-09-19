@@ -1,6 +1,7 @@
 /// The visibility of an item when written. Not all backends support all visibility levels.
-#[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Default, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum Visibility {
+    #[default]
     Public,
     Private,
 }
@@ -49,8 +50,9 @@ impl Docs {
     }
 }
 
+#[must_use]
 pub fn common_or_module_emission(x: &[Emission]) -> Emission {
-    if x.into_iter().all(|x| matches!(x, Emission::Builtin | Emission::Common)) {
+    if x.iter().all(|x| matches!(x, Emission::Builtin | Emission::Common)) {
         Emission::Common
     } else {
         Emission::Module(String::new())

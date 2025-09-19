@@ -1,7 +1,10 @@
 //! Like a regular [`String`](std::string::String), but FFI safe.
 
-use crate::lang::{Composite, Docs, Field, Meta, NAMESPACE_COMMON, Primitive, Representation, Type};
+use crate::inventory2::{Inventory, TypeId};
+use crate::lang::{Composite, Docs, Field, Meta, Primitive, Representation, Type, NAMESPACE_COMMON};
 use crate::lang::{Layout, TypeInfo};
+use crate::lang2::meta::{Emission, Visibility};
+use crate::lang2::types::TypeKind;
 use crate::pattern::TypePattern;
 use std::mem::forget;
 
@@ -97,6 +100,26 @@ unsafe impl TypeInfo for String {
         let meta = Meta::with_module_docs(NAMESPACE_COMMON.to_string(), doc);
         let composite = Composite::with_meta_repr("Utf8String".to_string(), fields, meta, repr);
         Type::Pattern(TypePattern::Utf8String(composite))
+    }
+}
+
+impl crate::lang2::types::TypeInfo for String {
+    fn id() -> TypeId {
+        TypeId::new(0x0D49712411310AE6E26AD32245BF70B2)
+    }
+}
+
+impl crate::lang2::Register for String {
+    fn register(inventory: &mut Inventory) {
+        let type_ = crate::lang2::types::Type {
+            emission: Emission::Common,
+            docs: crate::lang2::meta::Docs::empty(),
+            visibility: Visibility::Public,
+            name: "String".to_string(),
+            kind: TypeKind::TypePattern(crate::lang2::types::TypePattern::Utf8String),
+        };
+
+        inventory.register_type(<Self as crate::lang2::types::TypeInfo>::id(), type_);
     }
 }
 

@@ -22,6 +22,7 @@ pub trait TypeInfo {
     fn id() -> TypeId;
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TypeKind {
     Array(Array),
     Primitive(Primitive),
@@ -37,6 +38,7 @@ pub enum TypeKind {
     TypePattern(TypePattern),
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Type {
     pub name: String,
     pub visibility: Visibility,
@@ -66,5 +68,9 @@ pub struct Repr {
 impl Repr {
     fn c() -> Self {
         Self { layout: Layout::C, alignment: None }
+    }
+
+    fn u32() -> Self {
+        Self { layout: Layout::Primitive(Primitive::U32), alignment: None }
     }
 }
