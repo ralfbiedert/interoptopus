@@ -36,6 +36,7 @@ Requirements
 9) You can assume the `interoptopus` crate is in scope for emitting code. That said, be nice and prefix all items with 
    the fully qualified path, e.g., `::interoptopus::foo`, `::std::option::Option`, ...
 10) Enums only need to support `A`, `B = 123` and `C(T)` style variants.
+11) When emitting a type, do not re-build it from your model, but just emit it as is (possibly fixing the attached attributes as needed)
 
 About emitting TypeInfo:
 
