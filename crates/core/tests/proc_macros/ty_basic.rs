@@ -1,8 +1,15 @@
+use crate::proc_macros::ty_basic::EnumRenamedXYZ::X;
 use interoptopus::ffi;
 use interoptopus::lang::types::TypeInfo;
 use interoptopus_proc::ffi_type;
 use std::fmt::Debug;
 use std::marker::PhantomData;
+
+// const _: () = {
+//     assert!(X::WIRE_SAFE);
+//     assert!(Y::WIRE_SAFE);
+//     assert!(Z::WIRE_SAFE);
+// };
 
 #[ffi_type]
 struct Empty {}
@@ -131,7 +138,7 @@ where
 pub struct Transparent<'a>(UseCStrPtr<'a>);
 
 #[ffi_type(module = "abc")]
-pub struct Vec {
+pub struct Vec2 {
     pub x: f64,
     pub z: f64,
 }

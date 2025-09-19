@@ -37,6 +37,7 @@ pub enum TypeKind {
     Enum(Enum),
     FnPointer(Signature),
     ReadPointer(TypeId),
+    Service,
     ReadWritePointer(TypeId),
     /// A type that may only be observed behind a pointer.
     Opaque,

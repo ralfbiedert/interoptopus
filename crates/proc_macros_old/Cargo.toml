@@ -19,6 +19,7 @@ path = "src/lib.rs"
 proc-macro = true
 
 [dependencies]
+darling = { workspace = true }
 prettyplease = { workspace = true }
 proc-macro2 = { workspace = true }
 quote = { workspace = true }
