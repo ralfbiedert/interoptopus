@@ -31,10 +31,13 @@ pub struct Vec {
 }
 
 /// Documented struct.
+/// abc.
+/// def.
 #[ffi_type]
 #[derive(Clone)]
 pub struct StructDocumented {
     /// Documented field.
+    /// Other line
     pub x: f32,
 }
 
@@ -147,7 +150,7 @@ pub struct Vec2 {
     pub z: f64,
 }
 
-#[ffi_type(opaque)]
+#[ffi_type(opaque, transparent)]
 pub struct Opaque {
     _internal: *const Packed1,
     _unused: (),

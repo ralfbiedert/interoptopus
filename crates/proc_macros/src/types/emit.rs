@@ -1,6 +1,5 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::GenericParam;
 
 use crate::types::model::{TypeModel, TypeData, VariantData};
 
@@ -154,11 +153,14 @@ impl TypeModel {
                             format!("field_{}", index)
                         };
                         let ty = &field.ty;
+                        let field_docs = field.docs.join("\n");
                         quote! {
-                            ::interoptopus::lang::types::Field::new(
-                                #field_name,
-                                <#ty as ::interoptopus::lang::types::TypeInfo>::id()
-                            )
+                            ::interoptopus::lang::types::Field {
+                                name: #field_name.to_string(),
+                                docs: ::interoptopus::lang::meta::Docs::from_line(#field_docs),
+                                visibility: ::interoptopus::lang::meta::Visibility::Public,
+                                ty: <#ty as ::interoptopus::lang::types::TypeInfo>::id(),
+                            }
                         }
                     });
                 
@@ -176,6 +178,7 @@ impl TypeModel {
             TypeData::Enum(enum_data) => {
                 let variants = enum_data.variants.iter().map(|variant| {
                     let variant_name = variant.name.to_string();
+                    let variant_docs = variant.docs.join("\n");
                     let kind = match &variant.data {
                         VariantData::Unit => {
                             let value = if let Some(_discriminant) = &variant.discriminant {
@@ -196,9 +199,13 @@ impl TypeModel {
                             }
                         }
                     };
-                    
+
                     quote! {
-                        ::interoptopus::lang::types::Variant::new(#variant_name, #kind)
+                        ::interoptopus::lang::types::Variant {
+                            name: #variant_name.to_string(),
+                            docs: ::interoptopus::lang::meta::Docs::from_line(#variant_docs),
+                            kind: #kind,
+                        }
                     }
                 });
                 
@@ -222,32 +229,29 @@ impl TypeModel {
     }
     
     fn generate_ty(&self) -> TokenStream {
-        let type_name = if let Some(name) = &self.args.name {
-            name.clone()
-        } else {
-            let base_name = self.name.to_string();
-            if self.generics.params.is_empty() {
-                base_name
-            } else {
-                let generic_names = self.generics.params.iter()
-                    .filter_map(|param| {
-                        match param {
-                            GenericParam::Type(type_param) => Some(type_param.ident.to_string()),
-                            _ => None,
-                        }
-                    })
-                    .collect::<Vec<_>>()
-                    .join("");
-                format!("{}{}", base_name, generic_names)
-            }
-        };
-        
         let docs_content = self.docs.join("\n");
         let _module_name = self.args.module.as_deref().unwrap_or("");
-        
+
+        let type_name_expr = if let Some(name) = &self.args.name {
+            let name = name.clone();
+            quote! { #name.to_string() }
+        } else if self.generics.params.is_empty() {
+            let base_name = self.name.to_string();
+            quote! { #base_name.to_string() }
+        } else {
+            // For generic types, generate a meaningful name based on the concrete type
+            quote! {
+                {
+                    let type_name = std::any::type_name::<Self>();
+                    // Remove the module path and keep only the type name
+                    type_name.split("::").last().unwrap_or(type_name).to_string()
+                }
+            }
+        };
+
         quote! {
             ::interoptopus::lang::types::Type {
-                name: #type_name.to_string(),
+                name: #type_name_expr,
                 visibility: ::interoptopus::lang::meta::Visibility::Public,
                 docs: ::interoptopus::lang::meta::Docs::from_line(#docs_content),
                 emission: ::interoptopus::lang::meta::Emission::External,
