@@ -45,13 +45,11 @@ pub enum Layer3<T: TypeInfo> {
 }
 
 #[ffi_type(name = "EnumRenamed")]
-#[derive(Debug)]
 pub enum EnumRenamedXYZ {
     X,
 }
 
 #[ffi_type]
-#[derive(Clone)]
 pub enum EnumPayload {
     A,
     B(StructDocumented),
@@ -62,7 +60,6 @@ pub enum EnumPayload {
 }
 
 #[ffi_type]
-#[derive(Clone)]
 pub enum EnumValue {
     A = 1,
     B = 123,
