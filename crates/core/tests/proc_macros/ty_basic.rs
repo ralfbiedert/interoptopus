@@ -126,7 +126,7 @@ pub mod associated_types {
 
     #[ffi_type]
     pub struct FieldsViaAssociatedType {
-        pub x: u32, // <Chicken as Helper>::X,
+        pub x: <Chicken as Helper>::X,
     }
 }
 
