@@ -47,50 +47,7 @@ impl Parse for FfiTypeArgs {
             }
         }
 
-        // Validate conflicting attributes
-        args.validate_mutually_exclusive_attributes(opaque_span, transparent_span, service_span)?;
-
         Ok(args)
-    }
-}
-
-impl FfiTypeArgs {
-    fn validate_mutually_exclusive_attributes(
-        &self,
-        opaque_span: Option<proc_macro2::Span>,
-        transparent_span: Option<proc_macro2::Span>,
-        service_span: Option<proc_macro2::Span>,
-    ) -> syn::Result<()> {
-        let mut conflicts = Vec::new();
-
-        if self.opaque {
-            conflicts.push(("opaque", opaque_span));
-        }
-        if self.transparent {
-            conflicts.push(("transparent", transparent_span));
-        }
-        if self.service {
-            conflicts.push(("service", service_span));
-        }
-
-        if conflicts.len() > 1 {
-            let names: Vec<&str> = conflicts.iter().map(|(name, _)| *name).collect();
-            let span = conflicts[1].1.or(conflicts[0].1).unwrap_or_else(proc_macro2::Span::call_site);
-
-            return Err(syn::Error::new(
-                span,
-                format!(
-                    "Cannot use {} attributes together - they are mutually exclusive",
-                    match names.len() {
-                        2 => format!("'{}' and '{}'", names[0], names[1]),
-                        3 => format!("'{}', '{}', and '{}'", names[0], names[1], names[2]),
-                        _ => names.join(", "),
-                    }
-                ),
-            ));
-        }
-
-        Ok(())
     }
 }
 
