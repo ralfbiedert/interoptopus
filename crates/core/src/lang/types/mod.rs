@@ -69,8 +69,8 @@ pub enum Layout {
 /// How a type is represented in memory.
 #[derive(Clone, Copy, Debug, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Repr {
-    layout: Layout,
-    alignment: Option<usize>,
+    pub layout: Layout,
+    pub alignment: Option<usize>,
 }
 
 impl Repr {
