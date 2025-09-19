@@ -1,8 +1,8 @@
-use crate::inventory2::Inventory;
-use crate::lang2::function::{Argument, Signature};
-use crate::lang2::meta::{common_or_module_emission, Docs, Visibility};
-use crate::lang2::types::{Type, TypeId, TypeInfo, TypeKind};
-use crate::lang2::Register;
+use crate::inventory::Inventory;
+use crate::lang::function::{Argument, Signature};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
+use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
+use crate::lang::Register;
 
 macro_rules! impl_fnptr {
     // No arguments: extern "C" fn() -> R

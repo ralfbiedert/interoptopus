@@ -8,7 +8,6 @@ pub use buffer::WireBuffer;
 pub use error::WireError;
 pub use serde::{De, Ser};
 
-use crate::lang::{Composite, Docs, Field, Meta, Type, TypeInfo, WireInfo};
 use std::marker::PhantomData;
 
 /// Create a Wire from a type, either by allocating or by taking an external buffer.
@@ -195,23 +194,6 @@ where
         let mut wire = Wire::new_with_buffer(buf);
         wire.serialize(self).expect("Failed to serialize"); // TODO: return Result here
         wire
-    }
-}
-
-unsafe impl<T> TypeInfo for Wire<'_, T>
-where
-    T: Ser + De + WireInfo,
-{
-    fn type_info() -> Type {
-        let fields = vec![Field::new("buf".to_string(), WireBuffer::type_info())];
-
-        let docs = Docs::from_lines(vec!["Wired data FFI wrapper".to_string()]);
-
-        let composite = Composite::with_meta(T::name().to_string(), fields, Meta::with_module_docs(T::wire_info().namespace().unwrap_or_default().to_string(), docs));
-
-        // The root Wire<T> types are Wired, this makes backend generate WireOfT handling code.
-        // All inner types are Domain types.
-        Type::Wire(composite)
     }
 }
 

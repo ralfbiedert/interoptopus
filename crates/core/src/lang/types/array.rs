@@ -1,6 +1,6 @@
-use crate::lang2::meta::{Docs, Emission, Visibility};
-use crate::lang2::types::{Type, TypeId, TypeInfo, TypeKind};
-use crate::lang2::Register;
+use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
+use crate::lang::Register;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Array {
@@ -22,7 +22,7 @@ impl<T, const N: usize> Register for [T; N]
 where
     T: Register + TypeInfo,
 {
-    fn register(inventory: &mut crate::inventory2::Inventory) {
+    fn register(inventory: &mut crate::inventory::Inventory) {
         // Ensure base type is registered.
         T::register(inventory);
 

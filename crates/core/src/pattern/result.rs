@@ -28,17 +28,13 @@
 //! }
 //! ```
 
-use crate::inventory2::{Inventory, TypeId};
-use crate::lang::util::capitalize_first_letter;
-use crate::lang::{Docs, Enum, Layout, Meta, Primitive, Representation, Type, Variant};
-use crate::lang::{TypeInfo, VariantKind};
-use crate::lang2::Register;
-use crate::lang2::meta::{Emission, Visibility};
-use crate::lang2::types::{TypeInfo as _, TypeKind};
-use crate::pattern::TypePattern;
+use crate::inventory::{Inventory, TypeId};
+use crate::lang::meta::{Emission, Visibility};
+use crate::lang::types::{Type, TypeInfo as _, TypeInfo, TypeKind, TypePattern};
+use crate::lang::Register;
 use std::any::Any;
 use std::fmt::Debug;
-use std::panic::{AssertUnwindSafe, catch_unwind};
+use std::panic::{catch_unwind, AssertUnwindSafe};
 
 /// Extracts a string message from a panic unwind.
 pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
@@ -112,50 +108,19 @@ where
 {
     fn from(x: std::result::Result<T, E>) -> Self {
         match x {
-            std::result::Result::Ok(t) => Self::Ok(t),
-            std::result::Result::Err(err) => Self::Err(err),
+            Ok(t) => Self::Ok(t),
+            Err(err) => Self::Err(err),
         }
     }
 }
 
-unsafe impl<T, E> TypeInfo for Result<T, E>
-where
-    T: TypeInfo,
-    E: TypeInfo,
-{
-    fn type_info() -> Type {
-        let doc_t = Docs::from_line("Element if err is `Ok`.");
-        let doc_err = Docs::from_line("Error value.");
-
-        let variants = vec![
-            Variant::new("Ok".to_string(), VariantKind::Typed(0, Box::new(T::type_info())), doc_t),
-            Variant::new("Err".to_string(), VariantKind::Typed(1, Box::new(E::type_info())), doc_err),
-            Variant::new("Panic".to_string(), VariantKind::Unit(2), Docs::new()),
-            Variant::new("Null".to_string(), VariantKind::Unit(3), Docs::new()),
-        ];
-
-        let doc = Docs::from_line("Result that contains value or an error.");
-        let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_module_docs(T::type_info().namespace().map_or_else(String::new, std::convert::Into::into), doc);
-        let t_name = capitalize_first_letter(T::type_info().name_within_lib().as_str());
-        let e_name = capitalize_first_letter(E::type_info().name_within_lib().as_str());
-        let name = match T::type_info() {
-            Type::Primitive(Primitive::Void) => format!("Result{e_name}"),
-            _ => format!("Result{t_name}{e_name}"),
-        };
-        let the_enum = Enum::new(name, variants, meta, repr);
-        let result_enum = ResultType::new(the_enum);
-        Type::Pattern(TypePattern::Result(result_enum))
-    }
-}
-
-impl<T: crate::lang2::types::TypeInfo, E: crate::lang2::types::TypeInfo> crate::lang2::types::TypeInfo for Result<T, E> {
+impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
     fn id() -> TypeId {
         TypeId::new(0x9BCBD2325F73A8CBDAE991B5BB8EB6FC).derive_id(T::id())
     }
 }
 
-impl<T: crate::lang2::types::TypeInfo + Register, E: crate::lang2::types::TypeInfo + Register> Register for Result<T, E> {
+impl<T: TypeInfo + Register, E: TypeInfo + Register> Register for Result<T, E> {
     fn register(inventory: &mut Inventory) {
         // Ensure base types are registered.
         T::register(inventory);
@@ -164,12 +129,12 @@ impl<T: crate::lang2::types::TypeInfo + Register, E: crate::lang2::types::TypeIn
         let t = &inventory.types[&T::id()];
         let e = &inventory.types[&E::id()];
 
-        let type_ = crate::lang2::types::Type {
+        let type_ = Type {
             emission: Emission::Common,
-            docs: crate::lang2::meta::Docs::empty(),
+            docs: crate::lang::meta::Docs::empty(),
             visibility: Visibility::Public,
             name: format!("Result<{}, {}>", t.name, e.name),
-            kind: TypeKind::TypePattern(crate::lang2::types::TypePattern::Result(T::id(), E::id())),
+            kind: TypeKind::TypePattern(TypePattern::Result(T::id(), E::id())),
         };
 
         inventory.register_type(Self::id(), type_);
@@ -197,38 +162,6 @@ pub async fn result_to_ffi_async<T: TypeInfo, E: TypeInfo>(f: impl std::ops::Asy
 /// Converts a panic to a [`Result::Panic`].
 pub fn panic_to_result<T: TypeInfo, E: TypeInfo>(f: impl FnOnce() -> Result<T, E>) -> Result<T, E> {
     catch_unwind(AssertUnwindSafe(f)).unwrap_or_else(|_| Result::Panic)
-}
-
-#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct ResultType {
-    the_enum: Enum,
-}
-
-impl ResultType {
-    #[must_use]
-    pub fn new(the_enum: Enum) -> Self {
-        Self { the_enum }
-    }
-
-    #[must_use]
-    pub fn meta(&self) -> &Meta {
-        self.the_enum.meta()
-    }
-
-    #[must_use]
-    pub fn t(&self) -> &Type {
-        self.the_enum.variants()[0].kind().as_typed().unwrap()
-    }
-
-    #[must_use]
-    pub fn e(&self) -> &Type {
-        self.the_enum.variants()[1].kind().as_typed().unwrap()
-    }
-
-    #[must_use]
-    pub fn the_enum(&self) -> &Enum {
-        &self.the_enum
-    }
 }
 
 /// Internal helper trait converting `Result<T, E>` into `Result<*const T, E>`.

@@ -1,4 +1,3 @@
-use crate::lang::{Composite, Docs, Field, Meta, Primitive, Type, TypeInfo};
 use std::io::{Read, Write};
 use std::marker::PhantomData;
 
@@ -154,20 +153,5 @@ impl std::io::Read for WireBufferReader<'_> {
 impl Drop for WireBuffer<'_> {
     fn drop(&mut self) {
         // Explicitly do nothing here as the wire buffer must be deallocated on the other side.
-    }
-}
-
-unsafe impl TypeInfo for WireBuffer<'_> {
-    fn type_info() -> Type {
-        let fields = vec![
-            Field::new("data".to_string(), Type::ReadPointer(Box::new(Type::Primitive(Primitive::U8)))),
-            Field::new("len".to_string(), Type::Primitive(Primitive::I32)),
-            Field::new("capacity".to_string(), Type::Primitive(Primitive::I32)),
-        ];
-
-        let docs = Docs::from_lines(vec!["FFI buffer for Wire data transfer".to_string()]);
-        let composite = Composite::with_meta("WireBuffer".to_string(), fields, Meta::with_docs(docs));
-
-        Type::Composite(composite)
     }
 }

@@ -2,9 +2,9 @@
 #[macro_export]
 macro_rules! item2 {
     ($x:ty) => {{
-        use $crate::lang2::Register;
+        use $crate::lang::Register;
 
-        |x: &mut $crate::inventory2::Inventory| {
+        |x: &mut $crate::inventory::Inventory| {
             <$x as Register>::register(x);
         }
     }};

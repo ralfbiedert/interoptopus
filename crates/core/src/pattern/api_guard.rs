@@ -42,10 +42,9 @@
 //! - might even react to documentation changes (subject to change; feedback welcome).
 //!
 use crate::inventory::Inventory;
-use crate::inventory2::TypeId;
-use crate::lang::Type;
-use crate::lang2::meta::{Docs, Emission, Visibility};
-use crate::lang2::types::{TypeKind, TypePattern};
+use crate::inventory::TypeId;
+use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::types::{TypeKind, TypePattern};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
@@ -72,15 +71,15 @@ impl ApiVersion {
     }
 }
 
-impl crate::lang2::types::TypeInfo for ApiVersion {
+impl crate::lang::types::TypeInfo for ApiVersion {
     fn id() -> TypeId {
         TypeId::new(0xA6B162106C410FCAD91327A85E3FE14E)
     }
 }
 
-impl crate::lang2::Register for ApiVersion {
-    fn register(inventory: &mut crate::inventory2::Inventory) {
-        let type_ = crate::lang2::types::Type {
+impl crate::lang::Register for ApiVersion {
+    fn register(inventory: &mut crate::inventory::Inventory) {
+        let type_ = crate::lang::types::Type {
             emission: Emission::Common,
             docs: Docs::empty(),
             visibility: Visibility::Public,
@@ -88,13 +87,7 @@ impl crate::lang2::Register for ApiVersion {
             kind: TypeKind::TypePattern(TypePattern::APIVersion),
         };
 
-        inventory.register_type(<Self as crate::lang2::types::TypeInfo>::id(), type_);
-    }
-}
-
-unsafe impl crate::lang::TypeInfo for ApiVersion {
-    fn type_info() -> Type {
-        Type::Pattern(crate::pattern::TypePattern::APIVersion)
+        inventory.register_type(<Self as crate::lang::types::TypeInfo>::id(), type_);
     }
 }
 
@@ -116,9 +109,9 @@ impl ApiHash {
     pub fn from(inventory: &Inventory) -> Self {
         let mut hasher = DefaultHasher::new();
 
-        let types = inventory.c_types();
-        let functions = inventory.functions();
-        let constants = inventory.constants();
+        let types = inventory.types.iter();
+        let functions = inventory.functions.iter();
+        let constants = inventory.constants.iter();
 
         for t in types {
             t.hash(&mut hasher);
@@ -129,8 +122,8 @@ impl ApiHash {
         }
 
         for c in constants {
-            c.name().hash(&mut hasher);
-            c.value().fucking_hash_it_already(&mut hasher);
+            c.1.name.hash(&mut hasher);
+            c.1.value.hash(&mut hasher);
         }
 
         Self::new(hasher.finish())
@@ -190,9 +183,9 @@ macro_rules! api_guard2 {
             $f().into()
         }
 
-        use $crate::lang2::Register;
+        use $crate::lang::Register;
 
-        |x: &mut $crate::inventory2::Inventory| {
+        |x: &mut $crate::inventory::Inventory| {
             // TODO
             // - register __api_guard (this should automatically register the ApiGuard type)
             todo ...

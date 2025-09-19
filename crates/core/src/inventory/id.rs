@@ -30,12 +30,12 @@ impl Id {
 macro_rules! new_id {
     ($t:ident) => {
         #[derive(Hash, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-        pub struct $t($crate::inventory2::Id);
+        pub struct $t($crate::inventory::Id);
 
         impl $t {
             #[must_use]
             pub const fn new(id: u128) -> Self {
-                Self($crate::inventory2::Id::new(id))
+                Self($crate::inventory::Id::new(id))
             }
 
             #[must_use]
@@ -54,10 +54,10 @@ macro_rules! new_id {
 #[macro_export]
 macro_rules! type_id {
     ($t:ty) => {{
-        use $crate::inventory2::hash_str;
+        use $crate::inventory::hash_str;
 
         let t_name = ::std::any::type_name::<$t>();
-        let base = $crate::inventory2::TypeId::new(hash_str(t_name));
+        let base = $crate::inventory::TypeId::new(hash_str(t_name));
         let crate_hash = hash_str(env!("CARGO_PKG_NAME"));
         let file_hash = hash_str(file!());
         let line_hash = line!() as u128;

@@ -1,8 +1,8 @@
-use crate::lang2::function::{Argument, Signature};
-use crate::lang2::types::enums::VariantKind;
-use crate::lang2::types::fnptr::fnptr_typeid;
-use crate::lang2::types::std::{ptr_mut_typeid, ptr_typeid};
-use crate::lang2::types::{Enum, Field, Primitive, Repr, Struct, TypeId, TypeInfo, TypeKind, Variant};
+use crate::lang::function::{Argument, Signature};
+use crate::lang::types::enums::VariantKind;
+use crate::lang::types::fnptr::fnptr_typeid;
+use crate::lang::types::std::{ptr_mut_typeid, ptr_typeid};
+use crate::lang::types::{Enum, Field, Primitive, Repr, Struct, TypeId, TypeInfo, TypeKind, Variant};
 use std::ffi::{c_char, c_void};
 
 /// A pattern on a type level.

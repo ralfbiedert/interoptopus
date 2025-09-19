@@ -1,4 +1,4 @@
-use crate::inventory2::{FunctionId, ServiceId, TypeId};
+use crate::inventory::{FunctionId, ServiceId, TypeId};
 
 // TODO:
 //

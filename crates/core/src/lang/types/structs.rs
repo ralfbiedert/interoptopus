@@ -1,5 +1,5 @@
-use crate::lang2::meta::{Docs, Visibility};
-use crate::lang2::types::{Repr, TypeId};
+use crate::lang::meta::{Docs, Visibility};
+use crate::lang::types::{Repr, TypeId};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Field {

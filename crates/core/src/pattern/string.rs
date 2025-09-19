@@ -1,12 +1,10 @@
 //! Like a regular [`String`](std::string::String), but FFI safe.
 
-use crate::inventory2::{Inventory, TypeId};
-use crate::lang::{Composite, Docs, Field, Meta, Primitive, Representation, Type, NAMESPACE_COMMON};
-use crate::lang::{Layout, TypeInfo};
-use crate::lang2::meta::{Emission, Visibility};
-use crate::lang2::types::TypeKind;
-use crate::pattern::TypePattern;
+use crate::inventory::{Inventory, TypeId};
+use crate::lang::meta::{Emission, Visibility};
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
 use std::mem::forget;
+use crate::lang::Register;
 
 /// FFI analog of [`std::string::String`].
 #[derive(Debug)]
@@ -79,47 +77,23 @@ impl Drop for String {
     }
 }
 
-unsafe impl TypeInfo for String {
-    #[rustfmt::skip]
-    fn type_info() -> Type {
-        let fields = vec![
-            Field::new("ptr".to_string(), Type::ReadWritePointer(Box::new(Type::Primitive(Primitive::U8)))),
-            Field::new("len".to_string(), Type::Primitive(Primitive::U64)),
-            Field::new("capacity".to_string(), Type::Primitive(Primitive::U64)),
-        ];
-
-        let doc = Docs::from_lines(vec![
-            " UTF-8 string marshalling helper.".to_string(),
-            " A highly dangerous 'use once type' that has ownership semantics!".to_string(),
-            " Once passed over an FFI boundary 'the other side' is meant to own".to_string(),
-            " (and free) it. Rust handles that fine, but if in C# you put this".to_string(),
-            " in a struct and then call Rust multiple times with that struct ".to_string(),
-            " you'll free the same pointer multiple times, and get UB!".to_string(),
-        ]);
-        let repr = Representation::new(Layout::C, None);
-        let meta = Meta::with_module_docs(NAMESPACE_COMMON.to_string(), doc);
-        let composite = Composite::with_meta_repr("Utf8String".to_string(), fields, meta, repr);
-        Type::Pattern(TypePattern::Utf8String(composite))
-    }
-}
-
-impl crate::lang2::types::TypeInfo for String {
+impl TypeInfo for String {
     fn id() -> TypeId {
         TypeId::new(0x0D49712411310AE6E26AD32245BF70B2)
     }
 }
 
-impl crate::lang2::Register for String {
+impl Register for String {
     fn register(inventory: &mut Inventory) {
-        let type_ = crate::lang2::types::Type {
+        let type_ = Type {
             emission: Emission::Common,
-            docs: crate::lang2::meta::Docs::empty(),
+            docs: crate::lang::meta::Docs::empty(),
             visibility: Visibility::Public,
             name: "String".to_string(),
-            kind: TypeKind::TypePattern(crate::lang2::types::TypePattern::Utf8String),
+            kind: TypeKind::TypePattern(TypePattern::Utf8String),
         };
 
-        inventory.register_type(<Self as crate::lang2::types::TypeInfo>::id(), type_);
+        inventory.register_type(<Self as TypeInfo>::id(), type_);
     }
 }
 
