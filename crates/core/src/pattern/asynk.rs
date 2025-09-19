@@ -83,12 +83,6 @@ impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
     }
 }
 
-impl<T: crate::lang::types::TypeInfo> crate::lang::Register for AsyncCallback<T> {
-    fn register(inventory: &mut Inventory) {
-        <Self as TypeInfo>::register(inventory);
-    }
-}
-
 /// Used as `this: AsyncSelf` instead of `self` when using `Send` runtimes.
 pub struct AsyncSelf<S> {
     s: Arc<S>, // Self

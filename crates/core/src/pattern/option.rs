@@ -19,7 +19,6 @@ use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
 use crate::lang::types::TypeKind;
 use crate::lang::types::{TypeInfo as _, TypeInfo};
-use crate::lang::Register;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -137,12 +136,6 @@ impl<T: TypeInfo> TypeInfo for Option<T> {
         // Ensure base type is registered.
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
-    }
-}
-
-impl<T: TypeInfo> crate::lang::Register for Option<T> {
-    fn register(inventory: &mut Inventory) {
-        <Self as TypeInfo>::register(inventory);
     }
 }
 

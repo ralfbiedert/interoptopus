@@ -2,7 +2,6 @@ use crate::inventory::Inventory;
 use crate::lang::function::{Argument, Signature};
 use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
-use crate::lang::Register;
 
 macro_rules! impl_fnptr {
     // No arguments: extern "C" fn() -> R
@@ -45,12 +44,6 @@ macro_rules! impl_fnptr {
             }
         }
 
-        impl<$r: TypeInfo> crate::lang::Register for extern "C" fn() -> $r {
-            fn register(inventory: &mut Inventory) {
-                <Self as TypeInfo>::register(inventory)
-            }
-        }
-
         impl<$r: TypeInfo> TypeInfo for Option<extern "C" fn() -> $r> {
             const WIRE_SAFE: bool = $r::WIRE_SAFE;
             const RAW_SAFE: bool = $r::RAW_SAFE;
@@ -71,16 +64,11 @@ macro_rules! impl_fnptr {
                 <extern "C" fn() -> $r as TypeInfo>::register(inventory);
             }
         }
-
-        impl<$r: TypeInfo> crate::lang::Register for Option<extern "C" fn() -> $r> {
-            fn register(inventory: &mut Inventory) {
-                <Self as TypeInfo>::register(inventory)
-            }
-        }
     };
 
     // With arguments: extern "C" fn(T1, T2, ...) -> R
     ($r:ident, $($t:ident),+) => {
+        #[allow(unused_assignments)]
         impl<$r, $($t),+> TypeInfo for extern "C" fn($($t),+) -> $r
         where
             $($t: TypeInfo,)+
@@ -162,16 +150,6 @@ macro_rules! impl_fnptr {
             }
         }
 
-        impl<$r, $($t),+> crate::lang::Register for extern "C" fn($($t),+) -> $r
-        where
-            $($t: TypeInfo,)+
-            $r: TypeInfo,
-        {
-            fn register(inventory: &mut Inventory) {
-                <Self as TypeInfo>::register(inventory)
-            }
-        }
-
         impl<$r, $($t),+> TypeInfo for Option<extern "C" fn($($t),+) -> $r>
         where
             $($t: TypeInfo,)+
@@ -197,15 +175,6 @@ macro_rules! impl_fnptr {
             }
         }
 
-        impl<$r, $($t),+> crate::lang::Register for Option<extern "C" fn($($t),+) -> $r>
-        where
-            $($t: TypeInfo,)+
-            $r: TypeInfo,
-        {
-            fn register(inventory: &mut Inventory) {
-                <Self as TypeInfo>::register(inventory)
-            }
-        }
     };
 }
 

@@ -134,23 +134,11 @@ impl TypeInfo for CStrPtr<'_> {
     }
 
     fn ty() -> Type {
-        Type {
-            emission: Emission::Common,
-            docs: Docs::empty(),
-            visibility: Visibility::Public,
-            name: "CStrPtr".to_string(),
-            kind: Self::kind(),
-        }
+        Type { emission: Emission::Common, docs: Docs::empty(), visibility: Visibility::Public, name: "CStrPtr".to_string(), kind: Self::kind() }
     }
 
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
-    }
-}
-
-impl crate::lang::Register for CStrPtr<'_> {
-    fn register(inventory: &mut Inventory) {
-        <Self as TypeInfo>::register(inventory);
     }
 }
 

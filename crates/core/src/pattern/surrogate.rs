@@ -48,10 +48,9 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::types::TypeInfo;
+use crate::lang::types::{Type, TypeKind};
 use std::marker::PhantomData;
 use std::mem::{transmute, ManuallyDrop};
-use crate::lang::Register;
-use crate::lang::types::{TypeKind, Type};
 
 /// A marker trait for types that are surrogates for other types.
 ///
@@ -89,12 +88,6 @@ impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
 
     fn register(inventory: &mut Inventory) {
         L::register(inventory);
-    }
-}
-
-impl<T, L: TypeInfo + CorrectSurrogate<T>> crate::lang::Register for Surrogate<T, L> {
-    fn register(inventory: &mut Inventory) {
-        <Self as TypeInfo>::register(inventory);
     }
 }
 

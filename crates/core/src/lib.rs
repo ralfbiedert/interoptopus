@@ -168,6 +168,5 @@ mod error;
 pub mod ffi;
 pub mod inventory;
 pub mod lang;
-mod macros;
 pub mod pattern;
 pub mod wire;
