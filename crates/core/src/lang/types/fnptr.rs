@@ -8,44 +8,73 @@ macro_rules! impl_fnptr {
     // No arguments: extern "C" fn() -> R
     ($r:ident) => {
         impl<$r: TypeInfo> TypeInfo for extern "C" fn() -> $r {
+            const WIRE_SAFE: bool = $r::WIRE_SAFE;
+            const RAW_SAFE: bool = $r::RAW_SAFE;
+
             fn id() -> TypeId {
                 TypeId::new(0xEE8602B016C043561CA68291A8142F3B).derive_id($r::id())
             }
-        }
 
-        impl<$r: TypeInfo + Register> Register for extern "C" fn() -> $r {
-            fn register(inventory: &mut Inventory) {
-                $r::register(inventory);
+            fn kind() -> TypeKind {
+                TypeKind::FnPointer(Signature {
+                    arguments: vec![],
+                    rval: $r::id()
+                })
+            }
 
-                let r = &inventory.types[&$r::id()];
-                let ty_params = [inventory.types[&$r::id()].emission.clone()];
-                let emission = common_or_module_emission(&ty_params);
+            fn ty() -> Type {
+                let r_ty = $r::ty();
+                let emission = r_ty.emission;
                 let signature = Signature {
                     arguments: vec![],
                     rval: $r::id()
                 };
 
-                let type_ = Type {
+                Type {
                     emission,
                     docs: Docs::empty(),
                     visibility: Visibility::Public,
-                    name: format!(r#"extern "C" fn() -> {}"#, r.name),
+                    name: format!(r#"extern "C" fn() -> {}"#, r_ty.name),
                     kind: TypeKind::FnPointer(signature),
-                };
+                }
+            }
 
-                inventory.register_type(Self::id(), type_);
+            fn register(inventory: &mut Inventory) {
+                $r::register(inventory);
+                inventory.register_type(Self::id(), Self::ty());
+            }
+        }
+
+        impl<$r: TypeInfo> crate::lang::Register for extern "C" fn() -> $r {
+            fn register(inventory: &mut Inventory) {
+                <Self as TypeInfo>::register(inventory)
             }
         }
 
         impl<$r: TypeInfo> TypeInfo for Option<extern "C" fn() -> $r> {
+            const WIRE_SAFE: bool = $r::WIRE_SAFE;
+            const RAW_SAFE: bool = $r::RAW_SAFE;
+
             fn id() -> TypeId {
                 <extern "C" fn() -> $r as TypeInfo>::id()
             }
+
+            fn kind() -> TypeKind {
+                <extern "C" fn() -> $r as TypeInfo>::kind()
+            }
+
+            fn ty() -> Type {
+                <extern "C" fn() -> $r as TypeInfo>::ty()
+            }
+
+            fn register(inventory: &mut Inventory) {
+                <extern "C" fn() -> $r as TypeInfo>::register(inventory);
+            }
         }
 
-        impl<$r: TypeInfo + Register> Register for Option<extern "C" fn() -> $r> {
+        impl<$r: TypeInfo> crate::lang::Register for Option<extern "C" fn() -> $r> {
             fn register(inventory: &mut Inventory) {
-                <extern "C" fn() -> $r as Register>::register(inventory);
+                <Self as TypeInfo>::register(inventory)
             }
         }
     };
@@ -57,29 +86,42 @@ macro_rules! impl_fnptr {
             $($t: TypeInfo,)+
             $r: TypeInfo,
         {
+            const WIRE_SAFE: bool = $r::WIRE_SAFE $(&& $t::WIRE_SAFE)+;
+            const RAW_SAFE: bool = $r::RAW_SAFE $(&& $t::RAW_SAFE)+;
+
             fn id() -> TypeId {
                 TypeId::new(0xEE8602B016C043561CA68291A8142F3B)
                     .derive_id($r::id())
                     $(.derive_id($t::id()))+
             }
-        }
 
-        #[allow(non_snake_case, unused_assignments)]
-        impl<$r, $($t),+> Register for extern "C" fn($($t),+) -> $r
-        where
-            $($t: Register + TypeInfo,)+
-            $r: Register + TypeInfo,
-        {
-            fn register(inventory: &mut Inventory) {
-                $r::register(inventory);
-                $($t::register(inventory);)+
+            fn kind() -> TypeKind {
+                let arguments = {
+                    let mut args = Vec::new();
+                    let mut counter = 1;
+                    $(
+                        args.push(Argument {
+                            name: format!("x{}", counter),
+                            ty: $t::id()
+                        });
+                        counter += 1;
+                    )+
+                    args
+                };
 
-                let r = &inventory.types[&$r::id()];
-                $(let $t = &inventory.types[&$t::id()];)+
+                TypeKind::FnPointer(Signature {
+                    arguments,
+                    rval: $r::id()
+                })
+            }
+
+            fn ty() -> Type {
+                let r_ty = $r::ty();
+                $(let $t = $t::ty();)+
 
                 let ty_params = [
-                    inventory.types[&$r::id()].emission.clone(),
-                    $(inventory.types[&$t::id()].emission.clone()),+
+                    r_ty.emission.clone(),
+                    $($t.emission.clone()),+
                 ];
                 let emission = common_or_module_emission(&ty_params);
 
@@ -101,18 +143,32 @@ macro_rules! impl_fnptr {
                     rval: $r::id()
                 };
 
-                let type_ = Type {
+                Type {
                     emission,
                     docs: Docs::empty(),
                     visibility: Visibility::Public,
                     name: format!(r#"extern "C" fn({}) -> {}"#,
                         [$($t.name.clone()),+].join(", "),
-                        r.name
+                        r_ty.name
                     ),
                     kind: TypeKind::FnPointer(signature),
-                };
+                }
+            }
 
-                inventory.register_type(Self::id(), type_);
+            fn register(inventory: &mut Inventory) {
+                $r::register(inventory);
+                $($t::register(inventory);)+
+                inventory.register_type(Self::id(), Self::ty());
+            }
+        }
+
+        impl<$r, $($t),+> crate::lang::Register for extern "C" fn($($t),+) -> $r
+        where
+            $($t: TypeInfo,)+
+            $r: TypeInfo,
+        {
+            fn register(inventory: &mut Inventory) {
+                <Self as TypeInfo>::register(inventory)
             }
         }
 
@@ -121,18 +177,33 @@ macro_rules! impl_fnptr {
             $($t: TypeInfo,)+
             $r: TypeInfo,
         {
+            const WIRE_SAFE: bool = $r::WIRE_SAFE $(&& $t::WIRE_SAFE)+;
+            const RAW_SAFE: bool = $r::RAW_SAFE $(&& $t::RAW_SAFE)+;
+
             fn id() -> TypeId {
                 <extern "C" fn($($t),+) -> $r as TypeInfo>::id()
             }
+
+            fn kind() -> TypeKind {
+                <extern "C" fn($($t),+) -> $r as TypeInfo>::kind()
+            }
+
+            fn ty() -> Type {
+                <extern "C" fn($($t),+) -> $r as TypeInfo>::ty()
+            }
+
+            fn register(inventory: &mut Inventory) {
+                <extern "C" fn($($t),+) -> $r as TypeInfo>::register(inventory);
+            }
         }
 
-        impl<$r, $($t),+> Register for Option<extern "C" fn($($t),+) -> $r>
+        impl<$r, $($t),+> crate::lang::Register for Option<extern "C" fn($($t),+) -> $r>
         where
-            $($t: TypeInfo + Register,)+
-            $r: TypeInfo + Register,
+            $($t: TypeInfo,)+
+            $r: TypeInfo,
         {
             fn register(inventory: &mut Inventory) {
-                <extern "C" fn($($t),+) -> $r as Register>::register(inventory);
+                <Self as TypeInfo>::register(inventory)
             }
         }
     };

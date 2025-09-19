@@ -122,22 +122,35 @@ impl<'a> CStrPtr<'a> {
 }
 
 impl TypeInfo for CStrPtr<'_> {
+    const WIRE_SAFE: bool = true;
+    const RAW_SAFE: bool = true;
+
     fn id() -> TypeId {
         TypeId::new(0xDE450364E9ADDBA5DC9A6C5BBEC7759F)
+    }
+
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(TypePattern::CStrPointer)
+    }
+
+    fn ty() -> Type {
+        Type {
+            emission: Emission::Common,
+            docs: Docs::empty(),
+            visibility: Visibility::Public,
+            name: "CStrPtr".to_string(),
+            kind: Self::kind(),
+        }
+    }
+
+    fn register(inventory: &mut Inventory) {
+        inventory.register_type(Self::id(), Self::ty());
     }
 }
 
 impl crate::lang::Register for CStrPtr<'_> {
     fn register(inventory: &mut Inventory) {
-        let type_ = Type {
-            emission: Emission::Common,
-            docs: Docs::empty(),
-            visibility: Visibility::Public,
-            name: "CStrPtr".to_string(),
-            kind: TypeKind::TypePattern(TypePattern::CStrPointer),
-        };
-
-        inventory.register_type(<Self as TypeInfo>::id(), type_);
+        <Self as TypeInfo>::register(inventory);
     }
 }
 

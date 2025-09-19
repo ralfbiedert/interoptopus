@@ -72,22 +72,35 @@ impl ApiVersion {
 }
 
 impl crate::lang::types::TypeInfo for ApiVersion {
+    const WIRE_SAFE: bool = true;
+    const RAW_SAFE: bool = true;
+
     fn id() -> TypeId {
         TypeId::new(0xA6B162106C410FCAD91327A85E3FE14E)
+    }
+
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(TypePattern::APIVersion)
+    }
+
+    fn ty() -> crate::lang::types::Type {
+        crate::lang::types::Type {
+            emission: Emission::Common,
+            docs: Docs::empty(),
+            visibility: Visibility::Public,
+            name: "ApiVersion".to_string(),
+            kind: Self::kind(),
+        }
+    }
+
+    fn register(inventory: &mut crate::inventory::Inventory) {
+        inventory.register_type(Self::id(), Self::ty());
     }
 }
 
 impl crate::lang::Register for ApiVersion {
     fn register(inventory: &mut crate::inventory::Inventory) {
-        let type_ = crate::lang::types::Type {
-            emission: Emission::Common,
-            docs: Docs::empty(),
-            visibility: Visibility::Public,
-            name: "ApiVersion".to_string(),
-            kind: TypeKind::TypePattern(TypePattern::APIVersion),
-        };
-
-        inventory.register_type(<Self as crate::lang::types::TypeInfo>::id(), type_);
+        <Self as crate::lang::types::TypeInfo>::register(inventory);
     }
 }
 

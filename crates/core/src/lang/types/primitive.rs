@@ -58,25 +58,37 @@ impl Hash for PrimitiveValue {
 macro_rules! impl_primitive {
     ($t:ty, $t_str:expr, $primitive:expr, $id:expr) => {
         impl $crate::lang::types::TypeInfo for $t {
+            const WIRE_SAFE: bool = true;
+            const RAW_SAFE: bool = true;
+
             fn id() -> $crate::inventory::TypeId {
                 $crate::inventory::TypeId::new($id)
+            }
+
+            fn kind() -> $crate::lang::types::TypeKind {
+                $crate::lang::types::TypeKind::Primitive($primitive)
+            }
+
+            fn ty() -> $crate::lang::types::Type {
+                $crate::lang::types::Type {
+                    emission: $crate::lang::meta::Emission::Builtin,
+                    docs: $crate::lang::meta::Docs::empty(),
+                    visibility: $crate::lang::meta::Visibility::Public,
+                    name: $t_str.to_string(),
+                    kind: Self::kind(),
+                }
+            }
+
+            fn register(inventory: &mut $crate::inventory::Inventory) {
+                let type_id = Self::id();
+                let type_ = Self::ty();
+                _ = inventory.register_type(type_id, type_)
             }
         }
 
         impl $crate::lang::Register for $t {
             fn register(inventory: &mut $crate::inventory::Inventory) {
-                use $crate::lang::types::TypeInfo;
-
-                let type_id = Self::id();
-                let type_ = $crate::lang::types::Type {
-                    emission: $crate::lang::meta::Emission::Builtin,
-                    docs: $crate::lang::meta::Docs::empty(),
-                    visibility: $crate::lang::meta::Visibility::Public,
-                    name: $t_str.to_string(),
-                    kind: $crate::lang::types::TypeKind::Primitive($primitive),
-                };
-
-                _ = inventory.register_type(type_id, type_)
+                <Self as $crate::lang::types::TypeInfo>::register(inventory)
             }
         }
     };

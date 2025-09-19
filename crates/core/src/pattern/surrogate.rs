@@ -51,6 +51,7 @@ use crate::lang::types::TypeInfo;
 use std::marker::PhantomData;
 use std::mem::{transmute, ManuallyDrop};
 use crate::lang::Register;
+use crate::lang::types::{TypeKind, Type};
 
 /// A marker trait for types that are surrogates for other types.
 ///
@@ -71,14 +72,29 @@ pub struct Surrogate<T, L> {
 }
 
 impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
+    const WIRE_SAFE: bool = L::WIRE_SAFE;
+    const RAW_SAFE: bool = L::RAW_SAFE;
+
     fn id() -> TypeId {
         L::id()
     }
-}
 
-impl<T, L: TypeInfo + Register + CorrectSurrogate<T>> Register for Surrogate<T, L> {
+    fn kind() -> TypeKind {
+        L::kind()
+    }
+
+    fn ty() -> Type {
+        L::ty()
+    }
+
     fn register(inventory: &mut Inventory) {
         L::register(inventory);
+    }
+}
+
+impl<T, L: TypeInfo + CorrectSurrogate<T>> crate::lang::Register for Surrogate<T, L> {
+    fn register(inventory: &mut Inventory) {
+        <Self as TypeInfo>::register(inventory);
     }
 }
 
