@@ -1,6 +1,5 @@
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
-use crate::lang::Register;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Array {
@@ -25,13 +24,7 @@ where
     }
 
     fn ty() -> Type {
-        Type {
-            emission: Emission::Builtin,
-            docs: Docs::empty(),
-            visibility: Visibility::Public,
-            name: format!("[{}; {N}]", T::ty().name),
-            kind: Self::kind(),
-        }
+        Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: format!("[{}; {N}]", T::ty().name), kind: Self::kind() }
     }
 
     fn register(inventory: &mut crate::inventory::Inventory) {
@@ -39,14 +32,5 @@ where
         T::register(inventory);
 
         inventory.register_type(Self::id(), Self::ty());
-    }
-}
-
-impl<T, const N: usize> crate::lang::Register for [T; N]
-where
-    T: crate::lang::types::TypeInfo,
-{
-    fn register(inventory: &mut crate::inventory::Inventory) {
-        <Self as crate::lang::types::TypeInfo>::register(inventory);
     }
 }

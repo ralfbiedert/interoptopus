@@ -30,8 +30,7 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
-use crate::lang::types::{Type, TypeInfo as _, TypeInfo, TypeKind, TypePattern};
-use crate::lang::Register;
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
 use std::any::Any;
 use std::fmt::Debug;
 use std::panic::{catch_unwind, AssertUnwindSafe};
@@ -143,12 +142,6 @@ impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
         T::register(inventory);
         E::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
-    }
-}
-
-impl<T: TypeInfo, E: TypeInfo> crate::lang::Register for Result<T, E> {
-    fn register(inventory: &mut Inventory) {
-        <Self as TypeInfo>::register(inventory);
     }
 }
 

@@ -4,7 +4,6 @@ use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
 use std::mem::forget;
-use crate::lang::Register;
 
 /// FFI analog of [`std::string::String`].
 #[derive(Debug)]
@@ -90,23 +89,11 @@ impl TypeInfo for String {
     }
 
     fn ty() -> Type {
-        Type {
-            emission: Emission::Common,
-            docs: crate::lang::meta::Docs::empty(),
-            visibility: Visibility::Public,
-            name: "String".to_string(),
-            kind: Self::kind(),
-        }
+        Type { emission: Emission::Common, docs: crate::lang::meta::Docs::empty(), visibility: Visibility::Public, name: "String".to_string(), kind: Self::kind() }
     }
 
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
-    }
-}
-
-impl crate::lang::Register for String {
-    fn register(inventory: &mut Inventory) {
-        <Self as TypeInfo>::register(inventory);
     }
 }
 

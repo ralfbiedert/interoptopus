@@ -85,12 +85,6 @@ macro_rules! impl_primitive {
                 _ = inventory.register_type(type_id, type_)
             }
         }
-
-        impl $crate::lang::Register for $t {
-            fn register(inventory: &mut $crate::inventory::Inventory) {
-                <Self as $crate::lang::types::TypeInfo>::register(inventory)
-            }
-        }
     };
 }
 

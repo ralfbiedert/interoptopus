@@ -84,23 +84,11 @@ impl crate::lang::types::TypeInfo for ApiVersion {
     }
 
     fn ty() -> crate::lang::types::Type {
-        crate::lang::types::Type {
-            emission: Emission::Common,
-            docs: Docs::empty(),
-            visibility: Visibility::Public,
-            name: "ApiVersion".to_string(),
-            kind: Self::kind(),
-        }
+        crate::lang::types::Type { emission: Emission::Common, docs: Docs::empty(), visibility: Visibility::Public, name: "ApiVersion".to_string(), kind: Self::kind() }
     }
 
     fn register(inventory: &mut crate::inventory::Inventory) {
         inventory.register_type(Self::id(), Self::ty());
-    }
-}
-
-impl crate::lang::Register for ApiVersion {
-    fn register(inventory: &mut crate::inventory::Inventory) {
-        <Self as crate::lang::types::TypeInfo>::register(inventory);
     }
 }
 

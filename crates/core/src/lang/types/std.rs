@@ -1,7 +1,6 @@
 use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
-use crate::lang::Register;
 use std::collections::HashMap;
 use std::mem::MaybeUninit;
 
@@ -20,25 +19,13 @@ macro_rules! impl_ptr {
             }
 
             fn ty() -> Type {
-                Type {
-                    emission: Emission::Builtin,
-                    docs: Docs::empty(),
-                    visibility: Visibility::Public,
-                    name: $name.to_string(),
-                    kind: Self::kind()
-                }
+                Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: $name.to_string(), kind: Self::kind() }
             }
 
             fn register(inventory: &mut Inventory) {
                 // Ensure base type is registered.
                 T::register(inventory);
                 inventory.register_type(Self::id(), Self::ty());
-            }
-        }
-
-        impl<T: TypeInfo> crate::lang::Register for $t {
-            fn register(inventory: &mut Inventory) {
-                <Self as TypeInfo>::register(inventory)
             }
         }
     };
@@ -86,12 +73,6 @@ impl<T: TypeInfo> TypeInfo for MaybeUninit<T> {
     }
 }
 
-impl<T: TypeInfo> crate::lang::Register for MaybeUninit<T> {
-    fn register(inventory: &mut Inventory) {
-        <Self as TypeInfo>::register(inventory);
-    }
-}
-
 impl TypeInfo for String {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = true;
@@ -105,23 +86,11 @@ impl TypeInfo for String {
     }
 
     fn ty() -> Type {
-        Type {
-            emission: Emission::Common,
-            docs: Docs::empty(),
-            visibility: Visibility::Public,
-            name: "String".to_string(),
-            kind: Self::kind(),
-        }
+        Type { emission: Emission::Common, docs: Docs::empty(), visibility: Visibility::Public, name: "String".to_string(), kind: Self::kind() }
     }
 
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
-    }
-}
-
-impl crate::lang::Register for String {
-    fn register(inventory: &mut Inventory) {
-        <Self as TypeInfo>::register(inventory);
     }
 }
 
@@ -139,25 +108,13 @@ impl<T: TypeInfo> TypeInfo for Vec<T> {
 
     fn ty() -> Type {
         let t = T::ty();
-        Type {
-            emission: Emission::Builtin,
-            docs: Docs::empty(),
-            visibility: Visibility::Public,
-            name: format!("Vec<{}>", t.name),
-            kind: Self::kind(),
-        }
+        Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: format!("Vec<{}>", t.name), kind: Self::kind() }
     }
 
     fn register(inventory: &mut Inventory) {
         // Ensure base type is registered.
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
-    }
-}
-
-impl<T: TypeInfo> crate::lang::Register for Vec<T> {
-    fn register(inventory: &mut Inventory) {
-        <Self as TypeInfo>::register(inventory);
     }
 }
 
@@ -176,13 +133,7 @@ impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap
     fn ty() -> Type {
         let k = K::ty();
         let v = V::ty();
-        Type {
-            emission: Emission::Builtin,
-            docs: Docs::empty(),
-            visibility: Visibility::Public,
-            name: format!("HashMap<{}, {}>", k.name, v.name),
-            kind: Self::kind(),
-        }
+        Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: format!("HashMap<{}, {}>", k.name, v.name), kind: Self::kind() }
     }
 
     fn register(inventory: &mut Inventory) {
@@ -190,12 +141,6 @@ impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap
         K::register(inventory);
         V::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
-    }
-}
-
-impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> crate::lang::Register for HashMap<K, V, S> {
-    fn register(inventory: &mut Inventory) {
-        <Self as TypeInfo>::register(inventory);
     }
 }
 
@@ -212,22 +157,10 @@ impl TypeInfo for ::std::ffi::c_void {
     }
 
     fn ty() -> Type {
-        Type {
-            emission: Emission::Builtin,
-            docs: Docs::empty(),
-            visibility: Visibility::Public,
-            name: "c_void".to_string(),
-            kind: Self::kind(),
-        }
+        Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: "c_void".to_string(), kind: Self::kind() }
     }
 
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
-    }
-}
-
-impl crate::lang::Register for ::std::ffi::c_void {
-    fn register(inventory: &mut Inventory) {
-        <Self as TypeInfo>::register(inventory);
     }
 }
