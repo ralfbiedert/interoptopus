@@ -1,6 +1,7 @@
-use syn::{parse::Parse, punctuated::Punctuated, Expr, Ident, Lit, Token};
+use syn::{Expr, Ident, Lit, Token, parse::Parse, punctuated::Punctuated};
 
 #[derive(Debug, Clone, Default)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct FfiTypeArgs {
     pub packed: bool,
     pub transparent: bool,
@@ -13,7 +14,7 @@ pub struct FfiTypeArgs {
 
 impl Parse for FfiTypeArgs {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        let mut args = FfiTypeArgs::default();
+        let mut args = Self::default();
 
         if input.is_empty() {
             return Ok(args);
@@ -74,7 +75,7 @@ impl FfiTypeArgs {
 
         if conflicts.len() > 1 {
             let names: Vec<&str> = conflicts.iter().map(|(name, _)| *name).collect();
-            let span = conflicts[1].1.or(conflicts[0].1).unwrap_or(proc_macro2::Span::call_site());
+            let span = conflicts[1].1.or(conflicts[0].1).unwrap_or_else(proc_macro2::Span::call_site);
 
             return Err(syn::Error::new(
                 span,
@@ -85,7 +86,7 @@ impl FfiTypeArgs {
                         3 => format!("'{}', '{}', and '{}'", names[0], names[1], names[2]),
                         _ => names.join(", "),
                     }
-                )
+                ),
             ));
         }
 
@@ -110,17 +111,17 @@ impl Parse for FfiTypeArg {
         let span = ident.span();
 
         match ident.to_string().as_str() {
-            "packed" => Ok(FfiTypeArg::Packed),
-            "transparent" => Ok(FfiTypeArg::Transparent(span)),
-            "opaque" => Ok(FfiTypeArg::Opaque(span)),
-            "service" => Ok(FfiTypeArg::Service(span)),
-            "debug" => Ok(FfiTypeArg::Debug),
+            "packed" => Ok(Self::Packed),
+            "transparent" => Ok(Self::Transparent(span)),
+            "opaque" => Ok(Self::Opaque(span)),
+            "service" => Ok(Self::Service(span)),
+            "debug" => Ok(Self::Debug),
             "name" => {
                 input.parse::<Token![=]>()?;
                 let expr: Expr = input.parse()?;
                 if let Expr::Lit(lit) = expr {
                     if let Lit::Str(lit_str) = lit.lit {
-                        Ok(FfiTypeArg::Name(lit_str.value()))
+                        Ok(Self::Name(lit_str.value()))
                     } else {
                         Err(syn::Error::new_spanned(lit, "Expected string literal"))
                     }
@@ -133,7 +134,7 @@ impl Parse for FfiTypeArg {
                 let expr: Expr = input.parse()?;
                 if let Expr::Lit(lit) = expr {
                     if let Lit::Str(lit_str) = lit.lit {
-                        Ok(FfiTypeArg::Module(lit_str.value()))
+                        Ok(Self::Module(lit_str.value()))
                     } else {
                         Err(syn::Error::new_spanned(lit, "Expected string literal"))
                     }

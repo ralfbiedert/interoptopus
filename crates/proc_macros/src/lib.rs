@@ -1,6 +1,7 @@
 //! Proc macros for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
 //!
 //! Items in here will be re-exported by [the main crate](https://crates.io/crates/interoptopus).
+#![allow(clippy::needless_pass_by_value)]
 
 extern crate proc_macro; // Apparently needed to be imported like this.
 
