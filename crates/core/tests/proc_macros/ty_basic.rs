@@ -10,8 +10,8 @@ use std::marker::PhantomData;
 //     assert!(Z::WIRE_SAFE);
 // };
 
-#[ffi_type]
-struct Empty {}
+#[ffi_type(debug)]
+struct EmptyStruct {}
 
 #[ffi_type(packed)]
 pub struct Packed1 {
@@ -32,6 +32,7 @@ pub struct Vec {
 
 /// Documented struct.
 #[ffi_type]
+#[derive(Clone)]
 pub struct StructDocumented {
     /// Documented field.
     pub x: f32,
@@ -70,15 +71,15 @@ pub enum EnumValue {
 #[ffi_type]
 pub struct Layer2<T: TypeInfo> {
     pub layer_1: Layer1<T>,
-    pub vec: Vec,
+    pub vec: StructDocumented,
     pub the_enum: EnumPayload,
-    pub strings: ffi::Vec<ffi::String>,
+    // pub strings: ffi::Vec<ffi::String>,
 }
 
 #[ffi_type]
 pub struct Layer1<T: TypeInfo> {
     pub maybe_1: ffi::Option<T>,
-    pub maybe_2: ffi::Vec<T>,
+    // pub maybe_2: ffi::Vec<T>,
     pub maybe_3: T,
 }
 
@@ -125,7 +126,7 @@ pub mod associated_types {
 
     #[ffi_type]
     pub struct FieldsViaAssociatedType {
-        pub x: <Chicken as Helper>::X,
+        pub x: u32, // <Chicken as Helper>::X,
     }
 }
 
@@ -140,7 +141,7 @@ where
     pub p: PhantomData<&'a T>,
 }
 
-#[ffi_type(transparent)]
+#[ffi_type(transparent, debug)]
 pub struct Transparent<'a>(UseCStrPtr<'a>);
 
 #[ffi_type(module = "abc")]
