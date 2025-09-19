@@ -224,8 +224,39 @@ impl TypeModel {
     }
     
     fn generate_repr(&self) -> TokenStream {
-        // For now, just use the c() method for all cases since the Repr constructor is private
-        quote! { ::interoptopus::lang::types::Repr::c() }
+        if self.args.service {
+            // Services don't have a meaningful layout representation
+            return quote! {
+                ::interoptopus::lang::types::Repr {
+                    layout: ::interoptopus::lang::types::Layout::Opaque,
+                    alignment: None,
+                }
+            };
+        }
+
+        let layout = if self.args.opaque {
+            quote! { ::interoptopus::lang::types::Layout::Opaque }
+        } else if self.args.transparent {
+            quote! { ::interoptopus::lang::types::Layout::Transparent }
+        } else if self.args.packed {
+            quote! { ::interoptopus::lang::types::Layout::Packed }
+        } else {
+            match &self.data {
+                TypeData::Struct(_) => quote! { ::interoptopus::lang::types::Layout::C },
+                TypeData::Enum(_) => quote! {
+                    ::interoptopus::lang::types::Layout::Primitive(
+                        ::interoptopus::lang::types::Primitive::U32
+                    )
+                },
+            }
+        };
+
+        quote! {
+            ::interoptopus::lang::types::Repr {
+                layout: #layout,
+                alignment: None,
+            }
+        }
     }
     
     fn generate_ty(&self) -> TokenStream {
