@@ -2,6 +2,7 @@ use crate::lang2::meta::{Docs, Emission, Visibility};
 use crate::lang2::types::{Type, TypeId, TypeInfo, TypeKind};
 use crate::lang2::Register;
 
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Array {
     pub ty: TypeId,
     pub len: usize,

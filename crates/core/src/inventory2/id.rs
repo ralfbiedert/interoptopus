@@ -72,6 +72,7 @@ new_id!(FunctionId);
 new_id!(ServiceId);
 
 #[doc(hidden)]
+#[must_use]
 pub const fn hash_str(s: &str) -> u128 {
     let bytes = s.as_bytes();
     let mut hash = 0xcbf29ce484222325u128;

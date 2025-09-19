@@ -294,26 +294,39 @@ macro_rules! callback {
 
         impl $crate::lang2::Register for $name {
             fn register(inventory: &mut $crate::inventory2::Inventory) {
+                use $crate::lang2::types::TypeKind;
+                use $crate::lang2::Register;
+
                 // Register contained types
-                // <$rval>::register(inventory);
-                // $(<$ty>::register(inventory);)*
-                // <*const ::std::ffi::c_void>::register(inventory);
-                // <extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>::register(inventory);
+                <$rval>::register(inventory);
+                $(<$ty>::register(inventory);)*
+                <*const ::std::ffi::c_void>::register(inventory);
+                <extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>::register(inventory);
 
-                // T::register(inventory);
+                let r = &inventory.types[&<$rval>::id()];
+                $(let $param = &inventory.types[&<$ty>::id()];)*
 
-                // let t = &inventory.types[&T::id()];
-                //
-                // let type_ = crate::lang2::types::Type {
-                //     emission: t.emission.clone(),
-                //     docs: crate::lang2::meta::Docs::empty(),
-                //     visibility: Visibility::Public,
-                //     name: format!("AsyncCallback<{}>", t.name),
-                //     kind: TypeKind::TypePattern(crate::lang2::types::TypePattern::AsyncCallback(T::id())),
-                // };
-                //
-                // inventory.register_type(Self::id(), type_);
-                todo!()
+                let emissision = [
+                    r.emission.clone(),
+                    $($param.emission.clone(),)*
+                ];
+
+                let sig = $crate::lang2::function::Signature {
+                    arguments: vec![
+                        $($crate::lang2::function::Argument::new(stringify!($param), <$ty>::id()),)*
+                    ],
+                    rval: <$rval>::id(),
+                };
+
+                let type_ = $crate::lang2::types::Type {
+                    emission: $crate::lang2::meta::common_or_module_emission(&emissision),
+                    docs: $crate::lang2::meta::Docs::empty(),
+                    visibility: ::interoptopus::lang2::meta::Visibility::Public,
+                    name: stringify!($name).to_string(),
+                    kind: TypeKind::TypePattern(::interoptopus::lang2::types::TypePattern::NamedCallback(sig)),
+                };
+
+                inventory.register_type(Self::id(), type_);
             }
         }
 

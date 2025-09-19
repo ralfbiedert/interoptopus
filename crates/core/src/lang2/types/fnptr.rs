@@ -88,7 +88,7 @@ macro_rules! impl_fnptr {
                     let mut counter = 1;
                     $(
                         args.push(Argument {
-                            string: format!("x{}", counter),
+                            name: format!("x{}", counter),
                             ty: $t::id()
                         });
                         counter += 1;
@@ -150,3 +150,13 @@ impl_fnptr!(R, T1, T2, T3, T4, T5, T6, T7);
 impl_fnptr!(R, T1, T2, T3, T4, T5, T6, T7, T8);
 impl_fnptr!(R, T1, T2, T3, T4, T5, T6, T7, T8, T9);
 impl_fnptr!(R, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10);
+
+pub fn fnptr_typeid(sig: &Signature) -> TypeId {
+    let mut rval = TypeId::new(0xEE8602B016C043561CA68291A8142F3B).derive_id(sig.rval);
+
+    for x in &sig.arguments {
+        rval = rval.derive_id(x.ty);
+    }
+
+    rval
+}
