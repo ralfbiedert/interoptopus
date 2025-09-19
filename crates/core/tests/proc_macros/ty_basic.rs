@@ -13,11 +13,11 @@ use std::marker::PhantomData;
 #[ffi_type]
 struct ThisShouldFail;
 
+#[ffi_type]
+struct ThisShouldFail2 {}
+
 #[ffi_type(opaque)]
 struct ThisShouldWork;
-
-#[ffi_type(debug)]
-struct EmptyStructShouldFailToo {}
 
 #[ffi_type(packed)]
 pub struct Packed1 {
