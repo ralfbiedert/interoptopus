@@ -8,6 +8,7 @@ members = [
 
 # TODO: DELETE THIS SECTION - Excluded for now while refactoring
 exclude = [
+    "crates/proc_macros_old",
     "crates/backend_csharp",
     "crates/backend_c",
     "crates/backend_cpython",
