@@ -12,30 +12,41 @@ impl<T, const N: usize> TypeInfo for [T; N]
 where
     T: TypeInfo,
 {
+    const WIRE_SAFE: bool = T::WIRE_SAFE;
+    const RAW_SAFE: bool = T::RAW_SAFE;
+
     fn id() -> TypeId {
         // Reliably derive an ID for an array of type T and length N.
         T::id().derive(0x06A3676E231857123975EA87924CA277).derive(N as u128)
     }
-}
 
-impl<T, const N: usize> Register for [T; N]
-where
-    T: Register + TypeInfo,
-{
+    fn kind() -> TypeKind {
+        TypeKind::Array(Array { ty: T::id(), len: N })
+    }
+
+    fn ty() -> Type {
+        Type {
+            emission: Emission::Builtin,
+            docs: Docs::empty(),
+            visibility: Visibility::Public,
+            name: format!("[{}; {N}]", T::ty().name),
+            kind: Self::kind(),
+        }
+    }
+
     fn register(inventory: &mut crate::inventory::Inventory) {
         // Ensure base type is registered.
         T::register(inventory);
 
-        let t = &inventory.types[&T::id()];
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}
 
-        let type_ = Type {
-            emission: Emission::Builtin,
-            docs: Docs::empty(),
-            visibility: Visibility::Public,
-            name: format!("[{}; {N}]", t.name),
-            kind: TypeKind::Array(Array { ty: T::id(), len: N }),
-        };
-
-        inventory.register_type(Self::id(), type_);
+impl<T, const N: usize> crate::lang::Register for [T; N]
+where
+    T: crate::lang::types::TypeInfo,
+{
+    fn register(inventory: &mut crate::inventory::Inventory) {
+        <Self as crate::lang::types::TypeInfo>::register(inventory);
     }
 }

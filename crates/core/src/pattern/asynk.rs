@@ -53,28 +53,39 @@ impl<T: TypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(&T, *const c_v
     }
 }
 
-impl<T: crate::lang::types::TypeInfo> crate::lang::types::TypeInfo for AsyncCallback<T> {
+impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
+    const WIRE_SAFE: bool = T::WIRE_SAFE;
+    const RAW_SAFE: bool = T::RAW_SAFE;
+
     fn id() -> TypeId {
         T::id().derive(0x3BA866E612BB2BEA769699B3476994B8)
     }
-}
 
-impl<T: crate::lang::Register + crate::lang::types::TypeInfo> crate::lang::Register for AsyncCallback<T> {
-    fn register(inventory: &mut Inventory) {
-        // Ensure base type is registered.
-        T::register(inventory);
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(crate::lang::types::TypePattern::AsyncCallback(T::id()))
+    }
 
-        let t = &inventory.types[&T::id()];
-
-        let type_ = crate::lang::types::Type {
+    fn ty() -> crate::lang::types::Type {
+        let t = T::ty();
+        crate::lang::types::Type {
             emission: t.emission.clone(),
             docs: crate::lang::meta::Docs::empty(),
             visibility: Visibility::Public,
             name: format!("AsyncCallback<{}>", t.name),
-            kind: TypeKind::TypePattern(crate::lang::types::TypePattern::AsyncCallback(T::id())),
-        };
+            kind: Self::kind(),
+        }
+    }
 
-        inventory.register_type(Self::id(), type_);
+    fn register(inventory: &mut Inventory) {
+        // Ensure base type is registered.
+        T::register(inventory);
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}
+
+impl<T: crate::lang::types::TypeInfo> crate::lang::Register for AsyncCallback<T> {
+    fn register(inventory: &mut Inventory) {
+        <Self as TypeInfo>::register(inventory);
     }
 }
 

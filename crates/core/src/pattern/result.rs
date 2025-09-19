@@ -115,29 +115,40 @@ where
 }
 
 impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
+    const WIRE_SAFE: bool = T::WIRE_SAFE && E::WIRE_SAFE;
+    const RAW_SAFE: bool = T::RAW_SAFE && E::RAW_SAFE;
+
     fn id() -> TypeId {
         TypeId::new(0x9BCBD2325F73A8CBDAE991B5BB8EB6FC).derive_id(T::id())
     }
-}
 
-impl<T: TypeInfo + Register, E: TypeInfo + Register> Register for Result<T, E> {
-    fn register(inventory: &mut Inventory) {
-        // Ensure base types are registered.
-        T::register(inventory);
-        E::register(inventory);
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(TypePattern::Result(T::id(), E::id()))
+    }
 
-        let t = &inventory.types[&T::id()];
-        let e = &inventory.types[&E::id()];
-
-        let type_ = Type {
+    fn ty() -> Type {
+        let t = T::ty();
+        let e = E::ty();
+        Type {
             emission: Emission::Common,
             docs: crate::lang::meta::Docs::empty(),
             visibility: Visibility::Public,
             name: format!("Result<{}, {}>", t.name, e.name),
-            kind: TypeKind::TypePattern(TypePattern::Result(T::id(), E::id())),
-        };
+            kind: Self::kind(),
+        }
+    }
 
-        inventory.register_type(Self::id(), type_);
+    fn register(inventory: &mut Inventory) {
+        // Ensure base types are registered.
+        T::register(inventory);
+        E::register(inventory);
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}
+
+impl<T: TypeInfo, E: TypeInfo> crate::lang::Register for Result<T, E> {
+    fn register(inventory: &mut Inventory) {
+        <Self as TypeInfo>::register(inventory);
     }
 }
 

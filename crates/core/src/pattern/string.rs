@@ -78,22 +78,35 @@ impl Drop for String {
 }
 
 impl TypeInfo for String {
+    const WIRE_SAFE: bool = true;
+    const RAW_SAFE: bool = true;
+
     fn id() -> TypeId {
         TypeId::new(0x0D49712411310AE6E26AD32245BF70B2)
     }
-}
 
-impl Register for String {
-    fn register(inventory: &mut Inventory) {
-        let type_ = Type {
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(TypePattern::Utf8String)
+    }
+
+    fn ty() -> Type {
+        Type {
             emission: Emission::Common,
             docs: crate::lang::meta::Docs::empty(),
             visibility: Visibility::Public,
             name: "String".to_string(),
-            kind: TypeKind::TypePattern(TypePattern::Utf8String),
-        };
+            kind: Self::kind(),
+        }
+    }
 
-        inventory.register_type(<Self as TypeInfo>::id(), type_);
+    fn register(inventory: &mut Inventory) {
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}
+
+impl crate::lang::Register for String {
+    fn register(inventory: &mut Inventory) {
+        <Self as TypeInfo>::register(inventory);
     }
 }
 

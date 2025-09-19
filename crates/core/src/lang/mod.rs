@@ -9,3 +9,4 @@ pub mod types;
 pub trait Register {
     fn register(inventory: &mut Inventory);
 }
+

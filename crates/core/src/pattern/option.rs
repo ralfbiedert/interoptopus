@@ -111,27 +111,38 @@ impl<T> From<Option<T>> for std::option::Option<T> {
 }
 
 impl<T: TypeInfo> TypeInfo for Option<T> {
+    const WIRE_SAFE: bool = T::WIRE_SAFE;
+    const RAW_SAFE: bool = T::RAW_SAFE;
+
     fn id() -> TypeId {
         TypeId::new(0xF613EA2C1CDBE74FFFAC69753255D6DE).derive_id(T::id())
     }
-}
 
-impl<T: TypeInfo + Register> Register for Option<T> {
-    fn register(inventory: &mut Inventory) {
-        // Ensure base type is registered.
-        T::register(inventory);
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(crate::lang::types::TypePattern::Option(T::id()))
+    }
 
-        let t = &inventory.types[&T::id()];
-
-        let type_ = crate::lang::types::Type {
+    fn ty() -> crate::lang::types::Type {
+        let t = T::ty();
+        crate::lang::types::Type {
             emission: Emission::Common,
             docs: crate::lang::meta::Docs::empty(),
             visibility: Visibility::Public,
             name: format!("Option<{}>", t.name),
-            kind: TypeKind::TypePattern(crate::lang::types::TypePattern::Option(T::id())),
-        };
+            kind: Self::kind(),
+        }
+    }
 
-        inventory.register_type(Self::id(), type_);
+    fn register(inventory: &mut Inventory) {
+        // Ensure base type is registered.
+        T::register(inventory);
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}
+
+impl<T: TypeInfo> crate::lang::Register for Option<T> {
+    fn register(inventory: &mut Inventory) {
+        <Self as TypeInfo>::register(inventory);
     }
 }
 
