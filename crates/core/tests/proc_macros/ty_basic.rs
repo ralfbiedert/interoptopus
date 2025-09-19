@@ -1,4 +1,3 @@
-use crate::proc_macros::ty_basic::EnumRenamedXYZ::X;
 use interoptopus::ffi;
 use interoptopus::lang::types::TypeInfo;
 use interoptopus_proc::ffi_type;
@@ -59,6 +58,13 @@ pub enum EnumPayload {
     // We don't support these for now
     // D { x: Vec3f32 },
     // E(u8, u8, u8),
+}
+
+#[ffi_type]
+#[derive(Clone)]
+pub enum EnumValue {
+    A = 1,
+    B = 123,
 }
 
 #[ffi_type]
@@ -144,12 +150,6 @@ pub struct Vec2 {
 }
 
 #[ffi_type(opaque)]
-pub struct Opaque {
-    _internal: *const Packed1,
-    _unused: (),
-}
-
-#[ffi_type(service)]
 pub struct Opaque {
     _internal: *const Packed1,
     _unused: (),
