@@ -17,8 +17,8 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
+use crate::lang::types::TypeInfo;
 use crate::lang::types::TypeKind;
-use crate::lang::types::{TypeInfo as _, TypeInfo};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};

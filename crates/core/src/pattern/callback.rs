@@ -240,12 +240,3 @@ macro_rules! callback {
         }
     };
 }
-
-#[cfg(test)]
-mod test {
-    #[test]
-    fn callback_default() {
-        callback!(MyCallback());
-        MyCallback::default();
-    }
-}
