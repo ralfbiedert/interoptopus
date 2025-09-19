@@ -73,11 +73,21 @@ pub struct Repr {
 }
 
 impl Repr {
-    fn c() -> Self {
+    #[must_use]
+    pub fn c() -> Self {
         Self { layout: Layout::C, alignment: None }
     }
 
-    fn u32() -> Self {
+    #[must_use]
+    pub fn u32() -> Self {
         Self { layout: Layout::Primitive(Primitive::U32), alignment: None }
     }
+}
+
+pub const fn assert_wire_safe<T: TypeInfo>() {
+    assert!(T::WIRE_SAFE);
+}
+
+pub const fn assert_raw_safe<T: TypeInfo>() {
+    assert!(T::RAW_SAFE);
 }
