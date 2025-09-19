@@ -1,6 +1,7 @@
 mod args;
 mod emit;
 mod model;
+mod validation;
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -34,6 +35,9 @@ fn ffi_type_impl(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStre
 
     // Remove skip attributes from fields as they are macro helpers
     remove_skip_attributes(&mut input_ast);
+
+    args.validate()?;
+    model.validate()?;
 
     let typeinfo_impl = model.emit_typeinfo_impl();
 

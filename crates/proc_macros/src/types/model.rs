@@ -103,36 +103,7 @@ impl TypeModel {
 
         let model = Self { name: input.ident, vis: input.vis, generics: input.generics, data, args, docs };
 
-        // Validate that empty types are not allowed unless opaque
-        model.validate_non_empty()?;
-
         Ok(model)
-    }
-
-    fn validate_non_empty(&self) -> syn::Result<()> {
-        match &self.data {
-            TypeData::Struct(struct_data) => {
-                // Count non-skipped fields
-                let non_skipped_fields = struct_data.fields.iter().filter(|f| !f.skip).count();
-
-                if non_skipped_fields == 0 && !self.args.opaque {
-                    return Err(syn::Error::new_spanned(
-                        &self.name,
-                        "Empty structs and unit structs are not allowed unless marked as 'opaque'. Use #[ffi_type(opaque)] for types without meaningful fields."
-                    ));
-                }
-            }
-            TypeData::Enum(enum_data) => {
-                if enum_data.variants.is_empty() {
-                    return Err(syn::Error::new_spanned(
-                        &self.name,
-                        "Enums without variants are not allowed"
-                    ));
-                }
-            }
-        }
-
-        Ok(())
     }
 }
 
