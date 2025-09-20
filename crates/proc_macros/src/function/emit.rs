@@ -85,8 +85,11 @@ impl FunctionModel {
         let emission = self.emit_emission();
         let visibility = self.emit_visibility();
         let docs_tokens = self.emit_docs();
+        let validation_guards = self.emit_validation_guards();
 
         quote! {
+            #validation_guards
+
             impl #generics ::interoptopus::lang::function::FunctionInfo for #struct_name #generics #where_clause {
                 fn id() -> ::interoptopus::inventory::FunctionId {
                     ::interoptopus::inventory::FunctionId::from_id(::interoptopus::id!(#struct_name))
@@ -205,4 +208,54 @@ impl FunctionModel {
             ::interoptopus::lang::meta::Docs::from_lines(vec![#(#docs.to_string()),*])
         }
     }
+
+    fn emit_validation_guards(&self) -> TokenStream {
+        // Generate validation for each parameter
+        let parameter_validations = self.signature.inputs.iter().map(|param| {
+            let param_ty = self.elide_lifetimes(&param.ty);
+            quote! {
+                const _: () = const {
+                    ::interoptopus::lang::types::assert_raw_safe::<#param_ty>();
+                };
+            }
+        });
+
+        // Generate validation for return type
+        let return_type_validation = match &self.signature.output {
+            syn::ReturnType::Default => quote! {
+                // Unit type is always RAW_SAFE, no validation needed
+            },
+            syn::ReturnType::Type(_, return_ty) => {
+                let elided_return_ty = self.elide_lifetimes(return_ty);
+                quote! {
+                    const _: () = const {
+                        ::interoptopus::lang::types::assert_raw_safe::<#elided_return_ty>();
+                    };
+                }
+            }
+        };
+
+        quote! {
+            // Compile-time validation guards
+            #(#parameter_validations)*
+            #return_type_validation
+        }
+    }
+
+    fn elide_lifetimes(&self, ty: &syn::Type) -> syn::Type {
+        use syn::visit_mut::VisitMut;
+
+        struct LifetimeElisor;
+
+        impl VisitMut for LifetimeElisor {
+            fn visit_lifetime_mut(&mut self, lifetime: &mut syn::Lifetime) {
+                *lifetime = syn::Lifetime::new("'_", lifetime.span());
+            }
+        }
+
+        let mut elided_ty = ty.clone();
+        LifetimeElisor.visit_type_mut(&mut elided_ty);
+        elided_ty
+    }
+
 }
