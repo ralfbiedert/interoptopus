@@ -14,3 +14,14 @@ pub struct Service {
     destructor: FunctionId,
     methods: Vec<FunctionId>,
 }
+
+impl Service {
+    pub fn new(ty: TypeId, ctors: Vec<FunctionId>, destructor: FunctionId, methods: Vec<FunctionId>) -> Self {
+        Self {
+            ty,
+            ctors,
+            destructor,
+            methods,
+        }
+    }
+}

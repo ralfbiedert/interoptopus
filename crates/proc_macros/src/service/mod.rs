@@ -1,5 +1,41 @@
-use proc_macro2::TokenStream;
+mod args;
+mod emit;
+mod model;
 
-pub fn ffi_service(_attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
-    Ok(input)
+use proc_macro2::TokenStream;
+use quote::quote;
+use syn::{ItemImpl, parse2};
+
+use args::FfiServiceArgs;
+use model::ServiceModel;
+
+pub fn ffi_service(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
+    let args: FfiServiceArgs = parse2(attr)?;
+    let input_impl: ItemImpl = parse2(input)?;
+
+    // Parse the model
+    let model = ServiceModel::from_impl_item(input_impl.clone(), args.clone())?;
+
+    // Generate FFI functions
+    let ffi_functions = model.emit_ffi_functions();
+
+    // Generate ServiceInfo implementation
+    let service_info_impl = model.emit_service_info_impl();
+
+    // Generate verification blocks
+    let verification_blocks = model.emit_verification_blocks();
+
+    let result = quote! {
+        #input_impl
+        #ffi_functions
+        #service_info_impl
+        #verification_blocks
+    };
+
+    if args.debug {
+        let formatted = prettyplease::unparse(&syn::parse2(result.clone()).unwrap());
+        eprintln!("Generated code for service {}:\n{}", model.service_name, formatted);
+    }
+
+    Ok(result)
 }
