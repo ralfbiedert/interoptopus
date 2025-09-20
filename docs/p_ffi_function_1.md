@@ -42,6 +42,7 @@ Requirements
    will not work out it should emit a compiler error.
 8) You can assume the `interoptopus` crate is in scope for emitting code. That said, be nice and prefix all items with 
    the fully qualified path, e.g., `::interoptopus::foo`, `::std::option::Option`, ...
+9) If the user has already specified `extern "..."` on the function or `#[no_mangle]` you should emit an error 
 
 About emitting FunctionInfo:
 

@@ -22,24 +22,17 @@ impl Parse for FfiTypeArgs {
 
         let parsed = Punctuated::<FfiTypeArg, Token![,]>::parse_terminated(input)?;
 
-        let mut opaque_span = None;
-        let mut transparent_span = None;
-        let mut service_span = None;
-
         for arg in parsed {
             match arg {
                 FfiTypeArg::Packed => args.packed = true,
-                FfiTypeArg::Transparent(span) => {
+                FfiTypeArg::Transparent(_) => {
                     args.transparent = true;
-                    transparent_span = Some(span);
                 }
-                FfiTypeArg::Opaque(span) => {
+                FfiTypeArg::Opaque(_) => {
                     args.opaque = true;
-                    opaque_span = Some(span);
                 }
-                FfiTypeArg::Service(span) => {
+                FfiTypeArg::Service(_) => {
                     args.service = true;
-                    service_span = Some(span);
                 }
                 FfiTypeArg::Debug => args.debug = true,
                 FfiTypeArg::Name(name) => args.name = Some(name),
