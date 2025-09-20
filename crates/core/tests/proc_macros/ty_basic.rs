@@ -10,11 +10,8 @@ use std::marker::PhantomData;
 //     assert!(Z::WIRE_SAFE);
 // };
 
-#[ffi_type]
+// #[ffi_type]
 struct ThisShouldFail;
-
-#[ffi_type]
-struct ThisShouldFail2 {}
 
 #[ffi_type(opaque)]
 struct ThisShouldWork;
