@@ -77,7 +77,6 @@ pub mod cstr;
 pub mod option;
 pub mod primitive;
 pub mod result;
-pub mod service;
 pub mod slice;
 pub mod string;
 pub mod surrogate;
