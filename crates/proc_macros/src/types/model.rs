@@ -5,7 +5,6 @@ use syn::{Data, DeriveInput, Fields, Generics, Ident, Type, Visibility};
 #[derive(Clone)]
 pub struct TypeModel {
     pub name: Ident,
-    pub vis: Visibility,
     pub generics: Generics,
     pub data: TypeData,
     pub args: FfiTypeArgs,
@@ -29,6 +28,7 @@ pub struct EnumData {
 }
 
 #[derive(Clone)]
+#[allow(unused)]
 pub struct FieldModel {
     pub name: Option<Ident>,
     pub ty: Type,
@@ -101,7 +101,7 @@ impl TypeModel {
             Data::Union(_) => return Err(syn::Error::new_spanned(input, "Unions are not supported")),
         };
 
-        let model = Self { name: input.ident, vis: input.vis, generics: input.generics, data, args, docs };
+        let model = Self { name: input.ident, generics: input.generics, data, args, docs };
 
         Ok(model)
     }

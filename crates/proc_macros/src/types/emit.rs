@@ -11,6 +11,7 @@ impl TypeModel {
 
         let wire_safe = self.generate_wire_safe();
         let raw_safe = self.generate_raw_safe();
+        let async_safe = self.generate_async_safe();
         let id_expr = self.generate_id();
         let kind_expr = self.generate_kind();
         let ty_expr = self.generate_ty();
@@ -20,6 +21,7 @@ impl TypeModel {
             impl #impl_generics ::interoptopus::lang::types::TypeInfo for #name #ty_generics #where_clause {
                 const WIRE_SAFE: bool = #wire_safe;
                 const RAW_SAFE: bool = #raw_safe;
+                const ASYNC_SAFE: bool = #async_safe;
 
                 fn id() -> ::interoptopus::inventory::TypeId {
                     #id_expr
@@ -93,6 +95,39 @@ impl TypeModel {
                     VariantData::Unit => None,
                     VariantData::Tuple(ty) => Some({
                         quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE }
+                    }),
+                });
+
+                let checks: Vec<_> = variant_checks.collect();
+                if checks.is_empty() {
+                    quote! { true }
+                } else {
+                    quote! { #(#checks)&&* }
+                }
+            }
+        }
+    }
+
+    fn generate_async_safe(&self) -> TokenStream {
+        match &self.data {
+            TypeData::Struct(struct_data) => {
+                let field_checks = struct_data.fields.iter().filter(|f| !f.skip).map(|field| {
+                    let ty = &field.ty;
+                    quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE }
+                });
+
+                let checks: Vec<_> = field_checks.collect();
+                if checks.is_empty() {
+                    quote! { true }
+                } else {
+                    quote! { #(#checks)&&* }
+                }
+            }
+            TypeData::Enum(enum_data) => {
+                let variant_checks = enum_data.variants.iter().filter_map(|variant| match &variant.data {
+                    VariantData::Unit => None,
+                    VariantData::Tuple(ty) => Some({
+                        quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE }
                     }),
                 });
 

@@ -65,6 +65,7 @@ impl FunctionModel {
         };
 
         quote! {
+            #[allow(non_camel_case_types)]
             #vis struct #struct_name #generics #where_clause {
                 #phantom_data_field
             }

@@ -21,6 +21,7 @@ pub use wire::WireOnly;
 pub trait TypeInfo {
     const WIRE_SAFE: bool;
     const RAW_SAFE: bool;
+    const ASYNC_SAFE: bool;
 
     fn id() -> TypeId;
     fn kind() -> TypeKind;
@@ -88,7 +89,9 @@ impl Repr {
 pub const fn assert_wire_safe<T: TypeInfo>() {
     assert!(T::WIRE_SAFE);
 }
-
 pub const fn assert_raw_safe<T: TypeInfo>() {
     assert!(T::RAW_SAFE);
+}
+pub const fn assert_async_safe<T: TypeInfo>() {
+    assert!(T::ASYNC_SAFE);
 }

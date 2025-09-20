@@ -112,6 +112,7 @@ impl<T> From<Option<T>> for std::option::Option<T> {
 impl<T: TypeInfo> TypeInfo for Option<T> {
     const WIRE_SAFE: bool = T::WIRE_SAFE;
     const RAW_SAFE: bool = T::RAW_SAFE;
+    const ASYNC_SAFE: bool = T::ASYNC_SAFE;
 
     fn id() -> TypeId {
         TypeId::new(0xF613EA2C1CDBE74FFFAC69753255D6DE).derive_id(T::id())

@@ -1,14 +1,16 @@
 use crate::inventory::Inventory;
 use crate::lang::function::{Argument, Signature};
-use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
+use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
 
 macro_rules! impl_fnptr {
     // No arguments: extern "C" fn() -> R
     ($r:ident) => {
+        #[allow(non_snake_case)]
         impl<$r: TypeInfo> TypeInfo for extern "C" fn() -> $r {
-            const WIRE_SAFE: bool = $r::WIRE_SAFE;
-            const RAW_SAFE: bool = $r::RAW_SAFE;
+            const WIRE_SAFE: bool = false;
+            const RAW_SAFE: bool = true;
+            const ASYNC_SAFE: bool = true;
 
             fn id() -> TypeId {
                 TypeId::new(0xEE8602B016C043561CA68291A8142F3B).derive_id($r::id())
@@ -44,9 +46,11 @@ macro_rules! impl_fnptr {
             }
         }
 
+        #[allow(non_snake_case)]
         impl<$r: TypeInfo> TypeInfo for Option<extern "C" fn() -> $r> {
-            const WIRE_SAFE: bool = $r::WIRE_SAFE;
-            const RAW_SAFE: bool = $r::RAW_SAFE;
+            const WIRE_SAFE: bool = false;
+            const RAW_SAFE: bool = true;
+            const ASYNC_SAFE: bool = true;
 
             fn id() -> TypeId {
                 <extern "C" fn() -> $r as TypeInfo>::id()
@@ -68,14 +72,15 @@ macro_rules! impl_fnptr {
 
     // With arguments: extern "C" fn(T1, T2, ...) -> R
     ($r:ident, $($t:ident),+) => {
-        #[allow(unused_assignments)]
+        #[allow(unused_assignments, non_snake_case)]
         impl<$r, $($t),+> TypeInfo for extern "C" fn($($t),+) -> $r
         where
             $($t: TypeInfo,)+
             $r: TypeInfo,
         {
-            const WIRE_SAFE: bool = $r::WIRE_SAFE $(&& $t::WIRE_SAFE)+;
-            const RAW_SAFE: bool = $r::RAW_SAFE $(&& $t::RAW_SAFE)+;
+            const WIRE_SAFE: bool = false;
+            const RAW_SAFE: bool = true;
+            const ASYNC_SAFE: bool = true;
 
             fn id() -> TypeId {
                 TypeId::new(0xEE8602B016C043561CA68291A8142F3B)
@@ -150,13 +155,15 @@ macro_rules! impl_fnptr {
             }
         }
 
+        #[allow(unused_assignments, non_snake_case)]
         impl<$r, $($t),+> TypeInfo for Option<extern "C" fn($($t),+) -> $r>
         where
             $($t: TypeInfo,)+
             $r: TypeInfo,
         {
-            const WIRE_SAFE: bool = $r::WIRE_SAFE $(&& $t::WIRE_SAFE)+;
-            const RAW_SAFE: bool = $r::RAW_SAFE $(&& $t::RAW_SAFE)+;
+            const WIRE_SAFE: bool = false;
+            const RAW_SAFE: bool = true;
+            const ASYNC_SAFE: bool = true;
 
             fn id() -> TypeId {
                 <extern "C" fn($($t),+) -> $r as TypeInfo>::id()
@@ -191,6 +198,7 @@ impl_fnptr!(R, T1, T2, T3, T4, T5, T6, T7, T8);
 impl_fnptr!(R, T1, T2, T3, T4, T5, T6, T7, T8, T9);
 impl_fnptr!(R, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10);
 
+#[allow(dead_code)]
 pub fn fnptr_typeid(sig: &Signature) -> TypeId {
     let mut rval = TypeId::new(0xEE8602B016C043561CA68291A8142F3B).derive_id(sig.rval);
 

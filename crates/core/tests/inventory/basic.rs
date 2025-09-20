@@ -3,5 +3,5 @@ use interoptopus::inventory::Inventory;
 
 #[test]
 fn basic() {
-    let x = Inventory::new().register(extra_type!(u32)).validate();
+    let _ = Inventory::new().register(extra_type!(u32)).validate();
 }
