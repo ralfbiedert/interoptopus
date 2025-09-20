@@ -2,13 +2,13 @@ use crate::common::extract_docs;
 use crate::service::args::FfiServiceArgs;
 use proc_macro2::Span;
 use syn::spanned::Spanned;
-use syn::{FnArg, Ident, ImplItem, ItemImpl, Pat, Type, Visibility, ReturnType};
+use syn::{FnArg, Ident, ImplItem, ItemImpl, Pat, ReturnType, Type, Visibility};
 
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct ServiceModel {
     pub service_name: Ident,
     pub service_type: Type,
-    pub generics: syn::Generics,
     pub args: FfiServiceArgs,
     pub constructors: Vec<ServiceMethod>,
     pub methods: Vec<ServiceMethod>,
@@ -16,6 +16,7 @@ pub struct ServiceModel {
 }
 
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct ServiceMethod {
     pub name: Ident,
     pub docs: Vec<String>,
@@ -28,6 +29,7 @@ pub struct ServiceMethod {
 }
 
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct ServiceParameter {
     pub name: Ident,
     pub ty: Type,
@@ -36,10 +38,10 @@ pub struct ServiceParameter {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum ReceiverKind {
-    None,       // Constructor
-    Shared,     // &self
-    Mutable,    // &mut self
-    AsyncThis,  // Async<Self>
+    None,      // Constructor
+    Shared,    // &self
+    Mutable,   // &mut self
+    AsyncThis, // Async<Self>
 }
 
 impl ServiceModel {
@@ -110,28 +112,16 @@ impl ServiceModel {
                             if let Pat::Ident(pat_ident) = typed_arg.pat.as_ref() {
                                 let param_name = pat_ident.ident.clone();
 
-                                inputs.push(ServiceParameter {
-                                    name: param_name,
-                                    ty: param_type,
-                                    span: typed_arg.span(),
-                                });
+                                inputs.push(ServiceParameter { name: param_name, ty: param_type, span: typed_arg.span() });
                             } else {
-                                return Err(syn::Error::new_spanned(&typed_arg.pat, "Only simple parameter names are supported"));
+                                return Err(syn::Error::new_spanned(&typed_arg.pat, "Only named parameters are supported"));
                             }
                         }
                     }
                 }
 
-                let service_method = ServiceMethod {
-                    name: method_name,
-                    docs,
-                    inputs,
-                    output: method.sig.output.clone(),
-                    is_async,
-                    receiver_kind: receiver_kind.clone(),
-                    vis,
-                    span,
-                };
+                let service_method =
+                    ServiceMethod { name: method_name, docs, inputs, output: method.sig.output.clone(), is_async, receiver_kind: receiver_kind.clone(), vis, span };
 
                 match receiver_kind {
                     ReceiverKind::None => constructors.push(service_method),
@@ -145,8 +135,11 @@ impl ServiceModel {
             for method in &methods {
                 if method.receiver_kind == ReceiverKind::Mutable {
                     // Find the receiver span in the method to point the error there
-                    let error_span = if let Some(ImplItem::Fn(method_fn)) = input.items.iter()
-                        .find(|item| if let ImplItem::Fn(f) = item { f.sig.ident == method.name } else { false }) {
+                    let error_span = if let Some(ImplItem::Fn(method_fn)) = input
+                        .items
+                        .iter()
+                        .find(|item| if let ImplItem::Fn(f) = item { f.sig.ident == method.name } else { false })
+                    {
                         // Find the receiver argument
                         if let Some(FnArg::Receiver(receiver)) = method_fn.sig.inputs.first() {
                             receiver.span()
@@ -157,31 +150,17 @@ impl ServiceModel {
                         method.span
                     };
 
-                    return Err(syn::Error::new(
-                        error_span,
-                        "Async services cannot have methods with &mut self. Use &self instead.",
-                    ));
+                    return Err(syn::Error::new(error_span, "Async services cannot have methods with &mut self. Use &self instead."));
                 }
             }
         }
 
         // For now, reject generic services with a clear error message
         if !generics.params.is_empty() {
-            return Err(syn::Error::new_spanned(
-                &generics,
-                "Generic services are not yet supported by #[ffi_service]. Only concrete types are supported."
-            ));
+            return Err(syn::Error::new_spanned(&generics, "Generic services are not yet supported by #[ffi_service]. Only concrete types are supported."));
         }
 
-        Ok(ServiceModel {
-            service_name,
-            service_type,
-            generics,
-            args,
-            constructors,
-            methods,
-            is_async: has_async,
-        })
+        Ok(ServiceModel { service_name, service_type, args, constructors, methods, is_async: has_async })
     }
 
     pub fn service_name_snake_case(&self) -> String {

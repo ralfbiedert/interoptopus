@@ -1,11 +1,9 @@
+#![allow(unused)]
 use crate::proc_macros::fn_basic::Error;
 use interoptopus::ffi;
-use interoptopus::lang::service::Service;
 use interoptopus::pattern::asynk::{Async, AsyncRuntime};
-use interoptopus::pattern::result::result_to_ffi;
 use interoptopus_proc::{ffi_service, ffi_type};
 use std::marker::PhantomData;
-use std::thread::Builder;
 
 #[ffi_type]
 struct Runtime {

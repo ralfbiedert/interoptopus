@@ -1,9 +1,8 @@
 use crate::proc_macros::ty_basic::EnumPayload;
 use interoptopus::ffi;
-use interoptopus::lang::types::{TypeInfo, assert_raw_safe};
+use interoptopus::lang::types::TypeInfo;
 use interoptopus::pattern::result::{panic_to_result, result_to_ffi};
 use interoptopus_proc::{ffi_function, ffi_type};
-use std::sync::Mutex;
 
 #[ffi_type]
 pub struct Packed1(u8);
@@ -33,7 +32,7 @@ pub fn alignment_1(a: Packed1) -> Packed2 {
 }
 
 #[ffi_function]
-pub fn alignment_2(a: ffi::String) {}
+pub fn alignment_2(_x: ffi::String) {}
 
 #[ffi_function]
 pub fn behavior_panics_via_result() -> ffi::Result<(), Error> {
