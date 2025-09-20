@@ -38,7 +38,7 @@ pub fn behavior_panics_via_result() -> ffi::Result<(), Error> {
 /// Blah
 ///
 /// Foo
-#[ffi_function]
+#[ffi_function(export = "abc")]
 pub fn generic_1c<'a>(_x: Option<&'a Generic<'a, u8>>, y: &Generic<'a, u8>) -> u8 {
     *y.x
 }

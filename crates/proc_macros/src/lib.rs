@@ -5,6 +5,7 @@
 
 extern crate proc_macro; // Apparently needed to be imported like this.
 
+mod common;
 mod function;
 mod types;
 
