@@ -3,7 +3,7 @@ use crate::function::args::FfiFunctionArgs;
 use proc_macro2::Span;
 use quote::ToTokens;
 use syn::spanned::Spanned;
-use syn::{FnArg, Ident, ItemFn, Pat, PatType, Type, Visibility};
+use syn::{FnArg, Ident, ItemFn, Pat, Type, Visibility};
 
 #[derive(Clone)]
 pub struct FunctionModel {
@@ -24,6 +24,7 @@ pub struct FunctionSignature {
 }
 
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct FunctionParameter {
     pub name: Ident,
     pub ty: Type,
@@ -63,13 +64,9 @@ impl FunctionModel {
                         // Use the span of the type
                         let ty_span = typed_arg.ty.span();
 
-                        inputs.push(FunctionParameter {
-                            name: pat_ident.ident.clone(),
-                            ty: (*typed_arg.ty).clone(),
-                            ty_span
-                        });
+                        inputs.push(FunctionParameter { name: pat_ident.ident.clone(), ty: (*typed_arg.ty).clone(), ty_span });
                     } else {
-                        return Err(syn::Error::new_spanned(&typed_arg.pat, "Only simple parameter names are supported"));
+                        return Err(syn::Error::new_spanned(&typed_arg.pat, "Only named parameters are supported"));
                     }
                 }
                 FnArg::Receiver(_) => {

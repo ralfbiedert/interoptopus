@@ -1,8 +1,8 @@
 use proc_macro2::TokenStream;
-use quote::{quote, format_ident};
+use quote::{format_ident, quote};
 use syn::{ReturnType, Type};
 
-use crate::service::model::{ServiceModel, ServiceMethod, ReceiverKind};
+use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
 
 impl ServiceModel {
     pub fn emit_ffi_functions(&self) -> TokenStream {
@@ -46,7 +46,6 @@ impl ServiceModel {
         } else {
             quote! { #params, instance: *mut *const #service_type }
         };
-
 
         if self.is_async {
             quote! {
@@ -124,7 +123,7 @@ impl ServiceModel {
         let function_name = format_ident!("{}_{}", service_name_snake, method_name);
 
         let docs = self.emit_docs(&method.docs);
-        let service_type = &self.service_type;
+        let _service_type = &self.service_type;
 
         match method.receiver_kind {
             ReceiverKind::Shared => self.emit_shared_method(method, &function_name, &docs),
@@ -319,19 +318,15 @@ impl ServiceModel {
     }
 
     pub fn emit_service_info_impl(&self) -> TokenStream {
-        let service_name = &self.service_name;
+        let _service_name = &self.service_name;
         let service_type = &self.service_type;
         let service_name_snake = self.service_name_snake_case();
 
         // Generate constructor function names
-        let ctor_names: Vec<_> = self.constructors.iter().map(|ctor| {
-            format_ident!("{}_{}", service_name_snake, ctor.name)
-        }).collect();
+        let ctor_names: Vec<_> = self.constructors.iter().map(|ctor| format_ident!("{}_{}", service_name_snake, ctor.name)).collect();
 
         // Generate method function names
-        let method_names: Vec<_> = self.methods.iter().map(|method| {
-            format_ident!("{}_{}", service_name_snake, method.name)
-        }).collect();
+        let method_names: Vec<_> = self.methods.iter().map(|method| format_ident!("{}_{}", service_name_snake, method.name)).collect();
 
         let destructor_name = format_ident!("{}_destroy", service_name_snake);
 
