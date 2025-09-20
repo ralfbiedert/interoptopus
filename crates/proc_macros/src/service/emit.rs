@@ -42,9 +42,9 @@ impl ServiceModel {
         let error_type = self.extract_error_type_from_constructor(ctor);
 
         let constructor_params = if ctor.inputs.is_empty() {
-            quote! { instance: &mut *const #service_type }
+            quote! { instance: *mut *const #service_type }
         } else {
-            quote! { #params, instance: &mut *const #service_type }
+            quote! { #params, instance: *mut *const #service_type }
         };
 
 
@@ -52,7 +52,7 @@ impl ServiceModel {
             quote! {
                 #docs
                 #[::interoptopus_proc::ffi_function]
-                pub fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr {
+                pub unsafe fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr {
                     let result = #service_name::#ctor_name(#param_names);
                     match result {
                         ::interoptopus::ffi::Ok(service_instance) => {
@@ -70,7 +70,7 @@ impl ServiceModel {
             quote! {
                 #docs
                 #[::interoptopus_proc::ffi_function]
-                pub fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr {
+                pub unsafe fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr {
                     let result = #service_name::#ctor_name(#param_names);
                     match result {
                         ::interoptopus::ffi::Ok(service_instance) => {
@@ -144,11 +144,9 @@ impl ServiceModel {
         quote! {
             #docs
             #[::interoptopus_proc::ffi_function]
-            pub fn #function_name(instance: *const #service_type, #params) #return_type {
-                unsafe {
-                    let instance_ref = &*instance;
-                    instance_ref.#method_name(#param_names)
-                }
+            pub unsafe fn #function_name(instance: *const #service_type, #params) #return_type {
+                let instance_ref = &*instance;
+                instance_ref.#method_name(#param_names)
             }
         }
     }
@@ -163,11 +161,9 @@ impl ServiceModel {
         quote! {
             #docs
             #[::interoptopus_proc::ffi_function]
-            pub fn #function_name(instance: *mut #service_type, #params) #return_type {
-                unsafe {
-                    let instance_ref = &mut *instance;
-                    instance_ref.#method_name(#param_names)
-                }
+            pub unsafe fn #function_name(instance: *mut #service_type, #params) #return_type {
+                let instance_ref = &mut *instance;
+                instance_ref.#method_name(#param_names)
             }
         }
     }
@@ -181,56 +177,78 @@ impl ServiceModel {
         // Extract the inner type from ffi::Result<T, E>
         let callback_type = self.extract_async_callback_type(&method.output);
 
-        quote! {
-            #docs
-            #[::interoptopus_proc::ffi_function]
-            pub fn #function_name(
+        let async_params = if method.inputs.is_empty() {
+            quote! {
+                instance: *const #service_type,
+                callback: ::interoptopus::pattern::asynk::AsyncCallback<#callback_type>
+            }
+        } else {
+            quote! {
                 instance: *const #service_type,
                 #params,
                 callback: ::interoptopus::pattern::asynk::AsyncCallback<#callback_type>
+            }
+        };
+
+        quote! {
+            #docs
+            #[::interoptopus_proc::ffi_function]
+            pub unsafe fn #function_name(
+                #async_params
             ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr {
-                unsafe {
-                    let instance_arc = ::std::sync::Arc::from_raw(instance);
-                    let instance_clone = ::std::sync::Arc::clone(&instance_arc);
-                    ::std::mem::forget(instance_arc); // Don't drop the original
+                let instance_arc = ::std::sync::Arc::from_raw(instance);
+                let instance_clone = ::std::sync::Arc::clone(&instance_arc);
+                ::std::mem::forget(instance_arc); // Don't drop the original
 
-                    let async_this = ::interoptopus::pattern::asynk::Async::new(instance_clone.clone());
+                let async_this = ::interoptopus::pattern::asynk::Async::new(instance_clone.clone());
 
-                    use ::interoptopus::pattern::asynk::AsyncRuntime;
-                    instance_clone.spawn(move |_| async move {
-                        let result = #service_type::#method_name(async_this, #param_names).await;
-                        match result {
-                            ::interoptopus::ffi::Ok(value) => {
-                                callback.call(value);
-                                ::std::mem::forget(value);
-                            }
-                            ::interoptopus::ffi::Err(_err) => {
-                                // TODO: Handle async errors properly
-                            }
+                use ::interoptopus::pattern::asynk::AsyncRuntime;
+                instance_clone.spawn(move |_| async move {
+                    let result = #service_type::#method_name(async_this, #param_names).await;
+                    match result {
+                        ::interoptopus::ffi::Ok(value) => {
+                            callback.call(&value);
                         }
-                    });
-                }
-                ::interoptopus::ffi::Ok(())
+                        ::interoptopus::ffi::Err(_err) => {
+                            // TODO: Handle async errors properly
+                        }
+                        ::interoptopus::ffi::Result::Panic => {
+                            // TODO: Handle async panics properly
+                        }
+                        ::interoptopus::ffi::Result::Null => {
+                            // TODO: Handle async null properly
+                        }
+                    }
+                });
+                ::interoptopus::ffi::Ok(::std::ptr::null())
             }
         }
     }
 
     fn emit_params(&self, inputs: &[crate::service::model::ServiceParameter]) -> TokenStream {
-        let params = inputs.iter().map(|param| {
-            let name = &param.name;
-            let ty = &param.ty;
-            quote! { #name: #ty }
-        });
+        if inputs.is_empty() {
+            quote! {}
+        } else {
+            let params = inputs.iter().map(|param| {
+                let name = &param.name;
+                let ty = &param.ty;
+                quote! { #name: #ty }
+            });
 
-        quote! {
-            #(#params),*
+            quote! {
+                #(#params),*
+            }
         }
     }
 
     fn emit_param_names(&self, inputs: &[crate::service::model::ServiceParameter]) -> TokenStream {
-        let names = inputs.iter().map(|param| &param.name);
-        quote! {
-            #(#names),*
+        if inputs.is_empty() {
+            quote! {}
+        } else {
+            let names = inputs.iter().map(|param| &param.name);
+            quote! {
+                #(#names),*
+            }
         }
     }
 

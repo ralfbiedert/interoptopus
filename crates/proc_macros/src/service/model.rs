@@ -144,8 +144,21 @@ impl ServiceModel {
         if has_async {
             for method in &methods {
                 if method.receiver_kind == ReceiverKind::Mutable {
+                    // Find the receiver span in the method to point the error there
+                    let error_span = if let Some(ImplItem::Fn(method_fn)) = input.items.iter()
+                        .find(|item| if let ImplItem::Fn(f) = item { f.sig.ident == method.name } else { false }) {
+                        // Find the receiver argument
+                        if let Some(FnArg::Receiver(receiver)) = method_fn.sig.inputs.first() {
+                            receiver.span()
+                        } else {
+                            method.span
+                        }
+                    } else {
+                        method.span
+                    };
+
                     return Err(syn::Error::new(
-                        method.span,
+                        error_span,
                         "Async services cannot have methods with &mut self. Use &self instead.",
                     ));
                 }
