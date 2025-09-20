@@ -60,6 +60,7 @@ macro_rules! impl_primitive {
         impl $crate::lang::types::TypeInfo for $t {
             const WIRE_SAFE: bool = true;
             const RAW_SAFE: bool = true;
+            const ASYNC_SAFE: bool = true;
 
             fn id() -> $crate::inventory::TypeId {
                 $crate::inventory::TypeId::new($id)

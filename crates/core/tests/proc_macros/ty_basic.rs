@@ -1,3 +1,4 @@
+#![allow(unused)]
 use interoptopus::ffi;
 use interoptopus::lang::types::TypeInfo;
 use interoptopus_proc::ffi_type;

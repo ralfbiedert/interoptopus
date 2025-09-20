@@ -25,6 +25,7 @@ pub enum TypePattern {
     Vec(TypeId),
 }
 
+#[allow(dead_code)]
 pub fn fallback_type(pattern: &TypePattern) -> TypeKind {
     match pattern {
         TypePattern::CStrPointer => TypeKind::ReadPointer(c_char::id()),

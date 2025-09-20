@@ -10,8 +10,6 @@ pub struct FunctionModel {
     pub docs: Vec<String>,
     pub signature: FunctionSignature,
     pub is_unsafe: bool,
-    pub has_extern: bool,
-    pub has_no_mangle: bool,
 }
 
 #[derive(Clone)]
@@ -75,8 +73,7 @@ impl FunctionModel {
             }
         }
 
-        let model =
-            Self { name: input.sig.ident.clone(), vis: input.vis.clone(), args, docs, signature, is_unsafe: input.sig.unsafety.is_some(), has_extern, has_no_mangle };
+        let model = Self { name: input.sig.ident.clone(), vis: input.vis.clone(), args, docs, signature, is_unsafe: input.sig.unsafety.is_some() };
 
         Ok(model)
     }

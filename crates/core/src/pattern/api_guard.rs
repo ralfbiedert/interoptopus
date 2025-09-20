@@ -74,6 +74,7 @@ impl ApiVersion {
 impl crate::lang::types::TypeInfo for ApiVersion {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = true;
+    const ASYNC_SAFE: bool = true;
 
     fn id() -> TypeId {
         TypeId::new(0xA6B162106C410FCAD91327A85E3FE14E)

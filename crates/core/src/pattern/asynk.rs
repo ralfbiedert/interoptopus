@@ -54,8 +54,9 @@ impl<T: TypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(&T, *const c_v
 }
 
 impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
-    const WIRE_SAFE: bool = T::WIRE_SAFE;
+    const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = T::RAW_SAFE;
+    const ASYNC_SAFE: bool = T::ASYNC_SAFE;
 
     fn id() -> TypeId {
         T::id().derive(0x3BA866E612BB2BEA769699B3476994B8)

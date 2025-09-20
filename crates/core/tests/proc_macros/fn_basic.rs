@@ -5,13 +5,14 @@ use interoptopus::pattern::result::{panic_to_result, result_to_ffi};
 use interoptopus_proc::{ffi_function, ffi_type};
 
 #[ffi_type]
-struct Packed1(u8);
+pub struct Packed1(u8);
 
 #[ffi_type]
-struct Packed2(u8);
+pub struct Packed2(u8);
 
 #[ffi_type]
 #[derive(Debug, PartialOrd, PartialEq, Copy, Clone)]
+#[allow(dead_code)]
 pub enum Error {
     Fail,
 }

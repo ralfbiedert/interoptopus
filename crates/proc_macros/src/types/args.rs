@@ -45,6 +45,7 @@ impl Parse for FfiTypeArgs {
 }
 
 #[derive(Debug, Clone)]
+#[allow(unused)]
 enum FfiTypeArg {
     Packed,
     Transparent(proc_macro2::Span),

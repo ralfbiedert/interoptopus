@@ -25,10 +25,10 @@
 //! void call_with_string(uint8_t* s);
 //! ```
 //!
+use crate::Error;
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
-use crate::Error;
 use std::ffi::CStr;
 use std::marker::PhantomData;
 use std::option::Option::None;
@@ -122,8 +122,9 @@ impl<'a> CStrPtr<'a> {
 }
 
 impl TypeInfo for CStrPtr<'_> {
-    const WIRE_SAFE: bool = true;
+    const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = true;
+    const ASYNC_SAFE: bool = false;
 
     fn id() -> TypeId {
         TypeId::new(0xDE450364E9ADDBA5DC9A6C5BBEC7759F)
