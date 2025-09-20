@@ -85,17 +85,17 @@ impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
 }
 
 /// Used as `this: AsyncSelf` instead of `self` when using `Send` runtimes.
-pub struct AsyncSelf<S> {
+pub struct Async<S> {
     s: Arc<S>, // Self
 }
 
-impl<S> AsyncSelf<S> {
+impl<S> Async<S> {
     pub fn new(s: Arc<S>) -> Self {
         Self { s }
     }
 }
 
-impl<S> Deref for AsyncSelf<S> {
+impl<S> Deref for Async<S> {
     type Target = Arc<S>;
 
     fn deref(&self) -> &Self::Target {
@@ -139,7 +139,7 @@ impl<S, T> AsyncProxy<S, T> for AsyncThreadLocal<S, T> {
     }
 }
 
-impl<S, T> AsyncProxy<S, T> for AsyncSelf<S> {
+impl<S, T> AsyncProxy<S, T> for Async<S> {
     fn new(s: Arc<S>, _: T) -> Self {
         Self::new(s)
     }

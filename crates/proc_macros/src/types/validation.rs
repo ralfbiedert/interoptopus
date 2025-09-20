@@ -20,11 +20,8 @@ impl TypeModel {
                 // Count non-skipped fields
                 let non_skipped_fields = struct_data.fields.iter().filter(|f| !f.skip).count();
 
-                if non_skipped_fields == 0 && !self.args.opaque {
-                    return Err(Error::new_spanned(
-                        &self.name,
-                        "Empty structs and unit structs are not allowed unless marked as 'opaque'. Use #[ffi_type(opaque)] for types without meaningful fields.",
-                    ));
+                if non_skipped_fields == 0 && !self.args.opaque && !self.args.service {
+                    return Err(Error::new_spanned(&self.name, "Empty structs are not allowed unless marked as #[ffi_type(opaque)] or #[ffi_type(service)]."));
                 }
             }
             TypeData::Enum(enum_data) => {
