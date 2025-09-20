@@ -109,9 +109,9 @@ impl ServiceBad {
         ffi::Ok(Self {})
     }
 
-    // pub async fn call(_: Async<Self>) -> ffi::Result<(), Error> {
-    //     ffi::Ok(())
-    // }
+    pub async fn call(_: Async<Self>) -> ffi::Result<(), Error> {
+        ffi::Ok(())
+    }
 
     // TODO: Once an `async fn` is present, methods accepting `&mut self` must not compile.
     // pub fn bad(&mut self) {}
