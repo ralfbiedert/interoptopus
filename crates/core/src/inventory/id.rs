@@ -35,7 +35,12 @@ macro_rules! new_id {
         impl $t {
             #[must_use]
             pub const fn new(id: u128) -> Self {
-                Self($crate::inventory::Id::new(id))
+                Self::from_id($crate::inventory::Id::new(id))
+            }
+
+            #[must_use]
+            pub const fn from_id(id: Id) -> Self {
+                Self(id)
             }
 
             #[must_use]
@@ -51,13 +56,19 @@ macro_rules! new_id {
     };
 }
 
+/// This function returns a "pseudo-random" ID for a type.
+///
+/// Although the ID is probably stable between compilations, this macro must only be used inside
+/// function generating IDs. The reason being the macro takes into account the file and line
+/// number where it was invoked from.
+#[doc(hidden)]
 #[macro_export]
-macro_rules! type_id {
+macro_rules! id {
     ($t:ty) => {{
         use $crate::inventory::hash_str;
 
         let t_name = ::std::any::type_name::<$t>();
-        let base = $crate::inventory::TypeId::new(hash_str(t_name));
+        let base = $crate::inventory::Id::new(hash_str(t_name));
         let crate_hash = hash_str(env!("CARGO_PKG_NAME"));
         let file_hash = hash_str(file!());
         let line_hash = line!() as u128;

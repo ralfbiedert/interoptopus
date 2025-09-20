@@ -10,20 +10,7 @@ use syn::{DeriveInput, parse2};
 use args::FfiTypeArgs;
 use model::TypeModel;
 
-pub fn ffi_type(attr: TokenStream, input: TokenStream) -> TokenStream {
-    match ffi_type_impl(attr, input.clone()) {
-        Ok(result) => result,
-        Err(err) => {
-            let error = err.to_compile_error();
-            quote! {
-                #input
-                #error
-            }
-        }
-    }
-}
-
-fn ffi_type_impl(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
+pub fn ffi_type(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     let args: FfiTypeArgs = parse2(attr)?;
     let mut input_ast: DeriveInput = parse2(input)?;
 

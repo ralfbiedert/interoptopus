@@ -190,7 +190,7 @@ macro_rules! callback {
             const RAW_SAFE: bool = <$rval>::RAW_SAFE $(&& <$ty>::RAW_SAFE)*;
 
             fn id() -> $crate::inventory::TypeId {
-                $crate::type_id!($name)
+                $crate::id!($name)
             }
 
             fn kind() -> $crate::lang::types::TypeKind {
