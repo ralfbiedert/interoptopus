@@ -115,7 +115,7 @@ impl TypeModel {
         };
 
         quote! {
-            ::interoptopus::type_id!(#full_type)
+            ::interoptopus::inventory::TypeId::from_id(::interoptopus::id!(#full_type))
         }
     }
 

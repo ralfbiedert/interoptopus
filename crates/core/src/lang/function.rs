@@ -1,8 +1,12 @@
-use crate::inventory::{FunctionId, TypeId};
+use crate::inventory::{FunctionId, Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
 
 pub trait FunctionInfo {
     fn id() -> FunctionId;
+    fn signature() -> Signature;
+    fn function() -> Function;
+
+    fn register(inventory: &mut Inventory);
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
