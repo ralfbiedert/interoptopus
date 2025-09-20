@@ -1,6 +1,7 @@
 use proc_macro2::TokenStream;
-use quote::quote;
+use quote::{quote, quote_spanned};
 use syn::{ItemFn, ReturnType};
+use syn::spanned::Spanned;
 
 use crate::function::model::FunctionModel;
 
@@ -210,11 +211,21 @@ impl FunctionModel {
     }
 
     fn emit_validation_guards(&self) -> TokenStream {
-        // Generate validation for each parameter
+        // Generate validation for each parameter with improved span attribution
         let parameter_validations = self.signature.inputs.iter().map(|param| {
             let param_ty = self.elide_lifetimes(&param.ty);
-            quote! {
+
+            // Since we've proven that syn::Error::new_spanned works perfectly for span attribution,
+            // we need to implement our own check rather than relying on assert_raw_safe.
+            // This generates a properly-spanned error that covers the entire type.
+
+            // For now, we'll use the original assert_raw_safe but acknowledge the span limitation
+            // A future improvement could implement custom span-aware checking
+            quote_spanned! {param.ty.span()=>
                 const _: () = const {
+                    // NOTE: This has a known limitation where complex path types like std::string::String
+                    // only highlight the first segment (std) rather than the entire type.
+                    // This is due to how syn::Type::span() works for path types.
                     ::interoptopus::lang::types::assert_raw_safe::<#param_ty>();
                 };
             }
@@ -227,10 +238,20 @@ impl FunctionModel {
             },
             syn::ReturnType::Type(_, return_ty) => {
                 let elided_return_ty = self.elide_lifetimes(return_ty);
-                quote! {
-                    const _: () = const {
-                        ::interoptopus::lang::types::assert_raw_safe::<#elided_return_ty>();
-                    };
+
+                // Use the original span if available
+                if let Some(original_span) = self.signature.output_span {
+                    quote_spanned! {original_span=>
+                        const _: () = const {
+                            ::interoptopus::lang::types::assert_raw_safe::<#elided_return_ty>();
+                        };
+                    }
+                } else {
+                    quote! {
+                        const _: () = const {
+                            ::interoptopus::lang::types::assert_raw_safe::<#elided_return_ty>();
+                        };
+                    }
                 }
             }
         };
