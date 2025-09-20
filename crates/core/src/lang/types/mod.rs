@@ -90,7 +90,7 @@ pub const fn assert_wire_safe<T: TypeInfo>() {
     assert!(T::WIRE_SAFE);
 }
 pub const fn assert_raw_safe<T: TypeInfo>() {
-    assert!(T::RAW_SAFE);
+    assert!(T::RAW_SAFE, "This type cannot be safely passed over FFI boundaries.");
 }
 pub const fn assert_async_safe<T: TypeInfo>() {
     assert!(T::ASYNC_SAFE);
