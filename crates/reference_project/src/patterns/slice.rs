@@ -1,7 +1,6 @@
 use crate::types::arrays::CharArray;
 use crate::types::basic::Vec3f32;
 use crate::types::string::UseString;
-use interoptopus::lang2::types::TypeInfo;
 use interoptopus::pattern::slice::{Slice, SliceMut};
 use interoptopus::{callback, ffi, ffi_function};
 

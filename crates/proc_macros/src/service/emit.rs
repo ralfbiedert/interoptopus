@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
-use syn::{ReturnType, Type};
 use syn::spanned::Spanned;
+use syn::{ReturnType, Type};
 
 use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
 
@@ -35,7 +35,7 @@ impl ServiceModel {
     /// Replace Self with the actual service type in a type expression
     /// For const contexts, lifetime parameters are stripped
     fn replace_self_with_service_type(&self, ty: &Type) -> Type {
-        use syn::{Type, PathArguments, GenericArgument};
+        use syn::{GenericArgument, PathArguments, Type};
 
         match ty {
             Type::Path(type_path) => {
@@ -65,7 +65,6 @@ impl ServiceModel {
             _ => ty.clone(),
         }
     }
-
 
     fn emit_constructor_function(&self, ctor: &ServiceMethod) -> TokenStream {
         let service_name_snake = self.service_name_snake_case();
@@ -99,7 +98,7 @@ impl ServiceModel {
 
         quote! {
             #docs
-            #[::interoptopus_proc::ffi_function]
+            #[::interoptopus::ffi_function]
             pub unsafe fn #function_name #generics(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
                 let result = #service_call(#param_names);
                 match result {
@@ -124,7 +123,7 @@ impl ServiceModel {
         let generics = &self.generics;
 
         quote! {
-            #[::interoptopus_proc::ffi_function]
+            #[::interoptopus::ffi_function]
             pub fn #function_name #generics(instance: *const #service_type) {
                 if !instance.is_null() {
                     unsafe {
@@ -161,7 +160,7 @@ impl ServiceModel {
 
         quote! {
             #docs
-            #[::interoptopus_proc::ffi_function]
+            #[::interoptopus::ffi_function]
             pub unsafe fn #function_name #generics(instance: *const #service_type, #params) #return_type {
                 let instance_ref = &*instance;
                 instance_ref.#method_name(#param_names)
@@ -179,7 +178,7 @@ impl ServiceModel {
 
         quote! {
             #docs
-            #[::interoptopus_proc::ffi_function]
+            #[::interoptopus::ffi_function]
             pub unsafe fn #function_name #generics(instance: *mut #service_type, #params) #return_type {
                 let instance_ref = &mut *instance;
                 instance_ref.#method_name(#param_names)
@@ -212,7 +211,7 @@ impl ServiceModel {
 
         quote! {
             #docs
-            #[::interoptopus_proc::ffi_function]
+            #[::interoptopus::ffi_function]
             pub unsafe fn #function_name #generics(
                 #async_params
             ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
@@ -413,34 +412,38 @@ impl ServiceModel {
         };
 
         // Generate SERVICE_CTOR_SAFE checks for constructor return types
-        let ctor_verification_blocks: Vec<proc_macro2::TokenStream> = self.constructors.iter().map(|ctor| {
-            let ctor_name = &ctor.name;
-            let assert_fn_name = format_ident!("_assert_ctor_{}", ctor_name);
-            match &ctor.output {
-                ReturnType::Type(_, return_type) => {
-                    // Replace Self with the actual service type in the return type
-                    let return_type_resolved = self.replace_self_with_service_type(return_type);
-                    let return_type_span = return_type.span();
-                    quote::quote_spanned! { return_type_span =>
-                        const fn #assert_fn_name() {
-                            ::interoptopus::lang::types::assert_service_ctor_safe::<#return_type_resolved>();
+        let ctor_verification_blocks: Vec<proc_macro2::TokenStream> = self
+            .constructors
+            .iter()
+            .map(|ctor| {
+                let ctor_name = &ctor.name;
+                let assert_fn_name = format_ident!("_assert_ctor_{}", ctor_name);
+                match &ctor.output {
+                    ReturnType::Type(_, return_type) => {
+                        // Replace Self with the actual service type in the return type
+                        let return_type_resolved = self.replace_self_with_service_type(return_type);
+                        let return_type_span = return_type.span();
+                        quote::quote_spanned! { return_type_span =>
+                            const fn #assert_fn_name() {
+                                ::interoptopus::lang::types::assert_service_ctor_safe::<#return_type_resolved>();
+                            }
+                            #assert_fn_name();
                         }
-                        #assert_fn_name();
+                    }
+                    ReturnType::Default => {
+                        // Default return type () should be SERVICE_CTOR_SAFE
+                        // Use the method span since there's no explicit return type
+                        let method_span = ctor.span;
+                        quote::quote_spanned! { method_span =>
+                            const fn #assert_fn_name() {
+                                ::interoptopus::lang::types::assert_service_ctor_safe::<()>();
+                            }
+                            #assert_fn_name();
+                        }
                     }
                 }
-                ReturnType::Default => {
-                    // Default return type () should be SERVICE_CTOR_SAFE
-                    // Use the method span since there's no explicit return type
-                    let method_span = ctor.span;
-                    quote::quote_spanned! { method_span =>
-                        const fn #assert_fn_name() {
-                            ::interoptopus::lang::types::assert_service_ctor_safe::<()>();
-                        }
-                        #assert_fn_name();
-                    }
-                }
-            }
-        }).collect();
+            })
+            .collect();
 
         // Note: Skipping ASYNC_SAFE checks for now due to const context limitations with generics
         let async_safe_verification = quote! {};

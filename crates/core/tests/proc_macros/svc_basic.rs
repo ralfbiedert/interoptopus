@@ -4,7 +4,6 @@ use interoptopus::ffi;
 use interoptopus::pattern::asynk::{Async, AsyncRuntime};
 use interoptopus_proc::{ffi_service, ffi_type};
 use std::future::Future;
-use std::marker::PhantomData;
 
 #[ffi_type]
 struct Runtime {
@@ -88,7 +87,7 @@ impl ServiceA {
 pub struct ServiceB<'a> {
     // #[runtime]
     #[skip]
-    _x: PhantomData<&'a ()>,
+    _x: std::marker::PhantomData<&'a ()>,
 }
 
 // Temporarily commenting out generic service to test core functionality
@@ -99,9 +98,9 @@ impl<'a> ServiceB<'a> {
         ffi::Ok(Self { _x: Default::default() })
     }
 
-    pub fn new2() -> ffi::Result<(), Error> {
-        ffi::Ok(())
-    }
+    // pub fn new2() -> ffi::Result<(), Error> {
+    //     ffi::Ok(())
+    // }
 }
 
 //

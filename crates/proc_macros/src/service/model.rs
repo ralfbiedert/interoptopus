@@ -86,9 +86,6 @@ impl ServiceModel {
                 for (i, input_arg) in method.sig.inputs.iter().enumerate() {
                     match input_arg {
                         FnArg::Receiver(receiver) => {
-                            if i != 0 {
-                                return Err(syn::Error::new_spanned(receiver, "Receiver must be the first parameter"));
-                            }
                             receiver_kind = if receiver.mutability.is_some() {
                                 ReceiverKind::Mutable
                             } else {
