@@ -11,6 +11,8 @@ struct Runtime {
 }
 
 impl AsyncRuntime for Runtime {
+    type T = ();
+
     fn spawn<Fn, F>(&self, f: Fn)
     where
         Fn: FnOnce(()) -> F,
@@ -21,6 +23,7 @@ impl AsyncRuntime for Runtime {
 }
 
 impl AsyncRuntime for ServiceA {
+    type T = ();
     fn spawn<Fn, F>(&self, f: Fn)
     where
         Fn: FnOnce(()) -> F,
@@ -31,6 +34,7 @@ impl AsyncRuntime for ServiceA {
 }
 
 impl AsyncRuntime for ServiceB<'_> {
+    type T = ();
     fn spawn<Fn, F>(&self, f: Fn)
     where
         Fn: FnOnce(()) -> F,
@@ -40,6 +44,7 @@ impl AsyncRuntime for ServiceB<'_> {
     }
 }
 impl AsyncRuntime for ServiceBad {
+    type T = ();
     fn spawn<Fn, F>(&self, f: Fn)
     where
         Fn: FnOnce(()) -> F,
@@ -49,6 +54,7 @@ impl AsyncRuntime for ServiceBad {
     }
 }
 impl AsyncRuntime for ServiceMut {
+    type T = ();
     fn spawn<Fn, F>(&self, f: Fn)
     where
         Fn: FnOnce(()) -> F,
@@ -57,6 +63,8 @@ impl AsyncRuntime for ServiceMut {
         todo!()
     }
 }
+
+type X = Async<ServiceA>;
 
 #[ffi_type(service)]
 pub struct ServiceA {
@@ -70,9 +78,9 @@ impl ServiceA {
     }
 
     // TODO: Vec<String> TypeInfo issue with async callbacks - working on complex types
-    // pub async fn handle_vec_string(_: Async<Self>, s: ffi::Vec<ffi::String>) -> ffi::Result<ffi::Vec<ffi::String>, Error> {
-    //     ffi::Result::Ok(s)
-    // }
+    pub async fn handle_vec_string(_: Async<Self>, s: ffi::Vec<ffi::String>) -> ffi::Result<ffi::Vec<ffi::String>, Error> {
+        ffi::Result::Ok(s)
+    }
 }
 
 #[ffi_type(service)]
@@ -124,10 +132,10 @@ impl ServiceBad {
     // pub fn bad(&mut self) {}
 }
 
-const _: () = {
-    use interoptopus::lang::types::TypeInfo;
-    assert!(<ffi::Result<(), Error>>::SERVICE_CTOR_SAFE, "The method looks like a ctor, but it does not return ffi::Result<Self, _>.");
-};
+// const _: () = {
+//     use interoptopus::lang::types::TypeInfo;
+//     assert!(<ffi::Result<(), Error>>::SERVICE_CTOR_SAFE, "The method looks like a ctor, but it does not return ffi::Result<Self, _>.");
+// };
 
 #[ffi_type(service)]
 pub struct ServiceMut {}

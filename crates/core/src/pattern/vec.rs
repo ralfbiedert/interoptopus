@@ -1,5 +1,7 @@
 //! Like a regular [`Vec`](std::vec::Vec), but FFI safe.<sup>🚧</sup>
-use crate::lang::types::TypeInfo;
+use crate::inventory::{Inventory, TypeId};
+use crate::lang::meta::{Emission, Visibility};
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
 use std::mem::forget;
 
 #[derive(Debug)]
@@ -62,6 +64,38 @@ impl<T: TypeInfo> From<std::vec::Vec<T>> for Vec<T> {
 impl<T: TypeInfo> From<Vec<T>> for std::vec::Vec<T> {
     fn from(value: Vec<T>) -> Self {
         value.into_vec()
+    }
+}
+
+impl<T: TypeInfo> TypeInfo for Vec<T> {
+    const WIRE_SAFE: bool = false;
+    const RAW_SAFE: bool = true;
+    const ASYNC_SAFE: bool = true;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
+
+    fn id() -> TypeId {
+        TypeId::new(0x8046F09DA6F9059E4A0D8327DDE7FAC8).derive_id(T::id())
+    }
+
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(TypePattern::Vec(T::id()))
+    }
+
+    fn ty() -> Type {
+        let t = T::ty();
+        Type {
+            name: format!("Vec<{}>", t.name),
+            visibility: Visibility::Public,
+            docs: Default::default(),
+            emission: if matches!(t.emission, Emission::Module(_)) { t.emission } else { Emission::Common },
+            kind: Self::kind(),
+        }
+    }
+
+    fn register(inventory: &mut Inventory) {
+        T::register(inventory);
+        inventory.register_type(Self::id(), Self::ty());
     }
 }
 
