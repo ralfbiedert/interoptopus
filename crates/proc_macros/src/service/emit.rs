@@ -1,6 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::{ReturnType, Type};
+use syn::spanned::Spanned;
 
 use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
 
@@ -419,7 +420,8 @@ impl ServiceModel {
                 ReturnType::Type(_, return_type) => {
                     // Replace Self with the actual service type in the return type
                     let return_type_resolved = self.replace_self_with_service_type(return_type);
-                    quote! {
+                    let return_type_span = return_type.span();
+                    quote::quote_spanned! { return_type_span =>
                         const fn #assert_fn_name() {
                             ::interoptopus::lang::types::assert_service_ctor_safe::<#return_type_resolved>();
                         }
@@ -428,7 +430,9 @@ impl ServiceModel {
                 }
                 ReturnType::Default => {
                     // Default return type () should be SERVICE_CTOR_SAFE
-                    quote! {
+                    // Use the method span since there's no explicit return type
+                    let method_span = ctor.span;
+                    quote::quote_spanned! { method_span =>
                         const fn #assert_fn_name() {
                             ::interoptopus::lang::types::assert_service_ctor_safe::<()>();
                         }

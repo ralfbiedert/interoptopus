@@ -104,5 +104,5 @@ pub const fn assert_service_safe<T: TypeInfo>() {
 }
 
 pub const fn assert_service_ctor_safe<T: TypeInfo>() {
-    assert!(T::SERVICE_CTOR_SAFE);
+    assert!(T::SERVICE_CTOR_SAFE, "This method looks like a constructor, but does not return a Result<Self, _>");
 }
