@@ -90,7 +90,7 @@ pub struct ServiceB<'a> {
 //         ffi::Ok(Self { _x: Default::default() })
 //     }
 // }
-
+//
 // Commented out async method - TODO: Fix async Vec<String> support
 // pub async fn handle_vec_string(_: Async<Self>, s: ffi::Vec<ffi::String>) -> ffi::Result<ffi::Vec<ffi::String>, Error> {
 //     ffi::Result::Ok(s)
@@ -99,15 +99,24 @@ pub struct ServiceB<'a> {
 #[ffi_type(service)]
 pub struct ServiceBad {
     // #[runtime]
+    x: u32,
 }
 
 #[ffi_service]
 impl ServiceBad {
     pub fn new() -> ffi::Result<Self, Error> {
-        ffi::Ok(Self {})
+        ffi::Ok(Self { x: 12 })
     }
 
-    pub async fn call(_: Async<Self>) -> ffi::Result<(), Error> {
+    // TODO
+    // - warn on methods that look like ctors but don't return Result<Self, _>
+    // - warn if Async<Self> is used in non-async methods
+    // - check if warning, validation logic is condensed or all over the place
+    // - re-introduce manual prefix="asdasda"
+    // - check waht to do with lifetime'd services
+    // - check all parameters and types are ASYNC_SAFE on async services
+    pub fn call(x: u32) -> ffi::Result<(), Error> {
+        // x.x += 1;
         ffi::Ok(())
     }
 
