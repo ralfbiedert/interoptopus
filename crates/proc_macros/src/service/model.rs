@@ -9,6 +9,7 @@ use syn::{FnArg, Ident, ImplItem, ItemImpl, Pat, ReturnType, Type, Visibility};
 pub struct ServiceModel {
     pub service_name: Ident,
     pub service_type: Type,
+    pub generics: syn::Generics,
     pub args: FfiServiceArgs,
     pub constructors: Vec<ServiceMethod>,
     pub methods: Vec<ServiceMethod>,
@@ -130,9 +131,58 @@ impl ServiceModel {
             }
         }
 
-        // Validation for async services
-        if has_async {
-            for method in &methods {
+        // Note: We now support lifetime generics, but not type generics
+        for param in &generics.params {
+            if let syn::GenericParam::Type(_) = param {
+                return Err(syn::Error::new_spanned(param, "Type generic services are not yet supported by #[ffi_service]. Only lifetime generics are supported."));
+            }
+        }
+
+        let model = ServiceModel { service_name, service_type, generics, args, constructors, methods, is_async: has_async };
+
+        // Run consolidated validation
+        model.validate(&input)?;
+
+        Ok(model)
+    }
+
+    pub fn service_name_snake_case(&self) -> String {
+        // Check if a manual prefix is provided
+        if let Some(ref prefix) = self.args.prefix {
+            // Remove trailing underscore if present, we'll add it back when needed
+            prefix.trim_end_matches('_').to_string()
+        } else {
+            // Convert CamelCase to snake_case
+            let name = self.service_name.to_string();
+            let mut result = String::new();
+            let mut chars = name.chars().peekable();
+
+            while let Some(ch) = chars.next() {
+                if ch.is_uppercase() && !result.is_empty() {
+                    // Check if next char is lowercase (to handle acronyms correctly)
+                    if let Some(&next_ch) = chars.peek() {
+                        if next_ch.is_lowercase() {
+                            result.push('_');
+                        }
+                    }
+                }
+                result.push(ch.to_lowercase().next().unwrap_or(ch));
+            }
+
+            result
+        }
+    }
+
+    /// Consolidated validation for service constraints
+    pub fn validate(&self, input: &ItemImpl) -> syn::Result<()> {
+        self.validate_async_constraints(input)?;
+        Ok(())
+    }
+
+    /// Validate async service constraints
+    fn validate_async_constraints(&self, input: &ItemImpl) -> syn::Result<()> {
+        if self.is_async {
+            for method in &self.methods {
                 if method.receiver_kind == ReceiverKind::Mutable {
                     // Find the receiver span in the method to point the error there
                     let error_span = if let Some(ImplItem::Fn(method_fn)) = input
@@ -154,33 +204,6 @@ impl ServiceModel {
                 }
             }
         }
-
-        // For now, reject generic services with a clear error message
-        if !generics.params.is_empty() {
-            return Err(syn::Error::new_spanned(&generics, "Generic services are not yet supported by #[ffi_service]. Only concrete types are supported."));
-        }
-
-        Ok(ServiceModel { service_name, service_type, args, constructors, methods, is_async: has_async })
-    }
-
-    pub fn service_name_snake_case(&self) -> String {
-        // Convert CamelCase to snake_case
-        let name = self.service_name.to_string();
-        let mut result = String::new();
-        let mut chars = name.chars().peekable();
-
-        while let Some(ch) = chars.next() {
-            if ch.is_uppercase() && !result.is_empty() {
-                // Check if next char is lowercase (to handle acronyms correctly)
-                if let Some(&next_ch) = chars.peek() {
-                    if next_ch.is_lowercase() {
-                        result.push('_');
-                    }
-                }
-            }
-            result.push(ch.to_lowercase().next().unwrap_or(ch));
-        }
-
-        result
+        Ok(())
     }
 }

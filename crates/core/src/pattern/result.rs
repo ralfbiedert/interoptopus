@@ -30,7 +30,6 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
-use crate::lang::service::ServiceInfo;
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
 use std::any::Any;
 use std::fmt::Debug;
