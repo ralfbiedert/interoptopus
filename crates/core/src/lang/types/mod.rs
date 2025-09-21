@@ -22,6 +22,8 @@ pub trait TypeInfo {
     const WIRE_SAFE: bool;
     const RAW_SAFE: bool;
     const ASYNC_SAFE: bool;
+    const SERVICE_SAFE: bool;
+    const SERVICE_CTOR_SAFE: bool;
 
     fn id() -> TypeId;
     fn kind() -> TypeKind;

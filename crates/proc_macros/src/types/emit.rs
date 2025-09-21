@@ -12,6 +12,7 @@ impl TypeModel {
         let wire_safe = self.generate_wire_safe();
         let raw_safe = self.generate_raw_safe();
         let async_safe = self.generate_async_safe();
+        let service_safe = self.generate_service_safe();
         let id_expr = self.generate_id();
         let kind_expr = self.generate_kind();
         let ty_expr = self.generate_ty();
@@ -22,6 +23,8 @@ impl TypeModel {
                 const WIRE_SAFE: bool = #wire_safe;
                 const RAW_SAFE: bool = #raw_safe;
                 const ASYNC_SAFE: bool = #async_safe;
+                const SERVICE_SAFE: bool = #service_safe;
+                const SERVICE_CTOR_SAFE: bool = false;
 
                 fn id() -> ::interoptopus::inventory::TypeId {
                     #id_expr
@@ -138,6 +141,14 @@ impl TypeModel {
                     quote! { #(#checks)&&* }
                 }
             }
+        }
+    }
+
+    fn generate_service_safe(&self) -> TokenStream {
+        if self.args.service {
+            quote! { true }
+        } else {
+            quote! { false }
         }
     }
 

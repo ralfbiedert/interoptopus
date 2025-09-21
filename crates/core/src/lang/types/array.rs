@@ -14,6 +14,8 @@ where
     const WIRE_SAFE: bool = T::WIRE_SAFE;
     const RAW_SAFE: bool = T::RAW_SAFE;
     const ASYNC_SAFE: bool = T::ASYNC_SAFE;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
 
     fn id() -> TypeId {
         // Reliably derive an ID for an array of type T and length N.

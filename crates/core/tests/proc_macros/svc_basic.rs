@@ -115,14 +115,19 @@ impl ServiceBad {
     // - re-introduce manual prefix="asdasda"
     // - check waht to do with lifetime'd services
     // - check all parameters and types are ASYNC_SAFE on async services
-    pub fn call(x: u32) -> ffi::Result<(), Error> {
-        // x.x += 1;
-        ffi::Ok(())
-    }
+    // pub fn call_should_not_work(x: u32) -> ffi::Result<(), Error> {
+    //     // x.x += 1;
+    //     ffi::Ok(())
+    // }
 
     // TODO: Once an `async fn` is present, methods accepting `&mut self` must not compile.
     // pub fn bad(&mut self) {}
 }
+
+const _: () = {
+    use interoptopus::lang::types::TypeInfo;
+    assert!(<ffi::Result<(), Error>>::SERVICE_CTOR_SAFE, "The method looks like a ctor, but it does not return ffi::Result<Self, _>.");
+};
 
 #[ffi_type(service)]
 pub struct ServiceMut {}

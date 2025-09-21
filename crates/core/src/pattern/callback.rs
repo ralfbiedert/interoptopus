@@ -188,6 +188,9 @@ macro_rules! callback {
         impl $crate::lang::types::TypeInfo for $name {
             const WIRE_SAFE: bool = <$rval>::WIRE_SAFE $(&& <$ty>::WIRE_SAFE)*;
             const RAW_SAFE: bool = <$rval>::RAW_SAFE $(&& <$ty>::RAW_SAFE)*;
+            const ASYNC_SAFE: bool = <$rval>::ASYNC_SAFE $(&& <$ty>::ASYNC_SAFE)*;
+            const SERVICE_SAFE: bool = false;
+            const SERVICE_CTOR_SAFE: bool = false;
 
             fn id() -> $crate::inventory::TypeId {
                 $crate::id!($name)

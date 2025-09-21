@@ -74,6 +74,8 @@ impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
     const WIRE_SAFE: bool = L::WIRE_SAFE;
     const RAW_SAFE: bool = L::RAW_SAFE;
     const ASYNC_SAFE: bool = L::ASYNC_SAFE;
+    const SERVICE_SAFE: bool = L::SERVICE_SAFE;
+    const SERVICE_CTOR_SAFE: bool = L::SERVICE_CTOR_SAFE;
 
     fn id() -> TypeId {
         L::id()

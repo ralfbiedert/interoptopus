@@ -15,6 +15,8 @@ macro_rules! impl_ptr {
             const WIRE_SAFE: bool = false;
             const RAW_SAFE: bool = T::RAW_SAFE;
             const ASYNC_SAFE: bool = false;
+            const SERVICE_SAFE: bool = false;
+            const SERVICE_CTOR_SAFE: bool = false;
 
             fn id() -> TypeId {
                 T::id().derive($id)
@@ -62,6 +64,8 @@ impl<T: TypeInfo> TypeInfo for MaybeUninit<T> {
     const WIRE_SAFE: bool = T::WIRE_SAFE;
     const RAW_SAFE: bool = T::RAW_SAFE;
     const ASYNC_SAFE: bool = T::ASYNC_SAFE;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
 
     fn id() -> TypeId {
         // Same as base type
@@ -86,6 +90,8 @@ impl TypeInfo for String {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = false;
     const ASYNC_SAFE: bool = false;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
 
     fn id() -> TypeId {
         TypeId::new(0x121F9B85DF8484C54AFC97C4C345A715)
@@ -108,6 +114,8 @@ impl<T: TypeInfo> TypeInfo for Vec<T> {
     const WIRE_SAFE: bool = T::WIRE_SAFE;
     const RAW_SAFE: bool = false;
     const ASYNC_SAFE: bool = false;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
 
     fn id() -> TypeId {
         T::id().derive(0x3D4A1327D939CFFCC50EC62B7190BDE0)
@@ -133,6 +141,8 @@ impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap
     const WIRE_SAFE: bool = K::WIRE_SAFE && V::WIRE_SAFE;
     const RAW_SAFE: bool = false;
     const ASYNC_SAFE: bool = false;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
 
     fn id() -> TypeId {
         TypeId::new(0xB55DC9DFF8B775E03D34267E9F1DABE5).derive_id(K::id()).derive_id(V::id())
@@ -160,6 +170,8 @@ impl TypeInfo for ::std::ffi::c_void {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
 
     fn id() -> TypeId {
         TypeId::new(0x34E7C243AFCBE5D699605695ACF663B5)

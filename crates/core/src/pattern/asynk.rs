@@ -57,6 +57,8 @@ impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = T::RAW_SAFE;
     const ASYNC_SAFE: bool = T::ASYNC_SAFE;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
 
     fn id() -> TypeId {
         T::id().derive(0x3BA866E612BB2BEA769699B3476994B8)
