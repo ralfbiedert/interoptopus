@@ -55,40 +55,20 @@ impl ServiceModel {
             quote! { #params, instance: *mut *const #service_type }
         };
 
-        if self.is_async {
-            quote! {
-                #docs
-                #[::interoptopus_proc::ffi_function]
-                pub unsafe fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
-                    let result = #service_call(#param_names);
-                    match result {
-                        ::interoptopus::ffi::Ok(service_instance) => {
-                            let arc = ::std::sync::Arc::new(service_instance);
-                            *instance = ::std::sync::Arc::into_raw(arc);
-                            ::interoptopus::ffi::Ok(::std::ptr::null())
-                        }
-                        ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
-                        ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
-                        ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
+        quote! {
+            #docs
+            #[::interoptopus_proc::ffi_function]
+            pub unsafe fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
+                let result = #service_call(#param_names);
+                match result {
+                    ::interoptopus::ffi::Ok(service_instance) => {
+                        let arc = ::std::sync::Arc::new(service_instance);
+                        *instance = ::std::sync::Arc::into_raw(arc);
+                        ::interoptopus::ffi::Ok(::std::ptr::null())
                     }
-                }
-            }
-        } else {
-            quote! {
-                #docs
-                #[::interoptopus_proc::ffi_function]
-                pub unsafe fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT::<*const #service_type> {
-                    let result = #service_call(#param_names);
-                    match result {
-                        ::interoptopus::ffi::Ok(service_instance) => {
-                            let boxed = ::std::boxed::Box::new(service_instance);
-                            *instance = ::std::boxed::Box::leak(boxed);
-                            ::interoptopus::ffi::Ok(::std::ptr::null())
-                        }
-                        ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
-                        ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
-                        ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
-                    }
+                    ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
+                    ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
+                    ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
                 }
             }
         }
@@ -100,25 +80,12 @@ impl ServiceModel {
 
         let service_type = &self.service_type;
 
-        if self.is_async {
-            quote! {
-                #[::interoptopus_proc::ffi_function]
-                pub fn #function_name(instance: *const #service_type) {
-                    if !instance.is_null() {
-                        unsafe {
-                            let _ = ::std::sync::Arc::from_raw(instance);
-                        }
-                    }
-                }
-            }
-        } else {
-            quote! {
-                #[::interoptopus_proc::ffi_function]
-                pub fn #function_name(instance: *const #service_type) {
-                    if !instance.is_null() {
-                        unsafe {
-                            let _ = ::std::boxed::Box::from_raw(instance as *mut #service_type);
-                        }
+        quote! {
+            #[::interoptopus_proc::ffi_function]
+            pub fn #function_name(instance: *const #service_type) {
+                if !instance.is_null() {
+                    unsafe {
+                        let _ = ::std::sync::Arc::from_raw(instance);
                     }
                 }
             }

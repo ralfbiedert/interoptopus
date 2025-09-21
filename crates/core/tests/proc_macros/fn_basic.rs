@@ -57,7 +57,7 @@ pub unsafe fn ptr3(x: *mut i64) -> *mut i64 {
     x
 }
 
-#[ffi_function(debug)]
+#[ffi_function]
 pub fn ref5(x: &mut EnumPayload) {
     *x = EnumPayload::C(123);
 }

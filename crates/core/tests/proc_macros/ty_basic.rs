@@ -145,7 +145,7 @@ where
     pub p: PhantomData<&'a T>,
 }
 
-#[ffi_type(transparent, debug)]
+#[ffi_type(transparent)]
 pub struct Transparent<'a>(UseCStrPtr<'a>);
 
 #[ffi_type(module = "abc")]
