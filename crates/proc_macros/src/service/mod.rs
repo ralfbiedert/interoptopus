@@ -27,14 +27,25 @@ pub fn ffi_service(attr: TokenStream, input: TokenStream) -> syn::Result<TokenSt
 
     let result = quote! {
         #input_impl
+
+        // Generated FFI functions
         #ffi_functions
+
         #service_info_impl
         #verification_blocks
     };
 
     if args.debug {
-        let formatted = prettyplease::unparse(&syn::parse2(result.clone()).unwrap());
-        eprintln!("Generated code for service {}:\n{}", model.service_name, formatted);
+        match syn::parse2(result.clone()) {
+            Ok(parsed) => {
+                let formatted = prettyplease::unparse(&parsed);
+                eprintln!("Generated code for service {}:\n{}", model.service_name, formatted);
+            }
+            Err(e) => {
+                eprintln!("Failed to parse generated code for service {}: {}", model.service_name, e);
+                eprintln!("Raw generated code:\n{}", result);
+            }
+        }
     }
 
     Ok(result)
