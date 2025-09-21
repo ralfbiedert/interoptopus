@@ -71,7 +71,7 @@ pub struct ServiceA {
     // #[runtime]
 }
 
-#[ffi_service]
+// #[ffi_service(prefix = "foo_")]
 impl ServiceA {
     pub fn new() -> ffi::Result<Self, Error> {
         ffi::Ok(Self {})
@@ -92,12 +92,12 @@ pub struct ServiceB<'a> {
 
 // Temporarily commenting out generic service to test core functionality
 // TODO: Add support for generic services in the future
-// #[ffi_service]
-// impl<'a> ServiceB<'a> {
-//     pub fn new() -> ffi::Result<Self, Error> {
-//         ffi::Ok(Self { _x: Default::default() })
-//     }
-// }
+#[ffi_service]
+impl<'a> ServiceB<'a> {
+    pub fn new() -> ffi::Result<Self, Error> {
+        ffi::Ok(Self { _x: Default::default() })
+    }
+}
 //
 // Commented out async method - TODO: Fix async Vec<String> support
 // pub async fn handle_vec_string(_: Async<Self>, s: ffi::Vec<ffi::String>) -> ffi::Result<ffi::Vec<ffi::String>, Error> {
@@ -127,6 +127,11 @@ impl ServiceBad {
     //     // x.x += 1;
     //     ffi::Ok(())
     // }
+
+    pub async fn ok(x: Async<Self>, x2: u32) -> ffi::Result<(), Error> {
+        // x.x += 1;
+        ffi::Ok(())
+    }
 
     // TODO: Once an `async fn` is present, methods accepting `&mut self` must not compile.
     // pub fn bad(&mut self) {}
