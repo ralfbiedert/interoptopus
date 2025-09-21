@@ -26,6 +26,12 @@ impl ServiceModel {
         }
     }
 
+    /// Get the base service name without any generic parameters (for const contexts)
+    fn get_base_service_name(&self) -> syn::Ident {
+        self.service_name.clone()
+    }
+
+
     fn emit_constructor_function(&self, ctor: &ServiceMethod) -> TokenStream {
         let service_name_snake = self.service_name_snake_case();
         let ctor_name = &ctor.name;
@@ -37,13 +43,14 @@ impl ServiceModel {
 
         let service_type = &self.service_type;
         let service_name = &self.service_name;
+        let generics = &self.generics;
 
         // For generic types, we need to use the concrete type with turbofish syntax
         let service_call = if self.generics.params.is_empty() {
             quote! { #service_name::#ctor_name }
         } else {
-            // For now, we'll just use the type path directly - this assumes concrete instantiation
-            quote! { #service_type::#ctor_name }
+            // Use the full generic type with angle brackets for function calls
+            quote! { <#service_type>::#ctor_name }
         };
 
         // Extract error type from the constructor's return type
@@ -58,7 +65,7 @@ impl ServiceModel {
         quote! {
             #docs
             #[::interoptopus_proc::ffi_function]
-            pub unsafe fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
+            pub unsafe fn #function_name #generics(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
                 let result = #service_call(#param_names);
                 match result {
                     ::interoptopus::ffi::Ok(service_instance) => {
@@ -79,10 +86,11 @@ impl ServiceModel {
         let function_name = format_ident!("{}_destroy", service_name_snake);
 
         let service_type = &self.service_type;
+        let generics = &self.generics;
 
         quote! {
             #[::interoptopus_proc::ffi_function]
-            pub fn #function_name(instance: *const #service_type) {
+            pub fn #function_name #generics(instance: *const #service_type) {
                 if !instance.is_null() {
                     unsafe {
                         let _ = ::std::sync::Arc::from_raw(instance);
@@ -114,11 +122,12 @@ impl ServiceModel {
         let params = self.emit_params(&method.inputs);
         let param_names = self.emit_param_names(&method.inputs);
         let return_type = self.emit_return_type(&method.output);
+        let generics = &self.generics;
 
         quote! {
             #docs
             #[::interoptopus_proc::ffi_function]
-            pub unsafe fn #function_name(instance: *const #service_type, #params) #return_type {
+            pub unsafe fn #function_name #generics(instance: *const #service_type, #params) #return_type {
                 let instance_ref = &*instance;
                 instance_ref.#method_name(#param_names)
             }
@@ -131,11 +140,12 @@ impl ServiceModel {
         let params = self.emit_params(&method.inputs);
         let param_names = self.emit_param_names(&method.inputs);
         let return_type = self.emit_return_type(&method.output);
+        let generics = &self.generics;
 
         quote! {
             #docs
             #[::interoptopus_proc::ffi_function]
-            pub unsafe fn #function_name(instance: *mut #service_type, #params) #return_type {
+            pub unsafe fn #function_name #generics(instance: *mut #service_type, #params) #return_type {
                 let instance_ref = &mut *instance;
                 instance_ref.#method_name(#param_names)
             }
@@ -147,6 +157,7 @@ impl ServiceModel {
         let method_name = &method.name;
         let params = self.emit_params(&method.inputs);
         let param_names = self.emit_param_names(&method.inputs);
+        let generics = &self.generics;
 
         // Extract the inner type from ffi::Result<T, E>
         let callback_type = self.extract_async_callback_type(&method.output);
@@ -167,7 +178,7 @@ impl ServiceModel {
         quote! {
             #docs
             #[::interoptopus_proc::ffi_function]
-            pub unsafe fn #function_name(
+            pub unsafe fn #function_name #generics(
                 #async_params
             ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
                 let instance_arc = ::std::sync::Arc::from_raw(instance);
@@ -296,6 +307,7 @@ impl ServiceModel {
         let _service_name = &self.service_name;
         let service_type = &self.service_type;
         let service_name_snake = self.service_name_snake_case();
+        let generics = &self.generics;
 
         // Generate constructor function names
         let ctor_names: Vec<_> = self.constructors.iter().map(|ctor| format_ident!("{}_{}", service_name_snake, ctor.name)).collect();
@@ -306,7 +318,7 @@ impl ServiceModel {
         let destructor_name = format_ident!("{}_destroy", service_name_snake);
 
         quote! {
-            impl ::interoptopus::lang::service::ServiceInfo for #service_type {
+            impl #generics ::interoptopus::lang::service::ServiceInfo for #service_type {
                 fn id() -> ::interoptopus::inventory::ServiceId {
                     ::interoptopus::inventory::ServiceId::from_id(::interoptopus::id!(#service_type))
                 }
@@ -351,6 +363,7 @@ impl ServiceModel {
     pub fn emit_verification_blocks(&self) -> TokenStream {
         // Generate compile-time verification blocks
         let service_type = &self.service_type;
+        let base_service_name = self.get_base_service_name();
 
         let async_verification = if self.is_async {
             quote! {
@@ -375,7 +388,7 @@ impl ServiceModel {
                 // Verify that the service type implements the required traits
                 const fn _assert_service_type_is_valid() {
                     const fn _assert_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
-                    _assert_type_info::<#service_type>();
+                    _assert_type_info::<#base_service_name>();
                 }
 
                 // If this is an async service, verify AsyncRuntime is implemented

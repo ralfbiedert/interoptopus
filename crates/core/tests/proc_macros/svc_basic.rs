@@ -3,6 +3,7 @@ use crate::proc_macros::fn_basic::Error;
 use interoptopus::ffi;
 use interoptopus::pattern::asynk::{Async, AsyncRuntime};
 use interoptopus_proc::{ffi_service, ffi_type};
+use std::future::Future;
 use std::marker::PhantomData;
 
 #[ffi_type]
@@ -92,12 +93,17 @@ pub struct ServiceB<'a> {
 
 // Temporarily commenting out generic service to test core functionality
 // TODO: Add support for generic services in the future
-#[ffi_service(debug)]
+#[ffi_service]
 impl<'a> ServiceB<'a> {
     pub fn new() -> ffi::Result<Self, Error> {
         ffi::Ok(Self { _x: Default::default() })
     }
+
+    pub fn new2() -> ffi::Result<(), Error> {
+        ffi::Ok(())
+    }
 }
+
 //
 // Commented out async method - TODO: Fix async Vec<String> support
 // pub async fn handle_vec_string(_: Async<Self>, s: ffi::Vec<ffi::String>) -> ffi::Result<ffi::Vec<ffi::String>, Error> {
