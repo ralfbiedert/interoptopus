@@ -11,6 +11,8 @@ macro_rules! impl_fnptr {
             const WIRE_SAFE: bool = false;
             const RAW_SAFE: bool = true;
             const ASYNC_SAFE: bool = true;
+            const SERVICE_SAFE: bool = false;
+            const SERVICE_CTOR_SAFE: bool = false;
 
             fn id() -> TypeId {
                 TypeId::new(0xEE8602B016C043561CA68291A8142F3B).derive_id($r::id())
@@ -51,6 +53,8 @@ macro_rules! impl_fnptr {
             const WIRE_SAFE: bool = false;
             const RAW_SAFE: bool = true;
             const ASYNC_SAFE: bool = true;
+            const SERVICE_SAFE: bool = false;
+            const SERVICE_CTOR_SAFE: bool = false;
 
             fn id() -> TypeId {
                 <extern "C" fn() -> $r as TypeInfo>::id()
@@ -81,6 +85,8 @@ macro_rules! impl_fnptr {
             const WIRE_SAFE: bool = false;
             const RAW_SAFE: bool = true;
             const ASYNC_SAFE: bool = true;
+            const SERVICE_SAFE: bool = false;
+            const SERVICE_CTOR_SAFE: bool = false;
 
             fn id() -> TypeId {
                 TypeId::new(0xEE8602B016C043561CA68291A8142F3B)
@@ -164,6 +170,8 @@ macro_rules! impl_fnptr {
             const WIRE_SAFE: bool = false;
             const RAW_SAFE: bool = true;
             const ASYNC_SAFE: bool = true;
+            const SERVICE_CTOR_SAFE: bool = false;
+            const SERVICE_SAFE: bool = false;
 
             fn id() -> TypeId {
                 <extern "C" fn($($t),+) -> $r as TypeInfo>::id()

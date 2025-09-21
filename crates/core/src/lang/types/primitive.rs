@@ -61,6 +61,8 @@ macro_rules! impl_primitive {
             const WIRE_SAFE: bool = true;
             const RAW_SAFE: bool = true;
             const ASYNC_SAFE: bool = true;
+            const SERVICE_SAFE: bool = false;
+            const SERVICE_CTOR_SAFE: bool = false;
 
             fn id() -> $crate::inventory::TypeId {
                 $crate::inventory::TypeId::new($id)

@@ -80,6 +80,8 @@ impl TypeInfo for String {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
 
     fn id() -> TypeId {
         TypeId::new(0x0D49712411310AE6E26AD32245BF70B2)

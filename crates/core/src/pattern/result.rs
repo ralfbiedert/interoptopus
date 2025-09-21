@@ -30,6 +30,7 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
+use crate::lang::service::ServiceInfo;
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
 use std::any::Any;
 use std::fmt::Debug;
@@ -56,6 +57,10 @@ pub enum Result<T, E> {
     /// Internal variant used when null was passed where it shouldn't.
     Null,
 }
+
+// impl<T: ServiceInfo, E> Result<T, E> {
+//     // pub const ASSERT_CTOR_RVAL: bool = true;
+// }
 
 impl<T, E> ResultAsPtr for Result<T, E> {
     type AsPtr = Result<*const T, E>;
@@ -117,6 +122,8 @@ impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
     const WIRE_SAFE: bool = T::WIRE_SAFE && E::WIRE_SAFE;
     const RAW_SAFE: bool = T::RAW_SAFE && E::RAW_SAFE;
     const ASYNC_SAFE: bool = T::ASYNC_SAFE && E::ASYNC_SAFE;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = T::SERVICE_SAFE;
 
     fn id() -> TypeId {
         TypeId::new(0x9BCBD2325F73A8CBDAE991B5BB8EB6FC).derive_id(T::id())

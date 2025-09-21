@@ -125,6 +125,8 @@ impl TypeInfo for CStrPtr<'_> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = false;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
 
     fn id() -> TypeId {
         TypeId::new(0xDE450364E9ADDBA5DC9A6C5BBEC7759F)
