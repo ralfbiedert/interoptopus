@@ -31,6 +31,40 @@ impl ServiceModel {
         self.service_name.clone()
     }
 
+    /// Replace Self with the actual service type in a type expression
+    /// For const contexts, lifetime parameters are stripped
+    fn replace_self_with_service_type(&self, ty: &Type) -> Type {
+        use syn::{Type, PathArguments, GenericArgument};
+
+        match ty {
+            Type::Path(type_path) => {
+                let mut new_path = type_path.clone();
+
+                // Process each segment of the path
+                for segment in &mut new_path.path.segments {
+                    if segment.ident == "Self" {
+                        // Replace Self with the base service type name (no generics for const contexts)
+                        segment.ident = self.service_name.clone();
+                        // Don't add generic parameters in const contexts
+                        segment.arguments = PathArguments::None;
+                    } else {
+                        // Recursively process any generic arguments
+                        if let PathArguments::AngleBracketed(ref mut args) = segment.arguments {
+                            for arg in &mut args.args {
+                                if let GenericArgument::Type(inner_type) = arg {
+                                    *inner_type = self.replace_self_with_service_type(inner_type);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Type::Path(new_path)
+            }
+            _ => ty.clone(),
+        }
+    }
+
 
     fn emit_constructor_function(&self, ctor: &ServiceMethod) -> TokenStream {
         let service_name_snake = self.service_name_snake_case();
@@ -377,8 +411,32 @@ impl ServiceModel {
             quote! {}
         };
 
-        // Note: Skipping SERVICE_CTOR_SAFE checks for now due to const context limitations with generics
-        let ctor_verification_blocks: Vec<proc_macro2::TokenStream> = Vec::new();
+        // Generate SERVICE_CTOR_SAFE checks for constructor return types
+        let ctor_verification_blocks: Vec<proc_macro2::TokenStream> = self.constructors.iter().map(|ctor| {
+            let ctor_name = &ctor.name;
+            let assert_fn_name = format_ident!("_assert_ctor_{}", ctor_name);
+            match &ctor.output {
+                ReturnType::Type(_, return_type) => {
+                    // Replace Self with the actual service type in the return type
+                    let return_type_resolved = self.replace_self_with_service_type(return_type);
+                    quote! {
+                        const fn #assert_fn_name() {
+                            ::interoptopus::lang::types::assert_service_ctor_safe::<#return_type_resolved>();
+                        }
+                        #assert_fn_name();
+                    }
+                }
+                ReturnType::Default => {
+                    // Default return type () should be SERVICE_CTOR_SAFE
+                    quote! {
+                        const fn #assert_fn_name() {
+                            ::interoptopus::lang::types::assert_service_ctor_safe::<()>();
+                        }
+                        #assert_fn_name();
+                    }
+                }
+            }
+        }).collect();
 
         // Note: Skipping ASYNC_SAFE checks for now due to const context limitations with generics
         let async_safe_verification = quote! {};
