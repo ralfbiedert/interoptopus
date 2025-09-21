@@ -62,12 +62,8 @@ pub enum Result<T, E> {
 //     // pub const ASSERT_CTOR_RVAL: bool = true;
 // }
 
-impl<T, E> ResultAsPtr for Result<T, E> {
-    type AsPtr = Result<*const T, E>;
-}
-
-impl<T, E> ResultAsUnitT for Result<T, E> {
-    type AsUnitT = Result<(), E>;
+impl<T, E> ResultAs for Result<T, E> {
+    type AsT<X> = Result<X, E>;
 }
 
 impl<T, E> Result<T, E>
@@ -153,14 +149,6 @@ impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
     }
 }
 
-pub trait IntoFFIResult {
-    type FFIResult;
-}
-
-impl<T, E> IntoFFIResult for Result<T, E> {
-    type FFIResult = Self;
-}
-
 /// At some point we want to get rid of these once `Try` ([try_trait_v2](https://github.com/rust-lang/rust/issues/84277)) stabilizes.
 pub fn result_to_ffi<T: TypeInfo, E: TypeInfo>(f: impl FnOnce() -> std::result::Result<T, E>) -> Result<T, E> {
     f().into()
@@ -181,15 +169,6 @@ pub fn panic_to_result<T: TypeInfo, E: TypeInfo>(f: impl FnOnce() -> Result<T, E
 /// This type is mainly used from our proc macros that need to name the related
 /// type, without having access to reflection.
 #[doc(hidden)]
-pub trait ResultAsPtr {
-    type AsPtr;
-}
-
-/// Internal helper trait converting `Result<T, E>` into `Result<(), E>`.
-///
-/// This type is mainly used from our proc macros that need to name the related
-/// type, without having access to reflection.
-#[doc(hidden)]
-pub trait ResultAsUnitT {
-    type AsUnitT;
+pub trait ResultAs {
+    type AsT<T>;
 }

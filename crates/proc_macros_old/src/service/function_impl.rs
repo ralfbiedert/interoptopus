@@ -1,5 +1,5 @@
 use crate::service::Attributes;
-use crate::util::{ReplaceSelf, extract_doc_lines, purge_lifetimes_from_type};
+use crate::util::{extract_doc_lines, purge_lifetimes_from_type, ReplaceSelf};
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;
@@ -225,7 +225,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 }
             };
 
-            let ctor_result = quote_spanned! {span_rval => <<#service_type as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr };
+            let ctor_result = quote_spanned! {span_rval => <<#service_type as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::ResultAs>::AsT::<*const #service_type> };
 
             quote_spanned! { span_function =>
                 #method_attributes
@@ -350,7 +350,7 @@ pub fn generate_service_dtor(attributes: &Attributes, impl_block: &ItemImpl) -> 
 
     let span_service_ty = impl_block.self_ty.span();
     let ptr_type = quote_spanned!(span_service_ty => *const #without_lifetimes);
-    let ctor_result = quote_spanned! {span_service_ty => <<#without_lifetimes as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr };
+    let ctor_result = quote_spanned! {span_service_ty => <<#without_lifetimes as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::ResultAs>::AsT::<#ptr_type> };
 
     let object_deconstruction = if has_async {
         quote_spanned! { span_service_ty =>

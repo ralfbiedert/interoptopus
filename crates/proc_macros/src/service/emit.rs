@@ -51,7 +51,7 @@ impl ServiceModel {
             quote! {
                 #docs
                 #[::interoptopus_proc::ffi_function]
-                pub unsafe fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr {
+                pub unsafe fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
                     let result = #service_name::#ctor_name(#param_names);
                     match result {
                         ::interoptopus::ffi::Ok(service_instance) => {
@@ -69,7 +69,7 @@ impl ServiceModel {
             quote! {
                 #docs
                 #[::interoptopus_proc::ffi_function]
-                pub unsafe fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr {
+                pub unsafe fn #function_name(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT::<*const #service_type> {
                     let result = #service_name::#ctor_name(#param_names);
                     match result {
                         ::interoptopus::ffi::Ok(service_instance) => {
@@ -194,7 +194,7 @@ impl ServiceModel {
             #[::interoptopus_proc::ffi_function]
             pub unsafe fn #function_name(
                 #async_params
-            ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr {
+            ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
                 let instance_arc = ::std::sync::Arc::from_raw(instance);
                 let instance_clone = ::std::sync::Arc::clone(&instance_arc);
                 ::std::mem::forget(instance_arc); // Don't drop the original
