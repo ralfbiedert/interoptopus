@@ -1,8 +1,7 @@
 use crate::types::basic::Vec3f32;
 use crate::types::enums::EnumPayload;
-use interoptopus::lang::TypeInfo;
+use interoptopus::lang::types::TypeInfo;
 use interoptopus::{ffi, ffi_type};
-
 // Some nested object hierarchy using enums and generics.
 
 #[ffi_type]

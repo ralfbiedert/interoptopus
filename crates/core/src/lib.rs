@@ -162,7 +162,7 @@
 
 pub use error::Error;
 #[cfg(feature = "derive")]
-pub use interoptopus_proc::{ffi_function, ffi_type};
+pub use interoptopus_proc::{ffi_function, ffi_service, ffi_type};
 
 mod error;
 pub mod ffi;

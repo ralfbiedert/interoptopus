@@ -13,7 +13,7 @@ exclude = [
     "crates/backend_c",
     "crates/backend_cpython",
     "crates/backend_utils",
-    "crates/reference_project",
+    #    "crates/reference_project",
 ]
 resolver = "2"
 

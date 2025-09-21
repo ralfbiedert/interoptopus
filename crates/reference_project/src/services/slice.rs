@@ -1,5 +1,5 @@
 use crate::patterns::result::Error;
-use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
+use interoptopus::{ffi, ffi_service, ffi_type};
 
 /// Some struct we want to expose as a class.
 #[ffi_type(opaque)]

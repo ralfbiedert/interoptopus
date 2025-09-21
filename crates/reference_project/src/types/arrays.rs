@@ -1,7 +1,7 @@
 use crate::types::basic::Vec3f32;
 use crate::types::enums::EnumRenamedXYZ;
 use interoptopus::ffi_type;
-use interoptopus::lang::TypeInfo;
+use interoptopus::lang::types::TypeInfo;
 
 #[ffi_type]
 #[derive(Debug, Copy, Clone)]

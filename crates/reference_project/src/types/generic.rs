@@ -1,5 +1,5 @@
 use interoptopus::ffi_type;
-use interoptopus::lang::TypeInfo;
+use interoptopus::lang::types::TypeInfo;
 use std::fmt::Debug;
 
 #[ffi_type]
