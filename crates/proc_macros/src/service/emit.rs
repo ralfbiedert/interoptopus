@@ -167,7 +167,14 @@ impl ServiceModel {
             ReceiverKind::Shared => self.emit_shared_method(method, &function_name, &docs),
             ReceiverKind::Mutable => self.emit_mutable_method(method, &function_name, &docs),
             ReceiverKind::AsyncThis => self.emit_async_method(method, &function_name, &docs),
-            ReceiverKind::None => unreachable!("Constructors are handled separately"),
+            ReceiverKind::None => {
+                if method.is_async {
+                    // This shouldn't happen as async methods should have Async<Self> parameter
+                    panic!("Async methods in services should have Async<Self> as their first parameter")
+                } else {
+                    unreachable!("Non-async methods with no receiver should be constructors")
+                }
+            }
         }
     }
 
@@ -454,6 +461,34 @@ impl ServiceModel {
             })
             .collect::<Result<Vec<_>, Error>>()?;
 
+        // Generate validation for async methods - they should have Async<Self> as first parameter
+        let async_method_verification_blocks: Vec<TokenStream> = self
+            .methods
+            .iter()
+            .filter(|method| method.is_async && method.receiver_kind == ReceiverKind::AsyncThis)
+            .map(|method| {
+                let method_span = method.name.span();
+                // Create a validation that checks if Async<ServiceType> can be used
+                let service_name = &self.service_name;
+                let method_rval = match &method.output {
+                    ReturnType::Default => quote_spanned! { method_span => () },
+                    ReturnType::Type(_, x) => quote_spanned! { x.span() => #x },
+                };
+                Ok(quote_spanned! { method_span =>
+                    const fn _assert_async_type<U>()
+                    where
+                        U: ::interoptopus::pattern::asynk::AsyncRuntime
+                    {}
+                    _assert_async_type::<#service_name>();
+
+                    const fn _assert_rval_result1<T: ::interoptopus::lang::types::TypeInfo, E: ::interoptopus::lang::types::TypeInfo>(_: &::interoptopus::ffi::Result<T, E>) {}
+                    const fn _assert_rval_result2(x: &#method_rval) {
+                        _assert_rval_result1(&x);
+                    }
+                })
+            })
+            .collect::<Result<Vec<_>, Error>>()?;
+
         // Note: Skipping ASYNC_SAFE checks for now due to const context limitations with generics
         let async_safe_verification = quote_spanned! { self.service_name.span() => };
 
@@ -469,6 +504,7 @@ impl ServiceModel {
                 #async_verification
                 #async_safe_verification
                 #(#ctor_verification_blocks)*
+                #(#async_method_verification_blocks)*
 
                 ::interoptopus::lang::types::assert_service_safe::<#service_type>();
             };

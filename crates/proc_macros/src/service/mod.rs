@@ -26,13 +26,14 @@ pub fn ffi_service(attr: TokenStream, input: TokenStream) -> syn::Result<TokenSt
     let validation_blocks = model.emit_const_verification_blocks()?;
 
     let result = quote! {
+        #validation_blocks
+
         #input_impl
 
         // Generated FFI functions
         #ffi_functions
 
         #service_info_impl
-        #validation_blocks
     };
 
     if args.debug {
