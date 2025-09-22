@@ -36,7 +36,7 @@ impl Helper for u8 {}
 #[ffi_type(opaque, name = "Generic4")]
 pub struct Generic4<T>
 where
-    T: Helper,
+    T: Helper + TypeInfo,
 {
     pub x: T,
 }

@@ -5,7 +5,7 @@ use interoptopus::{ffi_function, ffi_type};
 #[ffi_function]
 fn wire_accept_string_1(_input: Wire<String>) {}
 
-#[ffi_type(wired)]
+#[ffi_type]
 pub struct MyString {
     pub x: String,
 }

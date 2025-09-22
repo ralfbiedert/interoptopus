@@ -18,7 +18,7 @@ pub struct CallbackTable {
 }
 
 /// Some struct we want to expose as a class.
-#[ffi_type(opaque)]
+#[ffi_type(service)]
 pub struct ServiceCallbacks {
     delegate_table: Option<CallbackTable>,
 }

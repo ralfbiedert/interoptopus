@@ -16,14 +16,18 @@
 # How
 
 WIP
-- [ ] Totally rewritten `Inventory`
+- [x] Totally rewritten `Inventory`
   - Type information is now flattened and unique (no more massively nested `Type` structs) 
-- [ ] Totally rewritten `lang` meta hierarchy 
+- [x] Totally rewritten `lang` meta hierarchy 
   - Lightweight & clean
   - Meta is in orthogonal POROs now, all public fields, no fluff accessor methods
-  - 
-TODO (vaguely in this order)
-- [ ] Change proc macros to emit new-style traits
+
+- TODO
+- [ ] Better error message when #[ffi_service] is used with #[ffi_type] that is not service  
+ 
+
+TODO-LT (vaguely in this order)
+- [x] Change proc macros to emit new-style traits
 - [ ] Clean up proc macros 
 - [ ] Introduce helper functions to work with new style `Inventory` (query, filter, replace)
 - [ ] Change C# backend to use new style `Inventory` and switch to model-based approach
@@ -32,6 +36,7 @@ TODO (vaguely in this order)
 - [ ] Write plugin code in C# backend 
 - [ ] (Re-)implement `Runtime` for C# backend using our own logic  
  
+
 
 # Where
 - `inventory` branch

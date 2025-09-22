@@ -31,8 +31,6 @@ pub mod services {
         pub mod result;
         pub mod sleep;
         pub mod structs;
-        pub mod todo_bad; // TODO - remove me later
-        pub mod todo_threadlocal;
         pub mod vecstring;
     }
     pub mod basic;
@@ -47,10 +45,10 @@ pub mod services {
 }
 
 pub mod types;
-mod wire;
+// pub mod wire;
 
 pub fn ffi_inventory() -> Inventory {
-    Inventory::builder()
+    Inventory::new()
         // Functions
         .register(builtins_string!())
         .register(builtins_wire!())

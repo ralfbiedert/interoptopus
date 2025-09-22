@@ -2,7 +2,7 @@ use crate::patterns::result::Error;
 use crate::types::enums::EnumPayload;
 use interoptopus::{ffi, ffi_service, ffi_type};
 
-#[ffi_type(opaque)]
+#[ffi_type(service)]
 pub struct ServiceResult {}
 
 #[ffi_service]

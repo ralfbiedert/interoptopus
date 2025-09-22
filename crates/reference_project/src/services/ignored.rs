@@ -1,5 +1,5 @@
 use crate::patterns::result::Error;
-use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
+use interoptopus::{ffi, ffi_service, ffi_type};
 
 #[ffi_type(opaque)]
 pub struct ServiceIgnoringMethods {}
@@ -10,7 +10,7 @@ impl ServiceIgnoringMethods {
         ffi::Result::Ok(Self {})
     }
 
-    #[ffi_service_method(ignore)]
+    // #[ffi_service_method(ignore)]
     pub fn this_is_ignored(&mut self) -> ffi::Result<(), Error> {
         ffi::Ok(())
     }
@@ -22,7 +22,7 @@ impl ServiceIgnoringMethods {
     }
 
     // Service methods without `self` are not valid for code generation and must be ignored.
-    #[ffi_service_method(ignore)]
+    // #[ffi_service_method(ignore)]
     pub fn test(&self, _: u32) -> ffi::Result<(), Error> {
         ffi::Ok(())
     }
