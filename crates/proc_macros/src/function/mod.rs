@@ -4,7 +4,7 @@ mod model;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{ItemFn, parse2};
+use syn::{parse2, ItemFn};
 
 use args::FfiFunctionArgs;
 use model::FunctionModel;
@@ -16,13 +16,9 @@ pub fn ffi_function(attr: TokenStream, input: TokenStream) -> syn::Result<TokenS
     // Parse the model
     let model = FunctionModel::from_item_fn(input_fn.clone(), args.clone())?;
 
-    // Generate the modified function
+    // Generate FFI
     let modified_function = model.emit_modified_function(&input_fn);
-
-    // Generate the companion struct
     let companion_struct = model.emit_companion_struct();
-
-    // Generate the FunctionInfo implementation
     let function_info_impl = model.emit_function_info_impl();
 
     let result = quote! {
@@ -32,7 +28,7 @@ pub fn ffi_function(attr: TokenStream, input: TokenStream) -> syn::Result<TokenS
     };
 
     if args.debug {
-        let formatted = prettyplease::unparse(&syn::parse2(result.clone()).unwrap());
+        let formatted = prettyplease::unparse(&syn::parse2(result.clone())?);
         eprintln!("Generated code for {}:\n{}", model.name, formatted);
     }
 

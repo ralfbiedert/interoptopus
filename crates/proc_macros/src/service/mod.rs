@@ -1,10 +1,11 @@
 mod args;
 mod emit;
 mod model;
+mod validation;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{ItemImpl, parse2};
+use syn::{parse2, ItemImpl};
 
 use args::FfiServiceArgs;
 use model::ServiceModel;
@@ -16,14 +17,13 @@ pub fn ffi_service(attr: TokenStream, input: TokenStream) -> syn::Result<TokenSt
     // Parse the model
     let model = ServiceModel::from_impl_item(input_impl.clone(), args.clone())?;
 
-    // Generate FFI functions
+    // Validate the model
+    model.validate(&input_impl)?;
+
+    // Generate FFI snippets
     let ffi_functions = model.emit_ffi_functions();
-
-    // Generate ServiceInfo implementation
     let service_info_impl = model.emit_service_info_impl();
-
-    // Generate verification blocks
-    let verification_blocks = model.emit_verification_blocks();
+    let validation_blocks = model.emit_const_verification_blocks();
 
     let result = quote! {
         #input_impl
@@ -32,7 +32,7 @@ pub fn ffi_service(attr: TokenStream, input: TokenStream) -> syn::Result<TokenSt
         #ffi_functions
 
         #service_info_impl
-        #verification_blocks
+        #validation_blocks
     };
 
     if args.debug {

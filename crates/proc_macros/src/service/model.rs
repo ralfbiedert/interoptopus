@@ -137,9 +137,6 @@ impl ServiceModel {
 
         let model = ServiceModel { service_name, service_type, generics, args, constructors, methods, is_async: has_async };
 
-        // Run consolidated validation
-        model.validate(&input)?;
-
         Ok(model)
     }
 
@@ -168,39 +165,5 @@ impl ServiceModel {
 
             result
         }
-    }
-
-    /// Consolidated validation for service constraints
-    pub fn validate(&self, input: &ItemImpl) -> syn::Result<()> {
-        self.validate_async_constraints(input)?;
-        Ok(())
-    }
-
-    /// Validate async service constraints
-    fn validate_async_constraints(&self, input: &ItemImpl) -> syn::Result<()> {
-        if self.is_async {
-            for method in &self.methods {
-                if method.receiver_kind == ReceiverKind::Mutable {
-                    // Find the receiver span in the method to point the error there
-                    let error_span = if let Some(ImplItem::Fn(method_fn)) = input
-                        .items
-                        .iter()
-                        .find(|item| if let ImplItem::Fn(f) = item { f.sig.ident == method.name } else { false })
-                    {
-                        // Find the receiver argument
-                        if let Some(FnArg::Receiver(receiver)) = method_fn.sig.inputs.first() {
-                            receiver.span()
-                        } else {
-                            method.span
-                        }
-                    } else {
-                        method.span
-                    };
-
-                    return Err(syn::Error::new(error_span, "Async services cannot have methods with &mut self. Use &self instead."));
-                }
-            }
-        }
-        Ok(())
     }
 }

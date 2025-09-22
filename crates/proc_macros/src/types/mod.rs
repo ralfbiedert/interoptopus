@@ -5,7 +5,7 @@ mod validation;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{DeriveInput, parse2};
+use syn::{parse2, DeriveInput};
 
 use args::FfiTypeArgs;
 use model::TypeModel;
@@ -17,14 +17,13 @@ pub fn ffi_type(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStrea
     // Parse the model BEFORE removing skip attributes so it can detect them
     let model = TypeModel::from_derive_input(input_ast.clone(), args.clone())?;
 
-    // Add repr attribute to the original AST
-    add_repr_attribute(&mut input_ast, &args)?;
-
-    // Remove skip attributes from fields as they are macro helpers
-    remove_skip_attributes(&mut input_ast);
-
+    // Validate
     args.validate()?;
     model.validate()?;
+
+    // Add repr attributes and remove skip attributes
+    add_repr_attribute(&mut input_ast, &args)?;
+    remove_skip_attributes(&mut input_ast);
 
     let typeinfo_impl = model.emit_typeinfo_impl();
 
