@@ -8,7 +8,7 @@
 //! use interoptopus::{ffi_function, callback};
 //! use interoptopus::pattern::slice::Slice;
 //!
-//! callback!(CallbackSlice(x: Slice<u8>) -> u8);
+//! callback!(CallbackSlice(x: Slice<'_, u8>) -> u8);
 //!
 //! #[ffi_function]
 //! pub fn my_function(callback: CallbackSlice) {
@@ -236,8 +236,13 @@ macro_rules! callback {
                 <$rval>::register(inventory);
                 $(<$ty>::register(inventory);)*
                 <*const ::std::ffi::c_void>::register(inventory);
-                <extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>::register(inventory);
-
+                // This gives compile errors on struct with `Slice<'a, _>` and similar, which
+                // apparently is the old `fn f()` vs. `for<> fn f()` (compiler) bug?
+                // We should get away 'forgetting' to register this particular type, because
+                // no one will be naming it (in fact no one can be naming it due to the same issues
+                // we're having), and backends will just see a `NamedCallback` pattern and should be
+                // fine.
+                // <extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>::register(inventory);
                 inventory.register_type(Self::id(), Self::ty());
             }
         }
