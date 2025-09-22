@@ -121,8 +121,14 @@ impl ServiceModel {
                 let service_method =
                     ServiceMethod { name: method_name, docs, inputs, output: method.sig.output.clone(), is_async, receiver_kind: receiver_kind.clone(), vis, span };
 
-                match receiver_kind {
-                    ReceiverKind::None => constructors.push(service_method),
+                // Validate async methods
+                if is_async && receiver_kind == ReceiverKind::None {
+                    return Err(syn::Error::new_spanned(&method.sig.inputs.first(), "Async methods must use Async<Self> as their first parameter"));
+                }
+
+                // Async methods are never constructors, regardless of receiver kind
+                match (receiver_kind, is_async) {
+                    (ReceiverKind::None, false) => constructors.push(service_method),
                     _ => methods.push(service_method),
                 }
             }

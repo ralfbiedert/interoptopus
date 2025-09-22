@@ -136,9 +136,10 @@ impl ServiceBad {
 
     // pub fn ok(x: u32, x2: u32) {}
 
-    pub async fn ok(x: u32, x2: u32) -> ffi::Result<(), Error> {
-        // x.x += 1;
+    pub async fn ok(_: Async<Self>, _: u32, x2: u32) -> ffi::Result<(), Error> {
+        // x.x += 1;z
         ffi::Ok(())
+        // 0
     }
 
     // pub fn bad(&mut self) {}
