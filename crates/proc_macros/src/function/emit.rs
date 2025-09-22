@@ -1,12 +1,12 @@
 use proc_macro2::TokenStream;
 use quote::{quote, quote_spanned};
-use syn::{ItemFn, ReturnType};
 use syn::spanned::Spanned;
+use syn::{Error, ItemFn, ReturnType};
 
 use crate::function::model::FunctionModel;
 
 impl FunctionModel {
-    pub fn emit_modified_function(&self, original_fn: &ItemFn) -> TokenStream {
+    pub fn emit_modified_function(&self, original_fn: &ItemFn) -> Result<TokenStream, Error> {
         let vis = &self.vis;
         let name = &self.name;
         let export_name = self.generate_export_name();
@@ -21,14 +21,14 @@ impl FunctionModel {
         };
         let where_clause = &generics.where_clause;
 
-        quote! {
+        Ok(quote! {
             #[unsafe(no_mangle)]
             #[unsafe(export_name = #export_name)]
             #vis #unsafety extern "C" fn #name #generics(#inputs) #output #where_clause #block
-        }
+        })
     }
 
-    pub fn emit_companion_struct(&self) -> TokenStream {
+    pub fn emit_companion_struct(&self) -> Result<TokenStream, Error> {
         let vis = &self.vis;
         let struct_name = &self.name;
         let generics = &self.signature.generics;
@@ -65,15 +65,15 @@ impl FunctionModel {
             }
         };
 
-        quote! {
+        Ok(quote! {
             #[allow(non_camel_case_types)]
             #vis struct #struct_name #generics #where_clause {
                 #phantom_data_field
             }
-        }
+        })
     }
 
-    pub fn emit_function_info_impl(&self) -> TokenStream {
+    pub fn emit_function_info_impl(&self) -> Result<TokenStream, Error> {
         let struct_name = &self.name;
         let export_name = self.generate_export_name();
         let generics = &self.signature.generics;
@@ -88,7 +88,7 @@ impl FunctionModel {
         let docs_tokens = self.emit_docs();
         let validation_guards = self.emit_validation_guards();
 
-        quote! {
+        Ok(quote! {
             #validation_guards
 
             impl #generics ::interoptopus::lang::function::FunctionInfo for #struct_name #generics #where_clause {
@@ -126,7 +126,7 @@ impl FunctionModel {
                     inventory.register_function(Self::id(), Self::function());
                 }
             }
-        }
+        })
     }
 
     fn emit_arguments(&self) -> Vec<TokenStream> {
@@ -221,6 +221,7 @@ impl FunctionModel {
 
             // For now, we'll use the original assert_raw_safe but acknowledge the span limitation
             // A future improvement could implement custom span-aware checking
+            dbg!(param.ty.span().source_text());
             quote_spanned! {param.ty.span()=>
                 const _: () = const {
                     // NOTE: This has a known limitation where complex path types like std::string::String
@@ -270,5 +271,4 @@ impl FunctionModel {
         LifetimeElisor.visit_type_mut(&mut elided_ty);
         elided_ty
     }
-
 }

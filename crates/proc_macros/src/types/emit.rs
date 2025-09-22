@@ -1,10 +1,11 @@
 use proc_macro2::TokenStream;
 use quote::quote;
+use syn::Error;
 
 use crate::types::model::{TypeData, TypeModel, VariantData};
 
 impl TypeModel {
-    pub fn emit_typeinfo_impl(&self) -> TokenStream {
+    pub fn emit_typeinfo_impl(&self) -> Result<TokenStream, Error> {
         let name = &self.name;
         let generics = &self.generics;
         let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
@@ -18,7 +19,7 @@ impl TypeModel {
         let ty_expr = self.generate_ty();
         let register_expr = self.generate_register();
 
-        quote! {
+        Ok(quote! {
             impl #impl_generics ::interoptopus::lang::types::TypeInfo for #name #ty_generics #where_clause {
                 const WIRE_SAFE: bool = #wire_safe;
                 const RAW_SAFE: bool = #raw_safe;
@@ -42,7 +43,7 @@ impl TypeModel {
                     #register_expr
                 }
             }
-        }
+        })
     }
 
     fn generate_wire_safe(&self) -> TokenStream {
