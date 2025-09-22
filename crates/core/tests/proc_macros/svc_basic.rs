@@ -138,7 +138,7 @@ impl ServiceBad {
         ffi::Ok(())
     }
 
-    // pub fn bad(&mut self) {}
+    pub fn bad(&mut self) {}
 }
 
 // const _: () = {

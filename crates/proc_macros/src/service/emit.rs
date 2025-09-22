@@ -96,6 +96,13 @@ impl ServiceModel {
             quote! { #params, instance: *mut *const #service_type }
         };
 
+        // Use Box for non-async services, Arc for async services
+        let (wrapper_creation, into_raw_call) = if self.is_async {
+            (quote! { let arc = ::std::sync::Arc::new(service_instance); }, quote! { ::std::sync::Arc::into_raw(arc) })
+        } else {
+            (quote! { let boxed = ::std::boxed::Box::new(service_instance); }, quote! { ::std::boxed::Box::into_raw(boxed) })
+        };
+
         quote! {
             #docs
             #[::interoptopus::ffi_function]
@@ -103,8 +110,8 @@ impl ServiceModel {
                 let result = #service_call(#param_names);
                 match result {
                     ::interoptopus::ffi::Ok(service_instance) => {
-                        let arc = ::std::sync::Arc::new(service_instance);
-                        *instance = ::std::sync::Arc::into_raw(arc);
+                        #wrapper_creation
+                        *instance = #into_raw_call;
                         ::interoptopus::ffi::Ok(::std::ptr::null())
                     }
                     ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
@@ -122,12 +129,19 @@ impl ServiceModel {
         let service_type = &self.service_type;
         let generics = &self.generics;
 
+        // Use Box for non-async services, Arc for async services
+        let from_raw_call = if self.is_async {
+            quote! { let _ = ::std::sync::Arc::from_raw(instance); }
+        } else {
+            quote! { let _ = ::std::boxed::Box::from_raw(instance as *mut #service_type); }
+        };
+
         quote! {
             #[::interoptopus::ffi_function]
             pub fn #function_name #generics(instance: *const #service_type) {
                 if !instance.is_null() {
                     unsafe {
-                        let _ = ::std::sync::Arc::from_raw(instance);
+                        #from_raw_call
                     }
                 }
             }
@@ -394,7 +408,7 @@ impl ServiceModel {
         }
     }
 
-    pub fn emit_verification_blocks(&self) -> TokenStream {
+    pub fn emit_const_verification_blocks(&self) -> TokenStream {
         // Generate compile-time verification blocks
         let service_type = &self.service_type;
         let base_service_name = self.get_base_service_name();
