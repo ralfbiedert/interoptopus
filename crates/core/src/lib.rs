@@ -26,7 +26,7 @@
 //!
 //! ```rust
 //! # use interoptopus::{ffi_function, ffi_type, function};
-//! # use interoptopus::inventory::{Inventory, InventoryBuilder};
+//! # use interoptopus::inventory::{Inventory};
 //! #[ffi_type]
 //! pub struct Vec2 {
 //!     pub x: f32,
@@ -40,10 +40,10 @@
 //!
 //! // List functions you want to export, types are inferred.
 //! pub fn ffi_inventory() -> Inventory {
-//!     Inventory::builder()
+//!     Inventory::new()
 //!         .register(function!(my_function))
 //!         .validate()
-//!         .build()
+//!
 //! }
 //!
 //! ```

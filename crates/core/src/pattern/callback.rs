@@ -193,7 +193,7 @@ macro_rules! callback {
             const SERVICE_CTOR_SAFE: bool = false;
 
             fn id() -> $crate::inventory::TypeId {
-                $crate::id!($name)
+                $crate::inventory::TypeId::from_id($crate::id!($name))
             }
 
             fn kind() -> $crate::lang::types::TypeKind {

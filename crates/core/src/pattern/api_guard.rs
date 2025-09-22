@@ -17,10 +17,10 @@
 //! use interoptopus::{api_guard, ffi_function, function};
 //!
 //! fn ffi_inventory() -> Inventory {
-//!     Inventory::builder()
+//!     Inventory::new()
 //!         .register(api_guard!(ffi_inventory)) // <- You must name the current function.
 //!         .validate()                          //    since it will be called at runtime
-//!         .build()                             //    but cannot be inferred.
+//!                                      //    but cannot be inferred.
 //! }
 //! ```
 //! In backends that support API guards an error message like this might be emitted if you try load
@@ -159,10 +159,10 @@ impl ApiHash {
 /// # use interoptopus::{api_guard, ffi_function, function};
 ///
 /// fn ffi_inventory() -> Inventory {
-///     Inventory::builder()
+///     Inventory::new()
 ///         .register(api_guard!(ffi_inventory)) // <- You must name the current function.
 ///         .validate()                          //    since it will be called at runtime
-///         .build()                             //    but cannot be inferred.
+///                                      //    but cannot be inferred.
 /// }
 /// ```
 #[macro_export]
@@ -173,9 +173,9 @@ macro_rules! api_guard {
             $f().into()
         }
 
-        use $crate::lang::FunctionInfo;
-        let info = __api_guard::function_info();
-        $crate::inventory::Symbol::Function(info)
+        |x: &mut $crate::inventory::Inventory| {
+            <__api_guard as $crate::lang::function::FunctionInfo>::register(x);
+        }
     }};
 }
 
