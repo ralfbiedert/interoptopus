@@ -144,7 +144,7 @@ impl ServiceBad {
     // pub fn bad(&mut self) {}
 }
 
-// #[ffi_type(service)]
+#[ffi_type(service)]
 pub struct ServiceMut {}
 
 #[ffi_service]

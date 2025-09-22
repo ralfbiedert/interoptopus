@@ -221,7 +221,6 @@ impl FunctionModel {
 
             // For now, we'll use the original assert_raw_safe but acknowledge the span limitation
             // A future improvement could implement custom span-aware checking
-            dbg!(param.ty.span().source_text());
             quote_spanned! {param.ty.span()=>
                 const _: () = const {
                     // NOTE: This has a known limitation where complex path types like std::string::String
