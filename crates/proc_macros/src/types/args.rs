@@ -10,6 +10,10 @@ pub struct FfiTypeArgs {
     pub debug: bool,
     pub name: Option<String>,
     pub module: Option<String>,
+    // Track source tokens for error reporting
+    pub transparent_token: Option<Ident>,
+    pub opaque_token: Option<Ident>,
+    pub service_token: Option<Ident>,
 }
 
 impl Parse for FfiTypeArgs {
@@ -25,14 +29,17 @@ impl Parse for FfiTypeArgs {
         for arg in parsed {
             match arg {
                 FfiTypeArg::Packed => args.packed = true,
-                FfiTypeArg::Transparent(_) => {
+                FfiTypeArg::Transparent(ident) => {
                     args.transparent = true;
+                    args.transparent_token = Some(ident);
                 }
-                FfiTypeArg::Opaque(_) => {
+                FfiTypeArg::Opaque(ident) => {
                     args.opaque = true;
+                    args.opaque_token = Some(ident);
                 }
-                FfiTypeArg::Service(_) => {
+                FfiTypeArg::Service(ident) => {
                     args.service = true;
+                    args.service_token = Some(ident);
                 }
                 FfiTypeArg::Debug => args.debug = true,
                 FfiTypeArg::Name(name) => args.name = Some(name),
@@ -48,9 +55,9 @@ impl Parse for FfiTypeArgs {
 #[allow(unused)]
 enum FfiTypeArg {
     Packed,
-    Transparent(proc_macro2::Span),
-    Opaque(proc_macro2::Span),
-    Service(proc_macro2::Span),
+    Transparent(Ident),
+    Opaque(Ident),
+    Service(Ident),
     Debug,
     Name(String),
     Module(String),
@@ -59,13 +66,12 @@ enum FfiTypeArg {
 impl Parse for FfiTypeArg {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let ident: Ident = input.parse()?;
-        let span = ident.span();
 
         match ident.to_string().as_str() {
             "packed" => Ok(Self::Packed),
-            "transparent" => Ok(Self::Transparent(span)),
-            "opaque" => Ok(Self::Opaque(span)),
-            "service" => Ok(Self::Service(span)),
+            "transparent" => Ok(Self::Transparent(ident)),
+            "opaque" => Ok(Self::Opaque(ident)),
+            "service" => Ok(Self::Service(ident)),
             "debug" => Ok(Self::Debug),
             "name" => {
                 input.parse::<Token![=]>()?;

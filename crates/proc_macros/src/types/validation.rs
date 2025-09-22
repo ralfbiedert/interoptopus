@@ -38,44 +38,44 @@ impl TypeModel {
 impl FfiTypeArgs {
     /// Validates the arguments, checking for all validation rules.
     pub fn validate(&self) -> syn::Result<()> {
-        self.validate_mutually_exclusive_attributes(None, None, None)?;
+        self.validate_mutually_exclusive_attributes()?;
         Ok(())
     }
 
     /// Validates that opaque, transparent, and service attributes are mutually exclusive.
-    fn validate_mutually_exclusive_attributes(
-        &self,
-        opaque_span: Option<proc_macro2::Span>,
-        transparent_span: Option<proc_macro2::Span>,
-        service_span: Option<proc_macro2::Span>,
-    ) -> syn::Result<()> {
+    fn validate_mutually_exclusive_attributes(&self) -> syn::Result<()> {
         let mut conflicts = Vec::new();
 
         if self.opaque {
-            conflicts.push(("opaque", opaque_span));
+            conflicts.push(("opaque", &self.opaque_token));
         }
         if self.transparent {
-            conflicts.push(("transparent", transparent_span));
+            conflicts.push(("transparent", &self.transparent_token));
         }
         if self.service {
-            conflicts.push(("service", service_span));
+            conflicts.push(("service", &self.service_token));
         }
 
         if conflicts.len() > 1 {
             let names: Vec<&str> = conflicts.iter().map(|(name, _)| *name).collect();
-            let span = conflicts[1].1.or(conflicts[0].1).unwrap_or_else(proc_macro2::Span::call_site);
+            // Use the second conflict's token for the error location, or the first as fallback
+            let error_token = conflicts[1].1.as_ref().or(conflicts[0].1.as_ref());
 
-            return Err(Error::new(
-                span,
-                format!(
-                    "Cannot use {} attributes together - they are mutually exclusive",
-                    match names.len() {
-                        2 => format!("'{}' and '{}'", names[0], names[1]),
-                        3 => format!("'{}', '{}', and '{}'", names[0], names[1], names[2]),
-                        _ => names.join(", "),
-                    }
-                ),
-            ));
+            let message = format!(
+                "Cannot use {} attributes together - they are mutually exclusive",
+                match names.len() {
+                    2 => format!("'{}' and '{}'", names[0], names[1]),
+                    3 => format!("'{}', '{}', and '{}'", names[0], names[1], names[2]),
+                    _ => names.join(", "),
+                }
+            );
+
+            return if let Some(token) = error_token {
+                Err(Error::new_spanned(token, message))
+            } else {
+                // Fallback if no tokens are available (shouldn't happen normally)
+                Err(Error::new(proc_macro2::Span::call_site(), message))
+            };
         }
 
         Ok(())

@@ -23,7 +23,7 @@ pub fn ffi_service(attr: TokenStream, input: TokenStream) -> syn::Result<TokenSt
     // Generate FFI snippets
     let ffi_functions = model.emit_ffi_functions();
     let service_info_impl = model.emit_service_info_impl();
-    let validation_blocks = model.emit_const_verification_blocks();
+    let validation_blocks = model.emit_const_verification_blocks()?;
 
     let result = quote! {
         #input_impl

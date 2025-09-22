@@ -88,21 +88,27 @@ impl Repr {
     }
 }
 
+#[track_caller]
 pub const fn assert_wire_safe<T: TypeInfo>() {
     assert!(T::WIRE_SAFE);
 }
 
+#[track_caller]
 pub const fn assert_raw_safe<T: TypeInfo>() {
     assert!(T::RAW_SAFE, "This type cannot be safely passed over FFI boundaries.");
 }
+
+#[track_caller]
 pub const fn assert_async_safe<T: TypeInfo>() {
     assert!(T::ASYNC_SAFE);
 }
 
+#[track_caller]
 pub const fn assert_service_safe<T: TypeInfo>() {
     assert!(T::SERVICE_SAFE);
 }
 
+#[track_caller]
 pub const fn assert_service_ctor_safe<T: TypeInfo>() {
-    assert!(T::SERVICE_CTOR_SAFE, "This method looks like a constructor, but does not return a Result<Self, _>");
+    assert!(T::SERVICE_CTOR_SAFE, "This method looks like a constructor, but does not return ffi::Result<Self, _>");
 }

@@ -133,18 +133,15 @@ impl ServiceBad {
     //     ffi::Ok(())
     // }
 
-    pub async fn ok(x: Async<Self>, x2: u32) -> ffi::Result<(), Error> {
-        // x.x += 1;
-        ffi::Ok(())
-    }
+    // pub fn ok(x: u32, x2: u32) {}
 
-    pub fn bad(&mut self) {}
+    // pub async fn ok(x: u32, x2: u32) -> ffi::Result<(), Error> {
+    //     // x.x += 1;
+    //     ffi::Ok(())
+    // }
+
+    // pub fn bad(&mut self) {}
 }
-
-// const _: () = {
-//     use interoptopus::lang::types::TypeInfo;
-//     assert!(<ffi::Result<(), Error>>::SERVICE_CTOR_SAFE, "The method looks like a ctor, but it does not return ffi::Result<Self, _>.");
-// };
 
 #[ffi_type(service)]
 pub struct ServiceMut {}
