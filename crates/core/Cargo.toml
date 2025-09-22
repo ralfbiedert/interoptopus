@@ -24,7 +24,10 @@ log = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
 
 [dev-dependencies]
-rustc-hash = { workspace = true }
+rustc-hash.workspace = true
+trybuild.workspace = true
+syn.workspace = true
+quote.workspace = true
 
 [package.metadata.docs.rs]
 all-features = true

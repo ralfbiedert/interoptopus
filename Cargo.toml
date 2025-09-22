@@ -13,7 +13,7 @@ exclude = [
     "crates/backend_c",
     "crates/backend_cpython",
     "crates/backend_utils",
-    #    "crates/reference_project",
+    "crates/reference_project",
 ]
 resolver = "2"
 
@@ -36,6 +36,7 @@ interoptopus_backend_utils = { path = "crates/backend_utils", version = "=0.15.0
 # Not published (no version dependency):
 interoptopus_reference_project = { path = "crates/reference_project" }
 
+
 # External
 anyhow = "1.0.98"
 darling = "0.20.11"
@@ -50,6 +51,8 @@ rustc-hash = { version = "2.1", default-features = false }
 serde = "1.0.219"
 syn = "2.0.104"
 tera = "1"
+trybuild = "1.0.111"
+insta = "1.43.2"
 
 [workspace.lints.clippy]
 correctness = { level = "deny", priority = -1 }

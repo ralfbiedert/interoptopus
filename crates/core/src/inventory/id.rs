@@ -70,10 +70,11 @@ macro_rules! id {
         let t_name = ::std::any::type_name::<$t>();
         let base = $crate::inventory::Id::new(hash_str(t_name));
         let crate_hash = hash_str(env!("CARGO_PKG_NAME"));
-        let file_hash = hash_str(file!());
+        // Messes up reproducibility.
+        // let file_hash = hash_str(file!());
         let line_hash = line!() as u128;
 
-        base.derive(crate_hash).derive(file_hash).derive(line_hash)
+        base.derive(crate_hash).derive(line_hash)
     }};
 }
 
