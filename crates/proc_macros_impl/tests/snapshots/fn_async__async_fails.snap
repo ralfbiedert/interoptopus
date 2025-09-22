@@ -1,0 +1,32 @@
+---
+source: crates/proc_macros_impl/tests/fn_async.rs
+expression: formatted
+---
+#[unsafe(export_name = "async_foo")]
+extern "C" fn async_foo() {}
+#[allow(non_camel_case_types)]
+struct async_foo {}
+impl ::interoptopus::lang::function::FunctionInfo for async_foo {
+    fn id() -> ::interoptopus::inventory::FunctionId {
+        ::interoptopus::inventory::FunctionId::from_id(::interoptopus::id!(async_foo))
+    }
+    fn signature() -> ::interoptopus::lang::function::Signature {
+        ::interoptopus::lang::function::Signature {
+            arguments: vec![],
+            rval: <() as ::interoptopus::lang::types::TypeInfo>::id(),
+        }
+    }
+    fn function() -> ::interoptopus::lang::function::Function {
+        ::interoptopus::lang::function::Function {
+            name: "async_foo".to_string(),
+            visibility: ::interoptopus::lang::meta::Visibility::Private,
+            docs: ::interoptopus::lang::meta::Docs::from_lines(vec![]),
+            emission: ::interoptopus::lang::meta::Emission::External,
+            signature: Self::signature(),
+        }
+    }
+    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+        <() as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+        inventory.register_function(Self::id(), Self::function());
+    }
+}

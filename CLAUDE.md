@@ -30,7 +30,8 @@ This runs tests and regenerates bindings for all target languages.
 ```
 crates/
 ├── core/                   # Main interoptopus crate with core FFI abstractions
-├── proc_macros/            # Procedural macros (#[ffi_type], #[ffi_function])
+├── proc_macros/            # Proc macro crate used by core
+├── proc_macros_impl/       # Procedural macros (#[ffi_type], #[ffi_function]) incl. testing function
 ├── backend_c/              # C header generation
 ├── backend_csharp/         # C# bindings generation
 ├── backend_cpython/        # Python bindings generation

@@ -13,7 +13,7 @@ exclude = [
     "crates/backend_c",
     "crates/backend_cpython",
     "crates/backend_utils",
-    #    "crates/reference_project",
+    "crates/reference_project",
 ]
 resolver = "2"
 
@@ -29,12 +29,14 @@ version = "0.15.0-alpha.17"
 # Internal
 interoptopus = { path = "crates/core", version = "=0.15.0-alpha.17" }
 interoptopus_proc = { path = "crates/proc_macros", version = "=0.15.0-alpha.17" }
+interoptopus_proc_impl = { path = "crates/proc_macros_impl", version = "=0.15.0-alpha.17" }
 interoptopus_backend_c = { path = "crates/backend_c", version = "=0.15.0-alpha.17" }
 interoptopus_backend_cpython = { path = "crates/backend_cpython", version = "=0.15.0-alpha.17" }
 interoptopus_backend_csharp = { path = "crates/backend_csharp", version = "=0.15.0-alpha.17" }
 interoptopus_backend_utils = { path = "crates/backend_utils", version = "=0.15.0-alpha.17" }
 # Not published (no version dependency):
 interoptopus_reference_project = { path = "crates/reference_project" }
+
 
 # External
 anyhow = "1.0.98"
@@ -50,6 +52,8 @@ rustc-hash = { version = "2.1", default-features = false }
 serde = "1.0.219"
 syn = "2.0.104"
 tera = "1"
+trybuild = "1.0.111"
+insta = "1.43.2"
 
 [workspace.lints.clippy]
 correctness = { level = "deny", priority = -1 }
