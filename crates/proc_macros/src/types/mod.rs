@@ -25,7 +25,7 @@ pub fn ffi_type(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStrea
     add_repr_attribute(&mut input_ast, &args)?;
     remove_skip_attributes(&mut input_ast);
 
-    let typeinfo_impl = model.emit_typeinfo_impl();
+    let typeinfo_impl = model.emit_typeinfo_impl()?;
 
     let result = quote! {
         #input_ast

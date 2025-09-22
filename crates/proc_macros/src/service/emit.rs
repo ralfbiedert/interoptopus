@@ -1,11 +1,11 @@
+use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote, ToTokens};
+use quote::{format_ident, quote, quote_spanned, ToTokens};
+use syn::spanned::Spanned;
 use syn::{Error, ReturnType, Type};
 
-use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
-
 impl ServiceModel {
-    pub fn emit_ffi_functions(&self) -> TokenStream {
+    pub fn emit_ffi_functions(&self) -> Result<TokenStream, Error> {
         let mut functions = Vec::new();
 
         // Generate constructor functions
@@ -21,9 +21,9 @@ impl ServiceModel {
             functions.push(self.emit_method_function(method));
         }
 
-        quote! {
+        Ok(quote! {
             #(#functions)*
-        }
+        })
     }
 
     /// Get the base service name without any generic parameters (for const contexts)
@@ -350,7 +350,7 @@ impl ServiceModel {
         }
     }
 
-    pub fn emit_service_info_impl(&self) -> TokenStream {
+    pub fn emit_service_info_impl(&self) -> Result<TokenStream, Error> {
         let _service_name = &self.service_name;
         let service_type = &self.service_type;
         let service_name_snake = self.service_name_snake_case();
@@ -364,7 +364,7 @@ impl ServiceModel {
 
         let destructor_name = format_ident!("{}_destroy", service_name_snake);
 
-        quote! {
+        Ok(quote! {
             impl #generics ::interoptopus::lang::service::ServiceInfo for #service_type {
                 fn id() -> ::interoptopus::inventory::ServiceId {
                     ::interoptopus::inventory::ServiceId::from_id(::interoptopus::id!(#service_type))
@@ -404,7 +404,7 @@ impl ServiceModel {
                     inventory.register_service(Self::id(), Self::service());
                 }
             }
-        }
+        })
     }
 
     pub fn emit_const_verification_blocks(&self) -> Result<TokenStream, Error> {
@@ -414,18 +414,15 @@ impl ServiceModel {
 
         let async_verification = if self.is_async {
             quote! {
-                const fn _assert_async_runtime() {
-                    const fn _assert_async<T: ::interoptopus::pattern::asynk::AsyncRuntime>() {}
-                    _assert_async::<#service_type>();
-                }
-                _assert_async_runtime();
+                const fn _assert_async<T: ::interoptopus::pattern::asynk::AsyncRuntime>() {}
+                _assert_async::<#service_type>();
             }
         } else {
             quote! {}
         };
 
         // Generate SERVICE_CTOR_SAFE checks for constructor return types
-        let ctor_verification_blocks: Vec<proc_macro2::TokenStream> = self
+        let ctor_verification_blocks: Vec<TokenStream> = self
             .constructors
             .iter()
             .map(|ctor| match &ctor.output {
@@ -445,24 +442,20 @@ impl ServiceModel {
         // Note: Skipping ASYNC_SAFE checks for now due to const context limitations with generics
         let async_safe_verification = quote! {};
 
-        Ok(quote! {
+        let x = self.service_type.span();
+        let base_service_verification = quote_spanned! { x =>
+            const fn _assert_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
+            _assert_type_info::<#base_service_name>();
+        };
+
+        Ok(quote_spanned! { x=>
             const _: () = {
-                // Verify that the service type implements the required traits
-                const fn _assert_service_type_is_valid() {
-                    const fn _assert_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
-                    _assert_type_info::<#base_service_name>();
-                }
-
-                // If this is an async service, verify AsyncRuntime is implemented
+                #base_service_verification
                 #async_verification
-
-                // Verify constructor return types are SERVICE_CTOR_SAFE
+                #async_safe_verification
                 #(#ctor_verification_blocks)*
 
-                // Verify async method parameters are ASYNC_SAFE
-                #async_safe_verification
-
-                _assert_service_type_is_valid();
+                ::interoptopus::lang::types::assert_service_safe::<#service_type>();
             };
         })
     }
