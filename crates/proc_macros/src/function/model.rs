@@ -1,5 +1,6 @@
 use crate::common::extract_docs;
 use crate::function::args::FfiFunctionArgs;
+use syn::spanned::Spanned;
 use syn::{FnArg, Ident, ItemFn, Pat, Type, Visibility};
 
 #[derive(Clone)]
@@ -50,14 +51,16 @@ impl FunctionModel {
 
         // Parse function parameters
         let mut inputs = Vec::new();
-        for input_arg in &input.sig.inputs {
+        for (index, input_arg) in input.sig.inputs.iter().enumerate() {
             match input_arg {
                 FnArg::Typed(typed_arg) => {
-                    if let Pat::Ident(pat_ident) = typed_arg.pat.as_ref() {
-                        inputs.push(FunctionParameter { name: pat_ident.ident.clone(), ty: (*typed_arg.ty).clone() });
+                    let param_name = if let Pat::Ident(pat_ident) = typed_arg.pat.as_ref() {
+                        pat_ident.ident.clone()
                     } else {
-                        return Err(syn::Error::new_spanned(&typed_arg.pat, "Only named parameters are supported"));
-                    }
+                        // Generate a synthetic name for non-identifier patterns (like `_`)
+                        syn::Ident::new(&format!("_{}", index), typed_arg.pat.span())
+                    };
+                    inputs.push(FunctionParameter { name: param_name, ty: (*typed_arg.ty).clone() });
                 }
                 FnArg::Receiver(_) => {
                     return Err(syn::Error::new_spanned(input_arg, "Methods with self parameters are not supported"));

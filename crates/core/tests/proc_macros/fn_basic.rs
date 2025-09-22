@@ -62,5 +62,10 @@ pub fn ref5(x: &mut EnumPayload) {
     *x = EnumPayload::C(123);
 }
 
+#[ffi_function]
+pub fn test_underscore_params(_: u32, _: ffi::String, x: u8) -> u8 {
+    x + 1
+}
+
 #[test]
 fn test() {}
