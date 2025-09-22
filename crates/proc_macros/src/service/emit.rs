@@ -1,7 +1,6 @@
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote};
-use syn::spanned::Spanned;
-use syn::{ReturnType, Type};
+use quote::{format_ident, quote, ToTokens};
+use syn::{Error, ReturnType, Type};
 
 use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
 
@@ -408,7 +407,7 @@ impl ServiceModel {
         }
     }
 
-    pub fn emit_const_verification_blocks(&self) -> TokenStream {
+    pub fn emit_const_verification_blocks(&self) -> Result<TokenStream, Error> {
         // Generate compile-time verification blocks
         let service_type = &self.service_type;
         let base_service_name = self.get_base_service_name();
@@ -429,40 +428,24 @@ impl ServiceModel {
         let ctor_verification_blocks: Vec<proc_macro2::TokenStream> = self
             .constructors
             .iter()
-            .map(|ctor| {
-                let ctor_name = &ctor.name;
-                let assert_fn_name = format_ident!("_assert_ctor_{}", ctor_name);
-                match &ctor.output {
-                    ReturnType::Type(_, return_type) => {
-                        // Replace Self with the actual service type in the return type
-                        let return_type_resolved = self.replace_self_with_service_type(return_type);
-                        let return_type_span = return_type.span();
-                        quote::quote_spanned! { return_type_span =>
-                            const fn #assert_fn_name() {
-                                ::interoptopus::lang::types::assert_service_ctor_safe::<#return_type_resolved>();
-                            }
-                            #assert_fn_name();
-                        }
-                    }
-                    ReturnType::Default => {
-                        // Default return type () should be SERVICE_CTOR_SAFE
-                        // Use the method span since there's no explicit return type
-                        let method_span = ctor.span;
-                        quote::quote_spanned! { method_span =>
-                            const fn #assert_fn_name() {
-                                ::interoptopus::lang::types::assert_service_ctor_safe::<()>();
-                            }
-                            #assert_fn_name();
-                        }
-                    }
+            .map(|ctor| match &ctor.output {
+                ReturnType::Type(_, return_type) => {
+                    let return_type_resolved = self.replace_self_with_service_type(return_type);
+                    let ctor_span = ctor.name.span();
+                    Ok(quote::quote_spanned! { ctor_span =>
+                        ::interoptopus::lang::types::assert_service_ctor_safe::<#return_type_resolved>();
+                    })
+                }
+                ReturnType::Default => {
+                    return Err(Error::new_spanned(ctor.name.to_token_stream(), "This method looks like a constructor, but it does not return ffi::Result<Self, _>"));
                 }
             })
-            .collect();
+            .collect::<Result<Vec<_>, Error>>()?;
 
         // Note: Skipping ASYNC_SAFE checks for now due to const context limitations with generics
         let async_safe_verification = quote! {};
 
-        quote! {
+        Ok(quote! {
             const _: () = {
                 // Verify that the service type implements the required traits
                 const fn _assert_service_type_is_valid() {
@@ -481,6 +464,6 @@ impl ServiceModel {
 
                 _assert_service_type_is_valid();
             };
-        }
+        })
     }
 }

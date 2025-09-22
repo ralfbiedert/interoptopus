@@ -131,7 +131,7 @@ impl ServiceModel {
         // Note: We now support lifetime generics, but not type generics
         for param in &generics.params {
             if let syn::GenericParam::Type(_) = param {
-                return Err(syn::Error::new_spanned(param, "Type generic services are not yet supported by #[ffi_service]. Only lifetime generics are supported."));
+                return Err(syn::Error::new_spanned(param, "Generic services are not supported by #[ffi_service], only lifetime work."));
             }
         }
 

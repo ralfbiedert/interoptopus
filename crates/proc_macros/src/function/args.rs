@@ -29,25 +29,25 @@ impl Parse for FfiFunctionArgs {
 
         let parsed = Punctuated::<FfiFunctionArg, Token![,]>::parse_terminated(input)?;
 
-        let mut export_span = None;
-        let mut module_span = None;
+        let mut export_ident = None;
+        let mut module_ident = None;
 
         for arg in parsed {
             match arg {
                 FfiFunctionArg::Debug => args.debug = true,
-                FfiFunctionArg::Export(kind, span) => {
-                    if export_span.is_some() {
-                        return Err(syn::Error::new(span, "export can only be specified once"));
+                FfiFunctionArg::Export(kind, ident) => {
+                    if export_ident.is_some() {
+                        return Err(syn::Error::new_spanned(ident, "export can only be specified once"));
                     }
                     args.export = Some(kind);
-                    export_span = Some(span);
+                    export_ident = Some(ident);
                 }
-                FfiFunctionArg::Module(kind, span) => {
-                    if module_span.is_some() {
-                        return Err(syn::Error::new(span, "module can only be specified once"));
+                FfiFunctionArg::Module(kind, ident) => {
+                    if module_ident.is_some() {
+                        return Err(syn::Error::new_spanned(ident, "module can only be specified once"));
                     }
                     args.module = Some(kind);
-                    module_span = Some(span);
+                    module_ident = Some(ident);
                 }
             }
         }
@@ -59,14 +59,13 @@ impl Parse for FfiFunctionArgs {
 #[derive(Debug, Clone)]
 enum FfiFunctionArg {
     Debug,
-    Export(ExportKind, proc_macro2::Span),
-    Module(ModuleKind, proc_macro2::Span),
+    Export(ExportKind, Ident),
+    Module(ModuleKind, Ident),
 }
 
 impl Parse for FfiFunctionArg {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let ident: Ident = input.parse()?;
-        let span = ident.span();
 
         match ident.to_string().as_str() {
             "debug" => Ok(Self::Debug),
@@ -77,14 +76,14 @@ impl Parse for FfiFunctionArg {
                 match expr {
                     Expr::Lit(lit) => {
                         if let Lit::Str(lit_str) = lit.lit {
-                            Ok(Self::Export(ExportKind::Custom(lit_str.value()), span))
+                            Ok(Self::Export(ExportKind::Custom(lit_str.value()), ident))
                         } else {
                             Err(syn::Error::new_spanned(lit, "Expected string literal or identifier"))
                         }
                     }
                     Expr::Path(path) => {
                         if path.path.is_ident("unique") {
-                            Ok(Self::Export(ExportKind::Unique, span))
+                            Ok(Self::Export(ExportKind::Unique, ident))
                         } else {
                             Err(syn::Error::new_spanned(path, "Expected 'unique' or string literal"))
                         }
@@ -99,14 +98,14 @@ impl Parse for FfiFunctionArg {
                 match expr {
                     Expr::Lit(lit) => {
                         if let Lit::Str(lit_str) = lit.lit {
-                            Ok(Self::Module(ModuleKind::Named(lit_str.value()), span))
+                            Ok(Self::Module(ModuleKind::Named(lit_str.value()), ident))
                         } else {
                             Err(syn::Error::new_spanned(lit, "Expected string literal or 'common'"))
                         }
                     }
                     Expr::Path(path) => {
                         if path.path.is_ident("common") {
-                            Ok(Self::Module(ModuleKind::Common, span))
+                            Ok(Self::Module(ModuleKind::Common, ident))
                         } else {
                             Err(syn::Error::new_spanned(path, "Expected 'common' or string literal"))
                         }

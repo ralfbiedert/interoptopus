@@ -239,19 +239,11 @@ impl FunctionModel {
             syn::ReturnType::Type(_, return_ty) => {
                 let elided_return_ty = self.elide_lifetimes(return_ty);
 
-                // Use the original span if available
-                if let Some(original_span) = self.signature.output_span {
-                    quote_spanned! {original_span=>
-                        const _: () = const {
-                            ::interoptopus::lang::types::assert_raw_safe::<#elided_return_ty>();
-                        };
-                    }
-                } else {
-                    quote! {
-                        const _: () = const {
-                            ::interoptopus::lang::types::assert_raw_safe::<#elided_return_ty>();
-                        };
-                    }
+                // Use the return type token directly for proper span attribution
+                quote_spanned! {return_ty.span()=>
+                    const _: () = const {
+                        ::interoptopus::lang::types::assert_raw_safe::<#elided_return_ty>();
+                    };
                 }
             }
         };
