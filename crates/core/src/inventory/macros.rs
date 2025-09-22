@@ -21,3 +21,13 @@ macro_rules! extra_type {
         }
     }};
 }
+
+/// Register an item.
+#[macro_export]
+macro_rules! function {
+    ($x:ty) => {{
+        |x: &mut $crate::inventory::Inventory| {
+            <$x as $crate::lang::function::FunctionInfo>::register(x);
+        }
+    }};
+}

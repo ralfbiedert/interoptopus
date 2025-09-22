@@ -37,6 +37,9 @@
 //! ```
 //!
 
+use crate::inventory::{Inventory, TypeId};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::ptr::{null, null_mut};
@@ -112,6 +115,33 @@ impl<T> Deref for Slice<'_, T> {
 
     fn deref(&self) -> &Self::Target {
         self.as_slice()
+    }
+}
+
+impl<T: TypeInfo> TypeInfo for Slice<'_, T> {
+    const WIRE_SAFE: bool = false;
+    const RAW_SAFE: bool = T::RAW_SAFE;
+    const ASYNC_SAFE: bool = false;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
+
+    fn id() -> TypeId {
+        TypeId::new(0xD77995219511CB31F7AB1D5D8F2D8A22).derive_id(T::id())
+    }
+
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(TypePattern::Slice(T::id()))
+    }
+
+    fn ty() -> Type {
+        let t = T::ty();
+        let emission = common_or_module_emission(&[t.emission]);
+        Type { name: format!("Slice<{}>", t.name), visibility: Visibility::Public, docs: Docs::empty(), emission, kind: Self::kind() }
+    }
+
+    fn register(inventory: &mut Inventory) {
+        T::register(inventory);
+        inventory.register_type(Self::id(), Self::ty());
     }
 }
 
@@ -194,6 +224,33 @@ impl<T> Deref for SliceMut<'_, T> {
 impl<T> DerefMut for SliceMut<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.as_slice_mut()
+    }
+}
+
+impl<T: TypeInfo> TypeInfo for SliceMut<'_, T> {
+    const WIRE_SAFE: bool = false;
+    const RAW_SAFE: bool = T::RAW_SAFE;
+    const ASYNC_SAFE: bool = false;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
+
+    fn id() -> TypeId {
+        TypeId::new(0xB4DB1DCC839538A76319E0F537203502).derive_id(T::id())
+    }
+
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(TypePattern::SliceMut(T::id()))
+    }
+
+    fn ty() -> Type {
+        let t = T::ty();
+        let emission = common_or_module_emission(&[t.emission]);
+        Type { name: format!("SliceMut<{}>", t.name), visibility: Visibility::Public, docs: Docs::empty(), emission, kind: Self::kind() }
+    }
+
+    fn register(inventory: &mut Inventory) {
+        T::register(inventory);
+        inventory.register_type(Self::id(), Self::ty());
     }
 }
 
