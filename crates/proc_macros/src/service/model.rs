@@ -82,6 +82,7 @@ impl ServiceModel {
                 // Parse parameters and determine receiver kind
                 let mut inputs = Vec::new();
                 let mut receiver_kind = ReceiverKind::None;
+                let mut param_index = 0; // Track index for generated parameter names
 
                 for (i, input_arg) in method.sig.inputs.iter().enumerate() {
                     match input_arg {
@@ -107,13 +108,15 @@ impl ServiceModel {
                                 }
                             }
 
-                            if let Pat::Ident(pat_ident) = typed_arg.pat.as_ref() {
-                                let param_name = pat_ident.ident.clone();
-
-                                inputs.push(ServiceParameter { name: param_name, ty: param_type, span: typed_arg.span() });
+                            let param_name = if let Pat::Ident(pat_ident) = typed_arg.pat.as_ref() {
+                                pat_ident.ident.clone()
                             } else {
-                                return Err(syn::Error::new_spanned(&typed_arg.pat, "Only named parameters are supported"));
-                            }
+                                // Generate a synthetic name for non-identifier patterns (like `_`)
+                                syn::Ident::new(&format!("_{}", param_index), typed_arg.pat.span())
+                            };
+
+                            inputs.push(ServiceParameter { name: param_name, ty: param_type, span: typed_arg.span() });
+                            param_index += 1;
                         }
                     }
                 }

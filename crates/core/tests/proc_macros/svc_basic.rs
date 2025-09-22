@@ -142,6 +142,10 @@ impl ServiceBad {
         // 0
     }
 
+    pub fn test_underscore_params(&self, _: u32, _: ffi::String, x: u8) -> ffi::Result<u8, Error> {
+        ffi::Ok(x + 1)
+    }
+
     // pub fn bad(&mut self) {}
 }
 
