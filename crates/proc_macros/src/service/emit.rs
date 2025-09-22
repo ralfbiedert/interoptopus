@@ -1,6 +1,6 @@
 use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote, quote_spanned, ToTokens};
+use quote::{format_ident, quote_spanned, ToTokens};
 use syn::spanned::Spanned;
 use syn::{Error, ReturnType, Type};
 
@@ -21,7 +21,7 @@ impl ServiceModel {
             functions.push(self.emit_method_function(method));
         }
 
-        Ok(quote! {
+        Ok(quote_spanned! { self.service_name.span() =>
             #(#functions)*
         })
     }
@@ -80,42 +80,50 @@ impl ServiceModel {
 
         // For generic types, we need to use the concrete type with turbofish syntax
         let service_call = if self.generics.params.is_empty() {
-            quote! { #service_name::#ctor_name }
+            quote_spanned! { ctor.name.span() => #service_name::#ctor_name }
         } else {
             // Use the full generic type with angle brackets for function calls
-            quote! { <#service_type>::#ctor_name }
+            quote_spanned! { ctor.name.span() => <#service_type>::#ctor_name }
         };
 
         // Extract error type from the constructor's return type
         let error_type = self.extract_error_type_from_constructor(ctor);
 
         let constructor_params = if ctor.inputs.is_empty() {
-            quote! { instance: *mut *const #service_type }
+            quote_spanned! { ctor.name.span() => instance: *mut *const #service_type }
         } else {
-            quote! { #params, instance: *mut *const #service_type }
+            quote_spanned! { ctor.name.span() => #params, instance: *mut *const #service_type }
         };
 
         // Use Box for non-async services, Arc for async services
         let (wrapper_creation, into_raw_call) = if self.is_async {
-            (quote! { let arc = ::std::sync::Arc::new(service_instance); }, quote! { ::std::sync::Arc::into_raw(arc) })
+            (
+                quote_spanned! { ctor.name.span() => let arc = ::std::sync::Arc::new(service_instance); },
+                quote_spanned! { ctor.name.span() => ::std::sync::Arc::into_raw(arc) },
+            )
         } else {
-            (quote! { let boxed = ::std::boxed::Box::new(service_instance); }, quote! { ::std::boxed::Box::into_raw(boxed) })
+            (
+                quote_spanned! { ctor.name.span() => let boxed = ::std::boxed::Box::new(service_instance); },
+                quote_spanned! { ctor.name.span() => ::std::boxed::Box::into_raw(boxed) },
+            )
         };
 
-        quote! {
+        quote_spanned! { ctor.name.span() =>
             #docs
             #[::interoptopus::ffi_function]
             pub unsafe fn #function_name #generics(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
-                let result = #service_call(#param_names);
-                match result {
-                    ::interoptopus::ffi::Ok(service_instance) => {
-                        #wrapper_creation
-                        *instance = #into_raw_call;
-                        ::interoptopus::ffi::Ok(::std::ptr::null())
+                unsafe {
+                   let result = #service_call(#param_names);
+                    match result {
+                        ::interoptopus::ffi::Ok(service_instance) => {
+                            #wrapper_creation
+                            *instance = #into_raw_call;
+                            ::interoptopus::ffi::Ok(::std::ptr::null())
+                        }
+                        ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
+                        ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
+                        ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
                     }
-                    ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
-                    ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
-                    ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
                 }
             }
         }
@@ -130,12 +138,12 @@ impl ServiceModel {
 
         // Use Box for non-async services, Arc for async services
         let from_raw_call = if self.is_async {
-            quote! { let _ = ::std::sync::Arc::from_raw(instance); }
+            quote_spanned! { self.service_name.span() => let _ = ::std::sync::Arc::from_raw(instance); }
         } else {
-            quote! { let _ = ::std::boxed::Box::from_raw(instance as *mut #service_type); }
+            quote_spanned! { self.service_name.span() => let _ = ::std::boxed::Box::from_raw(instance as *mut #service_type); }
         };
 
-        quote! {
+        quote_spanned! { self.service_name.span() =>
             #[::interoptopus::ffi_function]
             pub fn #function_name #generics(instance: *const #service_type) {
                 if !instance.is_null() {
@@ -171,13 +179,15 @@ impl ServiceModel {
         let return_type = self.emit_return_type(&method.output);
         let generics = &self.generics;
 
-        quote! {
+        quote_spanned! { method.name.span() =>
             #docs
             #[::interoptopus::ffi_function]
             pub unsafe fn #function_name #generics(instance: *const #service_type, #params) #return_type {
-                let instance_ref = &*instance;
-                instance_ref.#method_name(#param_names)
-            }
+                unsafe {
+                    let instance_ref = &*instance;
+                    instance_ref.#method_name(#param_names)
+                }
+           }
         }
     }
 
@@ -189,12 +199,14 @@ impl ServiceModel {
         let return_type = self.emit_return_type(&method.output);
         let generics = &self.generics;
 
-        quote! {
+        quote_spanned! { method.name.span() =>
             #docs
             #[::interoptopus::ffi_function]
             pub unsafe fn #function_name #generics(instance: *mut #service_type, #params) #return_type {
-                let instance_ref = &mut *instance;
-                instance_ref.#method_name(#param_names)
+                unsafe {
+                    let instance_ref = &mut *instance;
+                    instance_ref.#method_name(#param_names)
+                }
             }
         }
     }
@@ -210,64 +222,67 @@ impl ServiceModel {
         let callback_type = self.extract_async_callback_type(&method.output);
 
         let async_params = if method.inputs.is_empty() {
-            quote! {
+            quote_spanned! { method.name.span() =>
                 instance: *const #service_type,
                 callback: ::interoptopus::pattern::asynk::AsyncCallback<#callback_type>
             }
         } else {
-            quote! {
+            quote_spanned! { method.name.span() =>
                 instance: *const #service_type,
                 #params,
                 callback: ::interoptopus::pattern::asynk::AsyncCallback<#callback_type>
             }
         };
 
-        quote! {
+        quote_spanned! { method.name.span() =>
             #docs
             #[::interoptopus::ffi_function]
             pub unsafe fn #function_name #generics(
                 #async_params
             ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
-                let instance_arc = ::std::sync::Arc::from_raw(instance);
-                let instance_clone = ::std::sync::Arc::clone(&instance_arc);
-                ::std::mem::forget(instance_arc); // Don't drop the original
+                unsafe {
+                    let instance_arc = ::std::sync::Arc::from_raw(instance);
+                    let instance_clone = ::std::sync::Arc::clone(&instance_arc);
+                    ::std::mem::forget(instance_arc); // Don't drop the original
 
-                let async_this = ::interoptopus::pattern::asynk::Async::new(instance_clone.clone());
+                    let async_this = ::interoptopus::pattern::asynk::Async::new(instance_clone.clone());
 
-                use ::interoptopus::pattern::asynk::AsyncRuntime;
-                instance_clone.spawn(move |_| async move {
-                    let result = #service_type::#method_name(async_this, #param_names).await;
-                    match result {
-                        ::interoptopus::ffi::Ok(value) => {
-                            callback.call(&value);
+                    use ::interoptopus::pattern::asynk::AsyncRuntime;
+                    instance_clone.spawn(move |_| async move {
+                        let result = #service_type::#method_name(async_this, #param_names).await;
+                        match result {
+                            ::interoptopus::ffi::Ok(value) => {
+                                callback.call(&value);
+                            }
+                            ::interoptopus::ffi::Err(_err) => {
+                                // TODO: Handle async errors properly
+                            }
+                            ::interoptopus::ffi::Result::Panic => {
+                                // TODO: Handle async panics properly
+                            }
+                            ::interoptopus::ffi::Result::Null => {
+                                // TODO: Handle async null properly
+                            }
                         }
-                        ::interoptopus::ffi::Err(_err) => {
-                            // TODO: Handle async errors properly
-                        }
-                        ::interoptopus::ffi::Result::Panic => {
-                            // TODO: Handle async panics properly
-                        }
-                        ::interoptopus::ffi::Result::Null => {
-                            // TODO: Handle async null properly
-                        }
-                    }
-                });
-                ::interoptopus::ffi::Ok(::std::ptr::null())
+                    });
+                    ::interoptopus::ffi::Ok(::std::ptr::null())
+                }
+
             }
         }
     }
 
     fn emit_params(&self, inputs: &[crate::service::model::ServiceParameter]) -> TokenStream {
         if inputs.is_empty() {
-            quote! {}
+            quote_spanned! { self.service_name.span() => }
         } else {
             let params = inputs.iter().map(|param| {
                 let name = &param.name;
                 let ty = &param.ty;
-                quote! { #name: #ty }
+                quote_spanned! { name.span() => #name: #ty }
             });
 
-            quote! {
+            quote_spanned! { self.service_name.span() =>
                 #(#params),*
             }
         }
@@ -275,10 +290,10 @@ impl ServiceModel {
 
     fn emit_param_names(&self, inputs: &[crate::service::model::ServiceParameter]) -> TokenStream {
         if inputs.is_empty() {
-            quote! {}
+            quote_spanned! { self.service_name.span() => }
         } else {
             let names = inputs.iter().map(|param| &param.name);
-            quote! {
+            quote_spanned! { self.service_name.span() =>
                 #(#names),*
             }
         }
@@ -286,19 +301,19 @@ impl ServiceModel {
 
     fn emit_return_type(&self, output: &ReturnType) -> TokenStream {
         match output {
-            ReturnType::Default => quote! {},
-            ReturnType::Type(arrow, ty) => quote! { #arrow #ty },
+            ReturnType::Default => quote_spanned! { self.service_name.span() => },
+            ReturnType::Type(arrow, ty) => quote_spanned! { self.service_name.span() => #arrow #ty },
         }
     }
 
     fn emit_docs(&self, docs: &[String]) -> TokenStream {
         if docs.is_empty() {
-            quote! {}
+            quote_spanned! { self.service_name.span() => }
         } else {
             let doc_strings = docs.iter().map(|doc| {
-                quote! { #[doc = #doc] }
+                quote_spanned! { self.service_name.span() => #[doc = #doc] }
             });
-            quote! {
+            quote_spanned! { self.service_name.span() =>
                 #(#doc_strings)*
             }
         }
@@ -313,16 +328,16 @@ impl ServiceModel {
                         if segment.ident == "Result" {
                             if let syn::PathArguments::AngleBracketed(args) = &segment.arguments {
                                 if let Some(syn::GenericArgument::Type(inner_type)) = args.args.first() {
-                                    return quote! { #inner_type };
+                                    return quote_spanned! { self.service_name.span() => #inner_type };
                                 }
                             }
                         }
                     }
                 }
                 // Fallback to the whole type
-                quote! { #ty }
+                quote_spanned! { self.service_name.span() => #ty }
             }
-            ReturnType::Default => quote! { () },
+            ReturnType::Default => quote_spanned! { self.service_name.span() => () },
         }
     }
 
@@ -336,7 +351,7 @@ impl ServiceModel {
                             if let syn::PathArguments::AngleBracketed(args) = &segment.arguments {
                                 if let Some(syn::GenericArgument::Type(_)) = args.args.first() {
                                     if let Some(syn::GenericArgument::Type(error_type)) = args.args.iter().nth(1) {
-                                        return quote! { #error_type };
+                                        return quote_spanned! { ctor.name.span() => #error_type };
                                     }
                                 }
                             }
@@ -344,9 +359,9 @@ impl ServiceModel {
                     }
                 }
                 // Fallback - if we can't extract it, just use the Error type that should be in scope
-                quote! { Error }
+                quote_spanned! { ctor.name.span() => Error }
             }
-            ReturnType::Default => quote! { Error },
+            ReturnType::Default => quote_spanned! { ctor.name.span() => Error },
         }
     }
 
@@ -364,7 +379,7 @@ impl ServiceModel {
 
         let destructor_name = format_ident!("{}_destroy", service_name_snake);
 
-        Ok(quote! {
+        Ok(quote_spanned! { self.service_name.span() =>
             impl #generics ::interoptopus::lang::service::ServiceInfo for #service_type {
                 fn id() -> ::interoptopus::inventory::ServiceId {
                     ::interoptopus::inventory::ServiceId::from_id(::interoptopus::id!(#service_type))
@@ -413,12 +428,12 @@ impl ServiceModel {
         let base_service_name = self.get_base_service_name();
 
         let async_verification = if self.is_async {
-            quote! {
+            quote_spanned! { self.service_name.span() =>
                 const fn _assert_async<T: ::interoptopus::pattern::asynk::AsyncRuntime>() {}
                 _assert_async::<#service_type>();
             }
         } else {
-            quote! {}
+            quote_spanned! { self.service_name.span() => }
         };
 
         // Generate SERVICE_CTOR_SAFE checks for constructor return types
@@ -440,7 +455,7 @@ impl ServiceModel {
             .collect::<Result<Vec<_>, Error>>()?;
 
         // Note: Skipping ASYNC_SAFE checks for now due to const context limitations with generics
-        let async_safe_verification = quote! {};
+        let async_safe_verification = quote_spanned! { self.service_name.span() => };
 
         let x = self.service_type.span();
         let base_service_verification = quote_spanned! { x =>

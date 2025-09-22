@@ -203,7 +203,6 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
     let method_attributes = quote_spanned! {span_service_ty =>
         #[::interoptopus::ffi_function]
-        #[unsafe(no_mangle)]
         #[allow(unused_mut, unsafe_op_in_unsafe_fn)]
         #[allow(clippy::needless_lifetimes, clippy::extra_unused_lifetimes, clippy::redundant_locals, clippy::forget_non_drop, clippy::useless_conversion, clippy::let_unit_value)]
         #(
