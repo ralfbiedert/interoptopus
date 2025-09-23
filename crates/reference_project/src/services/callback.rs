@@ -2,7 +2,7 @@ use crate::patterns::callback::{
     MyCallback, MyCallbackContextual, MyCallbackNamespaced, MyCallbackVoid, SumDelegate1, SumDelegate2, SumDelegateReturn, SumDelegateReturn2,
 };
 use crate::patterns::result::Error;
-use interoptopus::{ffi, ffi_service, ffi_type};
+use interoptopus::{ffi, ffi::*, ffi_service, ffi_type};
 
 #[ffi_type]
 #[derive(Copy, Clone)]
