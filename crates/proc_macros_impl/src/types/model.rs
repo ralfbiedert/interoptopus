@@ -63,7 +63,7 @@ impl TypeModel {
                         .named
                         .into_iter()
                         .map(|field| {
-                            let skip = field.attrs.iter().any(|attr| attr.path().is_ident("skip"));
+                            let skip = field.attrs.iter().any(|attr| attr.path().is_ident("ffi::skip"));
                             FieldModel { name: field.ident, ty: field.ty, vis: field.vis, skip, docs: extract_docs(&field.attrs) }
                         })
                         .collect(),
@@ -71,7 +71,7 @@ impl TypeModel {
                         .unnamed
                         .into_iter()
                         .map(|field| {
-                            let skip = field.attrs.iter().any(|attr| attr.path().is_ident("skip"));
+                            let skip = field.attrs.iter().any(|attr| attr.path().is_ident("ffi::skip"));
                             FieldModel { name: None, ty: field.ty, vis: field.vis, skip, docs: extract_docs(&field.attrs) }
                         })
                         .collect(),
