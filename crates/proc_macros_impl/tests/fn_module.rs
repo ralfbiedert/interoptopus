@@ -16,7 +16,7 @@ fn module_explicit() {
 #[test]
 fn module_common() {
     let item: ItemFn = parse_quote! {
-        #[ffi_function(module = "common")]
+        #[ffi_function(module = common)]
         fn foo() {}
     };
 

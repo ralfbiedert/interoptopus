@@ -1,6 +1,6 @@
 ---
 source: crates/proc_macros_impl/tests/fn_module.rs
-expression: formatted
+expression: expand_fn!(item)
 ---
 #[unsafe(export_name = "foo")]
 extern "C" fn foo() {}
@@ -21,7 +21,7 @@ impl ::interoptopus::lang::function::FunctionInfo for foo {
             name: "foo".to_string(),
             visibility: ::interoptopus::lang::meta::Visibility::Private,
             docs: ::interoptopus::lang::meta::Docs::from_lines(vec![]),
-            emission: ::interoptopus::lang::meta::Emission::Module("common".to_string()),
+            emission: ::interoptopus::lang::meta::Emission::Common,
             signature: Self::signature(),
         }
     }

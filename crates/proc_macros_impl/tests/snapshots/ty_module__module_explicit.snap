@@ -1,6 +1,5 @@
 ---
 source: crates/proc_macros_impl/tests/ty_module.rs
-assertion_line: 15
 expression: expand_ty!(item)
 ---
 #[repr(C)]
@@ -35,7 +34,7 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
             name: "Foo".to_string(),
             visibility: ::interoptopus::lang::meta::Visibility::Public,
             docs: ::interoptopus::lang::meta::Docs::from_line(""),
-            emission: ::interoptopus::lang::meta::Emission::External,
+            emission: ::interoptopus::lang::meta::Emission::Module("foo".to_string()),
             kind: Self::kind(),
         }
     }

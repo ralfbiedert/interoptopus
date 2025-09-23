@@ -1,6 +1,6 @@
 /// Identifiers known to cause issues in some backend language that shouldn't be used in Rust either.
 #[allow(dead_code)]
-pub const FORBIDDEN_NAMES: [&str; 139] = [
+pub const FORBIDDEN_NAMES: [&str; 138] = [
     "abstract",
     "add",
     "alias",
@@ -45,7 +45,6 @@ pub const FORBIDDEN_NAMES: [&str; 139] = [
     "false",
     "False",
     "field",
-    "file",
     "finally",
     "fixed",
     "float",
