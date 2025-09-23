@@ -9,5 +9,4 @@ struct Opaque2 {}
 #[ffi_type(opaque)]
 struct Opaque3(());
 
-#[allow(dead_code)]
 fn main() {}

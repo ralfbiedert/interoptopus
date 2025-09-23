@@ -15,6 +15,7 @@ fn proc() {
     t.pass("tests/proc/fn/basic.rs");
     t.compile_fail("tests/proc/fn/forbidden_fn.rs");
     t.compile_fail("tests/proc/fn/forbidden_param.rs");
+    t.pass("tests/proc/fn/module.rs");
     t.compile_fail("tests/proc/fn/on_ty.rs");
     t.pass("tests/proc/fn/ref.rs");
     t.pass("tests/proc/fn/ref_lt.rs");
@@ -28,6 +29,8 @@ fn proc() {
     t.pass("tests/proc/svc/ctor.rs");
     t.compile_fail("tests/proc/svc/ctor_rval_bad_self.rs");
     t.compile_fail("tests/proc/svc/ctor_rval_omit.rs");
+    // t.compile_fail("tests/proc/svc/module.rs"); TODO: later
+    t.compile_fail("tests/proc/svc/opaque.rs"); // TODO: should have better error warning about `opaque`
 
     // ty
     t.pass("tests/proc/ty/basic.rs");
@@ -36,6 +39,7 @@ fn proc() {
     t.compile_fail("tests/proc/ty/forbidden_field.rs");
     t.pass("tests/proc/ty/generic_basic.rs");
     t.compile_fail("tests/proc/ty/generic_no_typeinfo.rs");
+    t.pass("tests/proc/ty/module.rs");
     t.pass("tests/proc/ty/opaque_basic.rs");
     t.pass("tests/proc/ty/opaque_no_typeinfo.rs");
     t.pass("tests/proc/ty/service_basic.rs");

@@ -11,5 +11,5 @@ fn async_fails() {
         async fn async_foo() {}
     };
 
-    test_fn!(item);
+    insta::assert_snapshot!(expand_fn!(item));
 }

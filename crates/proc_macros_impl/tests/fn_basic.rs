@@ -10,5 +10,5 @@ fn basic_expansion() {
         fn foo() {}
     };
 
-    test_fn!(item);
+    insta::assert_snapshot!(expand_fn!(item));
 }

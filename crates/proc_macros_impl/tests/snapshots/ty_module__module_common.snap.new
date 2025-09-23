@@ -1,0 +1,11 @@
+---
+source: crates/proc_macros_impl/tests/ty_module.rs
+assertion_line: 27
+expression: expand_ty!(item)
+---
+struct Foo {
+    x: u8,
+}
+::core::compile_error! {
+    "Expected string literal"
+}
