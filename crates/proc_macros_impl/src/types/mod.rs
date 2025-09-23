@@ -77,28 +77,73 @@ fn remove_skip_attributes(input: &mut DeriveInput) {
         Data::Struct(data_struct) => match &mut data_struct.fields {
             syn::Fields::Named(fields) => {
                 for field in &mut fields.named {
-                    field.attrs.retain(|attr| !attr.path().is_ident("skip"));
+                    field.attrs.retain(|attr| {
+                        // Remove ffi::skip attributes
+                        if let syn::Meta::Path(path) = &attr.meta {
+                            !(path.segments.len() == 2
+                                && path.segments[0].ident == "ffi"
+                                && path.segments[1].ident == "skip")
+                        } else {
+                            true // Keep non-path attributes
+                        }
+                    });
                 }
             }
             syn::Fields::Unnamed(fields) => {
                 for field in &mut fields.unnamed {
-                    field.attrs.retain(|attr| !attr.path().is_ident("skip"));
+                    field.attrs.retain(|attr| {
+                        // Remove ffi::skip attributes
+                        if let syn::Meta::Path(path) = &attr.meta {
+                            !(path.segments.len() == 2
+                                && path.segments[0].ident == "ffi"
+                                && path.segments[1].ident == "skip")
+                        } else {
+                            true // Keep non-path attributes
+                        }
+                    });
                 }
             }
             syn::Fields::Unit => {}
         },
         Data::Enum(data_enum) => {
             for variant in &mut data_enum.variants {
-                variant.attrs.retain(|attr| !attr.path().is_ident("skip"));
+                variant.attrs.retain(|attr| {
+                    // Remove ffi::skip attributes
+                    if let syn::Meta::Path(path) = &attr.meta {
+                        !(path.segments.len() == 2
+                            && path.segments[0].ident == "ffi"
+                            && path.segments[1].ident == "skip")
+                    } else {
+                        true // Keep non-path attributes
+                    }
+                });
                 match &mut variant.fields {
                     syn::Fields::Named(fields) => {
                         for field in &mut fields.named {
-                            field.attrs.retain(|attr| !attr.path().is_ident("skip"));
+                            field.attrs.retain(|attr| {
+                        // Remove ffi::skip attributes
+                        if let syn::Meta::Path(path) = &attr.meta {
+                            !(path.segments.len() == 2
+                                && path.segments[0].ident == "ffi"
+                                && path.segments[1].ident == "skip")
+                        } else {
+                            true // Keep non-path attributes
+                        }
+                    });
                         }
                     }
                     syn::Fields::Unnamed(fields) => {
                         for field in &mut fields.unnamed {
-                            field.attrs.retain(|attr| !attr.path().is_ident("skip"));
+                            field.attrs.retain(|attr| {
+                        // Remove ffi::skip attributes
+                        if let syn::Meta::Path(path) = &attr.meta {
+                            !(path.segments.len() == 2
+                                && path.segments[0].ident == "ffi"
+                                && path.segments[1].ident == "skip")
+                        } else {
+                            true // Keep non-path attributes
+                        }
+                    });
                         }
                     }
                     syn::Fields::Unit => {}

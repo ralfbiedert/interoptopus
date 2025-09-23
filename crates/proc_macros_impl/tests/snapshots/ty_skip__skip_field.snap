@@ -1,21 +1,16 @@
 ---
 source: crates/proc_macros_impl/tests/ty_skip.rs
-assertion_line: 17
 expression: expand_ty!(item)
 ---
 #[repr(C)]
 struct Foo {
     x: u8,
-    #[ffi::skip]
-    y: u8,
+    y: PhantomData<()>,
 }
 impl ::interoptopus::lang::types::TypeInfo for Foo {
-    const WIRE_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE
-        && <u8 as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE;
-    const RAW_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE
-        && <u8 as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE;
-    const ASYNC_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE
-        && <u8 as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE;
+    const WIRE_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE;
+    const RAW_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE;
+    const ASYNC_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE;
     const SERVICE_SAFE: bool = false;
     const SERVICE_CTOR_SAFE: bool = false;
     fn id() -> ::interoptopus::inventory::TypeId {
@@ -25,10 +20,6 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
         ::interoptopus::lang::types::TypeKind::Struct(::interoptopus::lang::types::Struct {
             fields: vec![
                 ::interoptopus::lang::types::Field { name : "x".to_string(), docs :
-                ::interoptopus::lang::meta::Docs::from_line(""), visibility :
-                ::interoptopus::lang::meta::Visibility::Public, ty : < u8 as
-                ::interoptopus::lang::types::TypeInfo > ::id(), },
-                ::interoptopus::lang::types::Field { name : "y".to_string(), docs :
                 ::interoptopus::lang::meta::Docs::from_line(""), visibility :
                 ::interoptopus::lang::meta::Visibility::Public, ty : < u8 as
                 ::interoptopus::lang::types::TypeInfo > ::id(), }
@@ -49,7 +40,6 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
         }
     }
     fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
-        <u8 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         <u8 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
     }
