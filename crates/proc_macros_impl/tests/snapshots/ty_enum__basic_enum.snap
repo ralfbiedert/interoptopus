@@ -1,0 +1,49 @@
+---
+source: crates/proc_macros_impl/tests/ty_enum.rs
+expression: expand_ty!(item)
+---
+#[repr(u32)]
+enum Foo {
+    A,
+    B,
+}
+impl ::interoptopus::lang::types::TypeInfo for Foo {
+    const WIRE_SAFE: bool = true;
+    const RAW_SAFE: bool = true;
+    const ASYNC_SAFE: bool = true;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
+    fn id() -> ::interoptopus::inventory::TypeId {
+        ::interoptopus::inventory::TypeId::from_id(::interoptopus::id!(Foo))
+    }
+    fn kind() -> ::interoptopus::lang::types::TypeKind {
+        ::interoptopus::lang::types::TypeKind::Enum(::interoptopus::lang::types::Enum {
+            variants: vec![
+                ::interoptopus::lang::types::Variant { name : "A".to_string(), docs :
+                ::interoptopus::lang::meta::Docs::from_line(""), kind :
+                ::interoptopus::lang::types::VariantKind::Unit(0), },
+                ::interoptopus::lang::types::Variant { name : "B".to_string(), docs :
+                ::interoptopus::lang::meta::Docs::from_line(""), kind :
+                ::interoptopus::lang::types::VariantKind::Unit(0), }
+            ],
+            repr: ::interoptopus::lang::types::Repr {
+                layout: ::interoptopus::lang::types::Layout::Primitive(
+                    ::interoptopus::lang::types::Primitive::U32,
+                ),
+                alignment: None,
+            },
+        })
+    }
+    fn ty() -> ::interoptopus::lang::types::Type {
+        ::interoptopus::lang::types::Type {
+            name: "Foo".to_string(),
+            visibility: ::interoptopus::lang::meta::Visibility::Public,
+            docs: ::interoptopus::lang::meta::Docs::from_line(""),
+            emission: ::interoptopus::lang::meta::Emission::External,
+            kind: Self::kind(),
+        }
+    }
+    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}

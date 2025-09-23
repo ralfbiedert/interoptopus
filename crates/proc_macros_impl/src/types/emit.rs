@@ -280,7 +280,7 @@ impl TypeModel {
             return quote_spanned! { self.name.span() =>
                 ::interoptopus::lang::types::Repr {
                     layout: ::interoptopus::lang::types::Layout::Opaque,
-                    alignment: None,
+                    alignment: ::std::option::Option::None,
                 }
             };
         }
@@ -305,7 +305,7 @@ impl TypeModel {
         quote_spanned! { self.name.span() =>
             ::interoptopus::lang::types::Repr {
                 layout: #layout,
-                alignment: None,
+                alignment: ::std::option::Option::None,
             }
         }
     }
