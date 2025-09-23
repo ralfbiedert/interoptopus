@@ -9,5 +9,4 @@ struct Service2 {}
 #[ffi_type(service)]
 struct Service3(());
 
-#[allow(dead_code)]
 fn main() {}

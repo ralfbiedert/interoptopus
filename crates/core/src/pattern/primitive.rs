@@ -1,5 +1,8 @@
 //! Additional support for primitives like `bool`.
 
+use crate::inventory::{Inventory, TypeId};
+use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::ops::Not;
@@ -52,6 +55,30 @@ impl From<Bool> for bool {
     }
 }
 
+impl TypeInfo for Bool {
+    const WIRE_SAFE: bool = true;
+    const RAW_SAFE: bool = true;
+    const ASYNC_SAFE: bool = true;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
+
+    fn id() -> TypeId {
+        TypeId::new(0x4ECDA35B6792FC1A61E444B3A9D3B3B8)
+    }
+
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(TypePattern::Bool)
+    }
+
+    fn ty() -> Type {
+        Type { name: "Bool".to_string(), visibility: Visibility::Public, docs: Docs::empty(), emission: Emission::Builtin, kind: Self::kind() }
+    }
+
+    fn register(inventory: &mut Inventory) {
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}
+
 /// A wrapper for the `c_char` type to differentiate it from a signed 8-bit integer for platforms
 /// that support this type.
 ///
@@ -76,6 +103,30 @@ impl From<c_char> for CChar {
 impl From<CChar> for c_char {
     fn from(x: CChar) -> Self {
         x.value
+    }
+}
+
+impl TypeInfo for CChar {
+    const WIRE_SAFE: bool = true;
+    const RAW_SAFE: bool = true;
+    const ASYNC_SAFE: bool = true;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
+
+    fn id() -> TypeId {
+        TypeId::new(0xBCA68B86EF7B3FEFAFBB645D6B156754)
+    }
+
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(TypePattern::CChar)
+    }
+
+    fn ty() -> Type {
+        Type { name: "CChar".to_string(), visibility: Visibility::Public, docs: Docs::empty(), emission: Emission::Builtin, kind: Self::kind() }
+    }
+
+    fn register(inventory: &mut Inventory) {
+        inventory.register_type(Self::id(), Self::ty());
     }
 }
 

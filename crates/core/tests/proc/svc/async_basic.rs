@@ -14,6 +14,10 @@ struct Service;
 
 #[ffi_service]
 impl Service {
+    pub fn new() -> ffi::Result<Self, Error> {
+        ffi::Ok(Self)
+    }
+
     pub async fn compute(_: Async<Self>) -> ffi::Result<u8, Error> {
         ffi::Ok(0)
     }

@@ -5,7 +5,7 @@ use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::{ffi_service, ffi_type};
 use tokio::runtime::{Builder, Runtime};
 
-#[ffi_type(opaque)]
+#[ffi_type(service)]
 pub struct ServiceAsyncBasic {
     runtime: Runtime,
 }
