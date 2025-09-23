@@ -18,11 +18,9 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - `#[ffi_service_ctor]` has been removed and is inferred.
 - `AsciiPointer` is now called `CStrPointer`, since it can contain non-ASCII data (e.g., when called from C#).
 - We fixed capitalization in some backends, e.g., a `Sliceu8` is now `SliceU8`.
-- When using `InventoryBuilder` you should call `.validate().inventory()` now.
-- It's now `Inventory::builder()` to create an `InventoryBuilder`.
-- To override visibility for all fields:
-    - Previously you had to `#[ffi_type(visibility(_ = "public"))]`
-    - Now you do `#[ffi_type(visibility(_all = "public"))]`
+- It's now `Inventory::new()` to create an `Inventory`, and you directly register on it. Call `validate()` when done.
+- Skipping fields now works with `#[skip]`
+- Services are now `#[ffi_type(service)]` and `#[ffi_service]`
 - Surrogates now work through the `Surrogate<T, L>` type.
     - Previously you needed to specify `#[ffi_surrogates(some_field = "some_foreign_type")]`
     - Instead, you now make `some_field` of type `Surrogate<Foreign, Local>`
@@ -41,6 +39,11 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - Likewise, `#[ffi_type(error)]` on enums has been removed.
 - Some item names (e.g., `public`) are forbidden now as they might conflict with backend language-specific keywords, and
   will be flagged when invoking `.validate()`.
+- The entire `Inventory` internal machinery has been rewritten from scratch. If you relied on delicate inventory
+  manipulation please have a look at the new `Inventory` APIs and file a issue / PR if something is missing.
+- Checking of forbidden names now happens inside the macro at compile time with much better diagnostics.
+- Many constructs are now forbidden that were previously allowed but 'dodgy'. In most cases you should get a clear 
+  error message if that happens. 
 
 #### All Backends
 

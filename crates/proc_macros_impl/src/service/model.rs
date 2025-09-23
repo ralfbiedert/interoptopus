@@ -1,4 +1,4 @@
-use crate::common::extract_docs;
+use crate::docs::extract_docs;
 use crate::service::args::FfiServiceArgs;
 use proc_macro2::Span;
 use syn::spanned::Spanned;

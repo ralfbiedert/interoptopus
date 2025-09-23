@@ -1,3 +1,4 @@
+use crate::forbidden::is_forbidden_name;
 use crate::service::model::{ReceiverKind, ServiceModel};
 use quote::ToTokens;
 use syn::{ImplItem, ItemImpl};
@@ -6,6 +7,7 @@ impl ServiceModel {
     /// Consolidated validation for service constraints
     pub fn validate(&self, input: &ItemImpl) -> syn::Result<()> {
         self.validate_async_constraints(input)?;
+        self.validate_forbidden_names()?;
         Ok(())
     }
 
@@ -33,6 +35,37 @@ impl ServiceModel {
                 }
             }
         }
+        Ok(())
+    }
+
+    /// Validates that no forbidden names are used for methods or parameters.
+    fn validate_forbidden_names(&self) -> syn::Result<()> {
+        // Check constructor method names and parameters
+        for constructor in &self.constructors {
+            // if is_forbidden_name(constructor.name.to_string()) {
+            //     return Err(syn::Error::new_spanned(&constructor.name, format!("Using the name '{}' can cause conflicts in generated code.", constructor.name)));
+            // }
+
+            for param in &constructor.inputs {
+                if is_forbidden_name(param.name.to_string()) {
+                    return Err(syn::Error::new_spanned(&param.name, format!("Using the name '{}' can cause conflicts in generated code.", param.name)));
+                }
+            }
+        }
+
+        // Check regular method names and parameters
+        for method in &self.methods {
+            if is_forbidden_name(method.name.to_string()) {
+                return Err(syn::Error::new_spanned(&method.name, format!("Using the name '{}' can cause conflicts in generated code.", method.name)));
+            }
+
+            for param in &method.inputs {
+                if is_forbidden_name(param.name.to_string()) {
+                    return Err(syn::Error::new_spanned(&param.name, format!("Using the name '{}' can cause conflicts in generated code.", param.name)));
+                }
+            }
+        }
+
         Ok(())
     }
 }

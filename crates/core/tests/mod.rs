@@ -13,6 +13,8 @@ fn proc() {
     t.compile_fail("tests/proc/fn/attr_extern_c.rs");
     t.compile_fail("tests/proc/fn/attr_no_mangle.rs");
     t.pass("tests/proc/fn/basic.rs");
+    t.compile_fail("tests/proc/fn/forbidden_fn.rs");
+    t.compile_fail("tests/proc/fn/forbidden_param.rs");
     t.compile_fail("tests/proc/fn/on_ty.rs");
     t.pass("tests/proc/fn/ref.rs");
     t.pass("tests/proc/fn/ref_lt.rs");
@@ -31,6 +33,7 @@ fn proc() {
     t.pass("tests/proc/ty/basic.rs");
     t.compile_fail("tests/proc/ty/empty_struct.rs");
     t.compile_fail("tests/proc/ty/empty_unit.rs");
+    t.compile_fail("tests/proc/ty/forbidden_field.rs");
     t.pass("tests/proc/ty/generic_basic.rs");
     t.compile_fail("tests/proc/ty/generic_no_typeinfo.rs");
     t.pass("tests/proc/ty/opaque_basic.rs");

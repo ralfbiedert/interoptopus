@@ -1,4 +1,5 @@
-use crate::common::extract_docs;
+use crate::docs::extract_docs;
+use crate::forbidden::is_forbidden_name;
 use crate::function::args::FfiFunctionArgs;
 use syn::spanned::Spanned;
 use syn::{FnArg, Ident, ItemFn, Pat, Type, Visibility};
@@ -85,6 +86,18 @@ impl FunctionModel {
         for param in &signature.generics.params {
             if let syn::GenericParam::Type(_) = param {
                 return Err(syn::Error::new_spanned(param, "Functions with type generics are not supported at FFI boundaries"));
+            }
+        }
+
+        // Check for forbidden function name
+        if is_forbidden_name(input.sig.ident.to_string()) {
+            return Err(syn::Error::new_spanned(&input.sig.ident, format!("Using the name '{}' can cause conflicts in generated code.", input.sig.ident)));
+        }
+
+        // Check for forbidden parameter names
+        for param in &signature.inputs {
+            if is_forbidden_name(param.name.to_string()) {
+                return Err(syn::Error::new_spanned(&param.name, format!("Using the name '{}' can cause conflicts in generated code.", param.name)));
             }
         }
 

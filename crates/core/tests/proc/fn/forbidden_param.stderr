@@ -1,0 +1,5 @@
+error: Using the name 'new' can cause conflicts in generated code.
+ --> tests/proc/fn/forbidden_param.rs:5:8
+  |
+5 | fn foo(new: u8) {}
+  |        ^^^
