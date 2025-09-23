@@ -1,9 +1,9 @@
 use crate::patterns::result::Error;
-use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
+use interoptopus::{ffi, ffi_service, ffi_type};
 use std::ffi::CString;
 
 /// Some struct we want to expose as a class.
-#[ffi_type(opaque)]
+#[ffi_type(service)]
 pub struct ServiceOnPanic {
     pub c_string: CString,
 }
