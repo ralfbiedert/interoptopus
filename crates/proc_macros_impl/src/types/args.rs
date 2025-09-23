@@ -1,5 +1,11 @@
 use syn::{Expr, Ident, Lit, Token, parse::Parse, punctuated::Punctuated};
 
+#[derive(Debug, Clone)]
+pub enum ModuleKind {
+    Named(String),
+    Common,
+}
+
 #[derive(Debug, Clone, Default)]
 #[allow(clippy::struct_excessive_bools)]
 pub struct FfiTypeArgs {
@@ -9,7 +15,7 @@ pub struct FfiTypeArgs {
     pub service: bool,
     pub debug: bool,
     pub name: Option<String>,
-    pub module: Option<String>,
+    pub module: Option<ModuleKind>,
     // Track source tokens for error reporting
     pub transparent_token: Option<Ident>,
     pub opaque_token: Option<Ident>,
@@ -60,7 +66,7 @@ enum FfiTypeArg {
     Service(Ident),
     Debug,
     Name(String),
-    Module(String),
+    Module(ModuleKind),
 }
 
 impl Parse for FfiTypeArg {
@@ -89,14 +95,23 @@ impl Parse for FfiTypeArg {
             "module" => {
                 input.parse::<Token![=]>()?;
                 let expr: Expr = input.parse()?;
-                if let Expr::Lit(lit) = expr {
-                    if let Lit::Str(lit_str) = lit.lit {
-                        Ok(Self::Module(lit_str.value()))
-                    } else {
-                        Err(syn::Error::new_spanned(lit, "Expected string literal"))
+
+                match expr {
+                    Expr::Lit(lit) => {
+                        if let Lit::Str(lit_str) = lit.lit {
+                            Ok(Self::Module(ModuleKind::Named(lit_str.value())))
+                        } else {
+                            Err(syn::Error::new_spanned(lit, "Expected string literal or 'common'"))
+                        }
                     }
-                } else {
-                    Err(syn::Error::new_spanned(expr, "Expected string literal"))
+                    Expr::Path(path) => {
+                        if path.path.is_ident("common") {
+                            Ok(Self::Module(ModuleKind::Common))
+                        } else {
+                            Err(syn::Error::new_spanned(path, "Expected 'common' or string literal"))
+                        }
+                    }
+                    _ => Err(syn::Error::new_spanned(expr, "Expected 'common' or string literal")),
                 }
             }
             _ => Err(syn::Error::new_spanned(ident, "Unknown attribute")),

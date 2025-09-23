@@ -310,9 +310,23 @@ impl TypeModel {
         }
     }
 
+    #[allow(dead_code)]
+    fn emit_emission(&self) -> TokenStream {
+        match &self.args.module {
+            Some(crate::types::args::ModuleKind::Named(name)) => {
+                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::Module(#name.to_string()) }
+            }
+            Some(crate::types::args::ModuleKind::Common) => {
+                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::Common }
+            }
+            None => {
+                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::External }
+            }
+        }
+    }
+
     fn generate_ty(&self) -> TokenStream {
         let docs_content = self.docs.join("\n");
-        let _module_name = self.args.module.as_deref().unwrap_or("");
 
         let type_name_expr = if let Some(name) = &self.args.name {
             let name = name.clone();
@@ -331,12 +345,14 @@ impl TypeModel {
             }
         };
 
+        let emission = self.emit_emission();
+
         quote_spanned! { self.name.span() =>
             ::interoptopus::lang::types::Type {
                 name: #type_name_expr,
                 visibility: ::interoptopus::lang::meta::Visibility::Public,
                 docs: ::interoptopus::lang::meta::Docs::from_line(#docs_content),
-                emission: ::interoptopus::lang::meta::Emission::External,
+                emission: #emission,
                 kind: Self::kind(),
             }
         }
