@@ -29,6 +29,7 @@ fn proc() {
     t.pass("tests/proc/svc/ctor.rs");
     t.compile_fail("tests/proc/svc/ctor_rval_bad_self.rs");
     t.compile_fail("tests/proc/svc/ctor_rval_omit.rs");
+    t.pass("tests/proc/svc/lifetime.rs");
     // t.compile_fail("tests/proc/svc/module.rs"); TODO: later
     t.compile_fail("tests/proc/svc/opaque.rs"); // TODO: should have better error warning about `opaque`
 
