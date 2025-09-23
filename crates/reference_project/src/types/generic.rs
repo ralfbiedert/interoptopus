@@ -3,7 +3,7 @@ use interoptopus::lang::types::TypeInfo;
 use std::fmt::Debug;
 
 #[ffi_type]
-pub struct ExtraType<T> {
+pub struct ExtraType<T: TypeInfo> {
     pub x: T,
 }
 
@@ -44,7 +44,7 @@ where
 #[ffi_type]
 pub struct Weird1<T: Clone>
 where
-    T: Copy + Copy,
+    T: Copy + Copy + TypeInfo,
 {
     x: T,
 }
@@ -53,7 +53,7 @@ where
 pub struct Weird2<'a, T: Clone, const N: usize>
 where
     T: Copy + Copy + 'a,
-    T: Debug,
+    T: Debug + TypeInfo,
 {
     t: T,
     a: [T; N],
