@@ -14,6 +14,9 @@ fn proc() {
     t.compile_fail("tests/proc/fn/attr_no_mangle.rs");
     t.pass("tests/proc/fn/basic.rs");
     t.compile_fail("tests/proc/fn/on_ty.rs");
+    t.pass("tests/proc/fn/ref.rs");
+    t.pass("tests/proc/fn/ref_lt.rs");
+    t.pass("tests/proc/fn/unsafe.rs");
     t.pass("tests/proc/fn/wildcard.rs");
 
     // svc
