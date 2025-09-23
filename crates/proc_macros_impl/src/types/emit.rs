@@ -48,6 +48,11 @@ impl TypeModel {
     }
 
     fn generate_wire_safe(&self) -> TokenStream {
+        // For opaque and service types, inner fields are not emitted, so we don't check them
+        if self.args.opaque || self.args.service {
+            return quote_spanned! { self.name.span() => true };
+        }
+
         match &self.data {
             TypeData::Struct(struct_data) => {
                 let field_checks = struct_data.fields.iter().filter(|f| !f.skip).map(|field| {
@@ -82,6 +87,11 @@ impl TypeModel {
     }
 
     fn generate_raw_safe(&self) -> TokenStream {
+        // For opaque and service types, inner fields are not emitted, so we don't check them
+        if self.args.opaque || self.args.service {
+            return quote_spanned! { self.name.span() => true };
+        }
+
         match &self.data {
             TypeData::Struct(struct_data) => {
                 let field_checks = struct_data.fields.iter().filter(|f| !f.skip).map(|field| {
@@ -116,6 +126,11 @@ impl TypeModel {
     }
 
     fn generate_async_safe(&self) -> TokenStream {
+        // For opaque and service types, inner fields are not emitted, so we don't check them
+        if self.args.opaque || self.args.service {
+            return quote_spanned! { self.name.span() => true };
+        }
+
         match &self.data {
             TypeData::Struct(struct_data) => {
                 let field_checks = struct_data.fields.iter().filter(|f| !f.skip).map(|field| {
@@ -332,25 +347,30 @@ impl TypeModel {
             inventory.register_type(Self::id(), Self::ty());
         };
 
-        let field_registrations = match &self.data {
-            TypeData::Struct(struct_data) => {
-                let registrations = struct_data.fields.iter().filter(|f| !f.skip).map(|field| {
-                    let ty = &field.ty;
-                    let span = field.name.as_ref().map(|n| n.span()).unwrap_or_else(|| ty.span());
-                    quote_spanned! { span =>
-                        <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory);
-                    }
-                });
-                quote_spanned! { self.name.span() => #(#registrations)* }
-            }
-            TypeData::Enum(enum_data) => {
-                let registrations = enum_data.variants.iter().filter_map(|variant| match &variant.data {
-                    VariantData::Unit => None,
-                    VariantData::Tuple(ty) => Some(quote_spanned! { variant.name.span() =>
-                        <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory);
-                    }),
-                });
-                quote_spanned! { self.name.span() => #(#registrations)* }
+        // For opaque and service types, inner fields are not emitted, so we don't register them
+        let field_registrations = if self.args.opaque || self.args.service {
+            quote_spanned! { self.name.span() => }
+        } else {
+            match &self.data {
+                TypeData::Struct(struct_data) => {
+                    let registrations = struct_data.fields.iter().filter(|f| !f.skip).map(|field| {
+                        let ty = &field.ty;
+                        let span = field.name.as_ref().map(|n| n.span()).unwrap_or_else(|| ty.span());
+                        quote_spanned! { span =>
+                            <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+                        }
+                    });
+                    quote_spanned! { self.name.span() => #(#registrations)* }
+                }
+                TypeData::Enum(enum_data) => {
+                    let registrations = enum_data.variants.iter().filter_map(|variant| match &variant.data {
+                        VariantData::Unit => None,
+                        VariantData::Tuple(ty) => Some(quote_spanned! { variant.name.span() =>
+                            <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+                        }),
+                    });
+                    quote_spanned! { self.name.span() => #(#registrations)* }
+                }
             }
         };
 
