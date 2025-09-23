@@ -37,5 +37,7 @@ fn proc() {
     t.pass("tests/proc/ty/generic_basic.rs");
     t.compile_fail("tests/proc/ty/generic_no_typeinfo.rs");
     t.pass("tests/proc/ty/opaque_basic.rs");
-    t.pass("tests/proc/ty/svc_basic.rs");
+    t.pass("tests/proc/ty/opaque_no_typeinfo.rs");
+    t.pass("tests/proc/ty/service_basic.rs");
+    t.pass("tests/proc/ty/service_no_typeinfo.rs");
 }

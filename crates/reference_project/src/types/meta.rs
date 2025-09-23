@@ -1,7 +1,6 @@
 use crate::types::enums::EnumRenamedXYZ;
 use interoptopus::ffi_type;
 use interoptopus::lang::types::TypeInfo;
-use interoptopus::lang::TypeInfo;
 use std::marker::PhantomData;
 
 #[ffi_type(name = "StructRenamed")]
