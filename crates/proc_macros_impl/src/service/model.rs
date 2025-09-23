@@ -27,6 +27,7 @@ pub struct ServiceMethod {
     pub receiver_kind: ReceiverKind,
     pub vis: Visibility,
     pub span: Span,
+    pub skip: bool,
 }
 
 #[derive(Clone)]
@@ -69,6 +70,23 @@ impl ServiceModel {
         // Process each method in the impl block
         for item in &input.items {
             if let ImplItem::Fn(method) = item {
+                // Check if method should be skipped
+                let skip = method.attrs.iter().any(|attr| {
+                    // Check for #[ffi::skip] attribute
+                    if let syn::Meta::Path(path) = &attr.meta {
+                        path.segments.len() == 2
+                            && path.segments[0].ident == "ffi"
+                            && path.segments[1].ident == "skip"
+                    } else {
+                        false
+                    }
+                });
+
+                // Skip processing this method if it has the skip attribute
+                if skip {
+                    continue;
+                }
+
                 let docs = extract_docs(&method.attrs);
                 let method_name = method.sig.ident.clone();
                 let is_async = method.sig.asyncness.is_some();
@@ -122,7 +140,7 @@ impl ServiceModel {
                 }
 
                 let service_method =
-                    ServiceMethod { name: method_name, docs, inputs, output: method.sig.output.clone(), is_async, receiver_kind: receiver_kind.clone(), vis, span };
+                    ServiceMethod { name: method_name, docs, inputs, output: method.sig.output.clone(), is_async, receiver_kind: receiver_kind.clone(), vis, span, skip: false };
 
                 // Validate async methods
                 if is_async && receiver_kind == ReceiverKind::None {
@@ -148,6 +166,7 @@ impl ServiceModel {
 
         Ok(model)
     }
+
 
     pub fn service_name_snake_case(&self) -> String {
         // Check if a manual prefix is provided

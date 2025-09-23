@@ -1,0 +1,42 @@
+---
+source: crates/proc_macros_impl/tests/svc_skip.rs
+assertion_line: 16
+expression: expand_svc!(item)
+---
+const _: () = {
+    const fn _assert_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
+    _assert_type_info::<Service>();
+    ::interoptopus::lang::types::assert_service_safe::<Service>();
+};
+impl Service {
+    #[ffi::skip]
+    fn new() -> ffi::Result<Self, Error> {}
+}
+#[::interoptopus::ffi_function]
+fn service_destroy(instance: *const Service) {
+    if !instance.is_null() {
+        unsafe {
+            let _ = ::std::boxed::Box::from_raw(instance as *mut Service);
+        }
+    }
+}
+impl ::interoptopus::lang::service::ServiceInfo for Service {
+    fn id() -> ::interoptopus::inventory::ServiceId {
+        ::interoptopus::inventory::ServiceId::from_id(::interoptopus::id!(Service))
+    }
+    fn service() -> ::interoptopus::lang::service::Service {
+        ::interoptopus::lang::service::Service::new(
+            <Service as ::interoptopus::lang::types::TypeInfo>::id(),
+            vec![],
+            <service_destroy as ::interoptopus::lang::function::FunctionInfo>::id(),
+            vec![],
+        )
+    }
+    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+        <Service as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+        <service_destroy as ::interoptopus::lang::function::FunctionInfo>::register(
+            inventory,
+        );
+        inventory.register_service(Self::id(), Self::service());
+    }
+}
