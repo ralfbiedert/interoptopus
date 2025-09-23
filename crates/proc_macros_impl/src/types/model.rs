@@ -63,7 +63,16 @@ impl TypeModel {
                         .named
                         .into_iter()
                         .map(|field| {
-                            let skip = field.attrs.iter().any(|attr| attr.path().is_ident("ffi::skip"));
+                            let skip = field.attrs.iter().any(|attr| {
+                                // Check for #[ffi::skip] attribute
+                                if let syn::Meta::Path(path) = &attr.meta {
+                                    path.segments.len() == 2
+                                        && path.segments[0].ident == "ffi"
+                                        && path.segments[1].ident == "skip"
+                                } else {
+                                    false
+                                }
+                            });
                             FieldModel { name: field.ident, ty: field.ty, vis: field.vis, skip, docs: extract_docs(&field.attrs) }
                         })
                         .collect(),
@@ -71,7 +80,16 @@ impl TypeModel {
                         .unnamed
                         .into_iter()
                         .map(|field| {
-                            let skip = field.attrs.iter().any(|attr| attr.path().is_ident("ffi::skip"));
+                            let skip = field.attrs.iter().any(|attr| {
+                                // Check for #[ffi::skip] attribute
+                                if let syn::Meta::Path(path) = &attr.meta {
+                                    path.segments.len() == 2
+                                        && path.segments[0].ident == "ffi"
+                                        && path.segments[1].ident == "skip"
+                                } else {
+                                    false
+                                }
+                            });
                             FieldModel { name: None, ty: field.ty, vis: field.vis, skip, docs: extract_docs(&field.attrs) }
                         })
                         .collect(),
