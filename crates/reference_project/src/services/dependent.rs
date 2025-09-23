@@ -13,7 +13,7 @@ impl ServiceMain {
     }
 }
 
-#[ffi_type(opaque)]
+#[ffi_type(service)]
 pub struct ServiceDependent {
     value: u32,
 }
