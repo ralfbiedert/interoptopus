@@ -51,7 +51,7 @@ pub fn ffi_inventory() -> Inventory {
     Inventory::new()
         // Functions
         .register(builtins_string!())
-        .register(builtins_wire!())
+        // .register(builtins_wire!())
         .register(builtins_vec!(u8))
         .register(builtins_vec!(ffi::String))
         .register(builtins_vec!(types::basic::Vec3f32))

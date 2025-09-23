@@ -104,8 +104,6 @@ impl TypeInfo for String {
 #[macro_export]
 macro_rules! builtins_string {
     () => {{
-        use ::interoptopus::lang::FunctionInfo;
-
         #[$crate::ffi_function]
         pub fn interoptopus_string_create(utf8: *const ::std::ffi::c_void, len: u64, rval: &mut ::std::mem::MaybeUninit<$crate::pattern::string::String>) -> i64 {
             let slice = if utf8.is_null() {
@@ -130,13 +128,10 @@ macro_rules! builtins_string {
             0
         }
 
-        let items = vec![
-            interoptopus_string_create::function_info(),
-            interoptopus_string_destroy::function_info(),
-            interoptopus_string_clone::function_info(),
-        ];
-        let builtins = $crate::pattern::builtins::Builtins::new(items);
-        let pattern = $crate::pattern::LibraryPattern::Builtins(builtins);
-        $crate::inventory::Symbol::Pattern(pattern)
+        |x: &mut $crate::inventory::Inventory| {
+            <interoptopus_string_create as $crate::lang::function::FunctionInfo>::register(x);
+            <interoptopus_string_destroy as $crate::lang::function::FunctionInfo>::register(x);
+            <interoptopus_string_clone as $crate::lang::function::FunctionInfo>::register(x);
+        }
     }};
 }

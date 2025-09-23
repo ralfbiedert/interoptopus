@@ -1,0 +1,5 @@
+error: This method looks like a constructor, but it does not return ffi::Result<Self, _>
+  --> tests/proc/svc/ctor_rval_omit.rs:13:12
+   |
+13 |     pub fn new() {}
+   |            ^^^
