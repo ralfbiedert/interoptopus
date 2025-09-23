@@ -30,7 +30,7 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
                 layout: ::interoptopus::lang::types::Layout::Primitive(
                     ::interoptopus::lang::types::Primitive::U32,
                 ),
-                alignment: None,
+                alignment: ::std::option::Option::None,
             },
         })
     }
