@@ -25,7 +25,7 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
             ],
             repr: ::interoptopus::lang::types::Repr {
                 layout: ::interoptopus::lang::types::Layout::C,
-                alignment: None,
+                alignment: ::std::option::Option::None,
             },
         })
     }

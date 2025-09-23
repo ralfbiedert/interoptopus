@@ -15,7 +15,7 @@ where
     T: TypeInfo,
 {
     pub x: u32,
-    #[skip]
+    #[ffi::skip]
     pub p: PhantomData<&'a T>,
 }
 

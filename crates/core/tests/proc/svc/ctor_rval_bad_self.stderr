@@ -1,8 +1,8 @@
-error[E0080]: evaluation of constant value failed
+error[E0080]: evaluation panicked: This method looks like a constructor, but does not return ffi::Result<Self, _>
   --> tests/proc/svc/ctor_rval_bad_self.rs:13:12
    |
 13 |     pub fn new() -> ffi::Result<u8, Error> {
-   |            ^^^ evaluation panicked: This method looks like a constructor, but does not return ffi::Result<Self, _>
+   |            ^^^ evaluation of `_` failed here
 
 error[E0308]: mismatched types
   --> tests/proc/svc/ctor_rval_bad_self.rs:13:12

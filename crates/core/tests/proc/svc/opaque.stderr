@@ -1,5 +1,5 @@
-error[E0080]: evaluation of constant value failed
+error[E0080]: evaluation panicked: This method looks like a constructor, but does not return ffi::Result<Self, _>
   --> tests/proc/svc/opaque.rs:13:12
    |
 13 |     pub fn new() -> ffi::Result<Self, Error> {
-   |            ^^^ evaluation panicked: This method looks like a constructor, but does not return ffi::Result<Self, _>
+   |            ^^^ evaluation of `_` failed here
