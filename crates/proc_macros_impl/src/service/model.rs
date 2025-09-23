@@ -3,7 +3,7 @@ use crate::service::args::FfiServiceArgs;
 use crate::utils::has_ffi_skip_attribute;
 use proc_macro2::Span;
 use syn::spanned::Spanned;
-use syn::{FnArg, Ident, ImplItem, ItemImpl, Pat, ReturnType, Type, Visibility};
+use syn::{FnArg, Generics, Ident, ImplItem, ItemImpl, Pat, ReturnType, Type, Visibility};
 
 #[derive(Clone)]
 #[allow(dead_code)]
@@ -29,6 +29,7 @@ pub struct ServiceMethod {
     pub vis: Visibility,
     pub span: Span,
     pub skip: bool,
+    pub generics: Generics,
 }
 
 #[derive(Clone)]
@@ -132,7 +133,7 @@ impl ServiceModel {
                 }
 
                 let service_method =
-                    ServiceMethod { name: method_name, docs, inputs, output: method.sig.output.clone(), is_async, receiver_kind: receiver_kind.clone(), vis, span, skip: false };
+                    ServiceMethod { name: method_name, docs, inputs, output: method.sig.output.clone(), is_async, receiver_kind: receiver_kind.clone(), vis, span, skip: false, generics: method.sig.generics.clone() };
 
                 // Validate async methods
                 if is_async && receiver_kind == ReceiverKind::None {

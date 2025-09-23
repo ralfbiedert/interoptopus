@@ -1,8 +1,8 @@
 use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote_spanned, ToTokens};
+use quote::{ToTokens, format_ident, quote_spanned};
 use syn::spanned::Spanned;
-use syn::{Error, ReturnType, Type};
+use syn::{Error, Generics, Lifetime, ReturnType, Type};
 
 impl ServiceModel {
     pub fn emit_ffi_functions(&self) -> Result<TokenStream, Error> {
@@ -29,6 +29,134 @@ impl ServiceModel {
     /// Get the base service name without any generic parameters (for const contexts)
     fn get_base_service_name(&self) -> syn::Ident {
         self.service_name.clone()
+    }
+
+    /// Replace anonymous lifetimes ('_) with explicit lifetime parameters
+    fn replace_anonymous_lifetimes(&self, ty: &Type, method_generics: &Generics) -> Type {
+        use syn::{GenericArgument, PathArguments, Type};
+
+        match ty {
+            Type::Reference(type_ref) => {
+                let mut new_ref = type_ref.clone();
+                if let Some(ref lifetime) = type_ref.lifetime {
+                    // Check if it's an anonymous lifetime
+                    if lifetime.ident == "_" {
+                        // Create or find a suitable lifetime parameter
+                        let replacement_lifetime = self.get_replacement_lifetime(method_generics);
+                        new_ref.lifetime = Some(replacement_lifetime);
+                    }
+                }
+                // Recursively process the referenced type
+                new_ref.elem = Box::new(self.replace_anonymous_lifetimes(&type_ref.elem, method_generics));
+                Type::Reference(new_ref)
+            }
+            Type::Path(type_path) => {
+                let mut new_path = type_path.clone();
+
+                // Process each segment of the path
+                for segment in &mut new_path.path.segments {
+                    // Recursively process any generic arguments
+                    if let PathArguments::AngleBracketed(ref mut args) = segment.arguments {
+                        for arg in &mut args.args {
+                            match arg {
+                                GenericArgument::Type(inner_type) => {
+                                    *inner_type = self.replace_anonymous_lifetimes(inner_type, method_generics);
+                                }
+                                GenericArgument::Lifetime(lifetime) => {
+                                    // Replace anonymous lifetime with explicit one
+                                    if lifetime.ident == "_" {
+                                        *lifetime = self.get_replacement_lifetime(method_generics);
+                                    }
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+                }
+
+                Type::Path(new_path)
+            }
+            _ => ty.clone(),
+        }
+    }
+
+    /// Get a suitable lifetime to replace anonymous lifetimes
+    fn get_replacement_lifetime(&self, method_generics: &Generics) -> Lifetime {
+        use syn::parse_quote;
+
+        // First, try to find an existing lifetime parameter
+        if let Some(first_lifetime) = method_generics.params.iter().find_map(|param| {
+            if let syn::GenericParam::Lifetime(lifetime_def) = param {
+                Some(&lifetime_def.lifetime)
+            } else {
+                None
+            }
+        }) {
+            first_lifetime.clone()
+        } else {
+            // If no lifetime parameters exist, create one that will be added to the generics
+            parse_quote!('a)
+        }
+    }
+
+    /// Check if a type contains anonymous lifetimes that need explicit parameters
+    fn type_contains_anonymous_lifetimes(&self, ty: &Type) -> bool {
+        use syn::{GenericArgument, PathArguments, Type};
+
+        match ty {
+            Type::Reference(type_ref) => {
+                if let Some(ref lifetime) = type_ref.lifetime {
+                    if lifetime.ident == "_" {
+                        return true;
+                    }
+                }
+                self.type_contains_anonymous_lifetimes(&type_ref.elem)
+            }
+            Type::Path(type_path) => {
+                for segment in &type_path.path.segments {
+                    if let PathArguments::AngleBracketed(ref args) = segment.arguments {
+                        for arg in &args.args {
+                            match arg {
+                                GenericArgument::Type(inner_type) => {
+                                    if self.type_contains_anonymous_lifetimes(inner_type) {
+                                        return true;
+                                    }
+                                }
+                                GenericArgument::Lifetime(lifetime) => {
+                                    if lifetime.ident == "_" {
+                                        return true;
+                                    }
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+                }
+                false
+            }
+            _ => false,
+        }
+    }
+
+    /// Add a lifetime parameter to generics if needed for anonymous lifetimes
+    fn ensure_lifetime_parameter(&self, method_generics: &Generics, return_type: &syn::ReturnType) -> Generics {
+        use syn::{GenericParam, ReturnType, parse_quote};
+
+        // Check if the return type contains anonymous lifetimes
+        let needs_lifetime = match return_type {
+            ReturnType::Type(_, ty) => self.type_contains_anonymous_lifetimes(ty),
+            _ => false,
+        };
+
+        if needs_lifetime && method_generics.params.iter().all(|param| !matches!(param, GenericParam::Lifetime(_))) {
+            // Add a lifetime parameter 'a
+            let mut new_generics = method_generics.clone();
+            let lifetime_param: GenericParam = parse_quote!('a);
+            new_generics.params.insert(0, lifetime_param);
+            new_generics
+        } else {
+            method_generics.clone()
+        }
     }
 
     /// Replace Self with the actual service type in a type expression
@@ -183,13 +311,16 @@ impl ServiceModel {
         let method_name = &method.name;
         let params = self.emit_params(&method.inputs);
         let param_names = self.emit_param_names(&method.inputs);
-        let return_type = self.emit_return_type(&method.output);
-        let generics = &self.generics;
+
+        // Ensure we have proper lifetime parameters and process types
+        let enhanced_generics = self.ensure_lifetime_parameter(&method.generics, &method.output);
+        let return_type = self.emit_return_type_processed(&method.output, &enhanced_generics);
+        let where_clause = &enhanced_generics.where_clause;
 
         quote_spanned! { method.name.span() =>
             #docs
             #[::interoptopus::ffi_function]
-            unsafe fn #function_name #generics(instance: *const #service_type, #params) #return_type {
+            unsafe fn #function_name #enhanced_generics(instance: *const #service_type, #params) #return_type #where_clause {
                 unsafe {
                     let instance_ref = &*instance;
                     instance_ref.#method_name(#param_names)
@@ -203,13 +334,16 @@ impl ServiceModel {
         let method_name = &method.name;
         let params = self.emit_params(&method.inputs);
         let param_names = self.emit_param_names(&method.inputs);
-        let return_type = self.emit_return_type(&method.output);
-        let generics = &self.generics;
+
+        // Ensure we have proper lifetime parameters and process types
+        let enhanced_generics = self.ensure_lifetime_parameter(&method.generics, &method.output);
+        let return_type = self.emit_return_type_processed(&method.output, &enhanced_generics);
+        let where_clause = &enhanced_generics.where_clause;
 
         quote_spanned! { method.name.span() =>
             #docs
             #[::interoptopus::ffi_function]
-            unsafe fn #function_name #generics(instance: *mut #service_type, #params) #return_type {
+            unsafe fn #function_name #enhanced_generics(instance: *mut #service_type, #params) #return_type #where_clause {
                 unsafe {
                     let instance_ref = &mut *instance;
                     instance_ref.#method_name(#param_names)
@@ -223,7 +357,10 @@ impl ServiceModel {
         let method_name = &method.name;
         let params = self.emit_params(&method.inputs);
         let param_names = self.emit_param_names(&method.inputs);
-        let generics = &self.generics;
+
+        // Ensure we have proper lifetime parameters
+        let enhanced_generics = self.ensure_lifetime_parameter(&method.generics, &method.output);
+        let where_clause = &enhanced_generics.where_clause;
 
         // Extract the inner type from ffi::Result<T, E>
         let callback_type = self.extract_async_callback_type(&method.output);
@@ -244,9 +381,9 @@ impl ServiceModel {
         quote_spanned! { method.name.span() =>
             #docs
             #[::interoptopus::ffi_function]
-            unsafe fn #function_name #generics(
+            unsafe fn #function_name #enhanced_generics(
                 #async_params
-            ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
+            ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> #where_clause {
                 unsafe {
                     let instance_arc = ::std::sync::Arc::from_raw(instance);
                     let instance_clone = ::std::sync::Arc::clone(&instance_arc);
@@ -306,10 +443,14 @@ impl ServiceModel {
         }
     }
 
-    fn emit_return_type(&self, output: &ReturnType) -> TokenStream {
+    fn emit_return_type_processed(&self, output: &ReturnType, method_generics: &Generics) -> TokenStream {
         match output {
             ReturnType::Default => quote_spanned! { self.service_name.span() => },
-            ReturnType::Type(arrow, ty) => quote_spanned! { self.service_name.span() => #arrow #ty },
+            ReturnType::Type(arrow, ty) => {
+                let service_ty = &self.replace_self_with_service_type(ty);
+                let processed_ty = self.replace_anonymous_lifetimes(service_ty, method_generics);
+                quote_spanned! { self.service_name.span() => #arrow #processed_ty }
+            }
         }
     }
 
