@@ -141,3 +141,7 @@ pub const FORBIDDEN_NAMES: [&str; 139] = [
     "with",
     "yield",
 ];
+
+pub fn is_forbidden_name(name: impl AsRef<str>) -> bool {
+    FORBIDDEN_NAMES.contains(&name.as_ref())
+}

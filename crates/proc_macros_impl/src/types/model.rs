@@ -1,4 +1,4 @@
-use crate::common::extract_docs;
+use crate::docs::extract_docs;
 use crate::types::args::FfiTypeArgs;
 use syn::{Data, DeriveInput, Fields, Generics, Ident, Type, Visibility};
 

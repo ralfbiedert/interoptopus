@@ -1,5 +1,6 @@
 use syn::Error;
 
+use crate::forbidden::is_forbidden_name;
 use crate::types::{
     args::FfiTypeArgs,
     model::{TypeData, TypeModel},
@@ -9,7 +10,7 @@ impl TypeModel {
     /// Validates the type model, checking for all validation rules.
     pub fn validate(&self) -> syn::Result<()> {
         self.validate_non_empty()?;
-        // Add more validation calls here as needed
+        self.validate_forbidden_names()?;
         Ok(())
     }
 
@@ -27,6 +28,36 @@ impl TypeModel {
             TypeData::Enum(enum_data) => {
                 if enum_data.variants.is_empty() {
                     return Err(Error::new_spanned(&self.name, "Enums without variants are not allowed"));
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Validates that no forbidden names are used for types, fields, or variants.
+    fn validate_forbidden_names(&self) -> syn::Result<()> {
+        // Check type name
+        if is_forbidden_name(self.name.to_string()) {
+            return Err(Error::new_spanned(&self.name, format!("Using the name '{}' can cause conflicts in generated code.", self.name)));
+        }
+
+        // Check fields and variants based on data type
+        match &self.data {
+            TypeData::Struct(struct_data) => {
+                for field in &struct_data.fields {
+                    if let Some(field_name) = &field.name {
+                        if is_forbidden_name(field_name.to_string()) {
+                            return Err(Error::new_spanned(field_name, format!("Using the name '{}' can cause conflicts in generated code.", field_name)));
+                        }
+                    }
+                }
+            }
+            TypeData::Enum(enum_data) => {
+                for variant in &enum_data.variants {
+                    if is_forbidden_name(variant.name.to_string()) {
+                        return Err(Error::new_spanned(&variant.name, format!("Using the name '{}' can cause conflicts in generated code.", variant.name)));
+                    }
                 }
             }
         }
