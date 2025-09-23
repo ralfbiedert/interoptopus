@@ -1,0 +1,5 @@
+error: expected `fn`
+ --> tests/proc/fn/on_ty.rs:4:1
+  |
+4 | struct Foo;
+  | ^^^^^^

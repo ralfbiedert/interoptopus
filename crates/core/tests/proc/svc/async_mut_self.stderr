@@ -1,0 +1,5 @@
+error: Async services cannot have methods with &mut self. Use &self instead.
+  --> tests/proc/svc/async_mut_self.rs:21:16
+   |
+21 |     pub fn bad(&mut self) {}
+   |                ^^^^^^^^^
