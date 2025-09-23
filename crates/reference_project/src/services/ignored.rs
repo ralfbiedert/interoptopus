@@ -17,6 +17,7 @@ impl ServiceIgnoringMethods {
 
     /// No FFI bindings are generated for non-pub methods.
     #[allow(unused)]
+    #[ffi::skip]
     fn not_exposed<T>(&mut self, _: T) -> ffi::Result<(), Error> {
         ffi::Ok(())
     }

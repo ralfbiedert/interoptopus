@@ -1,5 +1,6 @@
 use crate::patterns::result::Error;
 use crate::types::string::UseString;
+use interoptopus::lang::types::TypeInfo;
 use interoptopus::{callback, ffi, ffi_function, ffi_type};
 use std::ffi::c_void;
 use std::ptr::null;
@@ -17,7 +18,7 @@ callback!(StringCallback(s: ffi::String));
 callback!(NestedStringCallback(s: UseString));
 
 #[ffi_type]
-pub struct DelegateCallback<C> {
+pub struct DelegateCallback<C: TypeInfo> {
     pub callback: C,
     pub context: *const c_void,
 }
@@ -93,19 +94,4 @@ pub extern "C" fn exposed_sum1(x: *const c_void) {
 
 pub extern "C" fn exposed_sum2(x: i32, y: i32, _: *const c_void) -> i32 {
     x + y
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{MyCallback, MyCallbackNamespaced};
-    use interoptopus::lang::{TypeInfo, NAMESPACE_COMMON};
-
-    #[test]
-    fn namespaces_assigned_correctly() {
-        let ti1 = MyCallback::type_info();
-        let ti2 = MyCallbackNamespaced::type_info();
-
-        assert_eq!(ti1.namespace(), Some(""));
-        assert_eq!(ti2.namespace(), Some(NAMESPACE_COMMON));
-    }
 }

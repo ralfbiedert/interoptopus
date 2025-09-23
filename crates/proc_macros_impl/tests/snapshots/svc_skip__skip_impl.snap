@@ -9,7 +9,6 @@ const _: () = {
     ::interoptopus::lang::types::assert_service_safe::<Service>();
 };
 impl Service {
-    #[ffi::skip]
     fn new() -> ffi::Result<Self, Error> {}
 }
 #[::interoptopus::ffi_function]

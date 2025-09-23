@@ -25,10 +25,14 @@ pub fn ffi_service(attr: TokenStream, input: TokenStream) -> syn::Result<TokenSt
     let service_info_impl = model.emit_service_info_impl()?;
     let validation_blocks = model.emit_const_verification_blocks()?;
 
+    // Remove skip attributes from the impl block before outputting
+    let mut cleaned_input_impl = input_impl;
+    remove_skip_attributes(&mut cleaned_input_impl);
+
     let result = quote! {
         #validation_blocks
 
-        #input_impl
+        #cleaned_input_impl
 
         // Generated FFI functions
         #ffi_functions
@@ -50,4 +54,22 @@ pub fn ffi_service(attr: TokenStream, input: TokenStream) -> syn::Result<TokenSt
     }
 
     Ok(result)
+}
+
+/// Remove `ffi::skip` attributes from all methods in the impl block
+fn remove_skip_attributes(input_impl: &mut ItemImpl) {
+    for item in &mut input_impl.items {
+        if let syn::ImplItem::Fn(method) = item {
+            method.attrs.retain(|attr| {
+                // Remove ffi::skip attributes
+                if let syn::Meta::Path(path) = &attr.meta {
+                    !(path.segments.len() == 2
+                        && path.segments[0].ident == "ffi"
+                        && path.segments[1].ident == "skip")
+                } else {
+                    true // Keep non-path attributes
+                }
+            });
+        }
+    }
 }
