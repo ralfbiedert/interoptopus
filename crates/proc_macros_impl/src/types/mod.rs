@@ -7,6 +7,8 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{parse2, DeriveInput};
 
+use crate::utils::is_ffi_skip_attribute;
+
 use args::FfiTypeArgs;
 use model::TypeModel;
 
@@ -77,73 +79,28 @@ fn remove_skip_attributes(input: &mut DeriveInput) {
         Data::Struct(data_struct) => match &mut data_struct.fields {
             syn::Fields::Named(fields) => {
                 for field in &mut fields.named {
-                    field.attrs.retain(|attr| {
-                        // Remove ffi::skip attributes
-                        if let syn::Meta::Path(path) = &attr.meta {
-                            !(path.segments.len() == 2
-                                && path.segments[0].ident == "ffi"
-                                && path.segments[1].ident == "skip")
-                        } else {
-                            true // Keep non-path attributes
-                        }
-                    });
+                    field.attrs.retain(|attr| !is_ffi_skip_attribute(attr));
                 }
             }
             syn::Fields::Unnamed(fields) => {
                 for field in &mut fields.unnamed {
-                    field.attrs.retain(|attr| {
-                        // Remove ffi::skip attributes
-                        if let syn::Meta::Path(path) = &attr.meta {
-                            !(path.segments.len() == 2
-                                && path.segments[0].ident == "ffi"
-                                && path.segments[1].ident == "skip")
-                        } else {
-                            true // Keep non-path attributes
-                        }
-                    });
+                    field.attrs.retain(|attr| !is_ffi_skip_attribute(attr));
                 }
             }
             syn::Fields::Unit => {}
         },
         Data::Enum(data_enum) => {
             for variant in &mut data_enum.variants {
-                variant.attrs.retain(|attr| {
-                    // Remove ffi::skip attributes
-                    if let syn::Meta::Path(path) = &attr.meta {
-                        !(path.segments.len() == 2
-                            && path.segments[0].ident == "ffi"
-                            && path.segments[1].ident == "skip")
-                    } else {
-                        true // Keep non-path attributes
-                    }
-                });
+                variant.attrs.retain(|attr| !is_ffi_skip_attribute(attr));
                 match &mut variant.fields {
                     syn::Fields::Named(fields) => {
                         for field in &mut fields.named {
-                            field.attrs.retain(|attr| {
-                        // Remove ffi::skip attributes
-                        if let syn::Meta::Path(path) = &attr.meta {
-                            !(path.segments.len() == 2
-                                && path.segments[0].ident == "ffi"
-                                && path.segments[1].ident == "skip")
-                        } else {
-                            true // Keep non-path attributes
-                        }
-                    });
+                            field.attrs.retain(|attr| !is_ffi_skip_attribute(attr));
                         }
                     }
                     syn::Fields::Unnamed(fields) => {
                         for field in &mut fields.unnamed {
-                            field.attrs.retain(|attr| {
-                        // Remove ffi::skip attributes
-                        if let syn::Meta::Path(path) = &attr.meta {
-                            !(path.segments.len() == 2
-                                && path.segments[0].ident == "ffi"
-                                && path.segments[1].ident == "skip")
-                        } else {
-                            true // Keep non-path attributes
-                        }
-                    });
+                            field.attrs.retain(|attr| !is_ffi_skip_attribute(attr));
                         }
                     }
                     syn::Fields::Unit => {}

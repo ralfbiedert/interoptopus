@@ -10,6 +10,7 @@ mod forbidden;
 mod function;
 mod service;
 mod types;
+mod utils;
 
 use proc_macro2::TokenStream;
 use quote::quote;
