@@ -33,20 +33,31 @@ impl FunctionModel {
 
         // Check for conflicting attributes
         let has_extern = input.sig.abi.is_some();
-        let has_no_mangle = input.attrs.iter().any(|attr| attr.path().is_ident("no_mangle"));
+        let no_mangle_attr = input.attrs.iter().find(|attr| {
+            // Check for both #[no_mangle] and #[unsafe(no_mangle)]
+            if attr.path().is_ident("no_mangle") {
+                true
+            } else if attr.path().is_ident("unsafe") {
+                // Check if this is #[unsafe(no_mangle)]
+                match &attr.meta {
+                    syn::Meta::List(list) => list.tokens.to_string().trim() == "no_mangle",
+                    _ => false,
+                }
+            } else {
+                false
+            }
+        });
 
         if has_extern {
             return Err(syn::Error::new_spanned(
                 input.sig.abi.as_ref().unwrap(),
-                "Functions with explicit extern declarations are not supported. Remove the extern declaration and let the macro handle it.",
+                "Functions with explicit extern declarations are not supported. Remove the declaration and let #[ffi_function] handle it.",
             ));
         }
 
-        if has_no_mangle {
-            return Err(syn::Error::new_spanned(
-                input.attrs.iter().find(|attr| attr.path().is_ident("no_mangle")).unwrap(),
-                "Functions with #[no_mangle] are not supported. Remove the #[no_mangle] attribute and let the macro handle it.",
-            ));
+        if let Some(attr) = no_mangle_attr {
+            let message = "Functions with explicit #[no_mangle] are not supported, remove the attribute and let #[ffi_function] handle it.";
+            return Err(syn::Error::new_spanned(attr, message));
         }
 
         // Parse function parameters
