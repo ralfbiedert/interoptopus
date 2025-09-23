@@ -1,5 +1,6 @@
 use crate::docs::extract_docs;
 use crate::types::args::FfiTypeArgs;
+use crate::utils::has_ffi_skip_attribute;
 use syn::{Data, DeriveInput, Fields, Generics, Ident, Type, Visibility};
 
 #[derive(Clone)]
@@ -63,16 +64,7 @@ impl TypeModel {
                         .named
                         .into_iter()
                         .map(|field| {
-                            let skip = field.attrs.iter().any(|attr| {
-                                // Check for #[ffi::skip] attribute
-                                if let syn::Meta::Path(path) = &attr.meta {
-                                    path.segments.len() == 2
-                                        && path.segments[0].ident == "ffi"
-                                        && path.segments[1].ident == "skip"
-                                } else {
-                                    false
-                                }
-                            });
+                            let skip = has_ffi_skip_attribute(&field.attrs);
                             FieldModel { name: field.ident, ty: field.ty, vis: field.vis, skip, docs: extract_docs(&field.attrs) }
                         })
                         .collect(),
@@ -80,16 +72,7 @@ impl TypeModel {
                         .unnamed
                         .into_iter()
                         .map(|field| {
-                            let skip = field.attrs.iter().any(|attr| {
-                                // Check for #[ffi::skip] attribute
-                                if let syn::Meta::Path(path) = &attr.meta {
-                                    path.segments.len() == 2
-                                        && path.segments[0].ident == "ffi"
-                                        && path.segments[1].ident == "skip"
-                                } else {
-                                    false
-                                }
-                            });
+                            let skip = has_ffi_skip_attribute(&field.attrs);
                             FieldModel { name: None, ty: field.ty, vis: field.vis, skip, docs: extract_docs(&field.attrs) }
                         })
                         .collect(),

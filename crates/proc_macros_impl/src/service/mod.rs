@@ -7,6 +7,8 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{parse2, ItemImpl};
 
+use crate::utils::is_ffi_skip_attribute;
+
 use args::FfiServiceArgs;
 use model::ServiceModel;
 
@@ -60,16 +62,7 @@ pub fn ffi_service(attr: TokenStream, input: TokenStream) -> syn::Result<TokenSt
 fn remove_skip_attributes(input_impl: &mut ItemImpl) {
     for item in &mut input_impl.items {
         if let syn::ImplItem::Fn(method) = item {
-            method.attrs.retain(|attr| {
-                // Remove ffi::skip attributes
-                if let syn::Meta::Path(path) = &attr.meta {
-                    !(path.segments.len() == 2
-                        && path.segments[0].ident == "ffi"
-                        && path.segments[1].ident == "skip")
-                } else {
-                    true // Keep non-path attributes
-                }
-            });
+            method.attrs.retain(|attr| !is_ffi_skip_attribute(attr));
         }
     }
 }

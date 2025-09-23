@@ -1,5 +1,6 @@
 use crate::docs::extract_docs;
 use crate::service::args::FfiServiceArgs;
+use crate::utils::has_ffi_skip_attribute;
 use proc_macro2::Span;
 use syn::spanned::Spanned;
 use syn::{FnArg, Ident, ImplItem, ItemImpl, Pat, ReturnType, Type, Visibility};
@@ -71,16 +72,7 @@ impl ServiceModel {
         for item in &input.items {
             if let ImplItem::Fn(method) = item {
                 // Check if method should be skipped
-                let skip = method.attrs.iter().any(|attr| {
-                    // Check for #[ffi::skip] attribute
-                    if let syn::Meta::Path(path) = &attr.meta {
-                        path.segments.len() == 2
-                            && path.segments[0].ident == "ffi"
-                            && path.segments[1].ident == "skip"
-                    } else {
-                        false
-                    }
-                });
+                let skip = has_ffi_skip_attribute(&method.attrs);
 
                 // Skip processing this method if it has the skip attribute
                 if skip {
