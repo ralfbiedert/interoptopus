@@ -1,6 +1,6 @@
 use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
 use proc_macro2::TokenStream;
-use quote::{ToTokens, format_ident, quote_spanned};
+use quote::{format_ident, quote_spanned, ToTokens};
 use syn::spanned::Spanned;
 use syn::{Error, Generics, Lifetime, ReturnType, Type};
 
@@ -140,7 +140,7 @@ impl ServiceModel {
 
     /// Add a lifetime parameter to generics if needed for anonymous lifetimes
     fn ensure_lifetime_parameter(&self, method_generics: &Generics, return_type: &syn::ReturnType) -> Generics {
-        use syn::{GenericParam, ReturnType, parse_quote};
+        use syn::{parse_quote, GenericParam, ReturnType};
 
         // Check if the return type contains anonymous lifetimes
         let needs_lifetime = match return_type {
@@ -610,21 +610,16 @@ impl ServiceModel {
             .map(|method| {
                 let method_span = method.name.span();
                 // Create a validation that checks if Async<ServiceType> can be used
-                let service_name = &self.service_name;
                 let method_rval = match &method.output {
                     ReturnType::Default => quote_spanned! { method_span => () },
                     ReturnType::Type(_, x) => quote_spanned! { x.span() => #x },
                 };
                 Ok(quote_spanned! { method_span =>
-                    const fn _assert_async_type<U>()
-                    where
-                        U: ::interoptopus::pattern::asynk::AsyncRuntime
-                    {}
-                    _assert_async_type::<#service_name>();
-
-                    const fn _assert_rval_result1<T: ::interoptopus::lang::types::TypeInfo, E: ::interoptopus::lang::types::TypeInfo>(_: &::interoptopus::ffi::Result<T, E>) {}
-                    const fn _assert_rval_result2(x: &#method_rval) {
-                        _assert_rval_result1(&x);
+                    {
+                        const fn _assert_rval_result1<T: ::interoptopus::lang::types::TypeInfo, E: ::interoptopus::lang::types::TypeInfo>(_: &::interoptopus::ffi::Result<T, E>) {}
+                        const fn _assert_rval_result2(x: &#method_rval) {
+                            _assert_rval_result1(&x);
+                        }
                     }
                 })
             })
