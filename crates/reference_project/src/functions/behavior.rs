@@ -10,8 +10,8 @@ pub fn behavior_panics() {
 }
 
 #[ffi]
-#[allow(unreachable_code)]
 pub fn behavior_panics_via_result() -> ffi::Result<(), Error> {
+    #[allow(unreachable_code)]
     panic_to_result(|| {
         panic!("Oh no");
         result_to_ffi(|| Ok(()))
