@@ -1,10 +1,9 @@
-use interoptopus::{ffi_service, ffi_type};
+use interoptopus::ffi;
 
-#[ffi_type(service)]
+#[ffi(service)]
 struct Service;
 
-#[ffi_service]
+#[ffi]
 impl Service {}
 
-#[allow(dead_code)]
 fn main() {}

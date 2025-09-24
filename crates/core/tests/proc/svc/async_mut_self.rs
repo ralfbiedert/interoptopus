@@ -1,18 +1,18 @@
 use interoptopus::{
-    ffi, ffi_service, ffi_type,
+    ffi,
     pattern::asynk::{Async, AsyncRuntime},
 };
 use std::future::Future;
 
-#[ffi_type]
+#[ffi]
 enum Error {
     Something,
 }
 
-#[ffi_type(service)]
+#[ffi(service)]
 struct Service;
 
-#[ffi_service]
+#[ffi]
 impl Service {
     pub async fn new(_: Async<Self>) -> ffi::Result<u8, Error> {
         ffi::Ok(0)
@@ -32,5 +32,4 @@ impl AsyncRuntime for Service {
     }
 }
 
-#[allow(dead_code)]
 fn main() {}

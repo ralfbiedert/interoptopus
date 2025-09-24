@@ -1,12 +1,12 @@
 use quote::quote;
-use syn::{ItemStruct, parse_quote};
+use syn::{parse_quote, ItemStruct};
 
 mod util;
 
 #[test]
 fn skip_field() {
     let item: ItemStruct = parse_quote! {
-        #[ffi_type]
+        #[ffi]
         struct Foo {
             x: u8,
             #[ffi::skip]
@@ -14,5 +14,5 @@ fn skip_field() {
         }
     };
 
-    insta::assert_snapshot!(expand_ty!(item));
+    insta::assert_snapshot!(expand_ffi!(item));
 }

@@ -1,6 +1,6 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type]
+#[ffi]
 pub struct Foo<T> {
     x: T,
 }

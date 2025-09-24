@@ -1,7 +1,6 @@
 ---
 source: crates/proc_macros_impl/tests/svc_lifetime.rs
-assertion_line: 26
-expression: expand_svc!(item)
+expression: expand_ffi!(item)
 ---
 const _: () = {
     const fn _assert_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
@@ -29,7 +28,7 @@ impl Service {
         self.data.as_slice().into()
     }
 }
-#[::interoptopus::ffi_function]
+#[::interoptopus::ffi]
 unsafe fn service_new(
     instance: *mut *const Service,
 ) -> <::interoptopus::ffi::Result<
@@ -50,7 +49,7 @@ unsafe fn service_new(
         }
     }
 }
-#[::interoptopus::ffi_function]
+#[::interoptopus::ffi]
 fn service_destroy(instance: *const Service) {
     if !instance.is_null() {
         unsafe {
@@ -58,7 +57,7 @@ fn service_destroy(instance: *const Service) {
         }
     }
 }
-#[::interoptopus::ffi_function]
+#[::interoptopus::ffi]
 unsafe fn service_l1<'a, 'b>(
     instance: *mut Service,
     x: &u8,
@@ -71,7 +70,7 @@ unsafe fn service_l1<'a, 'b>(
         instance_ref.l1(x, _y, _slice, _slice2)
     }
 }
-#[::interoptopus::ffi_function]
+#[::interoptopus::ffi]
 unsafe fn service_return_slice<'a>(instance: *mut Service) -> ffi::Slice<'a, u32> {
     unsafe {
         let instance_ref = &mut *instance;

@@ -1,4 +1,4 @@
-error: Empty structs are not allowed unless marked as #[ffi_type(opaque)] or #[ffi_type(service)].
+error: Empty structs are not allowed unless marked as #[ffi(opaque)] or #[ffi(service)].
  --> tests/proc/ty/empty_unit.rs:4:8
   |
 4 | struct Foo;

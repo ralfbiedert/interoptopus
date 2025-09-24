@@ -1,16 +1,16 @@
-use interoptopus::{ffi, ffi_service, ffi_type};
+use interoptopus::ffi;
 
-#[ffi_type]
+#[ffi]
 enum Error {
     Something,
 }
 
-#[ffi_type(service)]
+#[ffi(service)]
 struct Service {
     pub data: Vec<u32>,
 }
 
-#[ffi_service]
+#[ffi]
 impl Service {
     pub fn new() -> ffi::Result<Self, Error> {
         ffi::Ok(Self { data: Vec::new() })
@@ -26,5 +26,4 @@ impl Service {
     }
 }
 
-#[allow(dead_code)]
 fn main() {}

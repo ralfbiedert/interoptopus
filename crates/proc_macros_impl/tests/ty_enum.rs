@@ -6,12 +6,12 @@ mod util;
 #[test]
 fn basic_enum() {
     let item: ItemEnum = parse_quote! {
-        #[ffi_type]
+        #[ffi]
         enum Foo {
             A,
             B
         }
     };
 
-    insta::assert_snapshot!(expand_ty!(item));
+    insta::assert_snapshot!(expand_ffi!(item));
 }

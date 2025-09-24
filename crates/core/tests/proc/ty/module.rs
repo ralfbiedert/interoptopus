@@ -1,11 +1,11 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type(module = "foo")]
+#[ffi(module = "foo")]
 struct Foo1 {
     x: u8,
 }
 
-#[ffi_type(module = common)]
+#[ffi(module = common)]
 struct Foo2 {
     x: u8,
 }

@@ -1,6 +1,6 @@
-use interoptopus::ffi_function;
+use interoptopus::ffi;
 
-#[ffi_function]
+#[ffi]
 #[allow(unused_variables)]
 fn foo(new: u8) {}
 

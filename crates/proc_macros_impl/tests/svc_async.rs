@@ -6,7 +6,7 @@ mod util;
 #[test]
 fn async_service() {
     let item: ItemImpl = parse_quote! {
-        #[ffi_service]
+        #[ffi]
         impl Service {
             pub fn new() -> ffi::Result<Self, Error> {
                 ffi::Ok(Self)
@@ -22,5 +22,5 @@ fn async_service() {
         }
     };
 
-    insta::assert_snapshot!(expand_svc!(item));
+    insta::assert_snapshot!(expand_ffi!(item));
 }

@@ -1,5 +1,5 @@
-error: expected `fn`
- --> tests/proc/fn/on_ty.rs:4:1
+error: Empty structs are not allowed unless marked as #[ffi(opaque)] or #[ffi(service)].
+ --> tests/proc/fn/on_ty.rs:4:8
   |
 4 | struct Foo;
-  | ^^^^^^
+  |        ^^^

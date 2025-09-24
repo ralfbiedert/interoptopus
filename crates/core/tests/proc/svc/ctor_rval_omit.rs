@@ -1,17 +1,16 @@
-use interoptopus::{ffi_service, ffi_type};
+use interoptopus::ffi;
 
-#[ffi_type]
+#[ffi]
 enum Error {
     Something,
 }
 
-#[ffi_type(service)]
+#[ffi(service)]
 struct Service;
 
-#[ffi_service]
+#[ffi]
 impl Service {
     pub fn new() {}
 }
 
-#[allow(dead_code)]
 fn main() {}

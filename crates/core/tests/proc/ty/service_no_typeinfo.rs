@@ -1,6 +1,6 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type(service)]
+#[ffi(service)]
 struct Service {
     x: std::sync::Mutex<u32>,
 }

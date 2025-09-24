@@ -1,15 +1,14 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type]
+#[ffi]
 struct Foo {
     x: u8,
 }
 
-#[ffi_type]
+#[ffi]
 enum Bar {
     A,
     B,
 }
 
-#[allow(dead_code)]
 fn main() {}

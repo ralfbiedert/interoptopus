@@ -1,7 +1,6 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type]
+#[ffi]
 struct Foo {}
 
-#[allow(dead_code)]
 fn main() {}

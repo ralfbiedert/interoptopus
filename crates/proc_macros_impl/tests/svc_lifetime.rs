@@ -6,7 +6,7 @@ mod util;
 #[test]
 fn supports_lifetimes() {
     let item: ItemImpl = parse_quote! {
-        #[ffi_service]
+        #[ffi]
             impl Service {
                 pub fn new() -> ffi::Result<Self, Error> {
                     ffi::Ok(Self { data: Vec::new() })
@@ -23,5 +23,5 @@ fn supports_lifetimes() {
             }
     };
 
-    insta::assert_snapshot!(expand_svc!(item));
+    insta::assert_snapshot!(expand_ffi!(item));
 }
