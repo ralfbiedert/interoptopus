@@ -1,5 +1,5 @@
 use interoptopus::ffi;
-use interoptopus::pattern::option::Option;
+use interoptopus::ffi::{Option, Result, String};
 
 #[ffi]
 pub struct Inner {
@@ -17,8 +17,6 @@ pub fn pattern_ffi_option_2(x: Option<Inner>) -> Inner {
 }
 
 #[ffi]
-pub fn pattern_ffi_option_3(
-    x: ffi::Option<ffi::Option<ffi::Result<ffi::Option<ffi::String>, super::result::Error>>>,
-) -> ffi::Option<ffi::Option<ffi::Result<ffi::Option<ffi::String>, super::result::Error>>> {
+pub fn pattern_ffi_option_3(x: Option<Option<Result<Option<String>, super::result::Error>>>) -> Option<Option<Result<Option<String>, super::result::Error>>> {
     x
 }
