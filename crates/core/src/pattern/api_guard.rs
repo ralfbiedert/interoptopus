@@ -168,7 +168,7 @@ impl ApiHash {
 #[macro_export]
 macro_rules! api_guard {
     ($f:tt) => {{
-        #[$crate::ffi_function]
+        #[$crate::ffi]
         pub fn __api_guard() -> $crate::pattern::api_guard::ApiVersion {
             $f().into()
         }
