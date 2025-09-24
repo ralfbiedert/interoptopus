@@ -1,11 +1,11 @@
-use interoptopus::{ffi, ffi_type};
+use interoptopus::ffi;
 
-#[ffi_type]
+#[ffi]
 pub struct UseCStrPtr<'a> {
     pub ascii_string: ffi::CStrPtr<'a>,
 }
 
-#[ffi_type]
+#[ffi]
 #[derive(Clone)]
 pub struct UseString {
     pub s1: ffi::String,

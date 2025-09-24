@@ -1,10 +1,10 @@
 use crate::patterns::result::Error;
-use interoptopus::{ffi, ffi_service, ffi_type};
+use interoptopus::ffi;
 
-#[ffi_type(service)]
+#[ffi(service)]
 pub struct ServiceIgnoringMethods {}
 
-#[ffi_service]
+#[ffi]
 impl ServiceIgnoringMethods {
     pub fn new() -> ffi::Result<Self, Error> {
         ffi::Result::Ok(Self {})

@@ -1,16 +1,15 @@
 use crate::patterns::result::Error;
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 use interoptopus::pattern::asynk::{Async, AsyncRuntime};
 use interoptopus::pattern::result::result_to_ffi;
-use interoptopus::{ffi, ffi_service};
 use tokio::runtime::{Builder, Runtime};
 
-#[ffi_type(service)]
+#[ffi(service)]
 pub struct ServiceAsyncResult {
     runtime: Runtime,
 }
 
-#[ffi_service]
+#[ffi]
 impl ServiceAsyncResult {
     pub fn new() -> ffi::Result<Self, Error> {
         result_to_ffi(|| {

@@ -1,7 +1,7 @@
 use crate::patterns::result::Error;
 use crate::types::string::UseString;
 use interoptopus::lang::types::TypeInfo;
-use interoptopus::{callback, ffi, ffi_function, ffi_type};
+use interoptopus::{callback, ffi};
 use std::ffi::c_void;
 use std::ptr::null;
 
@@ -17,43 +17,43 @@ callback!(Pointers(x: &i32, y: &mut i32));
 callback!(StringCallback(s: ffi::String));
 callback!(NestedStringCallback(s: UseString));
 
-#[ffi_type]
+#[ffi]
 pub struct DelegateCallback<C: TypeInfo> {
     pub callback: C,
     pub context: *const c_void,
 }
 
-#[ffi_function]
+#[ffi]
 pub fn pattern_callback_1(callback: MyCallback, x: u32) -> u32 {
     callback.call(x)
 }
 
-#[ffi_function]
+#[ffi]
 pub fn pattern_callback_2(callback: MyCallbackVoid) -> MyCallbackVoid {
     callback
 }
 
-// #[ffi_function]
+// #[ffi]
 // pub fn pattern_callback_3(callback: DelegateCallback<MyCallbackContextual>, x: u32) {
 //     callback.callback.call(callback.context, x);
 // }
 
-#[ffi_function]
+#[ffi]
 pub fn pattern_callback_4(callback: MyCallbackNamespaced, x: u32) -> u32 {
     callback.call(x)
 }
 
-#[ffi_function]
+#[ffi]
 pub fn pattern_callback_5() -> SumDelegate1 {
     (exposed_sum1 as extern "C" fn(*const c_void)).into() // This is an ugly Rust limitation right now, compare #108
 }
 
-#[ffi_function]
+#[ffi]
 pub fn pattern_callback_6() -> SumDelegate2 {
     SumDelegate2(Some(exposed_sum2), null()) // Similarly, compare #108
 }
 
-#[ffi_function]
+#[ffi]
 pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32, i: i32, o: &mut i32) -> ffi::Result<(), Error> {
     *o = i - 1;
 
@@ -73,7 +73,7 @@ pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32,
     ffi::Ok(())
 }
 
-#[ffi_function]
+#[ffi]
 pub fn pattern_callback_8(cb: StringCallback, cb2: NestedStringCallback, s: ffi::String) {
     cb.call(s.clone());
     cb2.call(UseString { s1: s.clone(), s2: s.clone() });

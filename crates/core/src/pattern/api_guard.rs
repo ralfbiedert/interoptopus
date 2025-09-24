@@ -14,7 +14,7 @@
 //!
 //! ```rust
 //! use interoptopus::inventory::Inventory;
-//! use interoptopus::{api_guard, ffi_function, function};
+//! use interoptopus::{api_guard, function};
 //!
 //! fn ffi_inventory() -> Inventory {
 //!     Inventory::new()
@@ -156,7 +156,7 @@ impl ApiHash {
 /// # Example
 /// ```rust
 /// # use interoptopus::inventory::Inventory;
-/// # use interoptopus::{api_guard, ffi_function, function};
+/// # use interoptopus::{api_guard, function};
 ///
 /// fn ffi_inventory() -> Inventory {
 ///     Inventory::new()

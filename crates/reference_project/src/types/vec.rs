@@ -1,6 +1,6 @@
-use interoptopus::{ffi, ffi_type};
+use interoptopus::ffi;
 
-#[ffi_type]
+#[ffi]
 #[derive(Clone)]
 pub struct UseSliceAndVec<'a> {
     pub s1: ffi::Slice<'a, ffi::String>,

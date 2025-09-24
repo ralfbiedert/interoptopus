@@ -1,14 +1,14 @@
 use crate::patterns::result::Error;
-use interoptopus::{ffi, ffi_service, ffi_type};
+use interoptopus::ffi;
 
 /// Some struct we want to expose as a class.
-#[ffi_type(service)]
+#[ffi(service)]
 pub struct ServiceVariousSlices {
     pub data: Vec<u32>,
 }
 
 // Regular implementation of methods.
-#[ffi_service]
+#[ffi]
 impl ServiceVariousSlices {
     pub fn new() -> ffi::Result<Self, Error> {
         ffi::Ok(Self { data: vec![123; 64] })

@@ -1,8 +1,8 @@
 use crate::types::basic::Vec3f32;
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
 /// Documented enum.
-#[ffi_type]
+#[ffi]
 pub enum EnumDocumented {
     /// Variant A.
     A,
@@ -12,13 +12,13 @@ pub enum EnumDocumented {
     C,
 }
 
-#[ffi_type(name = "EnumRenamed")]
+#[ffi(name = "EnumRenamed")]
 #[derive(Debug)]
 pub enum EnumRenamedXYZ {
     X,
 }
 
-#[ffi_type]
+#[ffi]
 #[derive(Clone)]
 pub enum EnumPayload {
     A,

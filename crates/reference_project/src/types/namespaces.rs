@@ -1,7 +1,7 @@
 pub mod common {
-    use interoptopus::ffi_type;
+    use interoptopus::ffi;
 
-    #[ffi_type(module = common)]
+    #[ffi(module = common)]
     pub struct Vec {
         pub x: f64,
         pub z: f64,

@@ -1,7 +1,7 @@
+use interoptopus::ffi;
 use interoptopus::wire::{Wire, Wireable};
-use interoptopus::{ffi, ffi_function, ffi_type};
 
-#[ffi_type]
+#[ffi]
 pub struct MyWiredType {
     name: String,
     values: Vec<u32>,
@@ -9,20 +9,20 @@ pub struct MyWiredType {
 
 // input is a serialized representation, parse it to access MyWiredType.
 // serialize resulting MyWiredType into a buffer and return it as WireOfMyWiredType on C# side
-#[ffi_function]
+#[ffi]
 fn perform_miracles(mut input: Wire<MyWiredType>) -> Wire<MyWiredType> {
     let w = input.unwire().expect("Something went wrong");
     w.wire()
 }
 
-#[ffi_function]
+#[ffi]
 fn perform_half_miracles(mut input: Wire<MyWiredType>, other: ffi::String) -> ffi::String {
     let w = input.unwire().expect("Something went wrong");
     let result = format!("{} {}", w.name, other.as_str());
     result.into()
 }
 
-#[ffi_function]
+#[ffi]
 fn perform_half_miracles_in_other_direction(input: ffi::String) -> Wire<'static, MyWiredType> {
     MyWiredType { name: input.as_str().to_owned(), values: vec![] }.wire()
 }
@@ -103,7 +103,7 @@ fn perform_half_miracles_in_other_direction(input: ffi::String) -> Wire<'static,
 //     }
 // }
 //
-// // #[ffi_type]
+// // #[ffi]
 // // struct Foo {
 // //     x: u32,
 // //     y: i32,

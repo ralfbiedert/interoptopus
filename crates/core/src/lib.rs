@@ -25,15 +25,15 @@
 //! ## Code you write ...
 //!
 //! ```rust
-//! # use interoptopus::{ffi_function, ffi_type, function};
+//! # use interoptopus::{ffi, function};
 //! # use interoptopus::inventory::{Inventory};
-//! #[ffi_type]
+//! #[ffi]
 //! pub struct Vec2 {
 //!     pub x: f32,
 //!     pub y: f32,
 //! }
 //!
-//! #[ffi_function]
+//! #[ffi]
 //! pub fn my_function(input: Vec2) {
 //!     println!("{}", input.x);
 //! }
@@ -161,9 +161,9 @@
 //!
 
 pub use error::Error;
-pub use interoptopus_proc::ffi;
+
 #[cfg(feature = "derive")]
-pub use interoptopus_proc::{ffi_function, ffi_service, ffi_type};
+pub use interoptopus_proc::ffi;
 
 mod error;
 pub mod ffi;

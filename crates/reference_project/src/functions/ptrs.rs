@@ -1,11 +1,11 @@
-use interoptopus::ffi_function;
+use interoptopus::ffi;
 
-#[ffi_function]
+#[ffi]
 pub fn ptr1(x: *const i64) -> *const i64 {
     x
 }
 
-#[ffi_function]
+#[ffi]
 pub fn ptr2(x: *const *const i64) -> *const *const i64 {
     x
 }
@@ -13,7 +13,7 @@ pub fn ptr2(x: *const *const i64) -> *const *const i64 {
 /// # Safety
 ///
 /// Parameter x must point to valid data.
-#[ffi_function]
+#[ffi]
 #[allow(unused_unsafe)]
 pub unsafe fn ptr3(x: *mut i64) -> *mut i64 {
     unsafe { *x = -*x };

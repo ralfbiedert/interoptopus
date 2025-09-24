@@ -1,15 +1,15 @@
 use crate::types::basic::Vec3f32;
 use crate::types::enums::EnumRenamedXYZ;
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 use interoptopus::lang::types::TypeInfo;
 
-#[ffi_type]
+#[ffi]
 #[derive(Debug, Copy, Clone)]
 pub struct Array {
     pub data: [u8; 16],
 }
 
-#[ffi_type]
+#[ffi]
 #[derive(Debug)]
 pub struct NestedArray {
     pub field_enum: EnumRenamedXYZ,
@@ -21,20 +21,20 @@ pub struct NestedArray {
     pub field_struct: Array,
 }
 
-#[ffi_type]
+#[ffi]
 #[derive(Copy, Clone, Debug)]
 pub struct FixedString<const N: usize> {
     pub data: [u8; N],
 }
 
-#[ffi_type]
+#[ffi]
 #[derive(Copy, Clone)]
 pub struct CharArray {
     pub str: FixedString<32>,
     pub str_2: FixedString<32>,
 }
 
-#[ffi_type]
+#[ffi]
 pub struct GenericArray<T>
 where
     T: TypeInfo,

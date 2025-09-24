@@ -5,12 +5,12 @@
 //! If you want to accept user-provided callbacks or "delegates":
 //!
 //!```
-//! use interoptopus::{ffi_function, callback};
+//! use interoptopus::{ffi, callback};
 //! use interoptopus::pattern::slice::Slice;
 //!
 //! callback!(CallbackSlice(x: Slice<'_, u8>) -> u8);
 //!
-//! #[ffi_function]
+//! #[ffi]
 //! pub fn my_function(callback: CallbackSlice) {
 //!     callback.call(Slice::empty());
 //! }
@@ -87,11 +87,11 @@
 //! Instead, you will have to return function pointers like so:
 //!
 //! ```rust
-//! # use interoptopus::{ffi_function, callback};
+//! # use interoptopus::{ffi, callback};
 //! # callback!(SumFunction(x: i32, y: i32) -> i32);
 //! # extern "C" fn my_sum_function(x: i32, y: i32, _: *const std::ffi::c_void) -> i32 { x + y }
 //! #
-//! #[ffi_function]
+//! #[ffi]
 //! pub fn return_sum_function() -> SumFunction {
 //!     SumFunction(Some(my_sum_function), std::ptr::null())
 //! }

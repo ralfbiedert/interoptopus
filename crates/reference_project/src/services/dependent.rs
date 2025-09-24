@@ -1,24 +1,24 @@
 use crate::patterns::result::Error;
-use interoptopus::{ffi, ffi_service, ffi_type};
+use interoptopus::ffi;
 
-#[ffi_type(service)]
+#[ffi(service)]
 pub struct ServiceMain {
     val: u32,
 }
 
-#[ffi_service]
+#[ffi]
 impl ServiceMain {
     pub fn new(x: u32) -> ffi::Result<Self, Error> {
         ffi::Ok(Self { val: x })
     }
 }
 
-#[ffi_type(service)]
+#[ffi(service)]
 pub struct ServiceDependent {
     val: u32,
 }
 
-#[ffi_service]
+#[ffi]
 impl ServiceDependent {
     pub fn from_main(main: &ServiceMain) -> ffi::Result<Self, Error> {
         ffi::Ok(Self { val: main.val })

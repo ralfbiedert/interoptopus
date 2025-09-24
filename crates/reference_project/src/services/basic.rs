@@ -1,10 +1,10 @@
 use crate::patterns::result::Error;
-use interoptopus::{ffi, ffi_service, ffi_type};
+use interoptopus::ffi;
 
-#[ffi_type(service)]
+#[ffi(service)]
 pub struct ServiceBasic {}
 
-#[ffi_service]
+#[ffi]
 impl ServiceBasic {
     pub fn new() -> ffi::Result<Self, Error> {
         ffi::Ok(Self {})

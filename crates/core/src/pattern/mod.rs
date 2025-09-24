@@ -12,9 +12,9 @@
 //! For example, instead of accepting a `*const u8` (or similar) and returning `0` on success
 //!
 //! ```
-//! # use interoptopus::ffi_function;
+//! # use interoptopus::ffi;
 //!
-//! #[ffi_function]
+//! #[ffi]
 //! pub fn write_file(file: *const u8) -> i8 {
 //!    let file = unsafe { /* ... */ };
 //!    0
@@ -25,14 +25,14 @@
 //! you would instead accept an [`ffi::String`](crate::pattern::string::String) and return an [`ffi::Result`](crate::pattern::result::Result):
 //!
 //! ```
-//! # use interoptopus::{ffi_function, ffi_type, ffi};
+//! # use interoptopus::ffi;
 //! #
-//! # #[ffi_type]
+//! # #[ffi]
 //! # pub enum MyError {
 //! #    Bad
 //! # }
 //!
-//! #[ffi_function]
+//! #[ffi]
 //! pub fn write_file(file: ffi::String) -> ffi::Result<(), MyError> {
 //!    let file = file.as_str();
 //!    ffi::Ok(())

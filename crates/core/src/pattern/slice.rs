@@ -8,10 +8,9 @@
 //! Here we export a function that wants the FFI equivalent of an `&[u32]`:
 //!
 //! ```
-//! use interoptopus::{ffi_function};
 //! use interoptopus::ffi;
 //!
-//! #[ffi_function]
+//! #[ffi]
 //! pub fn call_with_slice(ffi_slice: ffi::Slice<u32>) {
 //!     // ...
 //! }

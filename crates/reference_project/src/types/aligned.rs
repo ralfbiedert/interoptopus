@@ -1,12 +1,12 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type(packed)]
+#[ffi(packed)]
 pub struct Packed1 {
     pub x: u8,
     pub y: u16,
 }
 
-#[ffi_type(packed)]
+#[ffi(packed)]
 pub struct Packed2 {
     pub y: u16,
     pub x: u8,

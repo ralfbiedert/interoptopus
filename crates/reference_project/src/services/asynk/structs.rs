@@ -3,15 +3,14 @@ use crate::types::arrays::NestedArray;
 use interoptopus::ffi;
 use interoptopus::pattern::asynk::{Async, AsyncRuntime};
 use interoptopus::pattern::result::result_to_ffi;
-use interoptopus::{ffi_service, ffi_type};
 use tokio::runtime::{Builder, Runtime};
 
-#[ffi_type(service)]
+#[ffi(service)]
 pub struct ServiceAsyncStructs {
     runtime: Runtime,
 }
 
-#[ffi_service]
+#[ffi]
 impl ServiceAsyncStructs {
     pub fn new() -> ffi::Result<Self, Error> {
         result_to_ffi(|| {

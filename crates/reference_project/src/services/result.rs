@@ -1,11 +1,11 @@
 use crate::patterns::result::Error;
 use crate::types::enums::EnumPayload;
-use interoptopus::{ffi, ffi_service, ffi_type};
+use interoptopus::ffi;
 
-#[ffi_type(service)]
+#[ffi(service)]
 pub struct ServiceResult {}
 
-#[ffi_service]
+#[ffi]
 impl ServiceResult {
     pub fn new() -> ffi::Result<Self, Error> {
         ffi::Ok(Self {})
