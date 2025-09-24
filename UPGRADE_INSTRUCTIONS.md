@@ -2,7 +2,30 @@
 
 Tips for solving non-trivial breaking changes when upgrading from previous versions.
 
-### 0.14 → 0.15
+### 0.15-alpha.17 -> 0.15 
+
+Around -alpha.18 we did a massive update under the hood, which also changed some <alpha.17 behavior. If you upgrade 
+from 0.14 you should read the `0.14 → 0.15-alpha.17` section first, then come here and see what else changed. 
+If you far worked with some 0.15-alpha, check this list out: 
+
+- `#[ffi_type]`, `#[ffi_function]`, ... all of these have been removed. You just do `#[ffi]` now.
+- ffi functions do not check for panics anymore (unless asked, TBD)
+- The entire `Inventory` internal machinery has been rewritten from scratch. If you relied on delicate inventory
+  manipulation please have a look at the new `Inventory` APIs and file a issue / PR if something is missing.
+- Checking of forbidden names now happens inside the macro at compile time with much better diagnostics.
+- Many constructs are now forbidden that were previously allowed but 'dodgy'. In most cases you should get a clear
+  error message if that happens.
+- It's `Inventory::new()` now, and then `.validate()` instead of `.build()`
+- Services now need #[ffi(service)] on the type, not `opaque`
+- The "namespace" concept has been fully reworked. Under the hood it's called `emission` now, and should
+  give much more fine grained control which symbol goes where when writing interop. In addition, there is now native
+  support to tell it a symbol is "external" (aka, user-provided). In essence that will mean Interoptopus assumes
+  the symbol is defined (and will try to use it) but it's up to you to provide the definition.
+- Some #[ffi] attributes were renamed check the #[ffi] documentation for details
+
+
+
+### 0.14 → 0.15-alpha.17
 
 #### Core Library
 
@@ -39,12 +62,7 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - Likewise, `#[ffi_type(error)]` on enums has been removed.
 - Some item names (e.g., `public`) are forbidden now as they might conflict with backend language-specific keywords, and
   will be flagged when invoking `.validate()`.
-- The entire `Inventory` internal machinery has been rewritten from scratch. If you relied on delicate inventory
-  manipulation please have a look at the new `Inventory` APIs and file a issue / PR if something is missing.
-- Checking of forbidden names now happens inside the macro at compile time with much better diagnostics.
-- Many constructs are now forbidden that were previously allowed but 'dodgy'. In most cases you should get a clear 
-  error message if that happens. 
-- `#[ffi_type]`, `#[ffi_function]`, ... all of these have been removed. You just do `#[ffi]` now.
+
 
 #### All Backends
 
