@@ -21,3 +21,8 @@ pub fn ffi_function(attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
     interoptopus_proc_impl::ffi_service(attr.into(), item.into()).into()
 }
+
+#[proc_macro_attribute]
+pub fn ffi(attr: TokenStream, item: TokenStream) -> TokenStream {
+    interoptopus_proc_impl::ffi(attr.into(), item.into()).into()
+}
