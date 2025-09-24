@@ -1,0 +1,113 @@
+---
+source: crates/proc_macros_impl/tests/svc_lifetime.rs
+assertion_line: 26
+expression: expand_svc!(item)
+---
+const _: () = {
+    const fn _assert_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
+    _assert_type_info::<Service>();
+    ::interoptopus::lang::types::assert_service_ctor_safe::<
+        ffi::Result<Service, Error>,
+    >();
+    ::interoptopus::lang::types::assert_service_safe::<Service>();
+};
+impl Service {
+    pub fn new() -> ffi::Result<Self, Error> {
+        ffi::Ok(Self { data: Vec::new() })
+    }
+    #[allow(clippy::needless_lifetimes)]
+    pub fn l1<'a, 'b>(
+        &mut self,
+        x: &u8,
+        _y: &mut u8,
+        _slice: ffi::Slice<'a, u8>,
+        _slice2: ffi::Slice<'b, u8>,
+    ) -> u8 {
+        *x
+    }
+    pub fn return_slice(&mut self) -> ffi::Slice<'_, u32> {
+        self.data.as_slice().into()
+    }
+}
+#[::interoptopus::ffi_function]
+unsafe fn service_new(
+    instance: *mut *const Service,
+) -> <::interoptopus::ffi::Result<
+    (),
+    Error,
+> as ::interoptopus::pattern::result::ResultAs>::AsT<*const Service> {
+    unsafe {
+        let result = Service::new();
+        match result {
+            ::interoptopus::ffi::Ok(service_instance) => {
+                let boxed = ::std::boxed::Box::new(service_instance);
+                *instance = ::std::boxed::Box::into_raw(boxed);
+                ::interoptopus::ffi::Ok(::std::ptr::null())
+            }
+            ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
+            ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
+            ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
+        }
+    }
+}
+#[::interoptopus::ffi_function]
+fn service_destroy(instance: *const Service) {
+    if !instance.is_null() {
+        unsafe {
+            let _ = ::std::boxed::Box::from_raw(instance as *mut Service);
+        }
+    }
+}
+#[::interoptopus::ffi_function]
+unsafe fn service_l1<'a, 'b>(
+    instance: *mut Service,
+    x: &u8,
+    _y: &mut u8,
+    _slice: ffi::Slice<'a, u8>,
+    _slice2: ffi::Slice<'b, u8>,
+) -> u8 {
+    unsafe {
+        let instance_ref = &mut *instance;
+        instance_ref.l1(x, _y, _slice, _slice2)
+    }
+}
+#[::interoptopus::ffi_function]
+unsafe fn service_return_slice<'a>(instance: *mut Service) -> ffi::Slice<'a, u32> {
+    unsafe {
+        let instance_ref = &mut *instance;
+        instance_ref.return_slice()
+    }
+}
+impl ::interoptopus::lang::service::ServiceInfo for Service {
+    fn id() -> ::interoptopus::inventory::ServiceId {
+        ::interoptopus::inventory::ServiceId::from_id(::interoptopus::id!(Service))
+    }
+    fn service() -> ::interoptopus::lang::service::Service {
+        ::interoptopus::lang::service::Service::new(
+            <Service as ::interoptopus::lang::types::TypeInfo>::id(),
+            vec![< service_new as ::interoptopus::lang::function::FunctionInfo > ::id()],
+            <service_destroy as ::interoptopus::lang::function::FunctionInfo>::id(),
+            vec![
+                < service_l1 as ::interoptopus::lang::function::FunctionInfo > ::id(), <
+                service_return_slice as ::interoptopus::lang::function::FunctionInfo >
+                ::id()
+            ],
+        )
+    }
+    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+        <Service as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+        <service_new as ::interoptopus::lang::function::FunctionInfo>::register(
+            inventory,
+        );
+        <service_destroy as ::interoptopus::lang::function::FunctionInfo>::register(
+            inventory,
+        );
+        <service_l1 as ::interoptopus::lang::function::FunctionInfo>::register(
+            inventory,
+        );
+        <service_return_slice as ::interoptopus::lang::function::FunctionInfo>::register(
+            inventory,
+        );
+        inventory.register_service(Self::id(), Self::service());
+    }
+}
