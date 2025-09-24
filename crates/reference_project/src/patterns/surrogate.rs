@@ -1,5 +1,5 @@
+use interoptopus::ffi;
 use interoptopus::pattern::surrogate::{CorrectSurrogate, Surrogate};
-use interoptopus::{ffi_function, ffi_type};
 
 // Let's assume we can't implement `CTypeInfo` for this.
 mod foreign {
@@ -10,7 +10,7 @@ mod foreign {
 }
 
 // Instead, we create a local copy of that type with matching fields.
-#[ffi_type]
+#[ffi]
 pub struct Local {
     x: u32,
 }
@@ -22,13 +22,13 @@ unsafe impl CorrectSurrogate<foreign::SomeForeignType> for Local {}
 // Here we create a nicer alias.
 type SomeForeignType = Surrogate<foreign::SomeForeignType, Local>;
 
-#[ffi_type]
+#[ffi]
 pub struct Container {
     // We can then use the `Surrogate` type in our interfaces. It wil
     pub foreign: SomeForeignType,
 }
 
-#[ffi_function]
+#[ffi]
 pub fn pattern_surrogates_1(s: SomeForeignType, c: &mut Container) {
     c.foreign = s;
 }

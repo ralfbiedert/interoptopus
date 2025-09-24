@@ -2,9 +2,9 @@ use crate::patterns::callback::{
     MyCallback, MyCallbackContextual, MyCallbackNamespaced, MyCallbackVoid, SumDelegate1, SumDelegate2, SumDelegateReturn, SumDelegateReturn2,
 };
 use crate::patterns::result::Error;
-use interoptopus::{ffi, ffi::*, ffi_service, ffi_type};
+use interoptopus::{ffi, ffi::*};
 
-#[ffi_type]
+#[ffi]
 #[derive(Copy, Clone)]
 pub struct CallbackTable {
     pub my_callback: MyCallback,
@@ -18,13 +18,13 @@ pub struct CallbackTable {
 }
 
 /// Some struct we want to expose as a class.
-#[ffi_type(service)]
+#[ffi(service)]
 pub struct ServiceCallbacks {
     delegate_table: Option<CallbackTable>,
 }
 
 // Regular implementation of methods.
-#[ffi_service]
+#[ffi]
 impl ServiceCallbacks {
     pub fn new() -> ffi::Result<Self, Error> {
         ffi::Ok(Self { delegate_table: None })

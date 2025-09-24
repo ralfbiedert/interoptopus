@@ -8,7 +8,7 @@
 //! get zero-cost conversion helpers for free.
 //!
 //! ```
-//! use interoptopus::{ffi_function, ffi_type};
+//! use interoptopus::{ffi};
 //! use interoptopus::pattern::surrogate::{CorrectSurrogate, Surrogate};
 //! #
 //! # mod foreign {
@@ -21,7 +21,7 @@
 //! # }
 //!
 //! // Create a LocalVec3 with matching fields to your upstream type.
-//! #[ffi_type]
+//! #[ffi]
 //! pub struct LocalVec3 {
 //!     x: f32,
 //!     y: f32,
@@ -35,7 +35,7 @@
 //! // And here we create a nicer alias.
 //! type Vec3 = Surrogate<foreign::Vec3, LocalVec3>;
 //!
-//! #[ffi_function]
+//! #[ffi]
 //! pub fn do_compute(s: Vec3) {
 //!     let vec: foreign::Vec3 = s.into_t();
 //! }
@@ -50,7 +50,7 @@ use crate::inventory::{Inventory, TypeId};
 use crate::lang::types::TypeInfo;
 use crate::lang::types::{Type, TypeKind};
 use std::marker::PhantomData;
-use std::mem::{ManuallyDrop, transmute};
+use std::mem::{transmute, ManuallyDrop};
 
 /// A marker trait for types that are surrogates for other types.
 ///

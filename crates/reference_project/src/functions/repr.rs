@@ -1,7 +1,7 @@
 use crate::types::transparent::Transparent;
-use interoptopus::ffi_function;
+use interoptopus::ffi;
 
-#[ffi_function]
+#[ffi]
 pub fn repr1(x: Transparent, _r: &Transparent) -> Transparent {
     x
 }

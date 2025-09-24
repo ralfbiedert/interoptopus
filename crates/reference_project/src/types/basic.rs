@@ -1,13 +1,13 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
 /// Empty structs are only allowed as opaques.
-#[ffi_type(opaque)]
+#[ffi(opaque)]
 pub struct Empty {}
 
-#[ffi_type]
+#[ffi]
 pub struct Tupled(pub u8);
 
-#[ffi_type]
+#[ffi]
 #[derive(Debug, Copy, Clone, Default)]
 pub struct Vec3f32 {
     pub x: f32,
@@ -16,7 +16,7 @@ pub struct Vec3f32 {
 }
 
 /// Documented struct.
-#[ffi_type]
+#[ffi]
 pub struct StructDocumented {
     /// Documented field.
     pub x: f32,

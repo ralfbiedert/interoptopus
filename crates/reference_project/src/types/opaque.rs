@@ -1,7 +1,7 @@
 use crate::types::basic::Vec3f32;
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type(opaque)]
+#[ffi(opaque)]
 #[allow(dead_code)]
 pub struct Opaque {
     _internal: *const Vec3f32,
@@ -9,7 +9,7 @@ pub struct Opaque {
 }
 
 /// This can also be used for the `class` pattern.
-#[ffi_type(opaque)]
+#[ffi(opaque)]
 #[allow(unused)]
 pub struct SomeContext {
     pub(crate) some_field: u32,

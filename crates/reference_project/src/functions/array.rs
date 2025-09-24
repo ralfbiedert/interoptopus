@@ -1,9 +1,9 @@
 use crate::types::arrays::{Array, CharArray, FixedString, NestedArray};
 use crate::types::basic::Vec3f32;
 use crate::types::enums::EnumRenamedXYZ;
-use interoptopus::ffi_function;
+use interoptopus::ffi;
 
-#[ffi_function]
+#[ffi]
 pub fn array_1(x: Array) -> u8 {
     x.data[0]
 }
@@ -11,22 +11,22 @@ pub fn array_1(x: Array) -> u8 {
 // Apparently this is not valid C
 // https://stackoverflow.com/questions/11656532/returning-an-array-using-c
 //
-// #[ffi_function]
+// #[ffi]
 // pub fn array_2(x: [u8; 16]) -> [u8; 16] {
 //     x
 // }
 
-#[ffi_function]
+#[ffi]
 pub fn array_2() -> Array {
     Array { data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] }
 }
 
-#[ffi_function]
+#[ffi]
 pub fn array_3(arr: &mut Array) {
     arr.data[0] = 42;
 }
 
-#[ffi_function]
+#[ffi]
 pub fn nested_array_1() -> NestedArray {
     NestedArray {
         field_enum: EnumRenamedXYZ::X,
@@ -39,7 +39,7 @@ pub fn nested_array_1() -> NestedArray {
     }
 }
 
-#[ffi_function]
+#[ffi]
 pub fn nested_array_2(result: &mut NestedArray) {
     result.field_enum = EnumRenamedXYZ::X;
     result.field_vec = Vec3f32 { x: 1.0, y: 2.0, z: 3.0 };
@@ -49,12 +49,12 @@ pub fn nested_array_2(result: &mut NestedArray) {
     result.field_struct = Array { data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] };
 }
 
-#[ffi_function]
+#[ffi]
 pub fn nested_array_3(input: NestedArray) -> u8 {
     input.field_struct.data[1]
 }
 
-#[ffi_function]
+#[ffi]
 pub fn char_array_1() -> CharArray {
     let mut result = CharArray { str: FixedString { data: [0; 32] }, str_2: FixedString { data: [0; 32] } };
 
@@ -63,12 +63,12 @@ pub fn char_array_1() -> CharArray {
     result
 }
 
-#[ffi_function]
+#[ffi]
 pub fn char_array_2(arr: CharArray) -> CharArray {
     arr
 }
 
-#[ffi_function]
+#[ffi]
 pub fn char_array_3(arr: &CharArray) -> u8 {
     arr.str.data[0]
 }

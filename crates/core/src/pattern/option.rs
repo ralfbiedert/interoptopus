@@ -5,10 +5,9 @@
 //! This function accepts an FFI option and converts it into a Rust option.
 //!
 //! ```
-//! use interoptopus::ffi_function;
 //! use interoptopus::ffi;
 //!
-//! #[ffi_function]
+//! #[ffi]
 //! pub fn set_value(x: ffi::Option<u8>) {
 //!     let _ = x.into_option();
 //! }

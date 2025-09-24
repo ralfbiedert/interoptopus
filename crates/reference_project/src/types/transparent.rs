@@ -1,6 +1,6 @@
 use crate::types::basic::Tupled;
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type(transparent)]
+#[ffi(transparent)]
 #[allow(dead_code)]
 pub struct Transparent(Tupled);

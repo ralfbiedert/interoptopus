@@ -5,10 +5,9 @@
 //! In your library you can accept (ASCII- / C-) strings like this:
 //!
 //! ```
-//! use interoptopus::ffi_function;
 //! use interoptopus::ffi;
 //!
-//! #[ffi_function]
+//! #[ffi]
 //! pub fn call_with_string(s: ffi::CStrPtr) {
 //!     //
 //! }

@@ -1,14 +1,14 @@
+use interoptopus::ffi_function;
 use interoptopus::wire::Wire;
-use interoptopus::{ffi_function, ffi_type};
 
 // TODO: This fails to codegen on C#
-#[ffi_function]
+#[ffi]
 fn wire_accept_string_1(_input: Wire<String>) {}
 
-#[ffi_type]
+#[ffi]
 pub struct MyString {
     pub x: String,
 }
 
-#[ffi_function]
+#[ffi]
 pub fn wire_accept_string_2(_input: Wire<MyString>) {}

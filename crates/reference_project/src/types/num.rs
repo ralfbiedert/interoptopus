@@ -1,16 +1,16 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type(transparent)]
+#[ffi(transparent)]
 pub struct TransparentNum(usize);
 
-#[ffi_type]
+#[ffi]
 pub struct IVec3 {
     pub x: isize,
     pub y: isize,
     pub z: isize,
 }
 
-#[ffi_type]
+#[ffi]
 pub enum EnumNum {
     A(usize),
     B,

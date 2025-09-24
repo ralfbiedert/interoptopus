@@ -1,13 +1,13 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 use interoptopus::lang::types::TypeInfo;
 use std::fmt::Debug;
 
-#[ffi_type]
+#[ffi]
 pub struct ExtraType<T: TypeInfo> {
     pub x: T,
 }
 
-#[ffi_type]
+#[ffi]
 pub struct Generic<'a, T>
 where
     T: 'static,
@@ -16,7 +16,7 @@ where
     pub x: &'a T,
 }
 
-#[ffi_type(opaque)]
+#[ffi(opaque)]
 pub struct Generic2<T>
 where
     T: TypeInfo,
@@ -24,7 +24,7 @@ where
     pub x: T,
 }
 
-#[ffi_type(opaque, name = "Generic3")]
+#[ffi(opaque, name = "Generic3")]
 pub struct Generic3<T> {
     pub x: T,
 }
@@ -33,7 +33,7 @@ pub trait Helper {}
 
 impl Helper for u8 {}
 
-#[ffi_type(opaque, name = "Generic4")]
+#[ffi(opaque, name = "Generic4")]
 pub struct Generic4<T>
 where
     T: Helper + TypeInfo,
@@ -41,7 +41,7 @@ where
     pub x: T,
 }
 
-#[ffi_type]
+#[ffi]
 pub struct Weird1<T: Clone>
 where
     T: Copy + Copy + TypeInfo,
@@ -49,7 +49,7 @@ where
     x: T,
 }
 
-#[ffi_type]
+#[ffi]
 pub struct Weird2<'a, T: Clone, const N: usize>
 where
     T: Copy + Copy + 'a,
@@ -61,23 +61,23 @@ where
 }
 
 pub mod associated_types {
-    use interoptopus::ffi_type;
+    use interoptopus::ffi;
 
     pub trait Helper {
         type X;
     }
 
-    #[ffi_type]
+    #[ffi]
     pub struct Chicken(u8);
 
-    #[ffi_type]
+    #[ffi]
     pub struct Cow(u16);
 
     impl Helper for Chicken {
         type X = Cow;
     }
 
-    #[ffi_type]
+    #[ffi]
     pub struct FieldsViaAssociatedType {
         pub x: <Chicken as Helper>::X,
     }
