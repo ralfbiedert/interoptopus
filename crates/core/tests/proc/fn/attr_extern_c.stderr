@@ -1,4 +1,4 @@
-error: Functions with explicit extern declarations are not supported. Remove the declaration and let #[ffi_function] handle it.
+error: Functions with explicit extern declarations are not supported. Remove the declaration and let #[ffi] handle it.
  --> tests/proc/fn/attr_extern_c.rs:4:1
   |
 4 | extern "C" fn foo() {}

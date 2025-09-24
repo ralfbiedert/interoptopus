@@ -1,7 +1,6 @@
 ---
 source: crates/proc_macros_impl/tests/svc_async.rs
-assertion_line: 25
-expression: expand_svc!(item)
+expression: expand_ffi!(item)
 ---
 const _: () = {
     const fn _assert_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
@@ -42,7 +41,7 @@ impl Service {
         ffi::Ok(0)
     }
 }
-#[::interoptopus::ffi_function]
+#[::interoptopus::ffi]
 unsafe fn service_new(
     instance: *mut *const Service,
 ) -> <::interoptopus::ffi::Result<
@@ -63,7 +62,7 @@ unsafe fn service_new(
         }
     }
 }
-#[::interoptopus::ffi_function]
+#[::interoptopus::ffi]
 fn service_destroy(instance: *const Service) {
     if !instance.is_null() {
         unsafe {
@@ -71,7 +70,7 @@ fn service_destroy(instance: *const Service) {
         }
     }
 }
-#[::interoptopus::ffi_function]
+#[::interoptopus::ffi]
 unsafe fn service_compute1(
     instance: *const Service,
     callback: ::interoptopus::pattern::asynk::AsyncCallback<u8>,
@@ -102,7 +101,7 @@ unsafe fn service_compute1(
         ::interoptopus::ffi::Ok(::std::ptr::null())
     }
 }
-#[::interoptopus::ffi_function]
+#[::interoptopus::ffi]
 unsafe fn service_compute2(
     instance: *const Service,
     callback: ::interoptopus::pattern::asynk::AsyncCallback<u8>,

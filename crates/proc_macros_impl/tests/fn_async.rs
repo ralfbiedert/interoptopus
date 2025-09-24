@@ -7,9 +7,9 @@ mod util;
 #[test]
 fn async_fails() {
     let item: ItemFn = parse_quote! {
-        #[ffi_function]
+        #[ffi]
         async fn async_foo() {}
     };
 
-    insta::assert_snapshot!(expand_fn!(item));
+    insta::assert_snapshot!(expand_ffi!(item));
 }

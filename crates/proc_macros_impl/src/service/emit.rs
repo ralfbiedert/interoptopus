@@ -238,7 +238,7 @@ impl ServiceModel {
 
         quote_spanned! { ctor.name.span() =>
             #docs
-            #[::interoptopus::ffi_function]
+            #[::interoptopus::ffi]
             unsafe fn #function_name #generics(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
                 unsafe {
                    let result = #service_call(#param_names);
@@ -272,7 +272,7 @@ impl ServiceModel {
         };
 
         quote_spanned! { self.service_name.span() =>
-            #[::interoptopus::ffi_function]
+            #[::interoptopus::ffi]
             fn #function_name #generics(instance: *const #service_type) {
                 if !instance.is_null() {
                     unsafe {
@@ -319,7 +319,7 @@ impl ServiceModel {
 
         quote_spanned! { method.name.span() =>
             #docs
-            #[::interoptopus::ffi_function]
+            #[::interoptopus::ffi]
             unsafe fn #function_name #enhanced_generics(instance: *const #service_type, #params) #return_type #where_clause {
                 unsafe {
                     let instance_ref = &*instance;
@@ -342,7 +342,7 @@ impl ServiceModel {
 
         quote_spanned! { method.name.span() =>
             #docs
-            #[::interoptopus::ffi_function]
+            #[::interoptopus::ffi]
             unsafe fn #function_name #enhanced_generics(instance: *mut #service_type, #params) #return_type #where_clause {
                 unsafe {
                     let instance_ref = &mut *instance;
@@ -380,7 +380,7 @@ impl ServiceModel {
 
         quote_spanned! { method.name.span() =>
             #docs
-            #[::interoptopus::ffi_function]
+            #[::interoptopus::ffi]
             unsafe fn #function_name #enhanced_generics(
                 #async_params
             ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> #where_clause {

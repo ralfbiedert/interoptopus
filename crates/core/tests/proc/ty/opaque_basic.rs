@@ -1,12 +1,12 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type(opaque)]
+#[ffi(opaque)]
 struct Opaque1;
 
-#[ffi_type(opaque)]
+#[ffi(opaque)]
 struct Opaque2 {}
 
-#[ffi_type(opaque)]
+#[ffi(opaque)]
 struct Opaque3(());
 
 fn main() {}

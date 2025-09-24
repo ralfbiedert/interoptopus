@@ -1,11 +1,11 @@
-use interoptopus::{ffi_type, lang::types::TypeInfo};
+use interoptopus::{ffi, lang::types::TypeInfo};
 
-#[ffi_type]
+#[ffi]
 pub struct Foo1<T: TypeInfo> {
     x: T,
 }
 
-#[ffi_type]
+#[ffi]
 pub struct Foo2<T>
 where
     T: TypeInfo,

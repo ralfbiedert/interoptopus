@@ -132,8 +132,18 @@ impl ServiceModel {
                     }
                 }
 
-                let service_method =
-                    ServiceMethod { name: method_name, docs, inputs, output: method.sig.output.clone(), is_async, receiver_kind: receiver_kind.clone(), vis, span, skip: false, generics: method.sig.generics.clone() };
+                let service_method = ServiceMethod {
+                    name: method_name,
+                    docs,
+                    inputs,
+                    output: method.sig.output.clone(),
+                    is_async,
+                    receiver_kind: receiver_kind.clone(),
+                    vis,
+                    span,
+                    skip: false,
+                    generics: method.sig.generics.clone(),
+                };
 
                 // Validate async methods
                 if is_async && receiver_kind == ReceiverKind::None {
@@ -151,7 +161,7 @@ impl ServiceModel {
         // Note: We now support lifetime generics, but not type generics
         for param in &generics.params {
             if let syn::GenericParam::Type(_) = param {
-                return Err(syn::Error::new_spanned(param, "Generic services are not supported by #[ffi_service], only lifetime work."));
+                return Err(syn::Error::new_spanned(param, "Generic services are not supported by #[ffi], only lifetime work."));
             }
         }
 
@@ -159,7 +169,6 @@ impl ServiceModel {
 
         Ok(model)
     }
-
 
     pub fn service_name_snake_case(&self) -> String {
         // Check if a manual prefix is provided

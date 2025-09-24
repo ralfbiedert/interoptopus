@@ -1,9 +1,9 @@
-use interoptopus::ffi_function;
+use interoptopus::ffi;
 
-#[ffi_function(module = "foo")]
+#[ffi(module = "foo")]
 fn foo1() {}
 
-#[ffi_function(module = common)]
+#[ffi(module = common)]
 fn foo2() {}
 
 fn main() {}

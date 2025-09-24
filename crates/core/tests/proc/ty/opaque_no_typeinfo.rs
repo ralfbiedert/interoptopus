@@ -1,6 +1,6 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type(opaque)]
+#[ffi(opaque)]
 struct Opaque {
     x: std::sync::Mutex<u32>,
 }

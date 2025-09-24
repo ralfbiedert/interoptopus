@@ -1,4 +1,4 @@
-error: Functions with explicit #[no_mangle] are not supported, remove the attribute and let #[ffi_function] handle it.
+error: Functions with explicit #[no_mangle] are not supported, remove the attribute and let #[ffi] handle it.
  --> tests/proc/fn/attr_no_mangle.rs:4:1
   |
 4 | #[unsafe(no_mangle)]

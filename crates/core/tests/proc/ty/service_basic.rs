@@ -1,12 +1,12 @@
-use interoptopus::ffi_type;
+use interoptopus::ffi;
 
-#[ffi_type(service)]
+#[ffi(service)]
 struct Service1;
 
-#[ffi_type(service)]
+#[ffi(service)]
 struct Service2 {}
 
-#[ffi_type(service)]
+#[ffi(service)]
 struct Service3(());
 
 fn main() {}

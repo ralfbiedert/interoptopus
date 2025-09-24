@@ -1,9 +1,9 @@
-use interoptopus::ffi_function;
+use interoptopus::ffi;
 
-#[ffi_function]
+#[ffi]
 fn foo1<'a>(_: &'a u8) {}
 
-#[ffi_function]
+#[ffi]
 fn foo2<'a>(_: &'a mut u8) {}
 
 fn main() {}

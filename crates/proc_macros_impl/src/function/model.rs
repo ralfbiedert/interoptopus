@@ -52,12 +52,12 @@ impl FunctionModel {
         if has_extern {
             return Err(syn::Error::new_spanned(
                 input.sig.abi.as_ref().unwrap(),
-                "Functions with explicit extern declarations are not supported. Remove the declaration and let #[ffi_function] handle it.",
+                "Functions with explicit extern declarations are not supported. Remove the declaration and let #[ffi] handle it.",
             ));
         }
 
         if let Some(attr) = no_mangle_attr {
-            let message = "Functions with explicit #[no_mangle] are not supported, remove the attribute and let #[ffi_function] handle it.";
+            let message = "Functions with explicit #[no_mangle] are not supported, remove the attribute and let #[ffi] handle it.";
             return Err(syn::Error::new_spanned(attr, message));
         }
 

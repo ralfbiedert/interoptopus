@@ -1,7 +1,6 @@
 ---
 source: crates/proc_macros_impl/tests/svc_basic.rs
-assertion_line: 15
-expression: expand_svc!(item)
+expression: expand_ffi!(item)
 ---
 const _: () = {
     const fn _assert_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
@@ -11,11 +10,10 @@ const _: () = {
     >();
     ::interoptopus::lang::types::assert_service_safe::<Service>();
 };
-#[ffi_services]
 impl Service {
     fn new() -> ffi::Result<Self, Error> {}
 }
-#[::interoptopus::ffi_function]
+#[::interoptopus::ffi]
 unsafe fn service_new(
     instance: *mut *const Service,
 ) -> <::interoptopus::ffi::Result<
@@ -36,7 +34,7 @@ unsafe fn service_new(
         }
     }
 }
-#[::interoptopus::ffi_function]
+#[::interoptopus::ffi]
 fn service_destroy(instance: *const Service) {
     if !instance.is_null() {
         unsafe {

@@ -1,14 +1,14 @@
-use interoptopus::{ffi, ffi_service, ffi_type};
+use interoptopus::ffi;
 
-#[ffi_type]
+#[ffi]
 enum Error {
     Something,
 }
 
-#[ffi_type(opaque)]
+#[ffi(opaque)]
 struct Service;
 
-#[ffi_service]
+#[ffi]
 impl Service {
     pub fn new() -> ffi::Result<Self, Error> {
         ffi::Ok(Self)

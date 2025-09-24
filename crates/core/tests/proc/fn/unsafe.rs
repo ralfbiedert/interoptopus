@@ -1,6 +1,6 @@
-use interoptopus::ffi_function;
+use interoptopus::ffi;
 
-#[ffi_function]
+#[ffi]
 unsafe fn foo() {}
 
 fn main() {}

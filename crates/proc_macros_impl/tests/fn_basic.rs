@@ -6,9 +6,9 @@ mod util;
 #[test]
 fn basic_expansion() {
     let item: ItemFn = parse_quote! {
-        #[ffi_function]
+        #[ffi]
         fn foo() {}
     };
 
-    insta::assert_snapshot!(expand_fn!(item));
+    insta::assert_snapshot!(expand_ffi!(item));
 }

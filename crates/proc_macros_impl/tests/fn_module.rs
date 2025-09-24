@@ -6,19 +6,19 @@ mod util;
 #[test]
 fn module_explicit() {
     let item: ItemFn = parse_quote! {
-        #[ffi_function(module = "foo")]
+        #[ffi(module = "foo")]
         fn foo() {}
     };
 
-    insta::assert_snapshot!(expand_fn!(item));
+    insta::assert_snapshot!(expand_ffi!(item));
 }
 
 #[test]
 fn module_common() {
     let item: ItemFn = parse_quote! {
-        #[ffi_function(module = common)]
+        #[ffi(module = common)]
         fn foo() {}
     };
 
-    insta::assert_snapshot!(expand_fn!(item));
+    insta::assert_snapshot!(expand_ffi!(item));
 }

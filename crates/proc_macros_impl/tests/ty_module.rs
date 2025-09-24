@@ -6,23 +6,23 @@ mod util;
 #[test]
 fn module_explicit() {
     let item: ItemStruct = parse_quote! {
-        #[ffi_type(module = "foo")]
+        #[ffi(module = "foo")]
         struct Foo {
             x: u8
         }
     };
 
-    insta::assert_snapshot!(expand_ty!(item));
+    insta::assert_snapshot!(expand_ffi!(item));
 }
 
 #[test]
 fn module_common() {
     let item: ItemStruct = parse_quote! {
-        #[ffi_type(module = common)]
+        #[ffi(module = common)]
         struct Foo {
             x: u8
         }
     };
 
-    insta::assert_snapshot!(expand_ty!(item));
+    insta::assert_snapshot!(expand_ffi!(item));
 }
