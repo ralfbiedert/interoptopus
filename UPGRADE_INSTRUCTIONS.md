@@ -44,6 +44,7 @@ Tips for solving non-trivial breaking changes when upgrading from previous versi
 - Checking of forbidden names now happens inside the macro at compile time with much better diagnostics.
 - Many constructs are now forbidden that were previously allowed but 'dodgy'. In most cases you should get a clear 
   error message if that happens. 
+- `#[ffi_type]`, `#[ffi_function]`, ... all of these have been removed. You just do `#[ffi]` now.
 
 #### All Backends
 

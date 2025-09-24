@@ -9,7 +9,7 @@ use syn::{parse2, ItemFn};
 use args::FfiFunctionArgs;
 use model::FunctionModel;
 
-pub fn ffi_function(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
+pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     let args: FfiFunctionArgs = parse2(attr)?;
     let input_fn: ItemFn = parse2(input)?;
 
