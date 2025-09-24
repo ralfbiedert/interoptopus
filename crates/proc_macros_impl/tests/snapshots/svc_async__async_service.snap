@@ -1,0 +1,168 @@
+---
+source: crates/proc_macros_impl/tests/svc_async.rs
+assertion_line: 25
+expression: expand_svc!(item)
+---
+const _: () = {
+    const fn _assert_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
+    _assert_type_info::<Service>();
+    const fn _assert_async<T: ::interoptopus::pattern::asynk::AsyncRuntime>() {}
+    _assert_async::<Service>();
+    ::interoptopus::lang::types::assert_service_ctor_safe::<
+        ffi::Result<Service, Error>,
+    >();
+    {
+        const fn _assert_rval_result1<
+            T: ::interoptopus::lang::types::TypeInfo,
+            E: ::interoptopus::lang::types::TypeInfo,
+        >(_: &::interoptopus::ffi::Result<T, E>) {}
+        const fn _assert_rval_result2(x: &ffi::Result<u8, Error>) {
+            _assert_rval_result1(&x);
+        }
+    }
+    {
+        const fn _assert_rval_result1<
+            T: ::interoptopus::lang::types::TypeInfo,
+            E: ::interoptopus::lang::types::TypeInfo,
+        >(_: &::interoptopus::ffi::Result<T, E>) {}
+        const fn _assert_rval_result2(x: &ffi::Result<u8, Error>) {
+            _assert_rval_result1(&x);
+        }
+    }
+    ::interoptopus::lang::types::assert_service_safe::<Service>();
+};
+impl Service {
+    pub fn new() -> ffi::Result<Self, Error> {
+        ffi::Ok(Self)
+    }
+    pub async fn compute1(_: Async<Self>) -> ffi::Result<u8, Error> {
+        ffi::Ok(0)
+    }
+    pub async fn compute2(_: Async<Self>) -> ffi::Result<u8, Error> {
+        ffi::Ok(0)
+    }
+}
+#[::interoptopus::ffi_function]
+unsafe fn service_new(
+    instance: *mut *const Service,
+) -> <::interoptopus::ffi::Result<
+    (),
+    Error,
+> as ::interoptopus::pattern::result::ResultAs>::AsT<*const Service> {
+    unsafe {
+        let result = Service::new();
+        match result {
+            ::interoptopus::ffi::Ok(service_instance) => {
+                let arc = ::std::sync::Arc::new(service_instance);
+                *instance = ::std::sync::Arc::into_raw(arc);
+                ::interoptopus::ffi::Ok(::std::ptr::null())
+            }
+            ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
+            ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
+            ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
+        }
+    }
+}
+#[::interoptopus::ffi_function]
+fn service_destroy(instance: *const Service) {
+    if !instance.is_null() {
+        unsafe {
+            let _ = ::std::sync::Arc::from_raw(instance);
+        }
+    }
+}
+#[::interoptopus::ffi_function]
+unsafe fn service_compute1(
+    instance: *const Service,
+    callback: ::interoptopus::pattern::asynk::AsyncCallback<u8>,
+) -> <::interoptopus::ffi::Result<
+    (),
+    Error,
+> as ::interoptopus::pattern::result::ResultAs>::AsT<*const Service> {
+    unsafe {
+        let instance_arc = ::std::sync::Arc::from_raw(instance);
+        let instance_clone = ::std::sync::Arc::clone(&instance_arc);
+        ::std::mem::forget(instance_arc);
+        let async_this = ::interoptopus::pattern::asynk::Async::new(
+            instance_clone.clone(),
+        );
+        use ::interoptopus::pattern::asynk::AsyncRuntime;
+        instance_clone
+            .spawn(move |_| async move {
+                let result = Service::compute1(async_this).await;
+                match result {
+                    ::interoptopus::ffi::Ok(value) => {
+                        callback.call(&value);
+                    }
+                    ::interoptopus::ffi::Err(_err) => {}
+                    ::interoptopus::ffi::Result::Panic => {}
+                    ::interoptopus::ffi::Result::Null => {}
+                }
+            });
+        ::interoptopus::ffi::Ok(::std::ptr::null())
+    }
+}
+#[::interoptopus::ffi_function]
+unsafe fn service_compute2(
+    instance: *const Service,
+    callback: ::interoptopus::pattern::asynk::AsyncCallback<u8>,
+) -> <::interoptopus::ffi::Result<
+    (),
+    Error,
+> as ::interoptopus::pattern::result::ResultAs>::AsT<*const Service> {
+    unsafe {
+        let instance_arc = ::std::sync::Arc::from_raw(instance);
+        let instance_clone = ::std::sync::Arc::clone(&instance_arc);
+        ::std::mem::forget(instance_arc);
+        let async_this = ::interoptopus::pattern::asynk::Async::new(
+            instance_clone.clone(),
+        );
+        use ::interoptopus::pattern::asynk::AsyncRuntime;
+        instance_clone
+            .spawn(move |_| async move {
+                let result = Service::compute2(async_this).await;
+                match result {
+                    ::interoptopus::ffi::Ok(value) => {
+                        callback.call(&value);
+                    }
+                    ::interoptopus::ffi::Err(_err) => {}
+                    ::interoptopus::ffi::Result::Panic => {}
+                    ::interoptopus::ffi::Result::Null => {}
+                }
+            });
+        ::interoptopus::ffi::Ok(::std::ptr::null())
+    }
+}
+impl ::interoptopus::lang::service::ServiceInfo for Service {
+    fn id() -> ::interoptopus::inventory::ServiceId {
+        ::interoptopus::inventory::ServiceId::from_id(::interoptopus::id!(Service))
+    }
+    fn service() -> ::interoptopus::lang::service::Service {
+        ::interoptopus::lang::service::Service::new(
+            <Service as ::interoptopus::lang::types::TypeInfo>::id(),
+            vec![< service_new as ::interoptopus::lang::function::FunctionInfo > ::id()],
+            <service_destroy as ::interoptopus::lang::function::FunctionInfo>::id(),
+            vec![
+                < service_compute1 as ::interoptopus::lang::function::FunctionInfo >
+                ::id(), < service_compute2 as
+                ::interoptopus::lang::function::FunctionInfo > ::id()
+            ],
+        )
+    }
+    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+        <Service as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+        <service_new as ::interoptopus::lang::function::FunctionInfo>::register(
+            inventory,
+        );
+        <service_destroy as ::interoptopus::lang::function::FunctionInfo>::register(
+            inventory,
+        );
+        <service_compute1 as ::interoptopus::lang::function::FunctionInfo>::register(
+            inventory,
+        );
+        <service_compute2 as ::interoptopus::lang::function::FunctionInfo>::register(
+            inventory,
+        );
+        inventory.register_service(Self::id(), Self::service());
+    }
+}
