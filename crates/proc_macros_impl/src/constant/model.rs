@@ -4,9 +4,10 @@ use syn::{Expr, ItemConst, Type};
 
 use crate::docs::extract_docs;
 
-use super::args::{FfiConstantArgs, ModuleKind};
+use super::args::FfiConstantArgs;
 
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct ConstantModel {
     pub name: String,
     pub ty: Type,
@@ -52,14 +53,6 @@ impl ConstantModel {
 
     pub fn effective_name(&self) -> String {
         self.args.name.as_ref().unwrap_or(&self.name).clone()
-    }
-
-    pub fn module_path(&self) -> TokenStream {
-        match &self.args.module {
-            Some(ModuleKind::Named(name)) => quote! { Some(#name.to_string()) },
-            Some(ModuleKind::Common) => quote! { Some("common".to_string()) },
-            None => quote! { None },
-        }
     }
 
     pub fn docs_content(&self) -> String {
