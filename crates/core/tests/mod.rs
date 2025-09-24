@@ -9,6 +9,9 @@ mod inventory {
 fn proc() {
     let t = TestCases::new();
 
+    // const
+    t.pass("tests/proc/const/basic.rs");
+
     // fn
     t.compile_fail("tests/proc/fn/attr_extern_c.rs");
     t.compile_fail("tests/proc/fn/attr_no_mangle.rs");

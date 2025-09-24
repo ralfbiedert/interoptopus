@@ -8,7 +8,7 @@
 //! is generated is part of the test.
 
 use interoptopus::inventory::Inventory;
-use interoptopus::{builtins_string, builtins_vec, builtins_wire, constant, extra_type, ffi, function, pattern};
+use interoptopus::{builtins_string, builtins_vec, extra_type, ffi, function, service};
 
 pub mod constants;
 pub mod functions;
@@ -52,6 +52,7 @@ pub fn ffi_inventory() -> Inventory {
         // Functions
         .register(builtins_string!())
         // .register(builtins_wire!())
+        // TODO: Duplcate symbols!
         .register(builtins_vec!(u8))
         .register(builtins_vec!(ffi::String))
         .register(builtins_vec!(types::basic::Vec3f32))
@@ -184,7 +185,7 @@ pub fn ffi_inventory() -> Inventory {
         .register(function!(patterns::vec::pattern_vec_8))
         // TODO
         // .register(function!(wire::basic::wire_accept_string_1))
-        .register(function!(wire::basic::wire_accept_string_2))
+        // .register(function!(wire::basic::wire_accept_string_2))
         // TODO
         // .register(function!(wire::miracles::perform_miracles))
         // .register(function!(wire::miracles::perform_half_miracles))
@@ -199,21 +200,21 @@ pub fn ffi_inventory() -> Inventory {
         .register(extra_type!(types::num::IVec3))
         .register(extra_type!(types::num::TransparentNum))
         // Services
-        .register(pattern!(services::asynk::basic::ServiceAsyncBasic))
-        .register(pattern!(services::asynk::sleep::ServiceAsyncSleep))
-        .register(pattern!(services::asynk::vecstring::ServiceAsyncVecString))
-        .register(pattern!(services::asynk::result::ServiceAsyncResult))
-        .register(pattern!(services::asynk::structs::ServiceAsyncStructs))
-        .register(pattern!(services::basic::ServiceBasic))
-        .register(pattern!(services::dependent::ServiceMain))
-        .register(pattern!(services::dependent::ServiceDependent))
-        .register(pattern!(services::result::ServiceResult))
-        .register(pattern!(services::on_panic::ServiceOnPanic))
-        .register(pattern!(services::callback::ServiceCallbacks))
-        .register(pattern!(services::ignored::ServiceIgnoringMethods))
-        .register(pattern!(services::multiple_ctors::ServiceMultipleCtors))
-        .register(pattern!(services::slice::ServiceVariousSlices))
-        .register(pattern!(services::string::ServiceStrings))
+        .register(service!(services::asynk::basic::ServiceAsyncBasic))
+        .register(service!(services::asynk::sleep::ServiceAsyncSleep))
+        .register(service!(services::asynk::vecstring::ServiceAsyncVecString))
+        .register(service!(services::asynk::result::ServiceAsyncResult))
+        .register(service!(services::asynk::structs::ServiceAsyncStructs))
+        .register(service!(services::basic::ServiceBasic))
+        .register(service!(services::dependent::ServiceMain))
+        .register(service!(services::dependent::ServiceDependent))
+        .register(service!(services::result::ServiceResult))
+        .register(service!(services::on_panic::ServiceOnPanic))
+        .register(service!(services::callback::ServiceCallbacks))
+        .register(service!(services::ignored::ServiceIgnoringMethods))
+        .register(service!(services::multiple_ctors::ServiceMultipleCtors))
+        .register(service!(services::slice::ServiceVariousSlices))
+        .register(service!(services::string::ServiceStrings))
         .validate()
-        .build()
+        .validate()
 }

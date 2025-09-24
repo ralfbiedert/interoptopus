@@ -1,9 +1,11 @@
-use crate::inventory::{ConstantId, TypeId};
+use crate::inventory::{ConstantId, Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::PrimitiveValue;
 
 pub trait ConstantInfo {
     fn id() -> ConstantId;
+    fn constant() -> Constant;
+    fn register(inventory: &mut Inventory);
 }
 
 /// The value of a constant.
