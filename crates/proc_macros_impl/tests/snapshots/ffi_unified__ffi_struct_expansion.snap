@@ -1,0 +1,54 @@
+---
+source: crates/proc_macros_impl/tests/ffi_unified.rs
+expression: expand_ffi!(item)
+---
+#[repr(C)]
+pub struct TestStruct {
+    pub x: u32,
+    pub y: u32,
+}
+impl ::interoptopus::lang::types::TypeInfo for TestStruct {
+    const WIRE_SAFE: bool = <u32 as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE
+        && <u32 as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE;
+    const RAW_SAFE: bool = <u32 as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE
+        && <u32 as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE;
+    const ASYNC_SAFE: bool = <u32 as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE
+        && <u32 as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
+    fn id() -> ::interoptopus::inventory::TypeId {
+        ::interoptopus::inventory::TypeId::from_id(::interoptopus::id!(TestStruct))
+    }
+    fn kind() -> ::interoptopus::lang::types::TypeKind {
+        ::interoptopus::lang::types::TypeKind::Struct(::interoptopus::lang::types::Struct {
+            fields: vec![
+                ::interoptopus::lang::types::Field { name : "x".to_string(), docs :
+                ::interoptopus::lang::meta::Docs::from_line(""), visibility :
+                ::interoptopus::lang::meta::Visibility::Public, ty : < u32 as
+                ::interoptopus::lang::types::TypeInfo > ::id(), },
+                ::interoptopus::lang::types::Field { name : "y".to_string(), docs :
+                ::interoptopus::lang::meta::Docs::from_line(""), visibility :
+                ::interoptopus::lang::meta::Visibility::Public, ty : < u32 as
+                ::interoptopus::lang::types::TypeInfo > ::id(), }
+            ],
+            repr: ::interoptopus::lang::types::Repr {
+                layout: ::interoptopus::lang::types::Layout::C,
+                alignment: ::std::option::Option::None,
+            },
+        })
+    }
+    fn ty() -> ::interoptopus::lang::types::Type {
+        ::interoptopus::lang::types::Type {
+            name: "TestStruct".to_string(),
+            visibility: ::interoptopus::lang::meta::Visibility::Public,
+            docs: ::interoptopus::lang::meta::Docs::from_line(""),
+            emission: ::interoptopus::lang::meta::Emission::External,
+            kind: Self::kind(),
+        }
+    }
+    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+        <u32 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+        <u32 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}

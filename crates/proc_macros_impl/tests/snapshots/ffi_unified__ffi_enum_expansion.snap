@@ -1,0 +1,51 @@
+---
+source: crates/proc_macros_impl/tests/ffi_unified.rs
+expression: expand_ffi!(item)
+---
+#[repr(u32)]
+pub enum TestEnum {
+    Variant1,
+    Variant2(u32),
+}
+impl ::interoptopus::lang::types::TypeInfo for TestEnum {
+    const WIRE_SAFE: bool = <u32 as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE;
+    const RAW_SAFE: bool = <u32 as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE;
+    const ASYNC_SAFE: bool = <u32 as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
+    fn id() -> ::interoptopus::inventory::TypeId {
+        ::interoptopus::inventory::TypeId::from_id(::interoptopus::id!(TestEnum))
+    }
+    fn kind() -> ::interoptopus::lang::types::TypeKind {
+        ::interoptopus::lang::types::TypeKind::Enum(::interoptopus::lang::types::Enum {
+            variants: vec![
+                ::interoptopus::lang::types::Variant { name : "Variant1".to_string(),
+                docs : ::interoptopus::lang::meta::Docs::from_line(""), kind :
+                ::interoptopus::lang::types::VariantKind::Unit(0), },
+                ::interoptopus::lang::types::Variant { name : "Variant2".to_string(),
+                docs : ::interoptopus::lang::meta::Docs::from_line(""), kind :
+                ::interoptopus::lang::types::VariantKind::Tuple(< u32 as
+                ::interoptopus::lang::types::TypeInfo > ::id()), }
+            ],
+            repr: ::interoptopus::lang::types::Repr {
+                layout: ::interoptopus::lang::types::Layout::Primitive(
+                    ::interoptopus::lang::types::Primitive::U32,
+                ),
+                alignment: ::std::option::Option::None,
+            },
+        })
+    }
+    fn ty() -> ::interoptopus::lang::types::Type {
+        ::interoptopus::lang::types::Type {
+            name: "TestEnum".to_string(),
+            visibility: ::interoptopus::lang::meta::Visibility::Public,
+            docs: ::interoptopus::lang::meta::Docs::from_line(""),
+            emission: ::interoptopus::lang::meta::Emission::External,
+            kind: Self::kind(),
+        }
+    }
+    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+        <u32 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}
