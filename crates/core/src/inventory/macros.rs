@@ -19,3 +19,13 @@ macro_rules! function {
         }
     }};
 }
+
+/// Register an item.
+#[macro_export]
+macro_rules! service {
+    ($x:ty) => {{
+        |x: &mut $crate::inventory::Inventory| {
+            <$x as $crate::lang::service::ServiceInfo>::register(x);
+        }
+    }};
+}
