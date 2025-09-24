@@ -7,12 +7,12 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{parse2, DeriveInput};
 
-use crate::utils::is_ffi_skip_attribute;
+use crate::skip::is_ffi_skip_attribute;
 
 use args::FfiTypeArgs;
 use model::TypeModel;
 
-pub fn ffi_type(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
+pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     let args: FfiTypeArgs = parse2(attr)?;
     let mut input_ast: DeriveInput = parse2(input)?;
 

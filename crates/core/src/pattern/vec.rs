@@ -115,7 +115,7 @@ impl<T> Drop for Vec<T> {
 #[macro_export]
 macro_rules! builtins_vec {
     ($t:ty) => {{
-        #[$crate::ffi_function(export = unique)]
+        #[$crate::ffi(export = unique)]
         pub fn interoptopus_vec_create(data: *const ::std::ffi::c_void, len: u64, rval: &mut ::std::mem::MaybeUninit<$crate::pattern::vec::Vec<$t>>) -> i64 {
             let slice = if data.is_null() {
                 &[]
@@ -127,7 +127,7 @@ macro_rules! builtins_vec {
             0
         }
 
-        #[$crate::ffi_function(export = unique)]
+        #[$crate::ffi(export = unique)]
         pub fn interoptopus_vec_destroy(_: $crate::ffi::Vec<$t>) -> i64 {
             0
         }

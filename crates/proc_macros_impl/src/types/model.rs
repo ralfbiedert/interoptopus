@@ -1,6 +1,6 @@
 use crate::docs::extract_docs;
+use crate::skip::has_ffi_skip_attribute;
 use crate::types::args::FfiTypeArgs;
-use crate::utils::has_ffi_skip_attribute;
 use syn::{Data, DeriveInput, Fields, Generics, Ident, Type, Visibility};
 
 #[derive(Clone)]

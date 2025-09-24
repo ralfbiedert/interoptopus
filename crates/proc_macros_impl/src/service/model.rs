@@ -1,6 +1,6 @@
 use crate::docs::extract_docs;
 use crate::service::args::FfiServiceArgs;
-use crate::utils::has_ffi_skip_attribute;
+use crate::skip::has_ffi_skip_attribute;
 use proc_macro2::Span;
 use syn::spanned::Spanned;
 use syn::{FnArg, Generics, Ident, ImplItem, ItemImpl, Pat, ReturnType, Type, Visibility};

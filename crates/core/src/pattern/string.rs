@@ -104,7 +104,7 @@ impl TypeInfo for String {
 #[macro_export]
 macro_rules! builtins_string {
     () => {{
-        #[$crate::ffi_function]
+        #[$crate::ffi]
         pub fn interoptopus_string_create(utf8: *const ::std::ffi::c_void, len: u64, rval: &mut ::std::mem::MaybeUninit<$crate::pattern::string::String>) -> i64 {
             let slice = if utf8.is_null() {
                 &[]
@@ -117,12 +117,12 @@ macro_rules! builtins_string {
             0
         }
 
-        #[$crate::ffi_function]
+        #[$crate::ffi]
         pub fn interoptopus_string_destroy(utf8: $crate::pattern::string::String) -> i64 {
             0
         }
 
-        #[$crate::ffi_function]
+        #[$crate::ffi]
         pub fn interoptopus_string_clone(utf8: &$crate::pattern::string::String, rval: &mut ::std::mem::MaybeUninit<$crate::pattern::string::String>) -> i64 {
             rval.write(utf8.clone());
             0

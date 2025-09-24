@@ -7,12 +7,12 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{parse2, ItemImpl};
 
-use crate::utils::is_ffi_skip_attribute;
+use crate::skip::is_ffi_skip_attribute;
 
 use args::FfiServiceArgs;
 use model::ServiceModel;
 
-pub fn ffi_service(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
+pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     let args: FfiServiceArgs = parse2(attr)?;
     let input_impl: ItemImpl = parse2(input)?;
 
