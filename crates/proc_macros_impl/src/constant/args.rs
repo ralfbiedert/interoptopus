@@ -1,6 +1,7 @@
-use syn::{Expr, Ident, Lit, Token, parse::Parse, punctuated::Punctuated};
+use syn::{parse::Parse, punctuated::Punctuated, Expr, Ident, Lit, Token};
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub enum ModuleKind {
     Named(String),
     Common,

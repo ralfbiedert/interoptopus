@@ -8,7 +8,7 @@
 //! is generated is part of the test.
 
 use interoptopus::inventory::Inventory;
-use interoptopus::{builtins_string, builtins_vec, extra_type, ffi, function, service};
+use interoptopus::{builtins_string, builtins_vec, constant, extra_type, ffi, function, service};
 
 pub mod constants;
 pub mod functions;
@@ -215,6 +215,5 @@ pub fn ffi_inventory() -> Inventory {
         .register(service!(services::multiple_ctors::ServiceMultipleCtors))
         .register(service!(services::slice::ServiceVariousSlices))
         .register(service!(services::string::ServiceStrings))
-        .validate()
         .validate()
 }

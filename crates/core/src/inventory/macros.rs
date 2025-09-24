@@ -22,6 +22,16 @@ macro_rules! function {
 
 /// Register an item.
 #[macro_export]
+macro_rules! constant {
+    ($x:ty) => {{
+        |x: &mut $crate::inventory::Inventory| {
+            <$x as $crate::lang::constant::ConstantInfo>::register(x);
+        }
+    }};
+}
+
+/// Register an item.
+#[macro_export]
 macro_rules! service {
     ($x:ty) => {{
         |x: &mut $crate::inventory::Inventory| {
