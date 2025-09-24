@@ -1,6 +1,0 @@
----
-source: crates/proc_macros_impl/tests/const_basic.rs
-assertion_line: 13
-expression: expand_ffi!(item)
----
-const X: u8 = 123;
