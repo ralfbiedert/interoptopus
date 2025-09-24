@@ -96,7 +96,7 @@ macro_rules! impl_const_value_primitive {
         $rust_type:ty,
         $x:path
     ) => {
-        impl From<$rust_type> for $crate::lang::constant::ConstantValue {
+        impl From<$rust_type> for $crate::lang::constant::Value {
             fn from(x: $rust_type) -> Self {
                 Self::Primitive($x(x))
             }

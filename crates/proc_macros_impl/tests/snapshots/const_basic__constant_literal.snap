@@ -1,0 +1,27 @@
+---
+source: crates/proc_macros_impl/tests/const_basic.rs
+expression: expand_ffi!(item)
+---
+const MY_CONST: u32 = 42;
+#[allow(non_camel_case_types)]
+#[allow(clippy::redundant_pub_crate)]
+pub struct MY_CONST {}
+impl ::interoptopus::lang::constant::ConstantInfo for MY_CONST {
+    fn id() -> ::interoptopus::inventory::ConstantId {
+        ::interoptopus::inventory::ConstantId::from_id(::interoptopus::id!(MY_CONST))
+    }
+    fn constant() -> ::interoptopus::lang::constant::Constant {
+        ::interoptopus::lang::constant::Constant {
+            name: "MY_CONST".to_string(),
+            visibility: ::interoptopus::lang::meta::Visibility::Public,
+            docs: ::interoptopus::lang::meta::Docs::from_line(""),
+            emission: ::interoptopus::lang::meta::Emission::Common,
+            ty: <u32 as ::interoptopus::lang::types::TypeInfo>::id(),
+            value: ::interoptopus::lang::constant::ConstantValue::value(&MY_CONST),
+        }
+    }
+    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+        <u32 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+        inventory.register_constant(Self::id(), Self::constant());
+    }
+}
