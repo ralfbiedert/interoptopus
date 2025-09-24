@@ -1,6 +1,7 @@
 use crate::docs::extract_docs;
 use crate::forbidden::is_forbidden_name;
 use crate::function::args::FfiFunctionArgs;
+use quote::ToTokens;
 use syn::spanned::Spanned;
 use syn::{FnArg, Ident, ItemFn, Pat, Type, Visibility};
 
@@ -110,15 +111,36 @@ impl FunctionModel {
         match &self.args.export {
             Some(crate::function::args::ExportKind::Custom(name)) => name.clone(),
             Some(crate::function::args::ExportKind::Unique) => {
-                // Generate a pseudo-random suffix
+                // Generate a deterministic unique suffix based on function signature
                 let base_name = self.name.to_string();
                 let hash = {
                     use std::collections::hash_map::DefaultHasher;
                     use std::hash::{Hash, Hasher};
                     let mut hasher = DefaultHasher::new();
+
+                    // Hash the function name
                     base_name.hash(&mut hasher);
-                    file!().hash(&mut hasher);
-                    line!().hash(&mut hasher);
+
+                    // Hash the parameter types to differentiate between different instantiations
+                    for param in &self.signature.inputs {
+                        // Convert the type to a string for hashing
+                        let type_str = param.ty.to_token_stream().to_string();
+                        type_str.hash(&mut hasher);
+                    }
+
+                    // Hash the return type
+                    let return_type_str = match &self.signature.output {
+                        syn::ReturnType::Default => "()".to_string(),
+                        syn::ReturnType::Type(_, ty) => ty.to_token_stream().to_string(),
+                    };
+                    return_type_str.hash(&mut hasher);
+
+                    // Hash generic parameters if any
+                    for param in &self.signature.generics.params {
+                        let param_str = param.to_token_stream().to_string();
+                        param_str.hash(&mut hasher);
+                    }
+
                     hasher.finish()
                 };
                 format!("{}_{}", base_name, hash % 100000)
