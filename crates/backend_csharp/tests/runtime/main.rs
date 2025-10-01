@@ -2,9 +2,33 @@ use netcorehost::pdcstr;
 use std::thread::sleep;
 use std::time::Duration;
 
+trait ILogger {
+    fn log(&self, msg: &str);
+}
+
+struct MyLogger;
+
+impl ILogger for MyLogger {}
+
+ffi_plugin!(MyPlugin {
+    // TODO: how to do ILogger that wants to be passed in as libs require it.
+
+    fn do_math(x: u32, y: u32);
+
+    trait Bar {
+        fn bar(ILogger: &ILogger);
+    }
+});
+
 #[test]
 fn can_load() {
     sleep(Duration::from_secs(5));
+
+    let my_logger = MyLogger;
+
+    let runtime = DotNet::new();
+    let plugin = runtime.load_dll::<MyPlugin>("tests/runtime/bin/Debug/net9.0/plugin.dll")?;
+    plugin.do_math(123, 456);
 
     let fxr = netcorehost::nethost::load_hostfxr().unwrap();
     let r = fxr
