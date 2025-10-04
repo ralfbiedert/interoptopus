@@ -1,3 +1,4 @@
+using System;
 using My.Company;
 using My.Company.Common;
 using Xunit;
@@ -32,7 +33,7 @@ public class TestPatternVec
         Interop.pattern_vec_2(vec);
 
         // We must not be able to re-use the given vec
-        Assert.Throws<InteropException>(() => Interop.pattern_vec_2(vec));
+        Assert.Throws<NullReferenceException>(() => Interop.pattern_vec_2(vec));
     }
 
     [Fact]
@@ -40,7 +41,7 @@ public class TestPatternVec
     {
         var vec = Interop.pattern_vec_1();
         vec.Dispose();
-        Assert.Throws<InteropException>(() => Interop.pattern_vec_2(vec));
+        Assert.Throws<NullReferenceException>(() => Interop.pattern_vec_2(vec));
     }
 
     [Fact]
@@ -59,7 +60,7 @@ public class TestPatternVec
         var vec1 = Interop.pattern_vec_1();
         var vec2 = Interop.pattern_vec_3(vec1);
 
-        Assert.Throws<InteropException>(() => vec1[0]);
+        Assert.Throws<NullReferenceException>(() => vec1[0]);
 
         Assert.Equal(3, vec2.Count);
         Assert.Equal(1, vec2[0]);
@@ -68,7 +69,7 @@ public class TestPatternVec
 
         vec2.Dispose();
 
-        Assert.Throws<InteropException>(() => vec2[0]);
+        Assert.Throws<NullReferenceException>(() => vec2[0]);
     }
 
     [Fact]

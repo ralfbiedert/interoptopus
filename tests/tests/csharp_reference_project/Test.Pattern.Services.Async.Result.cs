@@ -24,10 +24,10 @@ public class TestPatternServicesAsyncResult
         var s = ServiceAsyncResult.New();
 
         try { await s.Fail(); }
-        catch (Exception e)
+        catch (EnumException<Error> e)
         {
+            Assert.True(e.Value.IsFail);
             exceptionThrown = true;
-            Assert.IsType<InteropException>(e);
         }
         s.Dispose();
 

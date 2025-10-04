@@ -53,7 +53,7 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
             } else {
                 indented!(w, [()()], r"if (managed.IsOk) {{ tcs.SetResult(managed.AsOk()); }}")?;
             }
-            indented!(w, [()()], r"else {{ tcs.SetException(new InteropException()); }}")?;
+            indented!(w, [()()], r"else {{ tcs.SetException(managed.ExceptionForVariant()); }}")?;
         }
         _ => indented!(w, [()()], r"tcs.SetResult(managed);")?,
     }

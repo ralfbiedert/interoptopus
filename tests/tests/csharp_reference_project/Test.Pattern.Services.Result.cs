@@ -16,7 +16,7 @@ public class TestPatternServicesResult
     public void Test()
     {
         var service = ServiceResult.New();
-        Assert.Throws<InteropException>(() => service.Test());
+        Assert.Throws<EnumException<Error>>(() => service.Test());
         service.Dispose();
     }
 
