@@ -212,8 +212,8 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
     w.newline()?;
 
     // As... "unwraps"
+    let throw = "throw ExceptionForVariant();".to_string();
     for variant in the_type.variants() {
-        let throw = "throw new InteropException();";
         match variant.kind() {
             VariantKind::Unit(x) => {
                 let vname = variant.name();
@@ -252,7 +252,30 @@ pub fn write_type_definition_enum_variant_utils(i: &Interop, w: &mut IndentWrite
             }
         }
     }
-    indented!(w, [()()], "throw new InteropException();")?;
+    indented!(w, [()()], r#"throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");"#)?;
+    indented!(w, [()], r"}}")?;
+    w.newline()?;
+
+    // Somewhat of a ToString implementation.
+    i.inline_hint(w, 1)?;
+    indented!(w, [()], r"public Exception ExceptionForVariant()")?;
+    indented!(w, [()], r"{{")?;
+    for variant in the_type.variants() {
+        let vname = variant.name();
+        match variant.kind() {
+            VariantKind::Unit(x) => {
+                indented!(w, [()()], r"if (_variant == {x}) return new EnumException();")?;
+            }
+            VariantKind::Typed(x, t) if t.is_void() => {
+                indented!(w, [()()], r"if (_variant == {x}) return new EnumException();")?;
+            }
+            VariantKind::Typed(x, t) => {
+                let ty = field_to_type(t);
+                indented!(w, [()()], r"if (_variant == {x}) return new EnumException<{ty}>(_{vname});")?;
+            }
+        }
+    }
+    indented!(w, [()()], r#"throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");"#)?;
     indented!(w, [()], r"}}")?;
     w.newline()?;
 
