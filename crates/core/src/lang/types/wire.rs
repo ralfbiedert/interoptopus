@@ -6,3 +6,11 @@ pub enum WireOnly {
     Vec(TypeId),
     Map(TypeId, TypeId),
 }
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! bad_wire {
+    () => {
+        panic!("Called a wire method on a type that does not support wiring.")
+    };
+}

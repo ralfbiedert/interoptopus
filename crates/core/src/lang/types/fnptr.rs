@@ -1,8 +1,11 @@
+use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::function::{Argument, Signature};
 use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
-use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
+use crate::lang::types::{SerializationError, Type, TypeId, TypeInfo, TypeKind};
+use std::io::{Read, Write};
 
+// Generate implementations for function pointers with different arities
 macro_rules! impl_fnptr {
     // No arguments: extern "C" fn() -> R
     ($r:ident) => {
@@ -46,6 +49,18 @@ macro_rules! impl_fnptr {
                 $r::register(inventory);
                 inventory.register_type(Self::id(), Self::ty());
             }
+
+            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+                bad_wire!()
+            }
+
+            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+                bad_wire!()
+            }
+
+            fn live_size(&self) -> usize {
+                bad_wire!()
+            }
         }
 
         #[allow(non_snake_case)]
@@ -70,6 +85,18 @@ macro_rules! impl_fnptr {
 
             fn register(inventory: &mut Inventory) {
                 <extern "C" fn() -> $r as TypeInfo>::register(inventory);
+            }
+
+            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+                bad_wire!()
+            }
+
+            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+                bad_wire!()
+            }
+
+            fn live_size(&self) -> usize {
+                bad_wire!()
             }
         }
     };
@@ -159,6 +186,18 @@ macro_rules! impl_fnptr {
                 $($t::register(inventory);)+
                 inventory.register_type(Self::id(), Self::ty());
             }
+
+            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+                bad_wire!()
+            }
+
+            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+                bad_wire!()
+            }
+
+            fn live_size(&self) -> usize {
+                bad_wire!()
+            }
         }
 
         #[allow(unused_assignments, non_snake_case)]
@@ -188,13 +227,22 @@ macro_rules! impl_fnptr {
             fn register(inventory: &mut Inventory) {
                 <extern "C" fn($($t),+) -> $r as TypeInfo>::register(inventory);
             }
+
+            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+                bad_wire!()
+            }
+
+            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+                bad_wire!()
+            }
+
+            fn live_size(&self) -> usize {
+                bad_wire!()
+            }
         }
 
     };
 }
-
-// Generate implementations for function pointers with different arities
-impl_fnptr!(R);
 impl_fnptr!(R, T1);
 impl_fnptr!(R, T1, T2);
 impl_fnptr!(R, T1, T2, T3);

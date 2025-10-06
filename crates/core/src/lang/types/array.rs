@@ -1,5 +1,7 @@
 use crate::lang::meta::{Docs, Emission, Visibility};
-use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
+use crate::lang::types::{SerializationError, Type, TypeId, TypeInfo, TypeKind};
+use std::io::{Read, Write};
+use std::mem::MaybeUninit;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Array {
@@ -35,5 +37,26 @@ where
         T::register(inventory);
 
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+        for x in self.iter() {
+            x.write(out)?;
+        }
+        Ok(())
+    }
+
+    fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+        let mut rval = [MaybeUninit::uninit(); N];
+
+        for x in &mut rval {
+            x.write(T::read(input)?);
+        }
+
+        Ok(unsafe { std::mem::transmute_copy(&rval) })
+    }
+
+    fn live_size(&self) -> usize {
+        self.iter().map(|x| x.live_size()).sum()
     }
 }
