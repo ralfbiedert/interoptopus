@@ -116,3 +116,38 @@ mod interop;
 
 pub use docs::Markdown;
 pub use interop::{DocStyle, EnumVariants, Functions, Indentation, Interop, InteropBuilder, NameCase};
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn is_included_verbatim() {
+        // Types which are marked as `Included` should be verbatim in the output.  I.e. they should
+        // not have the string modified in any way, including not changing the case.
+        use crate::Interop;
+        use interoptopus::inventory::{Inventory, Symbol};
+        use interoptopus::lang::{Enum, Function, Included, Meta, Representation, Signature, Type};
+
+        // Build a simple inventory.
+        let inventory = Inventory::builder()
+            .register(Symbol::Type(Type::Enum(Enum::new("included_t".into(), vec![], Meta::default(), Representation::default()))))
+            .register(Symbol::Function(Function::new(
+                "test".into(),
+                Signature::new(vec![], Type::Enum(Enum::new("included_t".into(), vec![], Meta::default(), Representation::default()))),
+                Meta::default(),
+                vec![],
+            )))
+            .validate()
+            .build()
+            // Change the type to be `Included` instead of `Enum`.
+            // If the user wants to follow interoptopus renaming from the configuration, they should
+            // run the name conversion on their own.
+            .replace_type("included_t", &Type::Included(Included::new("included_t".into(), Meta::default())));
+
+        let config = Interop::builder().inventory(inventory).build().unwrap();
+        let content = config.to_string().unwrap();
+
+        assert!(content.contains("included_t"));
+        assert!(!content.contains("INCLUDED_T"));
+        assert!(!content.contains("enum"));
+    }
+}

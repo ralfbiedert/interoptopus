@@ -15,6 +15,7 @@ pub use constant::{Constant, ConstantValue};
 pub use enums::{Enum, Variant, VariantKind};
 pub use fnpointer::FnPointer;
 pub use function::{Function, Parameter, Signature, SugaredReturnType};
+pub use included::Included;
 pub use info::{ConstantInfo, FunctionInfo, TypeInfo};
 pub use meta::{Docs, Meta, Visibility};
 pub use namespace::NamespaceMappings;
@@ -27,6 +28,7 @@ mod constant;
 mod enums;
 mod fnpointer;
 mod function;
+mod included;
 mod info;
 mod meta;
 mod namespace;
@@ -57,6 +59,8 @@ pub enum Type {
     /// Special patterns with primitives existing on C-level but special semantics.
     /// useful to higher level languages.
     Pattern(TypePattern),
+    /// A type only known by name expected to be defined elsewhere and included.
+    Included(Included),
 }
 
 /// The type contained inside a [`Wire`](crate::wire::Wire).
@@ -148,6 +152,7 @@ impl Type {
                 _ => x.fallback_type().name_within_lib(),
             },
             Self::Array(x) => x.rust_name(),
+            Self::Included(included) => included.name().to_string(),
         }
     }
 
@@ -177,6 +182,7 @@ impl Type {
             Self::ReadWritePointer(x) => Some(x.as_ref()),
             Self::Pattern(_) => None,
             Self::Array(_) => None,
+            Self::Included(_) => None,
         }
     }
 

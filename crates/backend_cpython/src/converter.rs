@@ -82,6 +82,7 @@ pub fn to_ctypes_name(the_type: &Type, with_type_annotations: bool) -> String {
         Type::WirePayload(_) => "todo".to_string(),
         Type::Array(x) => format!("{} * {}", to_ctypes_name(x.the_type(), with_type_annotations), x.len()),
         Type::Opaque(_) => "ERROR".to_string(),
+        Type::Included(_) => "ERROR".to_string(), // included types are not supported in this backend
         Type::FnPointer(x) => fnpointer_to_typename(x),
         Type::ReadPointer(x) => match &**x {
             Type::Opaque(_) => "ctypes.c_void_p".to_string(),
