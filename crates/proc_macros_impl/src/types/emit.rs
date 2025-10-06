@@ -6,6 +6,7 @@ use syn::Error;
 use crate::types::model::{TypeData, TypeModel, VariantData};
 
 impl TypeModel {
+    #[expect(clippy::unnecessary_wraps)]
     pub fn emit_typeinfo_impl(&self) -> Result<TokenStream, Error> {
         let name = &self.name;
         let generics = &self.generics;
@@ -57,7 +58,7 @@ impl TypeModel {
             TypeData::Struct(struct_data) => {
                 let field_checks = struct_data.fields.iter().filter(|f| !f.skip).map(|field| {
                     let ty = &field.ty;
-                    let span = field.name.as_ref().map(|n| n.span()).unwrap_or_else(|| ty.span());
+                    let span = field.name.as_ref().map_or_else(|| ty.span(), syn::Ident::span);
                     quote_spanned! { span => <#ty as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE }
                 });
 
@@ -96,7 +97,7 @@ impl TypeModel {
             TypeData::Struct(struct_data) => {
                 let field_checks = struct_data.fields.iter().filter(|f| !f.skip).map(|field| {
                     let ty = &field.ty;
-                    let span = field.name.as_ref().map(|n| n.span()).unwrap_or_else(|| ty.span());
+                    let span = field.name.as_ref().map_or_else(|| ty.span(), syn::Ident::span);
                     quote_spanned! { span => <#ty as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE }
                 });
 
@@ -135,7 +136,7 @@ impl TypeModel {
             TypeData::Struct(struct_data) => {
                 let field_checks = struct_data.fields.iter().filter(|f| !f.skip).map(|field| {
                     let ty = &field.ty;
-                    let span = field.name.as_ref().map(|n| n.span()).unwrap_or_else(|| ty.span());
+                    let span = field.name.as_ref().map_or_else(|| ty.span(), syn::Ident::span);
                     quote_spanned! { span => <#ty as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE }
                 });
 
@@ -204,7 +205,7 @@ impl TypeModel {
                     };
                     let ty = &field.ty;
                     let field_docs = field.docs.join("\n");
-                    let span = field.name.as_ref().map(|n| n.span()).unwrap_or_else(|| ty.span());
+                    let span = field.name.as_ref().map_or_else(|| ty.span(), syn::Ident::span);
                     quote_spanned! { span =>
                         ::interoptopus::lang::types::Field {
                             name: #field_name.to_string(),
@@ -371,7 +372,7 @@ impl TypeModel {
                 TypeData::Struct(struct_data) => {
                     let registrations = struct_data.fields.iter().filter(|f| !f.skip).map(|field| {
                         let ty = &field.ty;
-                        let span = field.name.as_ref().map(|n| n.span()).unwrap_or_else(|| ty.span());
+                        let span = field.name.as_ref().map_or_else(|| ty.span(), syn::Ident::span);
                         quote_spanned! { span =>
                             <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory);
                         }

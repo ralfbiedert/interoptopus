@@ -18,9 +18,6 @@ use quote::quote;
 use syn::{parse2, Item};
 
 pub fn ffi(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let attr = proc_macro2::TokenStream::from(attr);
-    let item = proc_macro2::TokenStream::from(item);
-
     // Helper function to handle results with consistent error formatting
     let handle_result = |result: syn::Result<TokenStream>| match result {
         Ok(tokens) => tokens,
@@ -42,5 +39,5 @@ pub fn ffi(attr: TokenStream, item: TokenStream) -> TokenStream {
         _ => Err(syn::Error::new_spanned(&parsed_item, "#[ffi] can only be applied to structs, enums, functions, const, or impl blocks")),
     });
 
-    handle_result(result).into()
+    handle_result(result)
 }

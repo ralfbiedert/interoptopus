@@ -50,7 +50,8 @@ pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
             }
             Err(e) => {
                 eprintln!("Failed to parse generated code for service {}: {}", model.service_name, e);
-                eprintln!("Raw generated code:\n{}", result);
+                eprintln!("Raw generated code:");
+                eprintln!("{result}");
             }
         }
     }

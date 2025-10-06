@@ -46,10 +46,10 @@ impl TypeModel {
         match &self.data {
             TypeData::Struct(struct_data) => {
                 for field in &struct_data.fields {
-                    if let Some(field_name) = &field.name {
-                        if is_forbidden_name(field_name.to_string()) {
-                            return Err(Error::new_spanned(field_name, format!("Using the name '{}' can cause conflicts in generated code.", field_name)));
-                        }
+                    if let Some(field_name) = &field.name
+                        && is_forbidden_name(field_name.to_string())
+                    {
+                        return Err(Error::new_spanned(field_name, format!("Using the name '{field_name}' can cause conflicts in generated code.")));
                     }
                 }
             }
