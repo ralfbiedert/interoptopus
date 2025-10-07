@@ -1,7 +1,10 @@
+use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::types::SerializationError;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
 use std::collections::HashMap;
+use std::io::{Read, Write};
 use std::mem::MaybeUninit;
 
 // TODO
@@ -35,6 +38,18 @@ macro_rules! impl_ptr {
                 T::register(inventory);
                 inventory.register_type(Self::id(), Self::ty());
             }
+
+            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+                bad_wire!()
+            }
+
+            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+                bad_wire!()
+            }
+
+            fn live_size(&self) -> usize {
+                bad_wire!()
+            }
         }
     };
 }
@@ -61,7 +76,7 @@ pub fn ptr_mut_typeid(x: TypeId) -> TypeId {
 }
 
 impl<T: TypeInfo> TypeInfo for MaybeUninit<T> {
-    const WIRE_SAFE: bool = T::WIRE_SAFE;
+    const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = T::RAW_SAFE;
     const ASYNC_SAFE: bool = T::ASYNC_SAFE;
     const SERVICE_SAFE: bool = false;
@@ -83,6 +98,18 @@ impl<T: TypeInfo> TypeInfo for MaybeUninit<T> {
     fn register(inventory: &mut Inventory) {
         // Same as base type
         T::register(inventory);
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        bad_wire!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        bad_wire!()
+    }
+
+    fn live_size(&self) -> usize {
+        bad_wire!()
     }
 }
 
@@ -107,6 +134,18 @@ impl TypeInfo for String {
 
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        bad_wire!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        bad_wire!()
+    }
+
+    fn live_size(&self) -> usize {
+        4 + self.as_bytes().len()
     }
 }
 
@@ -167,7 +206,7 @@ impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap
 }
 
 impl TypeInfo for ::std::ffi::c_void {
-    const WIRE_SAFE: bool = true;
+    const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
     const SERVICE_SAFE: bool = false;
@@ -187,5 +226,17 @@ impl TypeInfo for ::std::ffi::c_void {
 
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        bad_wire!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        bad_wire!()
+    }
+
+    fn live_size(&self) -> usize {
+        bad_wire!()
     }
 }

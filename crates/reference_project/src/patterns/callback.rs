@@ -79,7 +79,7 @@ pub fn pattern_callback_8(cb: StringCallback, cb2: NestedStringCallback, s: ffi:
     cb2.call(UseString { s1: s.clone(), s2: s.clone() });
 }
 
-#[ffi_function]
+#[ffi]
 pub fn pattern_callback_9(x: Pointers) -> i32 {
     let a = 1;
     let mut b = 2;

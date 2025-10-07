@@ -28,6 +28,7 @@ version = "0.15.0-alpha.18"
 # Internal
 interoptopus = { path = "crates/core", version = "=0.15.0-alpha.18" }
 interoptopus_proc = { path = "crates/proc_macros", version = "=0.15.0-alpha.18" }
+interoptopus_proc_impl = { path = "crates/proc_macros_impl", version = "=0.15.0-alpha.18" }
 interoptopus_backend_c = { path = "crates/backend_c", version = "=0.15.0-alpha.18" }
 interoptopus_backend_cpython = { path = "crates/backend_cpython", version = "=0.15.0-alpha.18" }
 interoptopus_backend_csharp = { path = "crates/backend_csharp", version = "=0.15.0-alpha.18" }

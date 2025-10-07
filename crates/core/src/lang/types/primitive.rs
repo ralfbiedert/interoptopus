@@ -1,4 +1,6 @@
+use crate::lang::types::SerializationError;
 use std::hash::{Hash, Hasher};
+use std::io::{Read, Write};
 
 #[derive(Copy, Clone, Debug, PartialOrd, PartialEq, Eq, Hash)]
 pub enum Primitive {
@@ -86,6 +88,21 @@ macro_rules! impl_primitive {
                 let type_id = Self::id();
                 let type_ = Self::ty();
                 _ = inventory.register_type(type_id, type_)
+            }
+
+            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+                out.write_all(&self.to_le_bytes())?;
+                Ok(())
+            }
+
+            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+                let mut bytes = [0; size_of::<$t>()];
+                input.read_exact(&mut bytes)?;
+                Ok(<$t>::from_le_bytes(bytes))
+            }
+
+            fn live_size(&self) -> usize {
+                size_of::<Self>()
             }
         }
     };
