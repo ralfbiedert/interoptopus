@@ -702,6 +702,8 @@ typedef void (*MYCALLBACKVOID)(const void* PTR, const void* CALLBACK_DATA);
 
 typedef void (*NESTEDSTRINGCALLBACK)(USESTRING S, const void* CALLBACK_DATA);
 
+typedef void (*POINTERS)(const int32_t* X, int32_t* Y, const void* CALLBACK_DATA);
+
 typedef void (*STRINGCALLBACK)(UTF8STRING S, const void* CALLBACK_DATA);
 
 typedef void (*SUMDELEGATE1)(const void* CALLBACK_DATA);
@@ -1111,6 +1113,8 @@ typedef SUMDELEGATE2 (*pattern_callback_6)();
 typedef RESULTERROR (*pattern_callback_7)(SUMDELEGATERETURN, SUMDELEGATERETURN2, int32_t, int32_t, int32_t*);
 
 typedef void (*pattern_callback_8)(STRINGCALLBACK, NESTEDSTRINGCALLBACK, UTF8STRING);
+
+typedef int32_t (*pattern_callback_9)(POINTERS);
 
 typedef void (*pattern_surrogates_1)(LOCAL, CONTAINER*);
 

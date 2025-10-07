@@ -185,8 +185,18 @@ pub fn param_to_type_overloaded(x: &Type) -> String {
 pub fn param_to_managed(x: &Parameter) -> String {
     match x.the_type() {
         Type::Primitive(_) => x.name().to_string(),
-        Type::ReadPointer(_) => x.name().to_string(),
-        Type::ReadWritePointer(_) => x.name().to_string(),
+        Type::ReadPointer(z) => match &**z {
+            Type::Opaque(_) => x.name().to_string(),
+            Type::Primitive(Primitive::Void) => x.name().to_string(),
+            Type::Pattern(TypePattern::CChar) => x.name().to_string(),
+            _ => format!("ref {}", x.name()),
+        },
+        Type::ReadWritePointer(z) => match &**z {
+            Type::Opaque(_) => x.name().to_string(),
+            Type::Primitive(Primitive::Void) => x.name().to_string(),
+            Type::Pattern(TypePattern::CChar) => x.name().to_string(),
+            _ => format!("ref {}", x.name()),
+        },
         _ if is_reusable(x.the_type()) => format!("{}.ToManaged()", x.name()),
         _ => format!("{}.IntoManaged()", x.name()),
     }
