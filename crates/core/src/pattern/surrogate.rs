@@ -46,11 +46,13 @@
 //! Surrogates are a niche feature to save you some implementation overhead in certain situations.
 //! In most cases the right things to do is defining your own FFI types and export these instead.
 
+use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::types::TypeInfo;
+use crate::lang::types::{SerializationError, TypeInfo};
 use crate::lang::types::{Type, TypeKind};
+use std::io::{Read, Write};
 use std::marker::PhantomData;
-use std::mem::{transmute, ManuallyDrop};
+use std::mem::{ManuallyDrop, transmute};
 
 /// A marker trait for types that are surrogates for other types.
 ///
@@ -71,7 +73,7 @@ pub struct Surrogate<T, L> {
 }
 
 impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
-    const WIRE_SAFE: bool = L::WIRE_SAFE;
+    const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = L::RAW_SAFE;
     const ASYNC_SAFE: bool = L::ASYNC_SAFE;
     const SERVICE_SAFE: bool = L::SERVICE_SAFE;
@@ -91,6 +93,18 @@ impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
 
     fn register(inventory: &mut Inventory) {
         L::register(inventory);
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        bad_wire!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        bad_wire!()
+    }
+
+    fn live_size(&self) -> usize {
+        bad_wire!()
     }
 }
 

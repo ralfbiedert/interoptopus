@@ -26,9 +26,10 @@
 //!
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
-use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
-use crate::Error;
+use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern};
+use crate::{Error, bad_wire};
 use std::ffi::CStr;
+use std::io::{Read, Write};
 use std::marker::PhantomData;
 use std::option::Option::None;
 use std::os::raw::c_char;
@@ -141,6 +142,18 @@ impl TypeInfo for CStrPtr<'_> {
 
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        bad_wire!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        bad_wire!()
+    }
+
+    fn live_size(&self) -> usize {
+        bad_wire!()
     }
 }
 

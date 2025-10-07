@@ -1,7 +1,7 @@
 use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::function::{Argument, Signature};
-use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
+use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::{SerializationError, Type, TypeId, TypeInfo, TypeKind};
 use std::io::{Read, Write};
 
@@ -50,11 +50,11 @@ macro_rules! impl_fnptr {
                 inventory.register_type(Self::id(), Self::ty());
             }
 
-            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+            fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
 
-            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+            fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
                 bad_wire!()
             }
 
@@ -87,11 +87,11 @@ macro_rules! impl_fnptr {
                 <extern "C" fn() -> $r as TypeInfo>::register(inventory);
             }
 
-            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+            fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
 
-            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+            fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
                 bad_wire!()
             }
 
@@ -187,11 +187,11 @@ macro_rules! impl_fnptr {
                 inventory.register_type(Self::id(), Self::ty());
             }
 
-            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+            fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
 
-            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+            fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
                 bad_wire!()
             }
 
@@ -228,11 +228,11 @@ macro_rules! impl_fnptr {
                 <extern "C" fn($($t),+) -> $r as TypeInfo>::register(inventory);
             }
 
-            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+            fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
 
-            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+            fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
                 bad_wire!()
             }
 

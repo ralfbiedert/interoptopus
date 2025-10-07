@@ -16,8 +16,9 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
-use crate::lang::types::TypeInfo;
 use crate::lang::types::TypeKind;
+use crate::lang::types::{SerializationError, TypeInfo};
+use std::io::{Read, Write};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -138,6 +139,18 @@ impl<T: TypeInfo> TypeInfo for Option<T> {
         // Ensure base type is registered.
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        todo!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        todo!()
+    }
+
+    fn live_size(&self) -> usize {
+        todo!()
     }
 }
 

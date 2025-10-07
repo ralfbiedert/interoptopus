@@ -39,11 +39,11 @@ macro_rules! impl_ptr {
                 inventory.register_type(Self::id(), Self::ty());
             }
 
-            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+            fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
 
-            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+            fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
                 bad_wire!()
             }
 
@@ -137,11 +137,11 @@ impl TypeInfo for String {
     }
 
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
-        bad_wire!()
+        todo!()
     }
 
     fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
-        bad_wire!()
+        todo!()
     }
 
     fn live_size(&self) -> usize {
@@ -174,6 +174,18 @@ impl<T: TypeInfo> TypeInfo for Vec<T> {
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
     }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        todo!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        todo!()
+    }
+
+    fn live_size(&self) -> usize {
+        todo!()
+    }
 }
 
 impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap<K, V, S> {
@@ -202,6 +214,18 @@ impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap
         K::register(inventory);
         V::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        todo!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        todo!()
+    }
+
+    fn live_size(&self) -> usize {
+        todo!()
     }
 }
 

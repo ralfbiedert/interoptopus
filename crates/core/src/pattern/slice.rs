@@ -37,8 +37,9 @@
 //!
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
-use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
+use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
+use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern};
+use std::io::{Read, Write};
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::ptr::{null, null_mut};
@@ -141,6 +142,18 @@ impl<T: TypeInfo> TypeInfo for Slice<'_, T> {
     fn register(inventory: &mut Inventory) {
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        todo!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        todo!()
+    }
+
+    fn live_size(&self) -> usize {
+        todo!()
     }
 }
 
@@ -250,6 +263,18 @@ impl<T: TypeInfo> TypeInfo for SliceMut<'_, T> {
     fn register(inventory: &mut Inventory) {
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        todo!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        todo!()
+    }
+
+    fn live_size(&self) -> usize {
+        todo!()
     }
 }
 

@@ -44,9 +44,10 @@
 use crate::inventory::Inventory;
 use crate::inventory::TypeId;
 use crate::lang::meta::{Docs, Emission, Visibility};
-use crate::lang::types::{TypeKind, TypePattern};
+use crate::lang::types::{SerializationError, TypeInfo, TypeKind, TypePattern};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
+use std::io::{Read, Write};
 
 /// Holds the API version hash of the given library.
 #[repr(transparent)]
@@ -71,7 +72,7 @@ impl ApiVersion {
     }
 }
 
-impl crate::lang::types::TypeInfo for ApiVersion {
+impl TypeInfo for ApiVersion {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
@@ -92,6 +93,18 @@ impl crate::lang::types::TypeInfo for ApiVersion {
 
     fn register(inventory: &mut crate::inventory::Inventory) {
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, w: &mut impl Write) -> Result<(), SerializationError> {
+        <u64 as TypeInfo>::write(&self.version, w)
+    }
+
+    fn read(r: &mut impl Read) -> Result<Self, SerializationError> {
+        Ok(ApiVersion { version: u64::read(r)? })
+    }
+
+    fn live_size(&self) -> usize {
+        self.version.live_size()
     }
 }
 

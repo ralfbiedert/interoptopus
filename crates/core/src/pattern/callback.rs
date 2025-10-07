@@ -245,6 +245,18 @@ macro_rules! callback {
                 // <extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>::register(inventory);
                 inventory.register_type(Self::id(), Self::ty());
             }
+
+            fn write(&self, _: &mut impl ::std::io::Write) -> Result<(), $crate::lang::types::SerializationError> {
+                $crate::bad_wire!()
+            }
+
+            fn read(_: &mut impl ::std::io::Read) -> Result<Self, $crate::lang::types::SerializationError> {
+                $crate::bad_wire!()
+            }
+
+            fn live_size(&self) -> usize {
+                $crate::bad_wire!()
+            }
         }
     };
 }

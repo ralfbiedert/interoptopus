@@ -2,7 +2,8 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
-use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
+use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern};
+use std::io::{Read, Write};
 use std::mem::forget;
 
 /// FFI analog of [`std::string::String`].
@@ -77,7 +78,7 @@ impl Drop for String {
 }
 
 impl TypeInfo for String {
-    const WIRE_SAFE: bool = false;
+    const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
     const SERVICE_SAFE: bool = false;
@@ -97,6 +98,18 @@ impl TypeInfo for String {
 
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        todo!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        todo!()
+    }
+
+    fn live_size(&self) -> usize {
+        todo!()
     }
 }
 

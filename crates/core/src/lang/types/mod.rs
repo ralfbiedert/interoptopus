@@ -38,10 +38,12 @@ pub trait TypeInfo {
     fn register(inventory: &mut Inventory);
 
     // Utilities for (de)serializing an instance of this type. These must be
-    // properly implemented iff WIRE_SAFE is true. Otherwise these
+    // properly implemented if WIRE_SAFE is true. Otherwise these
     // should panic.
     fn write(&self, out: &mut impl Write) -> Result<(), SerializationError>;
-    fn read(input: &mut impl Read) -> Result<Self, SerializationError>;
+    fn read(input: &mut impl Read) -> Result<Self, SerializationError>
+    where
+        Self: Sized;
     fn live_size(&self) -> usize;
 }
 

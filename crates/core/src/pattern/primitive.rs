@@ -2,9 +2,10 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
-use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
+use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
+use std::io::{Read, Write};
 use std::ops::Not;
 use std::os::raw::c_char;
 
@@ -77,6 +78,18 @@ impl TypeInfo for Bool {
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        todo!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        todo!()
+    }
+
+    fn live_size(&self) -> usize {
+        todo!()
+    }
 }
 
 /// A wrapper for the `c_char` type to differentiate it from a signed 8-bit integer for platforms
@@ -127,6 +140,18 @@ impl TypeInfo for CChar {
 
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        todo!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        todo!()
+    }
+
+    fn live_size(&self) -> usize {
+        todo!()
     }
 }
 

@@ -1,10 +1,12 @@
 //! Transparent `async fn` support over FFI.
 
+use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::Visibility;
-use crate::lang::types::{TypeInfo, TypeKind};
+use crate::lang::types::{SerializationError, TypeInfo, TypeKind};
 use std::ffi::c_void;
 use std::future::Future;
+use std::io::{Read, Write};
 use std::ops::Deref;
 use std::ptr::null;
 use std::sync::Arc;
@@ -83,6 +85,18 @@ impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
         // Ensure base type is registered.
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        bad_wire!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        bad_wire!()
+    }
+
+    fn live_size(&self) -> usize {
+        bad_wire!()
     }
 }
 

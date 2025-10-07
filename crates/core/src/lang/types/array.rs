@@ -11,7 +11,7 @@ pub struct Array {
 
 impl<T, const N: usize> TypeInfo for [T; N]
 where
-    T: TypeInfo,
+    T: TypeInfo + Copy,
 {
     const WIRE_SAFE: bool = T::WIRE_SAFE;
     const RAW_SAFE: bool = T::RAW_SAFE;

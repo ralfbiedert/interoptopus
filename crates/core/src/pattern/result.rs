@@ -30,9 +30,10 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
-use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern};
+use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern};
 use std::any::Any;
 use std::fmt::Debug;
+use std::io::{Read, Write};
 use std::panic::{AssertUnwindSafe, catch_unwind};
 
 /// Extracts a string message from a panic unwind.
@@ -145,6 +146,18 @@ impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
         T::register(inventory);
         E::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
+    }
+
+    fn write(&self, _: &mut impl Write) -> std::result::Result<(), SerializationError> {
+        todo!()
+    }
+
+    fn read(_: &mut impl Read) -> std::result::Result<Self, SerializationError> {
+        todo!()
+    }
+
+    fn live_size(&self) -> usize {
+        todo!()
     }
 }
 
