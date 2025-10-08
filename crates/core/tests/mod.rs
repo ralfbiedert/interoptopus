@@ -41,6 +41,7 @@ fn proc() {
     t.pass("tests/proc/ty/basic.rs");
     t.compile_fail("tests/proc/ty/empty_struct.rs");
     t.compile_fail("tests/proc/ty/empty_unit.rs");
+    t.compile_fail("tests/proc/ty/field_non_wire.rs");
     t.compile_fail("tests/proc/ty/forbidden_field.rs");
     t.pass("tests/proc/ty/generic_basic.rs");
     t.compile_fail("tests/proc/ty/generic_no_typeinfo.rs");

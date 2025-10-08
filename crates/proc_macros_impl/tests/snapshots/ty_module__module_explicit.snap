@@ -1,6 +1,6 @@
 ---
 source: crates/proc_macros_impl/tests/ty_module.rs
-expression: expand_ty!(item)
+expression: expand_ffi!(item)
 ---
 #[repr(C)]
 struct Foo {
@@ -41,5 +41,29 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
     fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
         <u8 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
+    }
+}
+impl ::interoptopus::lang::types::WireIO for Foo
+where
+    u8: ::interoptopus::lang::types::WireIO,
+{
+    fn write(
+        &self,
+        out: &mut impl ::std::io::Write,
+    ) -> ::std::result::Result<(), ::interoptopus::lang::types::SerializationError> {
+        <u8 as ::interoptopus::lang::types::WireIO>::write(&self.x, out)?;
+        ::std::result::Result::Ok(())
+    }
+    fn read(
+        input: &mut impl ::std::io::Read,
+    ) -> ::std::result::Result<Self, ::interoptopus::lang::types::SerializationError>
+    where
+        Self: Sized,
+    {
+        let x = <u8 as ::interoptopus::lang::types::WireIO>::read(input)?;
+        ::std::result::Result::Ok(Self { x })
+    }
+    fn live_size(&self) -> usize {
+        <u8 as ::interoptopus::lang::types::WireIO>::live_size(&self.x)
     }
 }

@@ -2,6 +2,7 @@ mod args;
 mod emit;
 mod model;
 mod validation;
+mod wireio;
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -28,10 +29,12 @@ pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     remove_skip_attributes(&mut input_ast);
 
     let typeinfo_impl = model.emit_typeinfo_impl()?;
+    let wireio_impl = model.emit_wireio_impl();
 
     let result = quote! {
         #input_ast
         #typeinfo_impl
+        #wireio_impl
     };
 
     if args.debug {

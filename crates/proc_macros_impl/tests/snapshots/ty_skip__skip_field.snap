@@ -1,6 +1,6 @@
 ---
 source: crates/proc_macros_impl/tests/ty_skip.rs
-expression: expand_ty!(item)
+expression: expand_ffi!(item)
 ---
 #[repr(C)]
 struct Foo {
@@ -42,5 +42,24 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
     fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
         <u8 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
+    }
+}
+impl ::interoptopus::lang::types::WireIO for Foo {
+    fn write(
+        &self,
+        _out: &mut impl ::std::io::Write,
+    ) -> ::std::result::Result<(), ::interoptopus::lang::types::SerializationError> {
+        ::interoptopus::bad_wire!()
+    }
+    fn read(
+        _input: &mut impl ::std::io::Read,
+    ) -> ::std::result::Result<Self, ::interoptopus::lang::types::SerializationError>
+    where
+        Self: Sized,
+    {
+        ::interoptopus::bad_wire!()
+    }
+    fn live_size(&self) -> usize {
+        ::interoptopus::bad_wire!()
     }
 }

@@ -40,7 +40,7 @@ pub struct ServiceParameter {
     pub span: Span,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ReceiverKind {
     None,      // Constructor
     Shared,    // &self
@@ -123,7 +123,7 @@ impl ServiceModel {
                                 pat_ident.ident.clone()
                             } else {
                                 // Generate a synthetic name for non-identifier patterns (like `_`)
-                                syn::Ident::new(&format!("_{}", param_index), typed_arg.pat.span())
+                                syn::Ident::new(&format!("_{param_index}"), typed_arg.pat.span())
                             };
 
                             inputs.push(ServiceParameter { name: param_name, ty: param_type, span: typed_arg.span() });
@@ -147,7 +147,7 @@ impl ServiceModel {
 
                 // Validate async methods
                 if is_async && receiver_kind == ReceiverKind::None {
-                    return Err(syn::Error::new_spanned(&method.sig.inputs.first(), "Async methods must use Async<Self> as their first parameter"));
+                    return Err(syn::Error::new_spanned(method.sig.inputs.first(), "Async methods must use Async<Self> as their first parameter"));
                 }
 
                 // Async methods are never constructors, regardless of receiver kind

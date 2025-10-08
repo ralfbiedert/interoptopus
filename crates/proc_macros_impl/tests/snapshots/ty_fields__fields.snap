@@ -1,15 +1,24 @@
 ---
-source: crates/proc_macros_impl/tests/ty_module.rs
+source: crates/proc_macros_impl/tests/ty_fields.rs
+assertion_line: 17
 expression: expand_ffi!(item)
 ---
 #[repr(C)]
 struct Foo {
     x: u8,
+    y: String,
+    z: f32,
 }
 impl ::interoptopus::lang::types::TypeInfo for Foo {
-    const WIRE_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE;
-    const RAW_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE;
-    const ASYNC_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE;
+    const WIRE_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE
+        && <String as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE
+        && <f32 as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE;
+    const RAW_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE
+        && <String as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE
+        && <f32 as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE;
+    const ASYNC_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE
+        && <String as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE
+        && <f32 as ::interoptopus::lang::types::TypeInfo>::ASYNC_SAFE;
     const SERVICE_SAFE: bool = false;
     const SERVICE_CTOR_SAFE: bool = false;
     fn id() -> ::interoptopus::inventory::TypeId {
@@ -21,6 +30,14 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
                 ::interoptopus::lang::types::Field { name : "x".to_string(), docs :
                 ::interoptopus::lang::meta::Docs::from_line(""), visibility :
                 ::interoptopus::lang::meta::Visibility::Public, ty : < u8 as
+                ::interoptopus::lang::types::TypeInfo > ::id(), },
+                ::interoptopus::lang::types::Field { name : "y".to_string(), docs :
+                ::interoptopus::lang::meta::Docs::from_line(""), visibility :
+                ::interoptopus::lang::meta::Visibility::Public, ty : < String as
+                ::interoptopus::lang::types::TypeInfo > ::id(), },
+                ::interoptopus::lang::types::Field { name : "z".to_string(), docs :
+                ::interoptopus::lang::meta::Docs::from_line(""), visibility :
+                ::interoptopus::lang::meta::Visibility::Public, ty : < f32 as
                 ::interoptopus::lang::types::TypeInfo > ::id(), }
             ],
             repr: ::interoptopus::lang::types::Repr {
@@ -34,24 +51,30 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
             name: "Foo".to_string(),
             visibility: ::interoptopus::lang::meta::Visibility::Public,
             docs: ::interoptopus::lang::meta::Docs::from_line(""),
-            emission: ::interoptopus::lang::meta::Emission::Common,
+            emission: ::interoptopus::lang::meta::Emission::External,
             kind: Self::kind(),
         }
     }
     fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
         <u8 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+        <String as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+        <f32 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
     }
 }
 impl ::interoptopus::lang::types::WireIO for Foo
 where
     u8: ::interoptopus::lang::types::WireIO,
+    String: ::interoptopus::lang::types::WireIO,
+    f32: ::interoptopus::lang::types::WireIO,
 {
     fn write(
         &self,
         out: &mut impl ::std::io::Write,
     ) -> ::std::result::Result<(), ::interoptopus::lang::types::SerializationError> {
         <u8 as ::interoptopus::lang::types::WireIO>::write(&self.x, out)?;
+        <String as ::interoptopus::lang::types::WireIO>::write(&self.y, out)?;
+        <f32 as ::interoptopus::lang::types::WireIO>::write(&self.z, out)?;
         ::std::result::Result::Ok(())
     }
     fn read(
@@ -61,9 +84,13 @@ where
         Self: Sized,
     {
         let x = <u8 as ::interoptopus::lang::types::WireIO>::read(input)?;
-        ::std::result::Result::Ok(Self { x })
+        let y = <String as ::interoptopus::lang::types::WireIO>::read(input)?;
+        let z = <f32 as ::interoptopus::lang::types::WireIO>::read(input)?;
+        ::std::result::Result::Ok(Self { x, y, z })
     }
     fn live_size(&self) -> usize {
         <u8 as ::interoptopus::lang::types::WireIO>::live_size(&self.x)
+            + <String as ::interoptopus::lang::types::WireIO>::live_size(&self.y)
+            + <f32 as ::interoptopus::lang::types::WireIO>::live_size(&self.z)
     }
 }

@@ -1,0 +1,21 @@
+error[E0277]: the trait bound `Bar: WireIO` is not satisfied
+  --> tests/proc/ty/field_non_wire.rs:32:5
+   |
+32 |     y: Bar,
+   |     ^^^^^^ the trait `WireIO` is not implemented for `Bar`
+   |
+   = help: the following other types implement trait `WireIO`:
+             &T
+             &mut T
+             ()
+             *const T
+             *mut T
+             ApiVersion
+             CStrPtr<'_>
+             HashMap<K, V, S>
+           and $N others
+   = help: see issue #48214
+help: add `#![feature(trivial_bounds)]` to the crate attributes to enable
+   |
+ 1 + #![feature(trivial_bounds)]
+   |
