@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0-alpha.20](https://github.com/ralfbiedert/interoptopus/compare/interoptopus_backend_csharp-v0.15.0-alpha.19...interoptopus_backend_csharp-v0.15.0-alpha.20)
+
+### 🐛 Bug Fixes
+
+
+- 🐛 Fix contained type names in Slice patterns - ([7aaf157](https://github.com/ralfbiedert/interoptopus/commit/7aaf157543a024cfe7c328d1963240177c61f6b2))
+- 🐛 Fix wrong codegen for wire of Option<String> - ([4b2d03a](https://github.com/ralfbiedert/interoptopus/commit/4b2d03acbf57fc2c844fb55501478ce5d27e038e))
+
+
 ## [0.15.0-alpha.17](https://github.com/ralfbiedert/interoptopus/compare/interoptopus_backend_csharp-v0.15.0-alpha.16...interoptopus_backend_csharp-v0.15.0-alpha.17)
 
 ### 🚜 Refactor

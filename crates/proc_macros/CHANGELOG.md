@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0-alpha.20](https://github.com/ralfbiedert/interoptopus/compare/interoptopus_proc-v0.15.0-alpha.19...interoptopus_proc-v0.15.0-alpha.20)
+
+### 🐛 Bug Fixes
+
+
+- 🐛 Fix invalid enum imports in procmacros - ([a0cef68](https://github.com/ralfbiedert/interoptopus/commit/a0cef68de34a497a493a18e50adb9ceda3ee30c5))
+
+
 ## [0.15.0-alpha.16](https://github.com/ralfbiedert/interoptopus/compare/interoptopus_proc-v0.15.0-alpha.15...interoptopus_proc-v0.15.0-alpha.16)
 
 ### ⚙️ Miscellaneous
