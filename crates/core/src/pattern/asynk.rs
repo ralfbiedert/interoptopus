@@ -3,7 +3,7 @@
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::Visibility;
-use crate::lang::types::{SerializationError, TypeInfo, TypeKind};
+use crate::lang::types::{SerializationError, TypeInfo, TypeKind, WireIO};
 use std::ffi::c_void;
 use std::future::Future;
 use std::io::{Read, Write};
@@ -86,7 +86,9 @@ impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl<T: WireIO> WireIO for AsyncCallback<T> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }

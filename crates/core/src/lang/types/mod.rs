@@ -9,7 +9,6 @@ mod wire;
 
 use crate::lang::function::Signature;
 use crate::lang::meta::{Docs, Emission, Visibility};
-use ::std::io::{Read, Write};
 
 use crate::inventory::{Inventory, TypeId};
 pub use array::Array;
@@ -17,7 +16,7 @@ pub use enums::{Enum, Variant, VariantKind};
 pub use pattern::TypePattern;
 pub use primitive::{Primitive, PrimitiveValue};
 pub use structs::{Field, Struct};
-pub use wire::WireOnly;
+pub use wire::{WireIO, WireOnly};
 
 pub trait TypeInfo {
     // Flags that govern where a type can be used. Allows
@@ -36,15 +35,6 @@ pub trait TypeInfo {
 
     // Registers the type and all dependents in an Inventory.
     fn register(inventory: &mut Inventory);
-
-    // Utilities for (de)serializing an instance of this type. These must be
-    // properly implemented if WIRE_SAFE is true. Otherwise these
-    // should panic.
-    fn write(&self, out: &mut impl Write) -> Result<(), SerializationError>;
-    fn read(input: &mut impl Read) -> Result<Self, SerializationError>
-    where
-        Self: Sized;
-    fn live_size(&self) -> usize;
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

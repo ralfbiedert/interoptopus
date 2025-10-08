@@ -34,7 +34,9 @@ macro_rules! impl_primitive {
                 let type_ = Self::ty();
                 _ = inventory.register_type(type_id, type_)
             }
+        }
 
+        impl $crate::lang::types::wire::WireIO for $t {
             fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
                 out.write_all(&self.get().to_le_bytes())?;
                 Ok(())

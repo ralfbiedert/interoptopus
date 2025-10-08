@@ -16,8 +16,8 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
-use crate::lang::types::TypeKind;
 use crate::lang::types::{SerializationError, TypeInfo};
+use crate::lang::types::{TypeKind, WireIO};
 use std::io::{Read, Write};
 
 #[cfg(feature = "serde")]
@@ -140,7 +140,9 @@ impl<T: TypeInfo> TypeInfo for Option<T> {
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl<T: WireIO> WireIO for Option<T> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }

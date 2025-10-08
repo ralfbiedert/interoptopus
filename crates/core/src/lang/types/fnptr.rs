@@ -2,6 +2,7 @@ use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::function::{Argument, Signature};
 use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
+use crate::lang::types::wire::WireIO;
 use crate::lang::types::{SerializationError, Type, TypeId, TypeInfo, TypeKind};
 use std::io::{Read, Write};
 
@@ -50,6 +51,10 @@ macro_rules! impl_fnptr {
                 inventory.register_type(Self::id(), Self::ty());
             }
 
+        }
+
+        #[allow(non_snake_case)]
+        impl<$r: TypeInfo> WireIO for extern "C" fn() -> $r {
             fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
@@ -86,7 +91,10 @@ macro_rules! impl_fnptr {
             fn register(inventory: &mut Inventory) {
                 <extern "C" fn() -> $r as TypeInfo>::register(inventory);
             }
+        }
 
+        #[allow(non_snake_case)]
+        impl<$r: WireIO> WireIO for extern "C" Option<extern "C" fn() -> $r> {
             fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
@@ -100,6 +108,9 @@ macro_rules! impl_fnptr {
             }
         }
     };
+
+
+
 
     // With arguments: extern "C" fn(T1, T2, ...) -> R
     ($r:ident, $($t:ident),+) => {
@@ -186,7 +197,14 @@ macro_rules! impl_fnptr {
                 $($t::register(inventory);)+
                 inventory.register_type(Self::id(), Self::ty());
             }
+        }
 
+        #[allow(unused_assignments, non_snake_case)]
+        impl<$r, $($t),+> WireIO for extern "C" fn($($t),+) -> $r
+        where
+            $($t: WireIO,)+
+            $r: WireIO,
+        {
             fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
@@ -227,7 +245,14 @@ macro_rules! impl_fnptr {
             fn register(inventory: &mut Inventory) {
                 <extern "C" fn($($t),+) -> $r as TypeInfo>::register(inventory);
             }
+        }
 
+        #[allow(unused_assignments, non_snake_case)]
+        impl<$r, $($t),+> WireIO for Option<extern "C" fn($($t),+) -> $r>
+        where
+            $($t: WireIO,)+
+            $r: WireIO,
+        {
             fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }

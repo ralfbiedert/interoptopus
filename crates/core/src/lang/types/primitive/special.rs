@@ -1,6 +1,7 @@
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::types::wire::WireIO;
 use crate::lang::types::{Primitive, SerializationError, Type, TypeInfo, TypeKind};
 use std::io::{Read, Write};
 
@@ -28,7 +29,9 @@ impl TypeInfo for () {
         let type_ = Self::ty();
         _ = inventory.register_type(type_id, type_)
     }
+}
 
+impl WireIO for () {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }
@@ -66,7 +69,9 @@ impl TypeInfo for bool {
         let type_ = Self::ty();
         _ = inventory.register_type(type_id, type_)
     }
+}
 
+impl WireIO for bool {
     fn write(&self, w: &mut impl Write) -> Result<(), SerializationError> {
         (*self as u8).write(w)
     }

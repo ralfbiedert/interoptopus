@@ -26,7 +26,7 @@
 //!
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
-use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern};
+use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use crate::{Error, bad_wire};
 use std::ffi::CStr;
 use std::io::{Read, Write};
@@ -143,7 +143,9 @@ impl TypeInfo for CStrPtr<'_> {
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl WireIO for CStrPtr<'_> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }

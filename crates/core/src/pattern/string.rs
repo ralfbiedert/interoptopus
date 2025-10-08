@@ -2,7 +2,7 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
-use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern};
+use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::io::{Read, Write};
 use std::mem::forget;
 
@@ -99,7 +99,9 @@ impl TypeInfo for String {
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl WireIO for String {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }

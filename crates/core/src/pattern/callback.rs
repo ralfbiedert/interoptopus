@@ -246,6 +246,9 @@ macro_rules! callback {
                 inventory.register_type(Self::id(), Self::ty());
             }
 
+        }
+
+        impl $crate::lang::types::WireIO for $name {
             fn write(&self, _: &mut impl ::std::io::Write) -> Result<(), $crate::lang::types::SerializationError> {
                 $crate::bad_wire!()
             }
@@ -257,6 +260,7 @@ macro_rules! callback {
             fn live_size(&self) -> usize {
                 $crate::bad_wire!()
             }
+
         }
     };
 }

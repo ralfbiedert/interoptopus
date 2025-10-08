@@ -2,11 +2,11 @@ use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::SerializationError;
+use crate::lang::types::wire::WireIO;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::mem::MaybeUninit;
-
 // TODO
 // trait Foo {}
 // impl<'a> Foo for &'a str {}
@@ -38,7 +38,9 @@ macro_rules! impl_ptr {
                 T::register(inventory);
                 inventory.register_type(Self::id(), Self::ty());
             }
+        }
 
+        impl<T: WireIO> WireIO for $t {
             fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
@@ -99,7 +101,9 @@ impl<T: TypeInfo> TypeInfo for MaybeUninit<T> {
         // Same as base type
         T::register(inventory);
     }
+}
 
+impl<T: WireIO> WireIO for MaybeUninit<T> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }
@@ -135,7 +139,9 @@ impl TypeInfo for String {
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl WireIO for String {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }
@@ -174,7 +180,9 @@ impl<T: TypeInfo> TypeInfo for Vec<T> {
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl<T: WireIO> WireIO for Vec<T> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }
@@ -215,7 +223,9 @@ impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap
         V::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl<K: WireIO, V: WireIO, S: ::std::hash::BuildHasher> WireIO for HashMap<K, V, S> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }
@@ -251,7 +261,9 @@ impl TypeInfo for ::std::ffi::c_void {
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl WireIO for ::std::ffi::c_void {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }

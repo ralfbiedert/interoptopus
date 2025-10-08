@@ -37,7 +37,7 @@ pub struct CharArray {
 #[ffi]
 pub struct GenericArray<T>
 where
-    T: TypeInfo,
+    T: TypeInfo + Copy,
 {
     pub data: [T; 16],
 }

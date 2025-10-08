@@ -44,7 +44,7 @@
 use crate::inventory::Inventory;
 use crate::inventory::TypeId;
 use crate::lang::meta::{Docs, Emission, Visibility};
-use crate::lang::types::{SerializationError, TypeInfo, TypeKind, TypePattern};
+use crate::lang::types::{SerializationError, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::io::{Read, Write};
@@ -94,9 +94,11 @@ impl TypeInfo for ApiVersion {
     fn register(inventory: &mut crate::inventory::Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl WireIO for ApiVersion {
     fn write(&self, w: &mut impl Write) -> Result<(), SerializationError> {
-        <u64 as TypeInfo>::write(&self.version, w)
+        <u64 as WireIO>::write(&self.version, w)
     }
 
     fn read(r: &mut impl Read) -> Result<Self, SerializationError> {

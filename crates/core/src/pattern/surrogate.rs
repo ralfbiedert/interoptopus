@@ -48,7 +48,7 @@
 
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::types::{SerializationError, TypeInfo};
+use crate::lang::types::{SerializationError, TypeInfo, WireIO};
 use crate::lang::types::{Type, TypeKind};
 use std::io::{Read, Write};
 use std::marker::PhantomData;
@@ -94,7 +94,9 @@ impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
     fn register(inventory: &mut Inventory) {
         L::register(inventory);
     }
+}
 
+impl<T, L: WireIO + CorrectSurrogate<T>> WireIO for Surrogate<T, L> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }

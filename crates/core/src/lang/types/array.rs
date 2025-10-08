@@ -1,4 +1,5 @@
 use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::types::wire::WireIO;
 use crate::lang::types::{SerializationError, Type, TypeId, TypeInfo, TypeKind};
 use std::io::{Read, Write};
 use std::mem::MaybeUninit;
@@ -38,7 +39,12 @@ where
 
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl<T, const N: usize> WireIO for [T; N]
+where
+    T: WireIO + Copy,
+{
     fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
         for x in self.iter() {
             x.write(out)?;

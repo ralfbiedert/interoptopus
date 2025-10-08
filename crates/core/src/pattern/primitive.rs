@@ -2,7 +2,7 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
-use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern};
+use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
@@ -78,7 +78,9 @@ impl TypeInfo for Bool {
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl WireIO for Bool {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }
@@ -141,7 +143,9 @@ impl TypeInfo for CChar {
     fn register(inventory: &mut Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
+}
 
+impl WireIO for CChar {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }
