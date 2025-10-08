@@ -32,6 +32,7 @@ interoptopus_proc_impl = { path = "crates/proc_macros_impl", version = "=0.15.0-
 interoptopus_backend_c = { path = "crates/backend_c", version = "=0.15.0-alpha.18" }
 interoptopus_backend_cpython = { path = "crates/backend_cpython", version = "=0.15.0-alpha.18" }
 interoptopus_backend_csharp = { path = "crates/backend_csharp", version = "=0.15.0-alpha.18" }
+interoptopus_backend_csharp_ng = { path = "crates/backend_csharp_ng", version = "=0.15.0-alpha.18" }
 interoptopus_backend_utils = { path = "crates/backend_utils", version = "=0.15.0-alpha.18" }
 # Not published (no version dependency):
 interoptopus_reference_project = { path = "crates/reference_project" }
