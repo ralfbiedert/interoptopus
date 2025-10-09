@@ -27,6 +27,7 @@ impl Id {
 }
 
 #[doc(hidden)]
+#[macro_export]
 macro_rules! new_id {
     ($t:ident) => {
         #[derive(Hash, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -39,7 +40,12 @@ macro_rules! new_id {
             }
 
             #[must_use]
-            pub const fn from_id(id: Id) -> Self {
+            pub const fn id(self) -> $crate::inventory::Id {
+                self.0
+            }
+
+            #[must_use]
+            pub const fn from_id(id: $crate::inventory::Id) -> Self {
                 Self(id)
             }
 
