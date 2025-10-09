@@ -31,4 +31,14 @@ pub enum TypeKind {
     // Struct(Struct),
     // Class(Class),
     // Enum(Enum),
+    // Delegate(...),
 }
+
+// TODO: And what about services, async callbacks & co?
+// - Should they be defined here?
+// - Are they again implied by something else?
+
+// TODO: Utopia
+// 1) Any emitted bit that might be used by any other emitted bit must be "modelled"
+// 2) Anything user visible should somehow be accessible via config options
+// 3) Any pure implementation detail (not seen by other code here, or C# callers) doesn't matter
