@@ -28,11 +28,22 @@
 
 pub enum TypeKind {
     // Primitive(Primitive),
-    // Struct(Struct),
-    // Class(Class),
-    // Enum(Enum),
+    // DataEnum(...),
+    // SimpleEnum(...),
+    // Struct(...),
+    // Class(...),
     // Delegate(...),
 }
+
+pub struct DataEnum {}
+
+pub enum Primitive {
+    Float,
+    Double,
+    Uint,
+}
+
+pub struct Struct {}
 
 // TODO: And what about services, async callbacks & co?
 // - Should they be defined here?
