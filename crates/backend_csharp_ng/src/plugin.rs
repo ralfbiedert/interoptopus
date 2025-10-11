@@ -1,1 +1,1 @@
-pub trait Plugin {}
+pub trait Plugin: 'static {}

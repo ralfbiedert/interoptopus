@@ -26,6 +26,17 @@
 //   indicated for each type it its intended to be generated, and with that enum definitively
 //   declaring what other parts of the code can expect to exist.
 
+mod delegate;
+mod enums;
+mod primitive;
+
+use interoptopus::new_id;
+
+use crate::lang::meta::NamespaceId;
+pub use enums::{DataEnum, Variant};
+
+new_id!(TypeIdCs);
+
 pub enum TypeKind {
     // Primitive(Primitive),
     // DataEnum(...),
@@ -35,15 +46,11 @@ pub enum TypeKind {
     // Delegate(...),
 }
 
-pub struct DataEnum {}
-
-pub enum Primitive {
-    Float,
-    Double,
-    Uint,
+pub struct Type {
+    namespace: NamespaceId,
+    name: String,
+    kind: TypeKind,
 }
-
-pub struct Struct {}
 
 // TODO: And what about services, async callbacks & co?
 // - Should they be defined here?

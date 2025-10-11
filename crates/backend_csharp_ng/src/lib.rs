@@ -36,7 +36,7 @@ impl Pipeline {
         Self { stages, data: StageData::default(), plugins: vec![] }
     }
 
-    pub fn register_plugin(&mut self, plugin: impl Plugin + 'static) -> &mut Self {
+    pub fn register_plugin(&mut self, plugin: impl Plugin) -> &mut Self {
         self.plugins.push(Box::new(plugin));
         self
     }

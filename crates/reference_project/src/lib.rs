@@ -16,6 +16,7 @@ pub mod functions;
 pub mod patterns {
     // pub mod api_entry;
     pub mod api_guard;
+    pub mod api_table;
     pub mod callback;
     pub mod option;
     pub mod primitive;

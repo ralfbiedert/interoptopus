@@ -71,6 +71,7 @@
 
 #[doc(hidden)]
 pub mod api_guard;
+mod api_table;
 pub mod asynk;
 pub mod callback;
 pub mod cstr;
