@@ -24,6 +24,7 @@ TODO-LT (vaguely in this order)
 - [x] Clean up proc macros 
 - [ ] Introduce helper functions to work with new style `Inventory` (query, filter, replace)
 - [ ] Change C# backend to use new style `Inventory` and switch to model-based approach
+- [ ] rename backends
 - [ ] Rework C# backend to emit items needed by Runtime `#[ffi_plugin]` use
 - [ ] Write `#[ffi_plugin]` macro  
 - [ ] Write plugin code in C# backend 
