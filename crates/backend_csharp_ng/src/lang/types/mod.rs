@@ -26,8 +26,10 @@
 //   indicated for each type it its intended to be generated, and with that enum definitively
 //   declaring what other parts of the code can expect to exist.
 
+mod csharp;
 mod delegate;
 mod enums;
+mod pattern;
 mod primitive;
 
 use interoptopus::new_id;
@@ -44,6 +46,9 @@ pub enum TypeKind {
     // Struct(...),
     // Class(...),
     // Delegate(...),
+    // Service(...)
+    // TypePattern(...)
+    // AsyncHelper(...)
 }
 
 pub struct Type {

@@ -14,8 +14,18 @@ pub struct Signature {
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub enum FunctionKind {
+    /// A forward function declaration without any C# body
+    RustFunction,
+    /// An overload with different parameters that essentially calls a `RustFunction`
+    /// with the same name.
+    RustOverload, // TODO, do we need much more fine-grained info about that?
+}
+
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Overload {
     pub signature: Signature,
+    pub kind: FunctionKind,
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
