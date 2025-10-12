@@ -42,13 +42,14 @@ new_id!(TypeIdCs);
 pub enum TypeKind {
     // Primitive(Primitive),
     // DataEnum(...),
-    // SimpleEnum(...),
-    // Struct(...),
-    // Class(...),
+    // SimpleEnum(...), // TODO: We don't have this atm.
+    // Struct(...), // TODO: ATM we decide relatively late if it's a class or struct, based on IDispose semantics
+    // Class(...),  // ... should these rather be "Blittable" and "Disposable"?
     // Delegate(...),
     // Service(...)
+    // Pointer(...) (can become `ref` in signatures, or `IntPtr` in sigs or fields).
     // TypePattern(...)
-    // AsyncHelper(...)
+    // AsyncHelper(...) // TODO: Should this be explicitly named? Probably yes?
 }
 
 pub struct Type {
