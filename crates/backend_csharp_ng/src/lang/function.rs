@@ -1,5 +1,8 @@
 use crate::lang::meta::Visibility;
 use crate::lang::types::TypeIdCs;
+use interoptopus::new_id;
+
+new_id!(FunctionIdCs);
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Argument {

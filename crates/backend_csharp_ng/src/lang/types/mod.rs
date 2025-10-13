@@ -26,30 +26,33 @@
 //   indicated for each type it its intended to be generated, and with that enum definitively
 //   declaring what other parts of the code can expect to exist.
 
+mod composite;
 mod csharp;
-mod delegate;
 mod enums;
 mod pattern;
 mod primitive;
 
 use interoptopus::new_id;
 
+use crate::lang::function::Signature;
 use crate::lang::meta::NamespaceId;
+use crate::lang::types::composite::Composite;
+use crate::lang::types::pattern::TypePattern;
+use crate::lang::types::primitive::Primitive;
 pub use enums::{DataEnum, Variant};
 
 new_id!(TypeIdCs);
 
 pub enum TypeKind {
-    // Primitive(Primitive),
-    // DataEnum(...),
-    // SimpleEnum(...), // TODO: We don't have this atm.
-    // Struct(...), // TODO: ATM we decide relatively late if it's a class or struct, based on IDispose semantics
-    // Class(...),  // ... should these rather be "Blittable" and "Disposable"?
-    // Delegate(...),
-    // Service(...)
-    // Pointer(...) (can become `ref` in signatures, or `IntPtr` in sigs or fields).
-    // TypePattern(...)
-    // AsyncHelper(...) // TODO: Should this be explicitly named? Probably yes?
+    Primitive(Primitive),
+    DataEnum(DataEnum),
+    Composite(Composite),
+    Delegate(Signature),
+    Service,           // TODO: Do we get away just declaring this `Service` without any data?
+    Pointer(TypeIdCs), // (can become `ref` in signatures, or `IntPtr` in sigs or fields).
+    TypePattern(TypePattern),
+    AsyncHelper(TypeIdCs),
+    // WireHelper(...) // TODO?
 }
 
 pub struct Type {
@@ -57,10 +60,6 @@ pub struct Type {
     name: String,
     kind: TypeKind,
 }
-
-// TODO: And what about services, async callbacks & co?
-// - Should they be defined here?
-// - Are they again implied by something else?
 
 // TODO: Utopia
 // 1) Any emitted bit that might be used by any other emitted bit must be "modelled"

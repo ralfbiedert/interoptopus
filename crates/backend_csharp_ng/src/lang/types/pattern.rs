@@ -1,4 +1,3 @@
-use crate::lang::service::ServiceIdCs;
 use crate::lang::types::TypeIdCs;
 
 pub enum TypePattern {
