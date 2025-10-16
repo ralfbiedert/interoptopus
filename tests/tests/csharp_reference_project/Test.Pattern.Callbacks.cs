@@ -156,4 +156,18 @@ public class TestPatternDelegates
         Assert.Equal("hello world", r2a);
         Assert.Equal("hello world", r2b);
     }
+
+
+    [Fact]
+    public void callback_roundtrip()
+    {
+        ResultError C1(int x, int y)
+        {
+            return ResultError.Ok;
+        }
+
+        var cc1 = new SumDelegateReturn(C1);
+        Assert.Equal(cc1.Call(0, 1), ResultError.Ok);
+    }
+
 }

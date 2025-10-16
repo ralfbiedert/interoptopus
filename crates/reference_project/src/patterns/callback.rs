@@ -15,6 +15,7 @@ callback!(SumDelegateReturn(x: i32, y: i32) -> ffi::Result<(), Error>);
 callback!(SumDelegateReturn2(x: i32, y: i32));
 callback!(Pointers(x: &i32, y: &mut i32));
 callback!(StringCallback(s: ffi::String));
+callback!(StringCallbackString(s: ffi::String) -> ffi::String);
 callback!(NestedStringCallback(s: UseString));
 
 #[ffi_type]
@@ -87,6 +88,9 @@ pub fn pattern_callback_9(x: Pointers) -> i32 {
     b
 }
 
+#[ffi_function]
+pub fn pattern_callback_10(_: StringCallbackString) {}
+
 pub extern "C" fn exposed_sum1(x: *const c_void) {
     println!("0x{x:?}");
     eprintln!("0x{x:?}");
@@ -99,7 +103,7 @@ pub extern "C" fn exposed_sum2(x: i32, y: i32, _: *const c_void) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::{MyCallback, MyCallbackNamespaced};
-    use interoptopus::lang::{NAMESPACE_COMMON, TypeInfo};
+    use interoptopus::lang::{TypeInfo, NAMESPACE_COMMON};
 
     #[test]
     fn namespaces_assigned_correctly() {

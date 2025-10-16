@@ -1,10 +1,10 @@
-use crate::Interop;
-use crate::converter::{is_reusable, param_to_managed, param_to_type, rval_to_type_sync, rval_to_type_unmanaged};
+use crate::converter::{is_reusable, param_to_managed, param_to_type, param_to_unmanaged, rval_to_type_sync, rval_to_type_unmanaged};
 use crate::interop::types::fnptrs::write_type_definition_fn_pointer_annotation;
-use crate::utils::{MoveSemantics, write_common_marshaller};
+use crate::utils::{write_common_marshaller, MoveSemantics};
+use crate::Interop;
 use interoptopus::lang::{Primitive, Type};
 use interoptopus::pattern::callback::NamedCallback;
-use interoptopus_backend_utils::{Error, IndentWriter, indented};
+use interoptopus_backend_utils::{indented, Error, IndentWriter};
 
 pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, the_type: &NamedCallback) -> Result<(), Error> {
     i.debug(w, "write_type_definition_named_callback")?;
@@ -18,18 +18,23 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     let mut params = Vec::new();
     let mut params_native = Vec::new();
     let mut params_invoke = Vec::new();
+    let mut params_call = Vec::new();
     for param in the_type.fnpointer().signature().params() {
         params.push(format!("{} {}", param_to_type(param.the_type()), param.name()));
         params_native.push(format!("{} {}", i.to_native_callback_typespecifier(param.the_type()), param.name()));
         params_invoke.push(param_to_managed(param));
+        params_call.push(param_to_unmanaged(param));
     }
     params.pop();
     params_invoke.pop();
+    params_call.pop();
+    params_call.push("IntPtr.Zero".to_string());
 
     write_type_definition_fn_pointer_annotation(w, the_type.fnpointer())?;
     let params_unsafe_str = params_native.join(", ");
     let params_str = params.join(", ");
     let params_invoke = params_invoke.join(", ");
+    let params_call = params_call.join(", ");
     indented!(w, r"{visibility} delegate {rval_unsafe} {name}Native({params_unsafe_str}); // 'True' native callback signature",)?;
     indented!(w, r"{visibility} delegate {rval_safe} {name}Delegate({params_str}); // Our C# signature")?;
     w.newline()?;
@@ -82,18 +87,22 @@ pub fn write_type_definition_named_callback(i: &Interop, w: &mut IndentWriter, t
     w.newline()?;
     indented!(w, [()], r"// Invokes the callback.")?;
     i.inline_hint(w, 1)?;
-    indented!(w, [()], r"internal {rval_safe} Call({params_str})")?;
+    indented!(w, [()], r"public {rval_safe} Call({params_str})")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var __target = Marshal.GetDelegateForFunctionPointer<{name}Native>(_ptr);")?;
-    indented!(w, [()()], r"// TODO")?;
     if the_type.fnpointer().signature().rval().is_void() {
-        indented!(w, [()()], r"// __target({params_invoke});")?;
+        indented!(w, [()()], r"__target({params_call});")?;
     } else {
-        indented!(w, [()()], r"// return __target({params_invoke});")?;
+        let suffix = match the_type.fnpointer().signature().rval() {
+            Type::Primitive(_) => "",
+            _ if is_reusable(the_type.fnpointer().signature().rval()) => ".ToManaged()",
+            _ => ".IntoManaged()",
+        };
+        indented!(w, [()()], r"return __target({params_call}){suffix};")?;
     }
-    match the_type.fnpointer().signature().rval() {
-        Type::Primitive(Primitive::Void) => indented!(w, [()()], r"return;")?,
-        _ => indented!(w, [()()], r"return default;")?,
+
+    if matches!(the_type.fnpointer().signature().rval(), Type::Primitive(Primitive::Void)) {
+        indented!(w, [()()], r"return;")?;
     }
     indented!(w, [()], r"}}")?;
     w.newline()?;

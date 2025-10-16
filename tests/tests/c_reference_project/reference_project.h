@@ -706,6 +706,8 @@ typedef void (*POINTERS)(const int32_t* X, int32_t* Y, const void* CALLBACK_DATA
 
 typedef void (*STRINGCALLBACK)(UTF8STRING S, const void* CALLBACK_DATA);
 
+typedef UTF8STRING (*STRINGCALLBACKSTRING)(UTF8STRING S, const void* CALLBACK_DATA);
+
 typedef void (*SUMDELEGATE1)(const void* CALLBACK_DATA);
 
 typedef int32_t (*SUMDELEGATE2)(int32_t X, int32_t Y, const void* CALLBACK_DATA);
@@ -1115,6 +1117,8 @@ RESULTERROR pattern_callback_7(SUMDELEGATERETURN C1, SUMDELEGATERETURN2 C2, int3
 void pattern_callback_8(STRINGCALLBACK CB, NESTEDSTRINGCALLBACK CB2, UTF8STRING S);
 
 int32_t pattern_callback_9(POINTERS X);
+
+void pattern_callback_10(STRINGCALLBACKSTRING IGNORED);
 
 void pattern_surrogates_1(LOCAL S, CONTAINER* C);
 

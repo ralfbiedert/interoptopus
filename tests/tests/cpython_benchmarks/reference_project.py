@@ -65,6 +65,7 @@ def init_lib(path):
     c_lib.pattern_ascii_pointer_5.argtypes = [ctypes.POINTER(ctypes.c_char), ctypes.c_uint32]
     c_lib.pattern_ascii_pointer_return_slice.argtypes = []
     c_lib.pattern_callback_1.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p), ctypes.c_uint32]
+    c_lib.pattern_callback_10.argtypes = [ctypes.CFUNCTYPE(Utf8String, Utf8String, ctypes.c_void_p)]
     c_lib.pattern_callback_2.argtypes = [ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)]
     c_lib.pattern_callback_4.argtypes = [ctypes.CFUNCTYPE(ctypes.c_uint32, ctypes.c_uint32, ctypes.c_void_p), ctypes.c_uint32]
     c_lib.pattern_callback_5.argtypes = []
@@ -270,6 +271,7 @@ def init_lib(path):
     c_lib.pattern_ascii_pointer_5.restype = ctypes.c_uint8
     c_lib.pattern_ascii_pointer_return_slice.restype = SliceUseCStrPtr
     c_lib.pattern_callback_1.restype = ctypes.c_uint32
+    c_lib.pattern_callback_10.restype = 
     c_lib.pattern_callback_2.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)
     c_lib.pattern_callback_4.restype = ctypes.c_uint32
     c_lib.pattern_callback_5.restype = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
@@ -895,6 +897,12 @@ def pattern_callback_9(x) -> int:
         x = callbacks.fn_ConstPtrI32_MutPtrI32_ConstPtrVoid_rval_void(x)
 
     return c_lib.pattern_callback_9(x)
+
+def pattern_callback_10(ignored):
+    if not hasattr(ignored, "__ctypes_from_outparam__"):
+        ignored = callbacks.fn_Utf8String_ConstPtrVoid_rval_Utf8String(ignored)
+
+    return c_lib.pattern_callback_10(ignored)
 
 def pattern_surrogates_1(s: Local, c: ctypes.POINTER(Container)):
     return c_lib.pattern_surrogates_1(s, c)
@@ -3134,6 +3142,7 @@ class callbacks:
     fn_UseString_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, UseString, ctypes.c_void_p)
     fn_ConstPtrI32_MutPtrI32_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_int32), ctypes.POINTER(ctypes.c_int32), ctypes.c_void_p)
     fn_Utf8String_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, Utf8String, ctypes.c_void_p)
+    fn_Utf8String_ConstPtrVoid_rval_Utf8String = ctypes.CFUNCTYPE(Utf8String, Utf8String, ctypes.c_void_p)
     fn_ConstPtrVoid_rval_void = ctypes.CFUNCTYPE(None, ctypes.c_void_p)
     fn_i32_i32_ConstPtrVoid_rval_i32 = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
     fn_i32_i32_ConstPtrVoid_rval_ResultError = ctypes.CFUNCTYPE(ResultError, ctypes.c_int32, ctypes.c_int32, ctypes.c_void_p)
