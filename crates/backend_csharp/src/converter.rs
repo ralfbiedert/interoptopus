@@ -2,9 +2,9 @@ use crate::interop::FunctionNameFlavor;
 use heck::ToUpperCamelCase;
 use interoptopus::lang::util::safe_name;
 use interoptopus::lang::{Composite, ConstantValue, Field, FnPointer, Function, Parameter, Primitive, PrimitiveValue, SugaredReturnType, Type, VariantKind, WirePayload};
+use interoptopus::pattern::TypePattern;
 use interoptopus::pattern::slice::SliceType;
 use interoptopus::pattern::vec::VecType;
-use interoptopus::pattern::TypePattern;
 
 /// Converts a primitive (Rust) type to a native C# type name, e.g., `f32` to `float`.
 pub fn primitive_to_type(x: Primitive) -> String {
