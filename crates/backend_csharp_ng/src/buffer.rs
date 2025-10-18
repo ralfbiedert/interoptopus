@@ -7,6 +7,6 @@ pub enum Section {
     Nested(Box<Section>),
 }
 
-pub struct Paragraph {
+pub struct Buffer {
     section: Vec<Section>,
 }

@@ -126,4 +126,4 @@ pub use docs::{Markdown, MarkdownConfig};
 pub use interop::{FunctionNameFlavor, Interop, InteropBuilder, InteropBuilderError, Visibility, WriteTypes};
 use interoptopus_backend_utils::template_engine;
 
-template_engine!("**/*.cs");
+template_engitne!("**/*.cs");
