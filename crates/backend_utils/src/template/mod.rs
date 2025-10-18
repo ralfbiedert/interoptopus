@@ -1,3 +1,5 @@
+mod assets;
+
 /// Indents each line in the given text with the specified prefix.
 pub fn indent_all_with(prefix: impl AsRef<str>, text: impl AsRef<str>) -> String {
     if text.as_ref().is_empty() {
@@ -40,10 +42,11 @@ pub fn indent_all_with(prefix: impl AsRef<str>, text: impl AsRef<str>) -> String
 #[macro_export]
 macro_rules! template_engine {
     ($template_glob:literal) => {
-        static TEMPLATE_FILES: std::sync::LazyLock<include_dir::Dir<'_>> = std::sync::LazyLock::new(|| include_dir::include_dir!("$CARGO_MANIFEST_DIR/templates"));
+        static TEMPLATE_FILES: ::std::sync::LazyLock<$crate::reexport::include_dir::Dir<'_>> =
+            ::std::sync::LazyLock::new(|| $crate::reexport::include_dir::include_dir!("$CARGO_MANIFEST_DIR/templates"));
 
-        pub(crate) static TEMPLATES: std::sync::LazyLock<tera::Tera> = std::sync::LazyLock::new(|| {
-            let mut tera = tera::Tera::default();
+        pub(crate) static TEMPLATES: ::std::sync::LazyLock<tera::Tera> = ::std::sync::LazyLock::new(|| {
+            let mut tera = $crate::reexport::tera::Tera::default();
             for file in TEMPLATE_FILES.find($template_glob).unwrap() {
                 file.as_file().map(|template| {
                     tera.add_raw_template(&template.path().to_str().unwrap(), template.contents_utf8().unwrap())

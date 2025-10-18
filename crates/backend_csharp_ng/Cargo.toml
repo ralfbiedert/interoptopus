@@ -9,6 +9,12 @@ version.workspace = true
 
 [dependencies]
 interoptopus.workspace = true
+interoptopus_backends.workspace = true
+include_dir.workspace = true
+
+[build-dependencies]
+interoptopus_backends.workspace = true
+
 
 [lints]
 workspace = true

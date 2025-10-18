@@ -1,5 +1,5 @@
 [package]
-name = "interoptopus_backend_utils"
+name = "interoptopus_backends"
 description = "Utilities for backend authors"
 authors.workspace = true
 keywords = ["ffi", "code-generation", "bindings"]
@@ -15,5 +15,6 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-interoptopus = { workspace = true }
-tera = { workspace = true }
+interoptopus.workspace = true
+tera.workspace = true
+include_dir.workspace = true
