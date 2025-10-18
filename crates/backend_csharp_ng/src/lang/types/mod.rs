@@ -48,11 +48,11 @@ pub enum TypeKind {
     DataEnum(DataEnum),
     Composite(Composite),
     Delegate(Signature),
-    Service,           // TODO: Do we get away just declaring this `Service` without any data?
+    Service,
     Pointer(TypeIdCs), // (can become `ref` in signatures, or `IntPtr` in sigs or fields).
-    TypePattern(TypePattern),
     AsyncHelper(TypeIdCs),
-    // WireHelper(...) // TODO?
+    WireHelper(TypeIdCs), // TODO?
+    TypePattern(TypePattern),
 }
 
 pub struct Type {
