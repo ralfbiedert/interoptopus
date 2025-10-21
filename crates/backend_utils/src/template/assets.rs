@@ -15,13 +15,13 @@ impl Assets {
         let mut archive = tar::Archive::new(reader);
         let mut files = HashMap::new();
 
-        for entry in archive.entries().map_err(Error::AssetError)? {
-            let mut entry = entry.map_err(Error::AssetError)?;
-            let path = entry.path().map_err(Error::AssetError)?;
+        for entry in archive.entries()? {
+            let mut entry = entry?;
+            let path = entry.path()?;
             let path_str = path.to_string_lossy().to_string();
 
             let mut contents = Vec::new();
-            entry.read_to_end(&mut contents).map_err(Error::AssetError)?;
+            entry.read_to_end(&mut contents)?;
 
             files.insert(path_str, contents);
         }
@@ -74,16 +74,16 @@ impl Assets {
 /// ```
 pub fn pack_assets(asset_file: impl AsRef<Path>, root: impl AsRef<Path>) -> Result<(), Error> {
     let root = root.as_ref();
-    let out_dir = std::env::var("OUT_DIR").map_err(|_| Error::MissingOutDir)?;
+    let out_dir = std::env::var("OUT_DIR")?;
     let out_path = PathBuf::from(out_dir).join(asset_file.as_ref());
 
-    let tar_file = File::create(&out_path).map_err(Error::AssetError)?;
+    let tar_file = File::create(&out_path)?;
     let mut builder = tar::Builder::new(tar_file);
 
     // Walk the directory tree
     walk_dir(root, root, &mut builder)?;
 
-    builder.finish().map_err(Error::AssetError)?;
+    builder.finish()?;
 
     println!("cargo:rerun-if-changed={}", root.display());
     println!("cargo:warning=Packed assets to {}", out_path.display());
@@ -97,15 +97,15 @@ fn walk_dir(root: &Path, current: &Path, builder: &mut tar::Builder<File>) -> Re
         return Ok(());
     }
 
-    for entry in std::fs::read_dir(current).map_err(Error::AssetError)? {
-        let entry = entry.map_err(Error::AssetError)?;
+    for entry in std::fs::read_dir(current)? {
+        let entry = entry?;
         let path = entry.path();
 
         if path.is_dir() {
             walk_dir(root, &path, builder)?;
         } else if path.is_file() {
-            let relative = path.strip_prefix(root).map_err(|_| Error::PathStripError)?;
-            builder.append_path_with_name(&path, relative).map_err(Error::AssetError)?;
+            let relative = path.strip_prefix(root)?;
+            builder.append_path_with_name(&path, relative)?;
         }
     }
 

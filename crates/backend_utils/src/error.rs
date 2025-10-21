@@ -22,3 +22,21 @@ impl Display for Error {
 }
 
 impl std::error::Error for Error {}
+
+impl From<std::io::Error> for Error {
+    fn from(e: std::io::Error) -> Self {
+        Error::AssetError(e)
+    }
+}
+
+impl From<std::env::VarError> for Error {
+    fn from(_: std::env::VarError) -> Self {
+        Error::MissingOutDir
+    }
+}
+
+impl From<std::path::StripPrefixError> for Error {
+    fn from(_: std::path::StripPrefixError) -> Self {
+        Error::PathStripError
+    }
+}
