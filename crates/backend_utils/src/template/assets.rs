@@ -53,40 +53,38 @@ impl Assets {
     }
 }
 
-/// Pack all files under `root` into a tar archive at `asset_file`
+/// Pack all files under `root` into a tar archive at `out_path`
 ///
 /// This function is meant to be called from build.rs scripts. It will:
 /// 1. Walk all files under the `root` directory
 /// 2. Create a tar archive containing all files with paths relative to `root`
-/// 3. Write the archive to `asset_file`
-///
-/// The output file will be placed in `OUT_DIR` so it can be included with `include_bytes!`
+/// 3. Write the archive to `out_path`
 ///
 /// # Example
 ///
 /// ```no_run
 /// // In build.rs
 /// use interoptopus_backends::template::pack_assets;
+/// use std::path::PathBuf;
 ///
 /// fn main() {
-///     pack_assets("templates.tar", "templates/").unwrap();
+///     let out_path = PathBuf::from(std::env::var("OUT_DIR").unwrap()).join("templates.tar");
+///     pack_assets(&out_path, "templates/").unwrap();
+///     println!("cargo:rerun-if-changed=templates/");
+///     println!("cargo:warning=Packed assets to {}", out_path.display());
 /// }
 /// ```
-pub fn pack_assets(asset_file: impl AsRef<Path>, root: impl AsRef<Path>) -> Result<(), Error> {
+pub fn pack_assets(out_path: impl AsRef<Path>, root: impl AsRef<Path>) -> Result<(), Error> {
     let root = root.as_ref();
-    let out_dir = std::env::var("OUT_DIR")?;
-    let out_path = PathBuf::from(out_dir).join(asset_file.as_ref());
+    let out_path = out_path.as_ref();
 
-    let tar_file = File::create(&out_path)?;
+    let tar_file = File::create(out_path)?;
     let mut builder = tar::Builder::new(tar_file);
 
     // Walk the directory tree
     walk_dir(root, root, &mut builder)?;
 
     builder.finish()?;
-
-    println!("cargo:rerun-if-changed={}", root.display());
-    println!("cargo:warning=Packed assets to {}", out_path.display());
 
     Ok(())
 }
