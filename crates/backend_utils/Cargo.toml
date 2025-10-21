@@ -16,5 +16,6 @@ workspace = true
 
 [dependencies]
 interoptopus.workspace = true
+tar.workspace = true
 tera.workspace = true
 include_dir.workspace = true

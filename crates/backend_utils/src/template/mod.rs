@@ -1,5 +1,7 @@
 mod assets;
 
+pub use assets::{pack_assets, Assets};
+
 /// Indents each line in the given text with the specified prefix.
 pub fn indent_all_with(prefix: impl AsRef<str>, text: impl AsRef<str>) -> String {
     if text.as_ref().is_empty() {

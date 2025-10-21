@@ -1,3 +1,5 @@
+use interoptopus_backends::template::pack_assets;
+
 fn main() {
-    // pack_string_assets("foo.assets", "templates/");
+    pack_assets("foo.assets", "templates/").unwrap();
 }

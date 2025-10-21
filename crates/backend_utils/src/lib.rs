@@ -1,4 +1,5 @@
+pub mod template;
+
 mod error;
-mod template;
 
 pub use error::Error;

@@ -2,7 +2,7 @@ use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
 pub enum Error {
-    Todo,
+    AssetError(std::io::Error),
 }
 
 impl Display for Error {
