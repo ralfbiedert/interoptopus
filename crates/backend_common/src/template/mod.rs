@@ -1,6 +1,8 @@
 mod assets;
+mod engine;
 
 pub use assets::{pack_assets, Assets};
+pub use engine::TemplateEngine;
 
 /// Indents each line in the given text with the specified prefix.
 pub fn indent_all_with(prefix: impl AsRef<str>, text: impl AsRef<str>) -> String {

@@ -2,7 +2,7 @@ use crate::Error;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 /// Runtime asset loader that can load files from an embedded tar archive
 pub struct Assets {
@@ -11,7 +11,7 @@ pub struct Assets {
 
 impl Assets {
     /// Internal method to load from any Read source
-    pub fn from_reader<R: Read>(reader: R) -> Result<Self, Error> {
+    pub fn from_reader(reader: impl Read) -> Result<Self, Error> {
         let mut archive = tar::Archive::new(reader);
         let mut files = HashMap::new();
 
@@ -30,14 +30,14 @@ impl Assets {
     }
 
     /// Load a file as a UTF-8 string
-    pub fn load_string(&self, path: impl AsRef<str>) -> Result<String, Error> {
+    pub fn get_string(&self, path: impl AsRef<str>) -> Result<String, Error> {
         let path = path.as_ref();
         let bytes = self.files.get(path).ok_or_else(|| Error::AssetNotFound(path.to_string()))?;
         String::from_utf8(bytes.clone()).map_err(|e| Error::AssetUtf8Error(path.to_string(), e))
     }
 
     /// Load a file as raw bytes
-    pub fn load_bytes(&self, path: impl AsRef<str>) -> Result<&[u8], Error> {
+    pub fn get_bytes(&self, path: impl AsRef<str>) -> Result<&[u8], Error> {
         let path = path.as_ref();
         self.files.get(path).map(|v| v.as_slice()).ok_or_else(|| Error::AssetNotFound(path.to_string()))
     }
