@@ -16,7 +16,7 @@ impl TemplateEngine {
         let mut tera = Tera::default();
 
         // This should just work
-        tera.add_raw_templates(assets.list().map(|x| (x, assets.get_string(x).unwrap()))).unwrap();
+        tera.add_raw_templates(assets.list().map(|x| (x, assets.get_string(x).unwrap())))?;
 
         Ok(Self { assets, tera })
     }
