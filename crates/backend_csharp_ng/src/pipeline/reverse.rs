@@ -1,1 +1,1 @@
-struct ReversePlugin {}
+pub struct ReversePlugin {}

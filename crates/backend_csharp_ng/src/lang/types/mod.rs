@@ -56,9 +56,9 @@ pub enum TypeKind {
 }
 
 pub struct Type {
-    namespace: NamespaceId,
-    name: String,
-    kind: TypeKind,
+    pub namespace: NamespaceId,
+    pub name: String,
+    pub kind: TypeKind,
 }
 
 // TODO: Utopia
