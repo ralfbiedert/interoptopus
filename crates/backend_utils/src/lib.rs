@@ -1,3 +1,4 @@
+pub mod output;
 pub mod template;
 
 mod error;

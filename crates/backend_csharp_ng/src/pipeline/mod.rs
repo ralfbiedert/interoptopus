@@ -1,2 +1,4 @@
-mod interop;
+mod forward;
 mod reverse;
+
+pub use forward::{ForwardConfig, ForwardPipeline};
