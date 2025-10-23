@@ -14,11 +14,24 @@ pub struct ForwardPipeline {
     // Basic input
     inventory: Inventory,
 
-    // Stages
+    // Model stages (transform and enrich data)
     type_id_mappings: type_id_mapping::Stage,
     type_id_mappings2: type_id_mapping::Stage,
     type_id_mappings3: type_id_mapping::Stage,
     type_id_mappings4: type_id_mapping::Stage,
+
+    // Output stages
+    // todo: configure multibuf output / setup somehow via config objects
+    // "foo.cs" -> Output::Code({ types:[0xa, 0xb, ...], fns:[0xc,...], ... })
+    // "bar.cs" -> Output::Code(...)
+    // "helper.csproj" -> Output::BuildDef(...)
+    //
+    // todo ... now add regular stages, but should in theory be
+    // runnable in any order at this stage w.r.t. data model
+    // (only dependency needed should be for assembling files)
+    // For example
+    // - write import definitions in each multibuf section
+    //
 
     // Output
     output: Multibuf,
@@ -42,7 +55,6 @@ impl ForwardPipeline {
 
     pub fn process(mut self) -> Multibuf {
         self.type_id_mappings.process(&mut self.inventory);
-
         self.output
     }
 }
