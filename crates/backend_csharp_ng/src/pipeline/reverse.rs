@@ -1,1 +1,3 @@
-pub struct ReversePlugin {}
+pub struct CsPluginConfig {}
+
+pub struct CsPlugin {}

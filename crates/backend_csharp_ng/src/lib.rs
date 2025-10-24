@@ -7,4 +7,4 @@ mod error;
 mod macros;
 mod pipeline;
 
-pub use pipeline::{ForwardConfig, ForwardPipeline};
+pub use pipeline::{RustPlugin, RustPluginConfig};

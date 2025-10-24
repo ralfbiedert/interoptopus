@@ -1,4 +1,4 @@
 mod forward;
 mod reverse;
 
-pub use forward::{ForwardConfig, ForwardPipeline};
+pub use forward::{RustPlugin, RustPluginConfig};

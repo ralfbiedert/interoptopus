@@ -3,9 +3,12 @@
 use crate::lang::types::TypeIdCs;
 use interoptopus::inventory::{Inventory, TypeId};
 use std::collections::HashMap;
+use std::marker::PhantomData;
 
 #[derive(Default)]
-pub struct Config {}
+pub struct Config {
+    _hidden: PhantomData<()>,
+}
 
 pub struct Stage {
     rust_to_cs: HashMap<TypeId, TypeIdCs>,
