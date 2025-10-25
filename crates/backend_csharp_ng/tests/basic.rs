@@ -1,19 +1,18 @@
-use backend_csharp_ng::stage::master_output;
+use backend_csharp_ng::dispatch::Dispatch;
+use backend_csharp_ng::stage::output_director;
 use backend_csharp_ng::{RustPlugin, RustPluginConfig};
 use interoptopus::inventory::Inventory;
 
 #[test]
-fn can_run_pipeline() {
-    let config = RustPluginConfig {
-        type_id_mapping: Default::default(),
-        type_id_mapping2: Default::default(),
-        type_id_mapping3: Default::default(),
-        type_id_mapping4: Default::default(),
-        master_output: master_output::Config { ..Default::default() },
-        ..Default::default()
-    };
+fn rust_plugin() {
     let inventory = Inventory::new();
-    let _ = RustPlugin::with_config(inventory, config).process();
+    let _ = RustPlugin::new(inventory).process();
+}
+
+#[test]
+fn rust_plugin_builder() {
+    let inventory = Inventory::new();
+    let _ = RustPlugin::builder(inventory).build();
 }
 
 #[test]
@@ -32,14 +31,17 @@ fn output() {
     //     .build(|b| "bar.cs");
 
     // this is it?!
-    let dispatch = Dispatch::single_file();
-    let dispatch = Dispatch::custom(|x| match x {
-        ... => "foo.cs",
-        ... => "builtins.cs",
-        ... => "build.csproj"
-    });
+    // let dispatch = Dispatch::single_file();
+    // let dispatch = Dispatch::custom(|x| match x {
+    //     ... => "foo.cs",
+    //     ... => "builtins.cs",
+    //     ... => "build.csproj"
+    // });
 
-    let config = RustPluginConfig { master_output: master_output::Config { ..Default::default() }, ..Default::default() };
+    // let dispatch = Dispatch::custom(|x| "foo".to_string());
+    let dispatch = Dispatch::single_file();
+
+    let config = RustPluginConfig { master_output: output_director::Config { ..Default::default() }, ..Default::default() };
     let inventory = Inventory::new();
     let output = RustPlugin::with_config(inventory, config).process();
     output.write_files();

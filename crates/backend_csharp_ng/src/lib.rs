@@ -1,3 +1,4 @@
+pub mod dispatch;
 pub mod lang;
 pub mod plugin;
 pub mod stage;
@@ -7,4 +8,5 @@ mod error;
 mod macros;
 mod pipeline;
 
+pub use error::Error;
 pub use pipeline::{RustPlugin, RustPluginConfig};

@@ -1,2 +1,2 @@
-pub mod master_output;
+pub mod output_director;
 pub mod type_id_mapping;
