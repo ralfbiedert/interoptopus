@@ -1,19 +1,16 @@
+use crate::id::TypeId;
 use crate::lang::meta::Visibility;
-use crate::lang::types::TypeIdCs;
-use interoptopus::new_id;
-
-new_id!(FunctionIdCs);
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Argument {
     pub name: String,
-    pub ty: TypeIdCs,
+    pub ty: TypeId,
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Signature {
     pub arguments: Vec<Argument>,
-    pub rval: TypeIdCs,
+    pub rval: TypeId,
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

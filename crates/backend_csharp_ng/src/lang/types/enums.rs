@@ -1,9 +1,9 @@
-use crate::lang::types::TypeIdCs;
+use crate::lang::types::TypeId;
 
 pub struct Variant {
     name: String,
     tag: usize,
-    ty: TypeIdCs,
+    ty: TypeId,
 }
 
 pub struct DataEnum {

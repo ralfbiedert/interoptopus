@@ -34,6 +34,7 @@ mod primitive;
 
 use interoptopus::new_id;
 
+use crate::id::TypeId;
 use crate::lang::function::Signature;
 use crate::lang::meta::NamespaceId;
 use crate::lang::types::composite::Composite;
@@ -41,17 +42,15 @@ use crate::lang::types::pattern::TypePattern;
 use crate::lang::types::primitive::Primitive;
 pub use enums::{DataEnum, Variant};
 
-new_id!(TypeIdCs);
-
 pub enum TypeKind {
     Primitive(Primitive),
     DataEnum(DataEnum),
     Composite(Composite),
     Delegate(Signature),
     Service,
-    Pointer(TypeIdCs), // (can become `ref` in signatures, or `IntPtr` in sigs or fields).
-    AsyncHelper(TypeIdCs),
-    WireHelper(TypeIdCs), // TODO?
+    Pointer(TypeId), // (can become `ref` in signatures, or `IntPtr` in sigs or fields).
+    AsyncHelper(TypeId),
+    WireHelper(TypeId), // TODO?
     TypePattern(TypePattern),
 }
 

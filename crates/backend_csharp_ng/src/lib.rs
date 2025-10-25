@@ -1,4 +1,5 @@
 pub mod dispatch;
+pub mod id;
 pub mod lang;
 pub mod plugin;
 pub mod stage;

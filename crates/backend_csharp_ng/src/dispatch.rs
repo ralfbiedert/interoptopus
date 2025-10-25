@@ -1,5 +1,4 @@
-use crate::lang::function::FunctionIdCs;
-use crate::lang::types::TypeIdCs;
+use crate::id::{FunctionId, TypeId};
 
 type DispatchFn = Box<dyn FnMut(Item) -> String>;
 
@@ -30,6 +29,6 @@ impl Default for Dispatch {
 }
 
 pub enum Item {
-    Type(TypeIdCs),
-    Function(FunctionIdCs),
+    Type(TypeId),
+    Function(FunctionId),
 }

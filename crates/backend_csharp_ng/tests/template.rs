@@ -4,7 +4,7 @@ use interoptopus_backends::template::Context;
 #[test]
 fn load_templates() {
     let templates = templates();
-    let file_header = templates.get("file_header.cs").unwrap();
+    let file_header = templates.get("header.cs").unwrap();
     assert!(file_header.contains("auto-generated"));
 }
 
@@ -19,7 +19,7 @@ fn render_templates() {
     context.insert("INTEROPTOPUS_CRATE", "DDD");
     context.insert("INTEROPTOPUS_VERSION", "EEE");
 
-    let rendered = templates.render("file_header.cs", &context).unwrap();
+    let rendered = templates.render("header.cs", &context).unwrap();
 
     assert!(rendered.contains("AAA"));
     assert!(rendered.contains("BBB"));

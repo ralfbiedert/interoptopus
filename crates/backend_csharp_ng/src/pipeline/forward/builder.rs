@@ -1,5 +1,4 @@
 use crate::dispatch::Dispatch;
-use crate::template::templates;
 use crate::{RustPlugin, RustPluginConfig};
 use interoptopus::inventory::Inventory;
 use interoptopus_backends::template::TemplateEngine;

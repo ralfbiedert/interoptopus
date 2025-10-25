@@ -1,4 +1,4 @@
-use crate::lang::types::TypeIdCs;
+use crate::lang::types::TypeId;
 
 // A C# `string`
-const STRING: TypeIdCs = TypeIdCs::new(0xBEA1AB15FD5682B7649431E17CB70B61);
+const STRING: TypeId = TypeId::new(0xBEA1AB15FD5682B7649431E17CB70B61);

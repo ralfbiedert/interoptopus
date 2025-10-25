@@ -1,7 +1,8 @@
 //! Introduces C# TypeIDs and converts a Rust `TypeId` into a C# one.
 
-use crate::lang::types::TypeIdCs;
-use interoptopus::inventory::{Inventory, TypeId};
+use crate::id::TypeId;
+use crate::stage::output_director;
+use interoptopus::inventory::Inventory;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 
@@ -11,7 +12,7 @@ pub struct Config {
 }
 
 pub struct Stage {
-    rust_to_cs: HashMap<TypeId, TypeIdCs>,
+    rust_to_cs: HashMap<interoptopus::inventory::TypeId, TypeId>,
 }
 
 impl Stage {
@@ -19,10 +20,5 @@ impl Stage {
         Self { rust_to_cs: Default::default() }
     }
 
-    pub fn process(&mut self, inventory: &Inventory) {
-        for key in inventory.types.keys() {
-            let cs = TypeIdCs::from_id(key.id());
-            self.rust_to_cs.insert(*key, cs);
-        }
-    }
+    pub fn process(&mut self, inventory: &Inventory) {}
 }
