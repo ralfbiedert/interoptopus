@@ -1,15 +1,15 @@
 use crate::dispatch::Dispatch;
-use crate::{RustPlugin, RustPluginConfig};
+use crate::{RustLibrary, RustLibraryConfig};
 use interoptopus::inventory::Inventory;
 use interoptopus_backends::template::TemplateEngine;
 
 #[derive(Default)]
-pub struct RustPluginBuilder {
+pub struct RustLibraryBuilder {
     inventory: Inventory,
-    config: RustPluginConfig,
+    config: RustLibraryConfig,
 }
 
-impl RustPluginBuilder {
+impl RustLibraryBuilder {
     pub(crate) fn new(inventory: Inventory) -> Self {
         Self { inventory, ..Default::default() }
     }
@@ -24,7 +24,7 @@ impl RustPluginBuilder {
         self
     }
 
-    pub fn build(self) -> RustPlugin {
-        RustPlugin::with_config(self.inventory, self.config)
+    pub fn build(self) -> RustLibrary {
+        RustLibrary::with_config(self.inventory, self.config)
     }
 }

@@ -1,12 +1,13 @@
 use crate::Error;
-use crate::pipeline::forward::RustPluginBuilder;
+use crate::pipeline::RustLibraryBuilder;
+use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
 use crate::stage::{meta_info, output_final, output_header, output_master, type_id_mapping};
 use interoptopus::inventory::Inventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
 
 #[derive(Default)]
-pub struct RustPluginConfig {
+pub struct RustLibraryConfig {
     pub meta_info: meta_info::Config,
     pub type_id_mapping: type_id_mapping::Config,
     pub type_id_mapping2: type_id_mapping::Config,
@@ -22,7 +23,7 @@ pub struct IntermediateOutputStages {
     pub header: output_header::Stage,
 }
 
-pub struct RustPlugin {
+pub struct RustLibrary {
     // Basic input
     inventory: Inventory,
 
@@ -50,18 +51,21 @@ pub struct RustPlugin {
 
     // Output
     output: Multibuf,
+
+    // Plugins
+    plugins: Vec<Box<dyn RustLibraryPlugin>>,
 }
 
-impl RustPlugin {
+impl RustLibrary {
     pub fn new(inventory: Inventory) -> Self {
-        Self::with_config(inventory, RustPluginConfig::default())
+        Self::with_config(inventory, RustLibraryConfig::default())
     }
 
-    pub fn builder(inventory: Inventory) -> RustPluginBuilder {
-        RustPluginBuilder::new(inventory)
+    pub fn builder(inventory: Inventory) -> RustLibraryBuilder {
+        RustLibraryBuilder::new(inventory)
     }
 
-    pub(crate) fn with_config(inventory: Inventory, config: RustPluginConfig) -> Self {
+    pub(crate) fn with_config(inventory: Inventory, config: RustLibraryConfig) -> Self {
         Self {
             inventory,
             meta_info: meta_info::Stage::new(config.meta_info),
@@ -73,14 +77,49 @@ impl RustPlugin {
             output_stages: IntermediateOutputStages { header: output_header::Stage::new(config.output_header) },
             output_final: output_final::Stage::new(config.output_final),
             output: Multibuf::default(),
+            plugins: vec![],
+        }
+    }
+
+    pub fn register_plugin(mut self, plugin: impl RustLibraryPlugin + 'static) -> Self {
+        self.plugins.push(Box::new(plugin));
+        self
+    }
+
+    fn plugin_init_pass(&mut self) {
+        for plugin in self.plugins.iter_mut() {
+            plugin.init(&mut self.inventory);
+        }
+    }
+
+    fn plugin_post_model_pass(&mut self) {
+        let post_model = PostModelPass::default();
+        for plugin in self.plugins.iter_mut() {
+            plugin.post_model(&mut self.inventory, post_model);
+        }
+    }
+
+    fn plugin_post_output_pass(&mut self) {
+        let post_output = PostOutputPass::default();
+        for plugin in self.plugins.iter_mut() {
+            plugin.post_output(&mut self.output, post_output);
         }
     }
 
     pub fn process(mut self) -> Result<Multibuf, Error> {
+        self.plugin_init_pass();
+
+        // Model stages
         self.meta_info.process(&mut self.inventory)?;
         self.type_id_mappings.process(&mut self.inventory)?;
+        self.plugin_post_model_pass();
+
+        /// Output stages
         self.output_master.process(&mut self.inventory)?;
         self.output_stages.header.process(&mut self.inventory, &self.output_master, &self.meta_info)?;
+        self.plugin_post_output_pass();
+
+        // Final output stage(s)
         self.output_final
             .process(&mut self.inventory, &mut self.output, &self.output_master, &self.output_stages)?;
 

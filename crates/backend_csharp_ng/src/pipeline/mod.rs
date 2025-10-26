@@ -1,5 +1,5 @@
-mod forward;
-mod reverse;
+mod csharp;
+mod rust;
 
-pub use forward::{IntermediateOutputStages, RustPlugin, RustPluginBuilder, RustPluginConfig};
-pub use reverse::{CsPlugin, CsPluginConfig};
+pub use csharp::{CsLibrary, CsLibraryConfig};
+pub use rust::{IntermediateOutputStages, RustLibrary, RustLibraryBuilder, RustLibraryConfig};
