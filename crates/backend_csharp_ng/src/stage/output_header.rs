@@ -2,7 +2,7 @@
 
 use crate::output::{Output, OutputKind};
 use crate::stage::{ProcessError, meta_info, output_master};
-use interoptopus::inventory::Inventory;
+use interoptopus::inventory::RustInventory;
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -18,7 +18,7 @@ impl Stage {
         Self { headers: Default::default() }
     }
 
-    pub fn process(&mut self, _: &Inventory, output_master: &output_master::Stage, meta_info: &meta_info::Stage) -> ProcessError {
+    pub fn process(&mut self, _: &RustInventory, output_master: &output_master::Stage, meta_info: &meta_info::Stage) -> ProcessError {
         let templates = output_master.templates();
 
         for output in output_master.outputs_of(OutputKind::Csharp) {

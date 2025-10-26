@@ -1,9 +1,9 @@
-use crate::inventory::{FunctionId, Inventory, ServiceId, TypeId};
+use crate::inventory::{FunctionId, Inventory, RustInventory, ServiceId, TypeId};
 
 pub trait ServiceInfo {
     fn id() -> ServiceId;
     fn service() -> Service;
-    fn register(inventory: &mut Inventory);
+    fn register(inventory: &mut impl Inventory);
 }
 
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
@@ -17,11 +17,6 @@ pub struct Service {
 
 impl Service {
     pub fn new(ty: TypeId, ctors: Vec<FunctionId>, destructor: FunctionId, methods: Vec<FunctionId>) -> Self {
-        Self {
-            ty,
-            ctors,
-            destructor,
-            methods,
-        }
+        Self { ty, ctors, destructor, methods }
     }
 }

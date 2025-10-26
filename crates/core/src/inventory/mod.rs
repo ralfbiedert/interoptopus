@@ -11,9 +11,17 @@ use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::mem::swap;
 
+pub trait Inventory {
+    fn register_type(&mut self, id: TypeId, ty: Type);
+    fn register_function(&mut self, id: FunctionId, function: Function);
+    fn register_constant(&mut self, id: ConstantId, constant: Constant);
+    fn register_service(&mut self, id: ServiceId, service: Service);
+    fn register(&mut self, f: impl Fn(&mut Self)) -> &mut Self;
+}
+
 // TODO: This should be 2 models: `RustInventory` & `ForeignInventory`
 #[derive(Default)]
-pub struct Inventory {
+pub struct RustInventory {
     pub types: HashMap<TypeId, Type>,
     pub functions: HashMap<FunctionId, Function>,
     pub constants: HashMap<ConstantId, Constant>,
@@ -21,7 +29,7 @@ pub struct Inventory {
     _guard: PhantomData<()>,
 }
 
-impl Inventory {
+impl RustInventory {
     #[must_use]
     pub fn new() -> Self {
         Self::default()
@@ -54,5 +62,28 @@ impl Inventory {
         let mut rval = Self::new();
         swap(&mut rval, self);
         rval
+    }
+}
+
+impl Inventory for RustInventory {
+    fn register_type(&mut self, id: TypeId, ty: Type) {
+        self.types.entry(id).or_insert(ty);
+    }
+
+    fn register_function(&mut self, id: FunctionId, function: Function) {
+        self.functions.entry(id).or_insert(function);
+    }
+
+    fn register_constant(&mut self, id: ConstantId, constant: Constant) {
+        self.constants.entry(id).or_insert(constant);
+    }
+
+    fn register_service(&mut self, id: ServiceId, service: Service) {
+        self.services.entry(id).or_insert(service);
+    }
+
+    fn register(&mut self, f: impl Fn(&mut Self)) -> &mut Self {
+        f(self);
+        self
     }
 }

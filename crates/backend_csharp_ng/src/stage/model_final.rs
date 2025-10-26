@@ -4,7 +4,7 @@
 
 use crate::model::RustModel;
 use crate::stage::ProcessError;
-use interoptopus::inventory::Inventory;
+use interoptopus::inventory::RustInventory;
 
 #[derive(Default)]
 pub struct Config {}
@@ -18,7 +18,7 @@ impl Stage {
         Self { rust_model: Default::default() }
     }
 
-    pub fn process(&mut self, _: &Inventory) -> ProcessError {
+    pub fn process(&mut self, _: &RustInventory) -> ProcessError {
         // TODO ...
         Ok(())
     }

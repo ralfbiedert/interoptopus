@@ -1,6 +1,6 @@
-use interoptopus::inventory::Inventory;
+use interoptopus::inventory::RustInventory;
 
 #[test]
 fn basic() {
-    let _ = Inventory::new().validate();
+    let _ = RustInventory::new().validate();
 }

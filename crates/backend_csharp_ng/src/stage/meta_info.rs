@@ -1,7 +1,7 @@
 //! ...
 
 use crate::stage::ProcessError;
-use interoptopus::inventory::Inventory;
+use interoptopus::inventory::RustInventory;
 
 #[derive(Default)]
 pub struct Config {}
@@ -16,7 +16,7 @@ impl Stage {
         Self { interop_dll_name: String::new(), interop_hash: String::new() }
     }
 
-    pub fn process(&mut self, _: &Inventory) -> ProcessError {
+    pub fn process(&mut self, _: &RustInventory) -> ProcessError {
         // TODO
         Ok(())
     }

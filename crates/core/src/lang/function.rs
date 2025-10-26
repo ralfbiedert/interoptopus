@@ -1,4 +1,4 @@
-use crate::inventory::{FunctionId, Inventory, TypeId};
+use crate::inventory::{FunctionId, Inventory, RustInventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
 
 pub trait FunctionInfo {
@@ -6,7 +6,7 @@ pub trait FunctionInfo {
     fn signature() -> Signature;
     fn function() -> Function;
 
-    fn register(inventory: &mut Inventory);
+    fn register(inventory: &mut impl Inventory);
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

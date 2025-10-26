@@ -13,11 +13,11 @@
 //! create guards calling this function when loading the DLL.
 //!
 //! ```rust
-//! use interoptopus::inventory::Inventory;
+//! use interoptopus::inventory::RustInventory;
 //! use interoptopus::{api_guard, function};
 //!
-//! fn ffi_inventory() -> Inventory {
-//!     Inventory::new()
+//! fn ffi_inventory() -> RustInventory {
+//!     RustInventory::new()
 //!         .register(api_guard!(ffi_inventory)) // <- You must name the current function.
 //!         .validate()                          //    since it will be called at runtime
 //!                                      //    but cannot be inferred.
@@ -41,7 +41,7 @@
 //! - will even react to benign API changes (e.g., just adding functions),
 //! - might even react to documentation changes (subject to change; feedback welcome).
 //!
-use crate::inventory::Inventory;
+use crate::inventory::RustInventory;
 use crate::inventory::TypeId;
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::{SerializationError, TypeInfo, TypeKind, TypePattern, WireIO};
@@ -66,7 +66,7 @@ impl ApiVersion {
 
     /// Create a new API version from the given library.
     #[must_use]
-    pub fn from_inventory(inventory: &Inventory) -> Self {
+    pub fn from_inventory(inventory: &RustInventory) -> Self {
         let version = ApiHash::from(inventory).hash;
         Self { version }
     }
@@ -91,7 +91,7 @@ impl TypeInfo for ApiVersion {
         crate::lang::types::Type { emission: Emission::Common, docs: Docs::empty(), visibility: Visibility::Public, name: "ApiVersion".to_string(), kind: Self::kind() }
     }
 
-    fn register(inventory: &mut crate::inventory::Inventory) {
+    fn register(inventory: &mut crate::inventory::RustInventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
 }
@@ -110,8 +110,8 @@ impl WireIO for ApiVersion {
     }
 }
 
-impl From<Inventory> for ApiVersion {
-    fn from(i: Inventory) -> Self {
+impl From<RustInventory> for ApiVersion {
+    fn from(i: RustInventory) -> Self {
         Self::from_inventory(&i)
     }
 }
@@ -125,7 +125,7 @@ pub struct ApiHash {
 impl ApiHash {
     /// Returns a unique hash for an inventory; used by backends.
     #[must_use]
-    pub fn from(inventory: &Inventory) -> Self {
+    pub fn from(inventory: &RustInventory) -> Self {
         let mut hasher = DefaultHasher::new();
 
         let types = inventory.types.iter();
@@ -170,11 +170,11 @@ impl ApiHash {
 ///
 /// # Example
 /// ```rust
-/// # use interoptopus::inventory::Inventory;
+/// # use interoptopus::inventory::RustInventory;
 /// # use interoptopus::{api_guard, function};
 ///
-/// fn ffi_inventory() -> Inventory {
-///     Inventory::new()
+/// fn ffi_inventory() -> RustInventory {
+///     RustInventory::new()
 ///         .register(api_guard!(ffi_inventory)) // <- You must name the current function.
 ///         .validate()                          //    since it will be called at runtime
 ///                                      //    but cannot be inferred.
@@ -188,7 +188,7 @@ macro_rules! api_guard {
             $f().into()
         }
 
-        |x: &mut $crate::inventory::Inventory| {
+        |x: &mut $crate::inventory::RustInventory| {
             <__api_guard as $crate::lang::function::FunctionInfo>::register(x);
         }
     }};
@@ -204,7 +204,7 @@ macro_rules! api_guard2 {
 
         use $crate::lang::Register;
 
-        |x: &mut $crate::inventory::Inventory| {
+        |x: &mut $crate::inventory::RustInventory| {
             // TODO
             // - register __api_guard (this should automatically register the ApiGuard type)
             todo ...

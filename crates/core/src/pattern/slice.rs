@@ -36,7 +36,7 @@
 //! ```
 //!
 
-use crate::inventory::{Inventory, TypeId};
+use crate::inventory::{RustInventory, TypeId};
 use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::io::{Read, Write};
@@ -139,7 +139,7 @@ impl<T: TypeInfo> TypeInfo for Slice<'_, T> {
         Type { name: format!("Slice<{}>", t.name), visibility: Visibility::Public, docs: Docs::empty(), emission, kind: Self::kind() }
     }
 
-    fn register(inventory: &mut Inventory) {
+    fn register(inventory: &mut RustInventory) {
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
     }
@@ -262,7 +262,7 @@ impl<T: TypeInfo> TypeInfo for SliceMut<'_, T> {
         Type { name: format!("SliceMut<{}>", t.name), visibility: Visibility::Public, docs: Docs::empty(), emission, kind: Self::kind() }
     }
 
-    fn register(inventory: &mut Inventory) {
+    fn register(inventory: &mut RustInventory) {
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
     }

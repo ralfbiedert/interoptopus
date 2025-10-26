@@ -7,7 +7,7 @@
 //! Note, many items here are deliberately not documented as testing how and if documentation
 //! is generated is part of the test.
 
-use interoptopus::inventory::Inventory;
+use interoptopus::inventory::RustInventory;
 use interoptopus::{builtins_string, builtins_vec, constant, extra_type, ffi, function, service};
 
 pub mod constants;
@@ -48,8 +48,8 @@ pub mod services {
 pub mod types;
 // pub mod wire;
 
-pub fn ffi_inventory() -> Inventory {
-    Inventory::new()
+pub fn ffi_inventory() -> RustInventory {
+    RustInventory::new()
         // Functions
         .register(builtins_string!())
         // .register(builtins_wire!())

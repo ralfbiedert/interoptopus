@@ -4,7 +4,7 @@ use crate::dispatch::Dispatch;
 use crate::output::{Output, OutputKind};
 use crate::stage::ProcessError;
 use crate::template::templates;
-use interoptopus::inventory::Inventory;
+use interoptopus::inventory::RustInventory;
 use interoptopus_backends::template::TemplateEngine;
 
 pub struct Config {
@@ -28,7 +28,7 @@ impl Stage {
         Self { config, outputs: vec![] }
     }
 
-    pub fn process(&mut self, _: &Inventory) -> ProcessError {
+    pub fn process(&mut self, _: &RustInventory) -> ProcessError {
         // TODO: for each possible file, create an entry
         self.outputs.push(Output { name: "Foo.cs".to_string(), kind: OutputKind::Csharp });
         Ok(())

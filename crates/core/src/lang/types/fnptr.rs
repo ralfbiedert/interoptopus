@@ -1,5 +1,5 @@
 use crate::bad_wire;
-use crate::inventory::Inventory;
+use crate::inventory::{Inventory, RustInventory};
 use crate::lang::function::{Argument, Signature};
 use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::wire::WireIO;
@@ -46,7 +46,7 @@ macro_rules! impl_fnptr {
                 }
             }
 
-            fn register(inventory: &mut Inventory) {
+            fn register(inventory: &mut impl Inventory) {
                 $r::register(inventory);
                 inventory.register_type(Self::id(), Self::ty());
             }
@@ -88,7 +88,7 @@ macro_rules! impl_fnptr {
                 <extern "C" fn() -> $r as TypeInfo>::ty()
             }
 
-            fn register(inventory: &mut Inventory) {
+            fn register(inventory: &mut impl Inventory) {
                 <extern "C" fn() -> $r as TypeInfo>::register(inventory);
             }
         }
@@ -192,7 +192,7 @@ macro_rules! impl_fnptr {
                 }
             }
 
-            fn register(inventory: &mut Inventory) {
+            fn register(inventory: &mut impl Inventory) {
                 $r::register(inventory);
                 $($t::register(inventory);)+
                 inventory.register_type(Self::id(), Self::ty());
@@ -242,7 +242,7 @@ macro_rules! impl_fnptr {
                 <extern "C" fn($($t),+) -> $r as TypeInfo>::ty()
             }
 
-            fn register(inventory: &mut Inventory) {
+            fn register(inventory: &mut impl Inventory) {
                 <extern "C" fn($($t),+) -> $r as TypeInfo>::register(inventory);
             }
         }

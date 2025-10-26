@@ -1,5 +1,5 @@
 use crate::bad_wire;
-use crate::inventory::Inventory;
+use crate::inventory::RustInventory;
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::SerializationError;
 use crate::lang::types::wire::WireIO;
@@ -33,7 +33,7 @@ macro_rules! impl_ptr {
                 Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: $name.to_string(), kind: Self::kind() }
             }
 
-            fn register(inventory: &mut Inventory) {
+            fn register(inventory: &mut RustInventory) {
                 // Ensure base type is registered.
                 T::register(inventory);
                 inventory.register_type(Self::id(), Self::ty());
@@ -97,7 +97,7 @@ impl<T: TypeInfo> TypeInfo for MaybeUninit<T> {
         T::ty()
     }
 
-    fn register(inventory: &mut Inventory) {
+    fn register(inventory: &mut RustInventory) {
         // Same as base type
         T::register(inventory);
     }
@@ -136,7 +136,7 @@ impl TypeInfo for String {
         Type { emission: Emission::Common, docs: Docs::empty(), visibility: Visibility::Public, name: "String".to_string(), kind: Self::kind() }
     }
 
-    fn register(inventory: &mut Inventory) {
+    fn register(inventory: &mut RustInventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
 }
@@ -175,7 +175,7 @@ impl<T: TypeInfo> TypeInfo for Vec<T> {
         Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: format!("Vec<{}>", t.name), kind: Self::kind() }
     }
 
-    fn register(inventory: &mut Inventory) {
+    fn register(inventory: &mut RustInventory) {
         // Ensure base type is registered.
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
@@ -217,7 +217,7 @@ impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap
         Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: format!("HashMap<{}, {}>", k.name, v.name), kind: Self::kind() }
     }
 
-    fn register(inventory: &mut Inventory) {
+    fn register(inventory: &mut RustInventory) {
         // Ensure base types are registered.
         K::register(inventory);
         V::register(inventory);
@@ -258,7 +258,7 @@ impl TypeInfo for ::std::ffi::c_void {
         Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: "c_void".to_string(), kind: Self::kind() }
     }
 
-    fn register(inventory: &mut Inventory) {
+    fn register(inventory: &mut RustInventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
 }

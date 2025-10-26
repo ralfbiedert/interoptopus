@@ -1,6 +1,6 @@
 use backend_csharp_ng::RustLibrary;
 use backend_csharp_ng::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
-use interoptopus::inventory::Inventory;
+use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::error::Error;
 use std::sync::Arc;
@@ -14,11 +14,11 @@ pub struct MyPlugin {
 }
 
 impl RustLibraryPlugin for MyPlugin {
-    fn init(&mut self, _: &mut Inventory) {
+    fn init(&mut self, _: &mut RustInventory) {
         self.init_called.store(true, Ordering::Relaxed);
     }
 
-    fn post_model(&mut self, _: &Inventory, _: PostModelPass) {
+    fn post_model(&mut self, _: &RustInventory, _: PostModelPass) {
         self.post_model_called.store(true, Ordering::Relaxed);
     }
 
@@ -29,7 +29,7 @@ impl RustLibraryPlugin for MyPlugin {
 
 #[test]
 fn can_register() -> Result<(), Box<dyn Error>> {
-    let inventory = Inventory::new();
+    let inventory = RustInventory::new();
     let init_called = Arc::new(AtomicBool::new(false));
     let post_model_called = Arc::new(AtomicBool::new(false));
     let post_output_called = Arc::new(AtomicBool::new(false));

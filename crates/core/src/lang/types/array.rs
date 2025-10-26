@@ -1,3 +1,4 @@
+use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::wire::WireIO;
 use crate::lang::types::{SerializationError, Type, TypeId, TypeInfo, TypeKind};
@@ -33,7 +34,7 @@ where
         Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: format!("[{}; {N}]", T::ty().name), kind: Self::kind() }
     }
 
-    fn register(inventory: &mut crate::inventory::Inventory) {
+    fn register(inventory: &mut impl Inventory) {
         // Ensure base type is registered.
         T::register(inventory);
 

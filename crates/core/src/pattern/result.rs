@@ -28,7 +28,7 @@
 //! }
 //! ```
 
-use crate::inventory::{Inventory, TypeId};
+use crate::inventory::{RustInventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::any::Any;
@@ -141,7 +141,7 @@ impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
         }
     }
 
-    fn register(inventory: &mut Inventory) {
+    fn register(inventory: &mut RustInventory) {
         // Ensure base types are registered.
         T::register(inventory);
         E::register(inventory);

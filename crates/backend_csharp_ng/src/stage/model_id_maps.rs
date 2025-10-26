@@ -2,7 +2,7 @@
 
 use crate::model::TypeId;
 use crate::stage::ProcessError;
-use interoptopus::inventory::Inventory;
+use interoptopus::inventory::RustInventory;
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -17,7 +17,7 @@ impl Stage {
         Self { rust_to_cs: Default::default() }
     }
 
-    pub fn process(&mut self, _: &Inventory) -> ProcessError {
+    pub fn process(&mut self, _: &RustInventory) -> ProcessError {
         // TODO ...
         Ok(())
     }

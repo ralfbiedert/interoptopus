@@ -1,11 +1,11 @@
-use crate::inventory::{ConstantId, Inventory, TypeId};
+use crate::inventory::{ConstantId, Inventory, RustInventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::PrimitiveValue;
 
 pub trait ConstantInfo {
     fn id() -> ConstantId;
     fn constant() -> Constant;
-    fn register(inventory: &mut Inventory);
+    fn register(inventory: &mut impl Inventory);
 }
 
 /// The value of a constant.

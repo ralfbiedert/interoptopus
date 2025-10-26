@@ -1,4 +1,4 @@
-use interoptopus::inventory::Inventory;
+use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
 
@@ -17,7 +17,7 @@ pub struct PostOutputPass<'a> {
 }
 
 pub trait RustLibraryPlugin {
-    fn init(&mut self, inventory: &mut Inventory);
-    fn post_model(&mut self, inventory: &Inventory, models: PostModelPass);
+    fn init(&mut self, inventory: &mut RustInventory);
+    fn post_model(&mut self, inventory: &RustInventory, models: PostModelPass);
     fn post_output(&mut self, multibuf: &mut Multibuf, outputs: PostOutputPass);
 }

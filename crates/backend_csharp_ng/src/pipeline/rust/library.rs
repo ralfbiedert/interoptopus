@@ -2,7 +2,7 @@ use crate::Error;
 use crate::pipeline::RustLibraryBuilder;
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
 use crate::stage::{meta_info, model_final, model_id_maps, output_final, output_header, output_master};
-use interoptopus::inventory::Inventory;
+use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
 
@@ -23,7 +23,7 @@ pub struct IntermediateOutputStages {
 
 pub struct RustLibrary {
     // Basic input
-    inventory: Inventory,
+    inventory: RustInventory,
 
     // Model stages (transform and enrich data)
     meta_info: meta_info::Stage,
@@ -53,15 +53,15 @@ pub struct RustLibrary {
 }
 
 impl RustLibrary {
-    pub fn new(inventory: Inventory) -> Self {
+    pub fn new(inventory: RustInventory) -> Self {
         Self::with_config(inventory, RustLibraryConfig::default())
     }
 
-    pub fn builder(inventory: Inventory) -> RustLibraryBuilder {
+    pub fn builder(inventory: RustInventory) -> RustLibraryBuilder {
         RustLibraryBuilder::new(inventory)
     }
 
-    pub(crate) fn with_config(inventory: Inventory, config: RustLibraryConfig) -> Self {
+    pub(crate) fn with_config(inventory: RustInventory, config: RustLibraryConfig) -> Self {
         Self {
             inventory,
             meta_info: meta_info::Stage::new(config.meta_info),

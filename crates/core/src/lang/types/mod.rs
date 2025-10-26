@@ -10,7 +10,7 @@ mod wire;
 use crate::lang::function::Signature;
 use crate::lang::meta::{Docs, Emission, Visibility};
 
-use crate::inventory::{Inventory, TypeId};
+use crate::inventory::{Inventory, RustInventory, TypeId};
 pub use array::Array;
 pub use enums::{Enum, Variant, VariantKind};
 pub use pattern::TypePattern;
@@ -34,7 +34,7 @@ pub trait TypeInfo {
     fn ty() -> Type;
 
     // Registers the type and all dependents in an Inventory.
-    fn register(inventory: &mut Inventory);
+    fn register(inventory: &mut impl Inventory);
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
