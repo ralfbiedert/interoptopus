@@ -15,7 +15,3 @@ error[E0277]: the trait bound `Bar: WireIO` is not satisfied
              HashMap<K, V, S>
            and $N others
    = help: see issue #48214
-help: add `#![feature(trivial_bounds)]` to the crate attributes to enable
-   |
- 1 + #![feature(trivial_bounds)]
-   |

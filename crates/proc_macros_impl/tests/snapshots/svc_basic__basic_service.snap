@@ -54,7 +54,7 @@ impl ::interoptopus::lang::service::ServiceInfo for Service {
             vec![],
         )
     }
-    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+    fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
         <Service as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         <service_new as ::interoptopus::lang::function::FunctionInfo>::register(
             inventory,

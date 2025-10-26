@@ -1,6 +1,6 @@
 ---
 source: crates/proc_macros_impl/tests/fn_async.rs
-expression: formatted
+expression: expand_ffi!(item)
 ---
 #[unsafe(export_name = "async_foo")]
 extern "C" fn async_foo() {}
@@ -25,7 +25,7 @@ impl ::interoptopus::lang::function::FunctionInfo for async_foo {
             signature: Self::signature(),
         }
     }
-    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+    fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
         <() as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         inventory.register_function(Self::id(), Self::function());
     }

@@ -38,7 +38,7 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
             kind: Self::kind(),
         }
     }
-    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+    fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
         <u8 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
     }

@@ -41,7 +41,7 @@ impl TypeModel {
                     #ty_expr
                 }
 
-                fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+                fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
                     #register_expr
                 }
             }

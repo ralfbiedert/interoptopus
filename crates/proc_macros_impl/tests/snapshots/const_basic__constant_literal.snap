@@ -20,7 +20,7 @@ impl ::interoptopus::lang::constant::ConstantInfo for MY_CONST {
             value: ::interoptopus::lang::constant::ConstantValue::value(&MY_CONST),
         }
     }
-    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+    fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
         <u32 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         inventory.register_constant(Self::id(), Self::constant());
     }

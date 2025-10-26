@@ -23,7 +23,7 @@ impl TypeInfo for Bar {
     fn ty() -> Type {
         todo!()
     }
-    fn register(_: &mut Inventory) {}
+    fn register(_: &mut impl Inventory) {}
 }
 
 #[ffi]

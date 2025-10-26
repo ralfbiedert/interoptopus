@@ -1,6 +1,5 @@
 ---
 source: crates/proc_macros_impl/tests/ty_fields.rs
-assertion_line: 17
 expression: expand_ffi!(item)
 ---
 #[repr(C)]
@@ -55,7 +54,7 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
             kind: Self::kind(),
         }
     }
-    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+    fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
         <u8 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         <String as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         <f32 as ::interoptopus::lang::types::TypeInfo>::register(inventory);

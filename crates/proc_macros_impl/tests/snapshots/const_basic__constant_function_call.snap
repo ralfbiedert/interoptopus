@@ -20,7 +20,7 @@ impl ::interoptopus::lang::constant::ConstantInfo for COMPUTED {
             value: ::interoptopus::lang::constant::ConstantValue::value(&COMPUTED),
         }
     }
-    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+    fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
         <i32 as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         inventory.register_constant(Self::id(), Self::constant());
     }

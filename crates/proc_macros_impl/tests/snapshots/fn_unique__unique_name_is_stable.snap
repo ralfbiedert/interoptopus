@@ -1,6 +1,5 @@
 ---
 source: crates/proc_macros_impl/tests/fn_unique.rs
-assertion_line: 13
 expression: expand_ffi!(item)
 ---
 #[unsafe(export_name = "foo_43031")]
@@ -26,7 +25,7 @@ impl ::interoptopus::lang::function::FunctionInfo for foo {
             signature: Self::signature(),
         }
     }
-    fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+    fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
         <() as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         inventory.register_function(Self::id(), Self::function());
     }
