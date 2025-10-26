@@ -1,6 +1,6 @@
 //! Like a regular [`String`](std::string::String), but FFI safe.
 
-use crate::inventory::{RustInventory, TypeId};
+use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::io::{Read, Write};
@@ -96,7 +96,7 @@ impl TypeInfo for String {
         Type { emission: Emission::Common, docs: crate::lang::meta::Docs::empty(), visibility: Visibility::Public, name: "String".to_string(), kind: Self::kind() }
     }
 
-    fn register(inventory: &mut RustInventory) {
+    fn register(inventory: &mut impl Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
 }

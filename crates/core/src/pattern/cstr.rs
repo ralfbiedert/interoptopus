@@ -24,7 +24,7 @@
 //! void call_with_string(uint8_t* s);
 //! ```
 //!
-use crate::inventory::{RustInventory, TypeId};
+use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use crate::{Error, bad_wire};
@@ -140,7 +140,7 @@ impl TypeInfo for CStrPtr<'_> {
         Type { emission: Emission::Common, docs: Docs::empty(), visibility: Visibility::Public, name: "CStrPtr".to_string(), kind: Self::kind() }
     }
 
-    fn register(inventory: &mut RustInventory) {
+    fn register(inventory: &mut impl Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
 }

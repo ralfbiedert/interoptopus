@@ -231,7 +231,7 @@ macro_rules! callback {
                 }
             }
 
-            fn register(inventory: &mut $crate::inventory::RustInventory) {
+            fn register(inventory: &mut impl $crate::inventory::Inventory) {
                 // Register contained types
                 <$rval>::register(inventory);
                 $(<$ty>::register(inventory);)*

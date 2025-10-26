@@ -1,6 +1,6 @@
 //! Like a regular [`Vec`](std::vec::Vec), but FFI safe.<sup>🚧</sup>
 
-use crate::inventory::{RustInventory, TypeId};
+use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::io::{Read, Write};
@@ -95,7 +95,7 @@ impl<T: TypeInfo> TypeInfo for Vec<T> {
         }
     }
 
-    fn register(inventory: &mut RustInventory) {
+    fn register(inventory: &mut impl Inventory) {
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());
     }

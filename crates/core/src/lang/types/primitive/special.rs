@@ -1,5 +1,5 @@
 use crate::bad_wire;
-use crate::inventory::{RustInventory, TypeId};
+use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::wire::WireIO;
 use crate::lang::types::{Primitive, SerializationError, Type, TypeInfo, TypeKind};
@@ -24,7 +24,7 @@ impl TypeInfo for () {
         Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: "()".to_string(), kind: Self::kind() }
     }
 
-    fn register(inventory: &mut RustInventory) {
+    fn register(inventory: &mut impl Inventory) {
         let type_id = Self::id();
         let type_ = Self::ty();
         _ = inventory.register_type(type_id, type_)
@@ -64,7 +64,7 @@ impl TypeInfo for bool {
         Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: "bool".to_string(), kind: Self::kind() }
     }
 
-    fn register(inventory: &mut RustInventory) {
+    fn register(inventory: &mut impl Inventory) {
         let type_id = Self::id();
         let type_ = Self::ty();
         _ = inventory.register_type(type_id, type_)

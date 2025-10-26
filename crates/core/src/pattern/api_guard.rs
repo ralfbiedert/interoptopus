@@ -91,7 +91,7 @@ impl TypeInfo for ApiVersion {
         crate::lang::types::Type { emission: Emission::Common, docs: Docs::empty(), visibility: Visibility::Public, name: "ApiVersion".to_string(), kind: Self::kind() }
     }
 
-    fn register(inventory: &mut crate::inventory::RustInventory) {
+    fn register(inventory: &mut impl crate::inventory::Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
 }

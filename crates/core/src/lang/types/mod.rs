@@ -10,7 +10,7 @@ mod wire;
 use crate::lang::function::Signature;
 use crate::lang::meta::{Docs, Emission, Visibility};
 
-use crate::inventory::{Inventory, RustInventory, TypeId};
+use crate::inventory::{Inventory, TypeId};
 pub use array::Array;
 pub use enums::{Enum, Variant, VariantKind};
 pub use pattern::TypePattern;

@@ -1,6 +1,6 @@
 //! Additional support for primitives like `bool`.
 
-use crate::inventory::{RustInventory, TypeId};
+use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 #[cfg(feature = "serde")]
@@ -75,7 +75,7 @@ impl TypeInfo for Bool {
         Type { name: "Bool".to_string(), visibility: Visibility::Public, docs: Docs::empty(), emission: Emission::Builtin, kind: Self::kind() }
     }
 
-    fn register(inventory: &mut RustInventory) {
+    fn register(inventory: &mut impl Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
 }
@@ -140,7 +140,7 @@ impl TypeInfo for CChar {
         Type { name: "CChar".to_string(), visibility: Visibility::Public, docs: Docs::empty(), emission: Emission::Builtin, kind: Self::kind() }
     }
 
-    fn register(inventory: &mut RustInventory) {
+    fn register(inventory: &mut impl Inventory) {
         inventory.register_type(Self::id(), Self::ty());
     }
 }

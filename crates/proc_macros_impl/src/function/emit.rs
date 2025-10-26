@@ -112,7 +112,7 @@ impl FunctionModel {
                     }
                 }
 
-                fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+                fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
                     // Register all parameter types
                     #(
                         #parameter_registrations;

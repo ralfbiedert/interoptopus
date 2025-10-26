@@ -1,7 +1,7 @@
 //! Transparent `async fn` support over FFI.
 
 use crate::bad_wire;
-use crate::inventory::{RustInventory, TypeId};
+use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::Visibility;
 use crate::lang::types::{SerializationError, TypeInfo, TypeKind, WireIO};
 use std::ffi::c_void;
@@ -81,7 +81,7 @@ impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
         }
     }
 
-    fn register(inventory: &mut RustInventory) {
+    fn register(inventory: &mut impl Inventory) {
         // Ensure base type is registered.
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());

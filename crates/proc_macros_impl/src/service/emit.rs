@@ -546,7 +546,7 @@ impl ServiceModel {
                     )
                 }
 
-                fn register(inventory: &mut ::interoptopus::inventory::Inventory) {
+                fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
                     // Register the service type itself
                     <#service_type as ::interoptopus::lang::types::TypeInfo>::register(inventory);
 

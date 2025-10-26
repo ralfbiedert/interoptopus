@@ -1,5 +1,5 @@
 use crate::bad_wire;
-use crate::inventory::{Inventory, RustInventory};
+use crate::inventory::Inventory;
 use crate::lang::function::{Argument, Signature};
 use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::wire::WireIO;

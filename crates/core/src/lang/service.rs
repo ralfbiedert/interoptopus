@@ -1,4 +1,4 @@
-use crate::inventory::{FunctionId, Inventory, RustInventory, ServiceId, TypeId};
+use crate::inventory::{FunctionId, Inventory, ServiceId, TypeId};
 
 pub trait ServiceInfo {
     fn id() -> ServiceId;

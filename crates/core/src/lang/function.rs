@@ -1,4 +1,4 @@
-use crate::inventory::{FunctionId, Inventory, RustInventory, TypeId};
+use crate::inventory::{FunctionId, Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
 
 pub trait FunctionInfo {

@@ -14,7 +14,7 @@
 //! ```
 //!
 
-use crate::inventory::{RustInventory, TypeId};
+use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, Visibility};
 use crate::lang::types::{SerializationError, TypeInfo};
 use crate::lang::types::{TypeKind, WireIO};
@@ -135,7 +135,7 @@ impl<T: TypeInfo> TypeInfo for Option<T> {
         }
     }
 
-    fn register(inventory: &mut RustInventory) {
+    fn register(inventory: &mut impl Inventory) {
         // Ensure base type is registered.
         T::register(inventory);
         inventory.register_type(Self::id(), Self::ty());

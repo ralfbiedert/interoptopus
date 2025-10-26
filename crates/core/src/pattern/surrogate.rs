@@ -47,7 +47,7 @@
 //! In most cases the right things to do is defining your own FFI types and export these instead.
 
 use crate::bad_wire;
-use crate::inventory::{RustInventory, TypeId};
+use crate::inventory::{Inventory, TypeId};
 use crate::lang::types::{SerializationError, TypeInfo, WireIO};
 use crate::lang::types::{Type, TypeKind};
 use std::io::{Read, Write};
@@ -91,7 +91,7 @@ impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
         L::ty()
     }
 
-    fn register(inventory: &mut RustInventory) {
+    fn register(inventory: &mut impl Inventory) {
         L::register(inventory);
     }
 }

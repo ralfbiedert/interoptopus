@@ -29,7 +29,7 @@ macro_rules! impl_primitive {
                 }
             }
 
-            fn register<I: $crate::inventory::Inventory>(inventory: &mut I) {
+            fn register(inventory: &mut impl $crate::inventory::Inventory) {
                 let type_id = Self::id();
                 let type_ = Self::ty();
                 _ = inventory.register_type(type_id, type_)

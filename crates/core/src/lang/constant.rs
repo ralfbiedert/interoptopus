@@ -1,4 +1,4 @@
-use crate::inventory::{ConstantId, Inventory, RustInventory, TypeId};
+use crate::inventory::{ConstantId, Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::PrimitiveValue;
 
