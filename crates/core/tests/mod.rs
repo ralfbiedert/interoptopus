@@ -3,6 +3,7 @@ use trybuild::TestCases;
 mod inventory {
     mod basic;
     mod forbidden;
+    mod macros;
 }
 
 #[test]
