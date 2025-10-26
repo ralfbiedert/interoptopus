@@ -1,4 +1,7 @@
 {{header}}
 
-{{functions}}
+namespace A {
+    {{ types | indent }}
+}
+
 

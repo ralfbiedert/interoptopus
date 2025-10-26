@@ -27,3 +27,19 @@ fn render_templates() {
     assert!(rendered.contains("DDD"));
     assert!(rendered.contains("EEE"));
 }
+
+const X: &str = r#"
+u32
+f32
+"#;
+
+#[test]
+fn nested() {
+    let templates = templates();
+    let mut context = Context::new();
+
+    context.insert("header", "// Foo");
+    context.insert("types", X);
+    let file_header = templates.render("master.cs", &context).unwrap();
+    print!("{}", file_header);
+}
