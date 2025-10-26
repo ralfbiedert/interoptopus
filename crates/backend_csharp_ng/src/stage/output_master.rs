@@ -1,20 +1,52 @@
-//! Main output configuration.
+//! Top-level output configuration.
 
-use crate::stage::{output_director, output_header};
+use crate::dispatch::Dispatch;
+use crate::output::{Output, OutputKind};
+use crate::stage::ProcessError;
+use crate::template::templates;
 use interoptopus::inventory::Inventory;
-use interoptopus_backends::output::Multibuf;
+use interoptopus_backends::template::TemplateEngine;
 
-#[derive(Default)]
-pub struct Config {}
+pub struct Config {
+    pub dispatch: Dispatch,
+    pub templates: TemplateEngine,
+}
 
-pub struct Stage {}
+impl Default for Config {
+    fn default() -> Self {
+        Self { dispatch: Default::default(), templates: templates() }
+    }
+}
+
+pub struct Stage {
+    config: Config,
+    outputs: Vec<Output>,
+}
 
 impl Stage {
-    pub fn new(_: Config) -> Self {
-        Self {}
+    pub fn new(config: Config) -> Self {
+        Self { config, outputs: vec![] }
     }
 
-    pub fn process(&mut self, _: &Inventory, output: &mut Multibuf, output_director: &output_director::Stage, output_header: &output_header::Stage) {
-        let dispatch = output_director.dispatch();
+    pub fn process(&mut self, inventory: &Inventory) -> ProcessError {
+        // TODO: for each possible file, create an entry
+        self.outputs.push(Output { name: "Foo.cs".to_string(), kind: OutputKind::Csharp });
+        Ok(())
+    }
+
+    pub fn dispatch(&self) -> &Dispatch {
+        &self.config.dispatch
+    }
+
+    pub fn templates(&self) -> &TemplateEngine {
+        &self.config.templates
+    }
+
+    pub fn outputs(&self) -> impl Iterator<Item = &Output> {
+        self.outputs.iter()
+    }
+
+    pub fn outputs_of(&self, kind: OutputKind) -> impl Iterator<Item = &Output> {
+        self.outputs.iter().filter(move |x| x.kind == kind)
     }
 }

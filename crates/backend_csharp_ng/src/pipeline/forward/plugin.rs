@@ -1,5 +1,6 @@
-use crate::pipeline::forward::builder::RustPluginBuilder;
-use crate::stage::{output_director, output_header, output_master, type_id_mapping};
+use crate::Error;
+use crate::pipeline::forward::RustPluginBuilder;
+use crate::stage::{output_final, output_header, output_master, type_id_mapping};
 use interoptopus::inventory::Inventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
@@ -10,9 +11,9 @@ pub struct RustPluginConfig {
     pub type_id_mapping2: type_id_mapping::Config,
     pub type_id_mapping3: type_id_mapping::Config,
     pub type_id_mapping4: type_id_mapping::Config,
-    pub output_director: output_director::Config,
-    pub output_header: output_header::Config,
     pub output_master: output_master::Config,
+    pub output_header: output_header::Config,
+    pub output_final: output_final::Config,
     _hidden: PhantomData<()>,
 }
 
@@ -25,16 +26,20 @@ pub struct RustPlugin {
     type_id_mappings2: type_id_mapping::Stage,
     type_id_mappings3: type_id_mapping::Stage,
     type_id_mappings4: type_id_mapping::Stage,
+    // ...
 
     // First output stage determining files to be produced
-    output_director: output_director::Stage,
+    output_master: output_master::Stage,
 
     // Most other output stages. Ideally these should have no cross-dependencies,
     // only depending on the models above. The last output stages (e.g., output_master)
     // then integrate all previous outputs to write the actual artifact (into Multibuf)
     output_header: output_header::Stage,
+    // ...
 
-    output_master: output_master::Stage,
+    // Last output stage(s). Writes a `.cs` file (later possibly other files w. other
+    // master stages) into the Multibuf.
+    output_final: output_final::Stage,
 
     // Output
     output: Multibuf,
@@ -56,19 +61,20 @@ impl RustPlugin {
             type_id_mappings2: type_id_mapping::Stage::new(config.type_id_mapping2),
             type_id_mappings3: type_id_mapping::Stage::new(config.type_id_mapping3),
             type_id_mappings4: type_id_mapping::Stage::new(config.type_id_mapping4),
-            output_director: output_director::Stage::new(config.output_director),
-            output_header: output_header::Stage::new(config.output_header),
             output_master: output_master::Stage::new(config.output_master),
+            output_header: output_header::Stage::new(config.output_header),
+            output_final: output_final::Stage::new(config.output_final),
             output: Multibuf::default(),
         }
     }
 
-    pub fn process(mut self) -> Multibuf {
-        self.type_id_mappings.process(&mut self.inventory);
-        self.output_director.process(&mut self.inventory);
-        self.output_header.process(&mut self.inventory, &self.output_director);
-        self.output_master
-            .process(&mut self.inventory, &mut self.output, &self.output_director, &self.output_header);
-        self.output
+    pub fn process(mut self) -> Result<Multibuf, Error> {
+        self.type_id_mappings.process(&mut self.inventory)?;
+        self.output_master.process(&mut self.inventory)?;
+        self.output_header.process(&mut self.inventory, &self.output_master)?;
+        self.output_final
+            .process(&mut self.inventory, &mut self.output, &self.output_master, &self.output_header)?;
+
+        Ok(self.output)
     }
 }

@@ -6,5 +6,5 @@ use interoptopus::inventory::Inventory;
 fn output() {
     let inventory = Inventory::new();
     let dispatch = Dispatch::single_file();
-    let output = RustPlugin::builder(inventory).dispatch(dispatch).build().process();
+    let output = RustPlugin::builder(inventory).dispatch(dispatch).build().process().unwrap();
 }

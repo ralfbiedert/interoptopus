@@ -15,12 +15,12 @@ impl RustPluginBuilder {
     }
 
     pub fn dispatch(mut self, dispatch: Dispatch) -> Self {
-        self.config.output_director.dispatch = dispatch;
+        self.config.output_master.dispatch = dispatch;
         self
     }
 
     pub fn templates(mut self, templates: TemplateEngine) -> Self {
-        self.config.output_director.templates = templates;
+        self.config.output_master.templates = templates;
         self
     }
 

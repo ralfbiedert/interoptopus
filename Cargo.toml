@@ -41,6 +41,7 @@ anyhow = "1.0.98"
 darling = "0.20.11"
 derive_builder = "0.20.2"
 heck = "0.5.0"
+fundle = "0.2.0"
 include_dir = { version = "0.7.4", features = ["glob"] }
 log = "0.4.27"
 prettyplease = "0.2.35"
