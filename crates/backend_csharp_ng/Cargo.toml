@@ -16,6 +16,9 @@ include_dir.workspace = true
 [build-dependencies]
 interoptopus_backends.workspace = true
 
+[dev-dependencies]
+insta.workspace = true
+
 
 [lints]
 workspace = true

@@ -1,7 +1,7 @@
 use crate::Error;
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::Read;
+use std::io::{Read, Write};
 use std::path::Path;
 
 /// Runtime asset loader that can load files from an embedded tar archive
@@ -74,12 +74,10 @@ impl Assets {
 ///     println!("cargo:warning=Packed assets to {}", out_path.display());
 /// }
 /// ```
-pub fn pack_assets(out_path: impl AsRef<Path>, root: impl AsRef<Path>) -> Result<(), Error> {
+pub fn pack_assets(out: impl Write, root: impl AsRef<Path>) -> Result<(), Error> {
     let root = root.as_ref();
-    let out_path = out_path.as_ref();
 
-    let tar_file = File::create(out_path)?;
-    let mut builder = tar::Builder::new(tar_file);
+    let mut builder = tar::Builder::new(out);
 
     // Walk the directory tree
     walk_dir(root, root, &mut builder)?;
@@ -90,7 +88,7 @@ pub fn pack_assets(out_path: impl AsRef<Path>, root: impl AsRef<Path>) -> Result
 }
 
 /// Recursively walk a directory and add all files to the tar archive
-fn walk_dir(root: &Path, current: &Path, builder: &mut tar::Builder<File>) -> Result<(), Error> {
+fn walk_dir(root: &Path, current: &Path, builder: &mut tar::Builder<impl Write>) -> Result<(), Error> {
     if !current.is_dir() {
         return Ok(());
     }
