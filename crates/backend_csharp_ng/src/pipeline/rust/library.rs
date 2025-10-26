@@ -1,7 +1,7 @@
 use crate::Error;
 use crate::pipeline::RustLibraryBuilder;
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
-use crate::stage::{meta_info, output_final, output_header, output_master, type_id_mapping};
+use crate::stage::{meta_info, model_final, model_id_maps, output_final, output_header, output_master};
 use interoptopus::inventory::Inventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
@@ -9,10 +9,8 @@ use std::marker::PhantomData;
 #[derive(Default)]
 pub struct RustLibraryConfig {
     pub meta_info: meta_info::Config,
-    pub type_id_mapping: type_id_mapping::Config,
-    pub type_id_mapping2: type_id_mapping::Config,
-    pub type_id_mapping3: type_id_mapping::Config,
-    pub type_id_mapping4: type_id_mapping::Config,
+    pub model_id_maps: model_id_maps::Config,
+    pub model_final: model_final::Config,
     pub output_master: output_master::Config,
     pub output_header: output_header::Config,
     pub output_final: output_final::Config,
@@ -29,10 +27,8 @@ pub struct RustLibrary {
 
     // Model stages (transform and enrich data)
     meta_info: meta_info::Stage,
-    type_id_mappings: type_id_mapping::Stage,
-    type_id_mappings2: type_id_mapping::Stage,
-    type_id_mappings3: type_id_mapping::Stage,
-    type_id_mappings4: type_id_mapping::Stage,
+    model_id_maps: model_id_maps::Stage,
+    model_final: model_final::Stage,
     // ...
 
     // First output stage determining files to be produced
@@ -69,10 +65,8 @@ impl RustLibrary {
         Self {
             inventory,
             meta_info: meta_info::Stage::new(config.meta_info),
-            type_id_mappings: type_id_mapping::Stage::new(config.type_id_mapping),
-            type_id_mappings2: type_id_mapping::Stage::new(config.type_id_mapping2),
-            type_id_mappings3: type_id_mapping::Stage::new(config.type_id_mapping3),
-            type_id_mappings4: type_id_mapping::Stage::new(config.type_id_mapping4),
+            model_id_maps: model_id_maps::Stage::new(config.model_id_maps),
+            model_final: model_final::Stage::new(config.model_final),
             output_master: output_master::Stage::new(config.output_master),
             output_stages: IntermediateOutputStages { header: output_header::Stage::new(config.output_header) },
             output_final: output_final::Stage::new(config.output_final),
@@ -111,7 +105,8 @@ impl RustLibrary {
 
         // Model stages
         self.meta_info.process(&mut self.inventory)?;
-        self.type_id_mappings.process(&mut self.inventory)?;
+        self.model_id_maps.process(&mut self.inventory)?;
+        self.model_final.process(&mut self.inventory)?;
         self.plugin_post_model_pass();
 
         // Output stages

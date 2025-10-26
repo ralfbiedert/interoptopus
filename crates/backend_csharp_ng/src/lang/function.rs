@@ -1,5 +1,5 @@
-use crate::id::TypeId;
 use crate::lang::meta::Visibility;
+use crate::model::TypeId;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Argument {

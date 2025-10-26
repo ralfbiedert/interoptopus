@@ -1,6 +1,6 @@
 //! Introduces C# TypeIDs and converts a Rust `TypeId` into a C# one.
 
-use crate::id::TypeId;
+use crate::model::TypeId;
 use crate::stage::ProcessError;
 use interoptopus::inventory::Inventory;
 use std::collections::HashMap;
@@ -18,6 +18,7 @@ impl Stage {
     }
 
     pub fn process(&mut self, _: &Inventory) -> ProcessError {
+        // TODO ...
         Ok(())
     }
 }

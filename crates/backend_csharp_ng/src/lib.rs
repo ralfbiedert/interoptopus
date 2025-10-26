@@ -1,5 +1,4 @@
 pub mod dispatch;
-pub mod id;
 pub mod lang;
 pub mod output;
 pub mod plugin;
@@ -8,6 +7,7 @@ pub mod template;
 
 mod error;
 mod macros;
+mod model;
 mod pipeline;
 
 pub use error::Error;

@@ -1,3 +1,4 @@
+pub mod constant;
 pub mod function;
 pub mod meta;
 pub mod pattern;

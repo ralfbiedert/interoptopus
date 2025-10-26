@@ -1,4 +1,4 @@
-use crate::id::{FunctionId, TypeId};
+use crate::model::{FunctionId, TypeId};
 
 type DispatchFn = Box<dyn FnMut(Item) -> String>;
 

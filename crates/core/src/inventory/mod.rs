@@ -1,7 +1,7 @@
 mod id;
 mod macros;
 
-pub use id::{hash_str, ConstantId, FunctionId, Id, ServiceId, TypeId};
+pub use id::{ConstantId, FunctionId, Id, ServiceId, TypeId, hash_str};
 
 use crate::lang::constant::Constant;
 use crate::lang::function::Function;
@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::mem::swap;
 
+// TODO: This should be 2 models: `RustInventory` & `ForeignInventory`
 #[derive(Default)]
 pub struct Inventory {
     pub types: HashMap<TypeId, Type>,

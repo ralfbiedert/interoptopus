@@ -32,12 +32,12 @@ mod enums;
 mod pattern;
 mod primitive;
 
-use crate::id::TypeId;
 use crate::lang::function::Signature;
 use crate::lang::meta::NamespaceId;
 use crate::lang::types::composite::Composite;
 use crate::lang::types::pattern::TypePattern;
 use crate::lang::types::primitive::Primitive;
+use crate::model::TypeId;
 pub use enums::{DataEnum, Variant};
 
 pub enum TypeKind {
