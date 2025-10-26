@@ -114,7 +114,7 @@ impl RustLibrary {
         self.type_id_mappings.process(&mut self.inventory)?;
         self.plugin_post_model_pass();
 
-        /// Output stages
+        // Output stages
         self.output_master.process(&mut self.inventory)?;
         self.output_stages.header.process(&mut self.inventory, &self.output_master, &self.meta_info)?;
         self.plugin_post_output_pass();
