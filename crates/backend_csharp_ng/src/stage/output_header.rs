@@ -3,6 +3,8 @@
 use crate::output::{Output, OutputKind};
 use crate::stage::{ProcessError, output_master};
 use interoptopus::inventory::Inventory;
+use interoptopus_backends::render;
+use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -24,6 +26,9 @@ impl Stage {
             // context.insert("foo", "bar");
             // let result = templates.render("header.cs", &context)?;
             // self.headers.insert(output.clone(), result);
+
+            let result = render!(templates, "header.cs", ("foo", "bar"), ("other", "something"))?;
+            self.headers.insert(output.clone(), result);
         }
         Ok(())
     }
