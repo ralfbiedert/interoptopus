@@ -4,8 +4,8 @@ macro_rules! extra_type {
     ($x:ty) => {{
         use $crate::lang::types::TypeInfo;
 
-        |x: &mut $crate::inventory::RustInventory| {
-            <$x as TypeInfo>::register(x);
+        |inventory| {
+            <$x as TypeInfo>::register(inventory);
         }
     }};
 }
@@ -14,8 +14,8 @@ macro_rules! extra_type {
 #[macro_export]
 macro_rules! function {
     ($x:ty) => {{
-        |x: &mut $crate::inventory::RustInventory| {
-            <$x as $crate::lang::function::FunctionInfo>::register(x);
+        |inventory| {
+            <$x as $crate::lang::function::FunctionInfo>::register(inventory);
         }
     }};
 }
@@ -24,8 +24,8 @@ macro_rules! function {
 #[macro_export]
 macro_rules! constant {
     ($x:ty) => {{
-        |x: &mut $crate::inventory::RustInventory| {
-            <$x as $crate::lang::constant::ConstantInfo>::register(x);
+        |inventory| {
+            <$x as $crate::lang::constant::ConstantInfo>::register(inventory);
         }
     }};
 }
@@ -34,8 +34,8 @@ macro_rules! constant {
 #[macro_export]
 macro_rules! service {
     ($x:ty) => {{
-        |x: &mut $crate::inventory::RustInventory| {
-            <$x as $crate::lang::service::ServiceInfo>::register(x);
+        |inventory| {
+            <$x as $crate::lang::service::ServiceInfo>::register(inventory);
         }
     }};
 }
