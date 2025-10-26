@@ -17,7 +17,7 @@ impl Stage {
         Self { rust_to_cs: Default::default() }
     }
 
-    pub fn process(&mut self, inventory: &Inventory) -> ProcessError {
+    pub fn process(&mut self, _: &Inventory) -> ProcessError {
         Ok(())
     }
 }

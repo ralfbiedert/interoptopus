@@ -28,7 +28,7 @@ impl Stage {
         Self { config, outputs: vec![] }
     }
 
-    pub fn process(&mut self, inventory: &Inventory) -> ProcessError {
+    pub fn process(&mut self, _: &Inventory) -> ProcessError {
         // TODO: for each possible file, create an entry
         self.outputs.push(Output { name: "Foo.cs".to_string(), kind: OutputKind::Csharp });
         Ok(())

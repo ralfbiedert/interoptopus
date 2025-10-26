@@ -1,6 +1,5 @@
 use crate::Error;
 use std::collections::HashMap;
-use std::fs::File;
 use std::io::{Read, Write};
 use std::path::Path;
 

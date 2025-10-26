@@ -1,4 +1,3 @@
-use interoptopus_backends::template;
 use interoptopus_backends::template::{TemplateEngine, pack_assets};
 use tera::Context;
 

@@ -1,10 +1,15 @@
 use backend_csharp_ng::RustPlugin;
-use backend_csharp_ng::dispatch::Dispatch;
 use interoptopus::inventory::Inventory;
+use std::error::Error;
 
 #[test]
-fn output() {
+fn output() -> Result<(), Box<dyn Error>> {
     let inventory = Inventory::new();
-    let dispatch = Dispatch::single_file();
-    let output = RustPlugin::builder(inventory).dispatch(dispatch).build().process().unwrap();
+    let multibuf = RustPlugin::new(inventory).process()?;
+
+    for output in multibuf.iter() {
+        println!("{:?}", output);
+    }
+
+    Ok(())
 }

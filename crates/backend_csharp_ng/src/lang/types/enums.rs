@@ -1,11 +1,11 @@
 use crate::lang::types::TypeId;
 
 pub struct Variant {
-    name: String,
-    tag: usize,
-    ty: TypeId,
+    pub name: String,
+    pub tag: usize,
+    pub ty: TypeId,
 }
 
 pub struct DataEnum {
-    variants: Vec<Variant>,
+    pub variants: Vec<Variant>,
 }

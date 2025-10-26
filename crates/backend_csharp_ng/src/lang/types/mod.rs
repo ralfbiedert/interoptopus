@@ -32,8 +32,6 @@ mod enums;
 mod pattern;
 mod primitive;
 
-use interoptopus::new_id;
-
 use crate::id::TypeId;
 use crate::lang::function::Signature;
 use crate::lang::meta::NamespaceId;
