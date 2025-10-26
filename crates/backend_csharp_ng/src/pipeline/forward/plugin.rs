@@ -1,5 +1,5 @@
 use crate::pipeline::forward::builder::RustPluginBuilder;
-use crate::stage::{output_director, output_header, type_id_mapping};
+use crate::stage::{output_director, output_header, output_master, type_id_mapping};
 use interoptopus::inventory::Inventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
@@ -12,6 +12,7 @@ pub struct RustPluginConfig {
     pub type_id_mapping4: type_id_mapping::Config,
     pub output_director: output_director::Config,
     pub output_header: output_header::Config,
+    pub output_master: output_master::Config,
     _hidden: PhantomData<()>,
 }
 
@@ -25,16 +26,15 @@ pub struct RustPlugin {
     type_id_mappings3: type_id_mapping::Stage,
     type_id_mappings4: type_id_mapping::Stage,
 
-    // Output stages
+    // First output stage determining files to be produced
     output_director: output_director::Stage,
 
+    // Most other output stages. Ideally these should have no cross-dependencies,
+    // only depending on the models above. The last output stages (e.g., output_master)
+    // then integrate all previous outputs to write the actual artifact (into Multibuf)
     output_header: output_header::Stage,
 
-    // todo ... now add regular stages, but should in theory be
-    // runnable in any order at this stage w.r.t. data model
-    // (only dependency needed should be for assembling files)
-    // For example
-    // - write import definitions in each multibuf section
+    output_master: output_master::Stage,
 
     // Output
     output: Multibuf,
@@ -58,14 +58,17 @@ impl RustPlugin {
             type_id_mappings4: type_id_mapping::Stage::new(config.type_id_mapping4),
             output_director: output_director::Stage::new(config.output_director),
             output_header: output_header::Stage::new(config.output_header),
+            output_master: output_master::Stage::new(config.output_master),
             output: Multibuf::default(),
         }
     }
 
     pub fn process(mut self) -> Multibuf {
         self.type_id_mappings.process(&mut self.inventory);
-        self.output_director.process(&mut self.inventory, &mut self.output);
-        self.output_header.process(&mut self.inventory, &mut self.output, &self.output_director);
+        self.output_director.process(&mut self.inventory);
+        self.output_header.process(&mut self.inventory, &self.output_director);
+        self.output_master
+            .process(&mut self.inventory, &mut self.output, &self.output_director, &self.output_header);
         self.output
     }
 }

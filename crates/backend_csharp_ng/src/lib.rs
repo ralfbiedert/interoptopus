@@ -1,6 +1,7 @@
 pub mod dispatch;
 pub mod id;
 pub mod lang;
+pub mod output;
 pub mod plugin;
 pub mod stage;
 pub mod template;

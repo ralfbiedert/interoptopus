@@ -1,35 +1,35 @@
 //! Main output configuration.
 
 use crate::dispatch::Dispatch;
+use crate::output::{Output, OutputKind};
 use crate::template::templates;
 use interoptopus::inventory::Inventory;
-use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::TemplateEngine;
-use std::marker::PhantomData;
 
 pub struct Config {
     pub dispatch: Dispatch,
     pub templates: TemplateEngine,
-    _hidden: PhantomData<()>,
 }
 
 impl Default for Config {
     fn default() -> Self {
-        Self { dispatch: Default::default(), templates: templates(), _hidden: Default::default() }
+        Self { dispatch: Default::default(), templates: templates() }
     }
 }
 
 pub struct Stage {
     config: Config,
+    outputs: Vec<Output>,
 }
 
 impl Stage {
     pub fn new(config: Config) -> Self {
-        Self { config }
+        Self { config, outputs: vec![] }
     }
 
-    pub fn process(&mut self, inventory: &Inventory, output: &mut Multibuf) {
-        // TODO: for each possible file, start creating an empty multibuf entry
+    pub fn process(&mut self, inventory: &Inventory) {
+        // TODO: for each possible file, create an entry
+        self.outputs.push(Output { name: "Foo.cs".to_string(), kind: OutputKind::Csharp });
     }
 
     pub fn dispatch(&self) -> &Dispatch {
@@ -38,5 +38,13 @@ impl Stage {
 
     pub fn templates(&self) -> &TemplateEngine {
         &self.config.templates
+    }
+
+    pub fn outputs(&self) -> impl Iterator<Item = &Output> {
+        self.outputs.iter()
+    }
+
+    pub fn outputs_of(&self, kind: OutputKind) -> impl Iterator<Item = &Output> {
+        self.outputs.iter().filter(move |x| x.kind == kind)
     }
 }
