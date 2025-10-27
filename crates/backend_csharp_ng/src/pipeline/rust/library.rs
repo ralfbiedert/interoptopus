@@ -108,7 +108,7 @@ impl RustLibrary {
 
         // Model passes
         self.meta_info.process()?;
-        self.model_id_maps.process()?;
+        self.model_id_maps.process(&self.inventory.types)?;
         self.model_type_map.process(&self.inventory.types)?;
         self.model_final.process()?;
         self.plugin_post_model_pass();
