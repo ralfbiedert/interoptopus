@@ -1,7 +1,6 @@
 //! ...
 
 use crate::pass::ProcessError;
-use interoptopus::inventory::RustInventory;
 
 #[derive(Default)]
 pub struct Config {}
@@ -16,7 +15,7 @@ impl Pass {
         Self { interop_dll_name: String::new(), interop_hash: String::new() }
     }
 
-    pub fn process(&mut self, _: &RustInventory) -> ProcessError {
+    pub fn process(&mut self) -> ProcessError {
         // TODO
         Ok(())
     }

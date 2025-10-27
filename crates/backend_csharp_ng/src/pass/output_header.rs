@@ -2,7 +2,6 @@
 
 use crate::output::{Output, OutputKind};
 use crate::pass::{meta_info, output_master, ProcessError};
-use interoptopus::inventory::RustInventory;
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -18,7 +17,7 @@ impl Pass {
         Self { headers: Default::default() }
     }
 
-    pub fn process(&mut self, _: &RustInventory, output_master: &output_master::Pass, meta_info: &meta_info::Pass) -> ProcessError {
+    pub fn process(&mut self, output_master: &output_master::Pass, meta_info: &meta_info::Pass) -> ProcessError {
         let templates = output_master.templates();
 
         for output in output_master.outputs_of(OutputKind::Csharp) {

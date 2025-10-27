@@ -4,7 +4,6 @@
 
 use crate::model::RustModel;
 use crate::pass::ProcessError;
-use interoptopus::inventory::RustInventory;
 
 #[derive(Default)]
 pub struct Config {}
@@ -18,7 +17,7 @@ impl Pass {
         Self { rust_model: Default::default() }
     }
 
-    pub fn process(&mut self, _: &RustInventory) -> ProcessError {
+    pub fn process(&mut self) -> ProcessError {
         // TODO ...
         Ok(())
     }

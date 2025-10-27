@@ -2,6 +2,7 @@
 
 use crate::model::TypeId;
 use crate::pass::ProcessError;
+use interoptopus::inventory::RustInventory;
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -16,7 +17,7 @@ impl Pass {
         Self { rust_to_cs: Default::default() }
     }
 
-    pub fn process(&mut self) -> ProcessError {
+    pub fn process(&mut self, _: &RustInventory) -> ProcessError {
         // TODO ...
         Ok(())
     }

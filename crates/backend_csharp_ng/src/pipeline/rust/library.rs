@@ -104,19 +104,18 @@ impl RustLibrary {
         self.plugin_init_pass();
 
         // Model passes
-        self.meta_info.process(&mut self.inventory)?;
-        self.model_id_maps.process(&mut self.inventory)?;
-        self.model_final.process(&mut self.inventory)?;
+        self.meta_info.process()?;
+        self.model_id_maps.process()?;
+        self.model_final.process()?;
         self.plugin_post_model_pass();
 
         // Output passes
-        self.output_master.process(&mut self.inventory)?;
-        self.output_passes.header.process(&mut self.inventory, &self.output_master, &self.meta_info)?;
+        self.output_master.process()?;
+        self.output_passes.header.process(&self.output_master, &self.meta_info)?;
         self.plugin_post_output_pass();
 
         // Final output pass(es)
-        self.output_final
-            .process(&mut self.inventory, &mut self.output, &self.output_master, &self.output_passes)?;
+        self.output_final.process(&mut self.output, &self.output_master, &self.output_passes)?;
 
         Ok(self.output)
     }

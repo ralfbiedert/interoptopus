@@ -3,7 +3,6 @@
 use crate::output::OutputKind;
 use crate::pass::{output_master, ProcessError};
 use crate::pipeline::IntermediateOutputPasses;
-use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;
 
@@ -17,7 +16,7 @@ impl Pass {
         Self {}
     }
 
-    pub fn process(&mut self, _: &RustInventory, output: &mut Multibuf, output_master: &output_master::Pass, intermediary: &IntermediateOutputPasses) -> ProcessError {
+    pub fn process(&mut self, output: &mut Multibuf, output_master: &output_master::Pass, intermediary: &IntermediateOutputPasses) -> ProcessError {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(OutputKind::Csharp) {
