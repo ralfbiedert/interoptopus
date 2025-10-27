@@ -1,24 +1,21 @@
-//! Introduces C# TypeIDs and converts a Rust `TypeId` into a C# one.
+//! ...
 
-use crate::model::TypeId;
+use crate::model::Types;
 use crate::pass::ProcessError;
-use interoptopus::inventory::RustInventory;
-use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct Config {}
 
 pub struct Pass {
-    rust_to_cs: HashMap<interoptopus::inventory::TypeId, TypeId>,
+    types: Types,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { rust_to_cs: Default::default() }
+        Self { types: Default::default() }
     }
 
-    pub fn process(&mut self, _: &RustInventory) -> ProcessError {
-        // TODO ...
+    pub fn process(&mut self, rust_types: &interoptopus::inventory::Types) -> ProcessError {
         Ok(())
     }
 }

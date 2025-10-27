@@ -38,6 +38,7 @@ pub trait TypeInfo {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TypeKind {
     Array(Array),
     Primitive(Primitive),
@@ -55,6 +56,7 @@ pub enum TypeKind {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Type {
     pub name: String,
     pub visibility: Visibility,
@@ -65,6 +67,7 @@ pub struct Type {
 
 /// How a struct or enum is laid out in memory.
 #[derive(Clone, Copy, Debug, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Layout {
     C,
     Transparent,
@@ -76,6 +79,7 @@ pub enum Layout {
 
 /// How a type is represented in memory.
 #[derive(Clone, Copy, Debug, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Repr {
     pub layout: Layout,
     pub alignment: Option<usize>,

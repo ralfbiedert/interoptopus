@@ -6,6 +6,7 @@ use std::io::{Read, Write};
 use std::mem::MaybeUninit;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Array {
     pub ty: TypeId,
     pub len: usize,

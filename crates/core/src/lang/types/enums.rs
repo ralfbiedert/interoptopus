@@ -3,12 +3,14 @@ use crate::lang::meta::Docs;
 use crate::lang::types::Repr;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum VariantKind {
     Unit(usize),
     Tuple(TypeId),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Variant {
     pub name: String,
     pub docs: Docs,
@@ -22,6 +24,7 @@ impl Variant {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Enum {
     pub variants: Vec<Variant>,
     pub repr: Repr,

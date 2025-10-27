@@ -2,6 +2,7 @@ use crate::lang::meta::{Docs, Visibility};
 use crate::lang::types::{Repr, TypeId};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Field {
     pub name: String,
     pub docs: Docs,
@@ -16,6 +17,7 @@ impl Field {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Struct {
     pub fields: Vec<Field>,
     pub repr: Repr,

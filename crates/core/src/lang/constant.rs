@@ -10,10 +10,13 @@ pub trait ConstantInfo {
 
 /// The value of a constant.
 #[derive(Clone, Debug, PartialOrd, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Value {
     Primitive(PrimitiveValue),
 }
 
+#[derive(Clone, Debug, PartialOrd, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Constant {
     pub name: String,
     pub visibility: Visibility,

@@ -1,18 +1,19 @@
-use crate::inventory::{ConstantId, FunctionId, Inventory, ServiceId, TypeId};
+use crate::inventory::{ConstantId, Constants, FunctionId, Functions, Inventory, ServiceId, Services, TypeId, Types};
 use crate::lang::constant::Constant;
 use crate::lang::function::Function;
 use crate::lang::service::Service;
 use crate::lang::types::Type;
-use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::mem::swap;
 
 #[derive(Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RustInventory {
-    pub types: HashMap<TypeId, Type>,
-    pub functions: HashMap<FunctionId, Function>,
-    pub constants: HashMap<ConstantId, Constant>,
-    pub services: HashMap<ServiceId, Service>,
+    pub types: Types,
+    pub functions: Functions,
+    pub constants: Constants,
+    pub services: Services,
+    #[cfg_attr(feature = "serde", serde(skip))]
     _guard: PhantomData<()>,
 }
 

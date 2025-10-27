@@ -8,6 +8,7 @@ pub trait ServiceInfo {
 
 /// Combines a receiver, constructor, destructor and multiple methods in one entity.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Service {
     ty: TypeId,
     ctors: Vec<FunctionId>,

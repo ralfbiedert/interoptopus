@@ -1,4 +1,4 @@
-use crate::pass::{meta_info, model_final, model_id_maps, output_final, output_header, output_master};
+use crate::pass::{meta_info, model_final, model_id_maps, model_type_map, output_final, output_header, output_master};
 use crate::pipeline::RustLibraryBuilder;
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
 use crate::Error;
@@ -10,6 +10,7 @@ use std::marker::PhantomData;
 pub struct RustLibraryConfig {
     pub meta_info: meta_info::Config,
     pub model_id_maps: model_id_maps::Config,
+    pub model_type_map: model_type_map::Config,
     pub model_final: model_final::Config,
     pub output_master: output_master::Config,
     pub output_header: output_header::Config,
@@ -28,6 +29,7 @@ pub struct RustLibrary {
     // Model passes (transform and enrich data)
     meta_info: meta_info::Pass,
     model_id_maps: model_id_maps::Pass,
+    model_type_map: model_type_map::Pass,
     model_final: model_final::Pass,
     // ...
 
@@ -66,6 +68,7 @@ impl RustLibrary {
             inventory,
             meta_info: meta_info::Pass::new(config.meta_info),
             model_id_maps: model_id_maps::Pass::new(config.model_id_maps),
+            model_type_map: model_type_map::Pass::new(config.model_type_map),
             model_final: model_final::Pass::new(config.model_final),
             output_master: output_master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses { header: output_header::Pass::new(config.output_header) },
@@ -106,6 +109,7 @@ impl RustLibrary {
         // Model passes
         self.meta_info.process()?;
         self.model_id_maps.process()?;
+        self.model_type_map.process(&self.inventory.types)?;
         self.model_final.process()?;
         self.plugin_post_model_pass();
 

@@ -5,6 +5,7 @@ mod special;
 use std::hash::{Hash, Hasher};
 
 #[derive(Copy, Clone, Debug, PartialOrd, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Primitive {
     Void,
     Bool,
@@ -23,6 +24,7 @@ pub enum Primitive {
 }
 
 #[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PrimitiveValue {
     Bool(bool),
     U8(u8),

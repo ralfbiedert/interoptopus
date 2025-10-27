@@ -8,8 +8,10 @@ use std::marker::PhantomData;
 use std::mem::swap;
 
 #[derive(Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ForeignInventory {
     pub types: HashMap<TypeId, Type>,
+    #[cfg_attr(feature = "serde", serde(skip))]
     _guard: PhantomData<()>,
 }
 

@@ -1,4 +1,5 @@
 #[derive(Hash, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Id(u128);
 
 impl Id {
@@ -31,6 +32,7 @@ impl Id {
 macro_rules! new_id {
     ($t:ident) => {
         #[derive(Hash, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub struct $t($crate::inventory::Id);
 
         impl $t {

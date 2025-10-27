@@ -9,12 +9,17 @@ mod id;
 
 pub use id::{ConstantId, FunctionId, ServiceId, TypeId};
 
+pub type Types = HashMap<TypeId, Type>;
+pub type Functions = HashMap<FunctionId, Function>;
+pub type Constants = HashMap<ConstantId, Constant>;
+pub type Services = HashMap<ServiceId, Service>;
+
 #[derive(Default)]
 pub struct RustModel {
-    pub types: HashMap<TypeId, Type>,
-    pub functions: HashMap<FunctionId, Function>,
-    pub constants: HashMap<ConstantId, Constant>,
-    pub services: HashMap<ServiceId, Service>,
+    pub types: Types,
+    pub functions: Functions,
+    pub constants: Constants,
+    pub services: Services,
     _guard: PhantomData<()>,
 }
 

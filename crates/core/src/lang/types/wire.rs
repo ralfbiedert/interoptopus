@@ -2,6 +2,7 @@ use crate::lang::types::{SerializationError, TypeId};
 use std::io::{Read, Write};
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum WireOnly {
     String,
     Vec(TypeId),

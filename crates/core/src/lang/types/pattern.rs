@@ -8,6 +8,7 @@ use std::ffi::{c_char, c_void};
 /// A pattern on a type level.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[allow(clippy::large_enum_variant)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TypePattern {
     CStrPointer,
     Utf8String,

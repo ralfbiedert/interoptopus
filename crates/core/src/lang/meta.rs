@@ -1,5 +1,6 @@
 /// The visibility of an item when written. Not all backends support all visibility levels.
 #[derive(Clone, Copy, Default, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Visibility {
     #[default]
     Public,
@@ -8,6 +9,7 @@ pub enum Visibility {
 
 /// Where an item definition should be placed in generated files.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Emission {
     /// This is a built-in type (e.g., `f32` <-> `float`) and does not need to be defined (emitted
     /// in generated interop code). Also used for "std" like builtins, `String` <-> `string`.
@@ -25,6 +27,7 @@ pub enum Emission {
 
 /// Markdown generated from the `///` you put on Rust code.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Docs {
     pub lines: Vec<String>,
 }
