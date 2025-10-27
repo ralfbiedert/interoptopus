@@ -1,17 +1,17 @@
 //! ...
 
-use crate::stage::ProcessError;
+use crate::pass::ProcessError;
 use interoptopus::inventory::RustInventory;
 
 #[derive(Default)]
 pub struct Config {}
 
-pub struct Stage {
+pub struct Pass {
     interop_dll_name: String,
     interop_hash: String,
 }
 
-impl Stage {
+impl Pass {
     pub fn new(_: Config) -> Self {
         Self { interop_dll_name: String::new(), interop_hash: String::new() }
     }

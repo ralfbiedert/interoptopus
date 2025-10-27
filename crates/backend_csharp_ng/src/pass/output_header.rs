@@ -1,7 +1,7 @@
 //! Writes top-level file header.
 
 use crate::output::{Output, OutputKind};
-use crate::stage::{ProcessError, meta_info, output_master};
+use crate::pass::{meta_info, output_master, ProcessError};
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
@@ -9,16 +9,16 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub struct Config {}
 
-pub struct Stage {
+pub struct Pass {
     headers: HashMap<Output, String>,
 }
 
-impl Stage {
+impl Pass {
     pub fn new(_: Config) -> Self {
         Self { headers: Default::default() }
     }
 
-    pub fn process(&mut self, _: &RustInventory, output_master: &output_master::Stage, meta_info: &meta_info::Stage) -> ProcessError {
+    pub fn process(&mut self, _: &RustInventory, output_master: &output_master::Pass, meta_info: &meta_info::Pass) -> ProcessError {
         let templates = output_master.templates();
 
         for output in output_master.outputs_of(OutputKind::Csharp) {

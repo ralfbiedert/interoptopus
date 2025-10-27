@@ -1,6 +1,4 @@
-use backend_csharp_ng::dispatch::Dispatch;
-use backend_csharp_ng::stage::output_master;
-use backend_csharp_ng::{RustLibrary, RustLibraryConfig};
+use backend_csharp_ng::RustLibrary;
 use interoptopus::inventory::RustInventory;
 
 #[test]

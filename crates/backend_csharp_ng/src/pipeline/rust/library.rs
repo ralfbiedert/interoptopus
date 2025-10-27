@@ -1,7 +1,7 @@
-use crate::Error;
+use crate::pass::{meta_info, model_final, model_id_maps, output_final, output_header, output_master};
 use crate::pipeline::RustLibraryBuilder;
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
-use crate::stage::{meta_info, model_final, model_id_maps, output_final, output_header, output_master};
+use crate::Error;
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
@@ -17,33 +17,33 @@ pub struct RustLibraryConfig {
     _hidden: PhantomData<()>,
 }
 
-pub struct IntermediateOutputStages {
-    pub header: output_header::Stage,
+pub struct IntermediateOutputPasses {
+    pub header: output_header::Pass,
 }
 
 pub struct RustLibrary {
     // Basic input
     inventory: RustInventory,
 
-    // Model stages (transform and enrich data)
-    meta_info: meta_info::Stage,
-    model_id_maps: model_id_maps::Stage,
-    model_final: model_final::Stage,
+    // Model passes (transform and enrich data)
+    meta_info: meta_info::Pass,
+    model_id_maps: model_id_maps::Pass,
+    model_final: model_final::Pass,
     // ...
 
-    // First output stage determining files to be produced
-    output_master: output_master::Stage,
+    // First output pass determining files to be produced
+    output_master: output_master::Pass,
 
-    // Most other output stages. Ideally these should have no cross-dependencies,
+    // Most other output passes. Ideally these should have no cross-dependencies,
     // only depending on the models above. The last output stages (e.g., output_master)
     // then integrate all previous outputs to write the actual artifact (into Multibuf)
     // We put them into a separate struct so we don't have to later pass 20+ of them
     // to final.
-    output_stages: IntermediateOutputStages,
+    output_passes: IntermediateOutputPasses,
 
     // Last output stage(s). Writes a `.cs` file (later possibly other files w. other
     // master stages) into the Multibuf.
-    output_final: output_final::Stage,
+    output_final: output_final::Pass,
 
     // Output
     output: Multibuf,
@@ -64,12 +64,12 @@ impl RustLibrary {
     pub(crate) fn with_config(inventory: RustInventory, config: RustLibraryConfig) -> Self {
         Self {
             inventory,
-            meta_info: meta_info::Stage::new(config.meta_info),
-            model_id_maps: model_id_maps::Stage::new(config.model_id_maps),
-            model_final: model_final::Stage::new(config.model_final),
-            output_master: output_master::Stage::new(config.output_master),
-            output_stages: IntermediateOutputStages { header: output_header::Stage::new(config.output_header) },
-            output_final: output_final::Stage::new(config.output_final),
+            meta_info: meta_info::Pass::new(config.meta_info),
+            model_id_maps: model_id_maps::Pass::new(config.model_id_maps),
+            model_final: model_final::Pass::new(config.model_final),
+            output_master: output_master::Pass::new(config.output_master),
+            output_passes: IntermediateOutputPasses { header: output_header::Pass::new(config.output_header) },
+            output_final: output_final::Pass::new(config.output_final),
             output: Multibuf::default(),
             plugins: vec![],
         }
@@ -103,20 +103,20 @@ impl RustLibrary {
     pub fn process(mut self) -> Result<Multibuf, Error> {
         self.plugin_init_pass();
 
-        // Model stages
+        // Model passes
         self.meta_info.process(&mut self.inventory)?;
         self.model_id_maps.process(&mut self.inventory)?;
         self.model_final.process(&mut self.inventory)?;
         self.plugin_post_model_pass();
 
-        // Output stages
+        // Output passes
         self.output_master.process(&mut self.inventory)?;
-        self.output_stages.header.process(&mut self.inventory, &self.output_master, &self.meta_info)?;
+        self.output_passes.header.process(&mut self.inventory, &self.output_master, &self.meta_info)?;
         self.plugin_post_output_pass();
 
-        // Final output stage(s)
+        // Final output pass(es)
         self.output_final
-            .process(&mut self.inventory, &mut self.output, &self.output_master, &self.output_stages)?;
+            .process(&mut self.inventory, &mut self.output, &self.output_master, &self.output_passes)?;
 
         Ok(self.output)
     }

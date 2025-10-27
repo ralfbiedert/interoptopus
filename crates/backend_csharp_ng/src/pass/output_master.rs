@@ -2,7 +2,7 @@
 
 use crate::dispatch::Dispatch;
 use crate::output::{Output, OutputKind};
-use crate::stage::ProcessError;
+use crate::pass::ProcessError;
 use crate::template::templates;
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::template::TemplateEngine;
@@ -18,12 +18,12 @@ impl Default for Config {
     }
 }
 
-pub struct Stage {
+pub struct Pass {
     config: Config,
     outputs: Vec<Output>,
 }
 
-impl Stage {
+impl Pass {
     pub fn new(config: Config) -> Self {
         Self { config, outputs: vec![] }
     }

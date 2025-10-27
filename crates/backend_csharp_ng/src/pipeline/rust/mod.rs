@@ -2,4 +2,4 @@ mod builder;
 mod library;
 
 pub use builder::RustLibraryBuilder;
-pub use library::{IntermediateOutputStages, RustLibrary, RustLibraryConfig};
+pub use library::{IntermediateOutputPasses, RustLibrary, RustLibraryConfig};

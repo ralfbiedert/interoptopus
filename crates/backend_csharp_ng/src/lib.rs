@@ -1,8 +1,8 @@
 pub mod dispatch;
 pub mod lang;
 pub mod output;
+pub mod pass;
 pub mod plugin;
-pub mod stage;
 pub mod template;
 
 mod error;
