@@ -33,7 +33,6 @@ mod pattern;
 mod primitive;
 
 use crate::lang::function::Signature;
-use crate::lang::meta::NamespaceId;
 use crate::lang::types::composite::Composite;
 use crate::lang::types::pattern::TypePattern;
 use crate::lang::types::primitive::Primitive;
@@ -53,7 +52,8 @@ pub enum TypeKind {
 }
 
 pub struct Type {
-    pub namespace: NamespaceId,
+    // TODO: Handle this separately and not as part of model?
+    // pub namespace: NamespaceId,
     pub name: String,
     pub kind: TypeKind,
 }
