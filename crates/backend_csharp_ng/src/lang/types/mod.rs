@@ -37,6 +37,7 @@ use crate::lang::types::composite::Composite;
 use crate::lang::types::pattern::TypePattern;
 use crate::lang::types::primitive::Primitive;
 use crate::model::TypeId;
+
 pub use enums::{DataEnum, Variant};
 
 pub enum TypeKind {

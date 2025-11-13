@@ -29,9 +29,11 @@ impl Id {
 
 #[doc(hidden)]
 #[macro_export]
+#[allow(unexpected_cfgs, reason = "All crates share same feature")]
 macro_rules! new_id {
     ($t:ident) => {
         #[derive(Hash, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+        #[allow(unexpected_cfgs, reason = "All crates share same feature")]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub struct $t($crate::inventory::Id);
 
