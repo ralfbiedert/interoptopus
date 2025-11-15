@@ -1,6 +1,6 @@
 //! ...
 
-use crate::pass::ProcessError;
+use crate::pass::{ModelResult, Outcome, OutputResult};
 
 #[derive(Default)]
 pub struct Config {}
@@ -15,9 +15,9 @@ impl Pass {
         Self { interop_dll_name: String::new(), interop_hash: String::new() }
     }
 
-    pub fn process(&mut self) -> ProcessError {
+    pub fn process(&mut self) -> ModelResult {
         // TODO
-        Ok(())
+        Ok(Outcome::Unchanged)
     }
 
     pub fn interop_dll_name(&self) -> &str {

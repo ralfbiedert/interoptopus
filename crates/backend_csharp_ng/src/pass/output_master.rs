@@ -2,7 +2,7 @@
 
 use crate::dispatch::Dispatch;
 use crate::output::{Output, OutputKind};
-use crate::pass::ProcessError;
+use crate::pass::OutputResult;
 use crate::template::templates;
 use interoptopus_backends::template::TemplateEngine;
 
@@ -27,7 +27,7 @@ impl Pass {
         Self { config, outputs: vec![] }
     }
 
-    pub fn process(&mut self) -> ProcessError {
+    pub fn process(&mut self) -> OutputResult {
         // TODO: for each possible file, create an entry
         self.outputs.push(Output { name: "Foo.cs".to_string(), kind: OutputKind::Csharp });
         Ok(())

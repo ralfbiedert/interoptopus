@@ -33,12 +33,12 @@ mod pattern;
 mod primitive;
 
 use crate::lang::function::Signature;
-use crate::lang::types::composite::Composite;
-use crate::lang::types::pattern::TypePattern;
-use crate::lang::types::primitive::Primitive;
 use crate::model::TypeId;
 
+pub use composite::Composite;
 pub use enums::{DataEnum, Variant};
+pub use pattern::TypePattern;
+pub use primitive::Primitive;
 
 pub enum TypeKind {
     Primitive(Primitive),

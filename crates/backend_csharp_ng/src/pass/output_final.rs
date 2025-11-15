@@ -1,7 +1,7 @@
 //! Last output step where a buffer is fully materialized.
 
 use crate::output::OutputKind;
-use crate::pass::{output_master, ProcessError};
+use crate::pass::{OutputResult, output_master};
 use crate::pipeline::IntermediateOutputPasses;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;
@@ -16,7 +16,7 @@ impl Pass {
         Self {}
     }
 
-    pub fn process(&mut self, output: &mut Multibuf, output_master: &output_master::Pass, intermediary: &IntermediateOutputPasses) -> ProcessError {
+    pub fn process(&mut self, output: &mut Multibuf, output_master: &output_master::Pass, intermediary: &IntermediateOutputPasses) -> OutputResult {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(OutputKind::Csharp) {

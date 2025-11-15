@@ -1,7 +1,7 @@
 //! Writes top-level file header.
 
 use crate::output::{Output, OutputKind};
-use crate::pass::{meta_info, output_master, ProcessError};
+use crate::pass::{OutputResult, meta_info, output_master};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -17,7 +17,7 @@ impl Pass {
         Self { headers: Default::default() }
     }
 
-    pub fn process(&mut self, output_master: &output_master::Pass, meta_info: &meta_info::Pass) -> ProcessError {
+    pub fn process(&mut self, output_master: &output_master::Pass, meta_info: &meta_info::Pass) -> OutputResult {
         let templates = output_master.templates();
 
         for output in output_master.outputs_of(OutputKind::Csharp) {

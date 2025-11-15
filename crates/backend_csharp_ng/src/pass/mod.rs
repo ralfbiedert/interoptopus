@@ -1,4 +1,5 @@
 use crate::Error;
+use std::cmp::PartialEq;
 
 pub mod meta_info;
 pub mod model_final;
@@ -8,4 +9,19 @@ pub mod output_final;
 pub mod output_header;
 pub mod output_master;
 
-pub type ProcessError = Result<(), Error>;
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub enum Outcome {
+    Unchanged,
+    Changed,
+}
+
+impl Outcome {
+    pub fn cng(&self, o: &mut bool) {
+        if *self == Self::Changed {
+            *o = true;
+        }
+    }
+}
+
+pub type ModelResult = Result<Outcome, Error>;
+pub type OutputResult = Result<(), Error>;

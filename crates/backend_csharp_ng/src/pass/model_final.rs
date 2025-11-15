@@ -3,7 +3,8 @@
 //! and we might lose ability to reuse them in "Rust" and "Csharp" library models.
 
 use crate::model::RustModel;
-use crate::pass::ProcessError;
+use crate::pass::Outcome::Unchanged;
+use crate::pass::{ModelResult, OutputResult};
 
 #[derive(Default)]
 pub struct Config {}
@@ -17,8 +18,8 @@ impl Pass {
         Self { rust_model: Default::default() }
     }
 
-    pub fn process(&mut self) -> ProcessError {
+    pub fn process(&mut self) -> ModelResult {
         // TODO ...
-        Ok(())
+        Ok(Unchanged)
     }
 }

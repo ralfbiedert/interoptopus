@@ -1,7 +1,7 @@
-use crate::pass::{meta_info, model_final, model_id_maps, model_type_map, output_final, output_header, output_master};
-use crate::pipeline::RustLibraryBuilder;
-use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
 use crate::Error;
+use crate::pass::{ModelResult, OutputResult, meta_info, model_final, model_id_maps, model_type_map, output_final, output_header, output_master};
+use crate::pipeline::{RustLibraryBuilder, loop_model_passes_until_done};
+use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
@@ -89,34 +89,35 @@ impl RustLibrary {
         }
     }
 
-    fn plugin_post_model_pass(&mut self) {
-        let post_model = PostModelPass::default();
-        for plugin in self.plugins.iter_mut() {
-            plugin.post_model(&mut self.inventory, post_model);
-        }
-    }
-
-    fn plugin_post_output_pass(&mut self) {
+    fn plugin_post_output_pass(&mut self) -> OutputResult {
         let post_output = PostOutputPass::default();
         for plugin in self.plugins.iter_mut() {
-            plugin.post_output(&mut self.output, post_output);
+            plugin.post_output(&mut self.output, post_output)?;
         }
+        Ok(())
     }
 
     pub fn process(mut self) -> Result<Multibuf, Error> {
         self.plugin_init_pass();
 
         // Model passes
-        self.meta_info.process()?;
-        self.model_id_maps.process(&self.inventory.types)?;
-        self.model_type_map.process(&self.inventory.types)?;
-        self.model_final.process()?;
-        self.plugin_post_model_pass();
+        loop_model_passes_until_done(|mut r| {
+            r.run(self.meta_info.process())?;
+            r.run(self.model_id_maps.process(&self.inventory.types))?;
+            r.run(self.model_type_map.process(&self.inventory.types))?;
+            r.run(self.model_final.process())?;
+
+            let post_model = PostModelPass::default();
+            for plugin in self.plugins.iter_mut() {
+                r.run(plugin.post_model(&mut self.inventory, post_model))?;
+            }
+            Ok(())
+        })?;
 
         // Output passes
         self.output_master.process()?;
         self.output_passes.header.process(&self.output_master, &self.meta_info)?;
-        self.plugin_post_output_pass();
+        self.plugin_post_output_pass()?;
 
         // Final output pass(es)
         self.output_final.process(&mut self.output, &self.output_master, &self.output_passes)?;
