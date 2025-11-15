@@ -25,7 +25,7 @@ impl PassRunner {
     }
 }
 
-pub fn loop_model_passes_until_done(f: impl FnMut(&mut PassRunner) -> Result<(), Error>) -> Result<(), Error> {
+pub fn loop_model_passes_until_done(mut f: impl FnMut(&mut PassRunner) -> Result<(), Error>) -> Result<(), Error> {
     loop {
         let mut pass_runner = PassRunner::new();
         f(&mut pass_runner)?;

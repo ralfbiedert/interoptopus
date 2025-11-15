@@ -1,8 +1,8 @@
 //! Introduces C# TypeIDs and converts a Rust `TypeId` into a C# one.
 
 use crate::model::TypeId;
+use crate::pass::ModelResult;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{ModelResult, OutputResult};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -16,12 +16,18 @@ pub struct Pass {
     cs_to_rs: RsToCs,
 }
 
+impl Pass {}
+
 impl Pass {
     pub fn new(_: Config) -> Self {
         Self { rs_to_cs: Default::default(), cs_to_rs: Default::default() }
     }
 
-    pub fn process(&mut self, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(&mut self) -> ModelResult {
         Ok(Unchanged)
+    }
+
+    pub(crate) fn set_rust_to_cs(&mut self, rust_id: interoptopus::inventory::TypeId, cs_id: TypeId) {
+        self.rs_to_cs.insert(rust_id, cs_id);
     }
 }

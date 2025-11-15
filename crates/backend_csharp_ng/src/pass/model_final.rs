@@ -3,8 +3,8 @@
 //! and we might lose ability to reuse them in "Rust" and "Csharp" library models.
 
 use crate::model::RustModel;
+use crate::pass::ModelResult;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{ModelResult, OutputResult};
 
 #[derive(Default)]
 pub struct Config {}

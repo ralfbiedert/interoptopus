@@ -1,6 +1,6 @@
 //! ...
 
-use crate::pass::{ModelResult, Outcome, OutputResult};
+use crate::pass::{ModelResult, Outcome};
 
 #[derive(Default)]
 pub struct Config {}

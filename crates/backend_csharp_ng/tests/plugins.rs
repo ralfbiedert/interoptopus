@@ -1,4 +1,6 @@
 use backend_csharp_ng::RustLibrary;
+use backend_csharp_ng::pass::Outcome::Unchanged;
+use backend_csharp_ng::pass::{ModelResult, OutputResult};
 use backend_csharp_ng::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
@@ -18,12 +20,14 @@ impl RustLibraryPlugin for MyPlugin {
         self.init_called.store(true, Ordering::Relaxed);
     }
 
-    fn post_model(&mut self, _: &RustInventory, _: PostModelPass) {
+    fn post_model(&mut self, _: &RustInventory, _: PostModelPass) -> ModelResult {
         self.post_model_called.store(true, Ordering::Relaxed);
+        Ok(Unchanged)
     }
 
-    fn post_output(&mut self, _: &mut Multibuf, _: PostOutputPass) {
+    fn post_output(&mut self, _: &mut Multibuf, _: PostOutputPass) -> OutputResult {
         self.post_output_called.store(true, Ordering::Relaxed);
+        Ok(())
     }
 }
 
