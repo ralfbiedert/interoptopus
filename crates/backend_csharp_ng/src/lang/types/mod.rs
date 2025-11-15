@@ -35,7 +35,7 @@ mod primitive;
 use crate::lang::function::Signature;
 use crate::model::TypeId;
 
-pub use composite::Composite;
+pub use composite::{Composite, CompositeKind, Field};
 pub use enums::{DataEnum, Variant};
 pub use pattern::TypePattern;
 pub use primitive::Primitive;
