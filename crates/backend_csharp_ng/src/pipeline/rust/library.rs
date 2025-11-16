@@ -22,9 +22,9 @@ pub struct RustLibraryConfig {
     pub model_type_map_service: model_type_map_service::Config,
     pub model_type_map_patterns: model_type_map_patterns::Config,
     pub model_type_map_enum_variants: model_type_map_enum_variants::Config,
+    pub model_type_map_enum: model_type_map_enum::Config,
     pub model_type_map_struct_fields: model_type_map_struct_fields::Config,
     pub model_type_map_struct_blittable: model_type_map_struct_blittable::Config,
-    pub model_type_map_enum: model_type_map_enum::Config,
     pub model_type_map_struct: model_type_map_struct::Config,
     pub model_type_names: model_type_names::Config,
     pub model_type_map: model_type_map::Config,
@@ -54,14 +54,13 @@ pub struct RustLibrary {
     model_type_map_service: model_type_map_service::Pass,
     model_type_map_patterns: model_type_map_patterns::Pass,
     model_type_map_enum_variants: model_type_map_enum_variants::Pass,
+    model_type_map_enum: model_type_map_enum::Pass,
     model_type_map_struct_fields: model_type_map_struct_fields::Pass,
     model_type_map_struct_blittable: model_type_map_struct_blittable::Pass,
-    model_type_map_enum: model_type_map_enum::Pass,
     model_type_map_struct: model_type_map_struct::Pass,
     model_type_names: model_type_names::Pass,
     model_type_map: model_type_map::Pass,
     model_final: model_final::Pass,
-    // ...
 
     // First output pass determining files to be produced
     output_master: output_master::Pass,
@@ -106,9 +105,9 @@ impl RustLibrary {
             model_type_map_service: model_type_map_service::Pass::new(config.model_type_map_service),
             model_type_map_patterns: model_type_map_patterns::Pass::new(config.model_type_map_patterns),
             model_type_map_enum_variants: model_type_map_enum_variants::Pass::new(config.model_type_map_enum_variants),
+            model_type_map_enum: model_type_map_enum::Pass::new(config.model_type_map_enum),
             model_type_map_struct_fields: model_type_map_struct_fields::Pass::new(config.model_type_map_struct_fields),
             model_type_map_struct_blittable: model_type_map_struct_blittable::Pass::new(config.model_type_map_struct_blittable),
-            model_type_map_enum: model_type_map_enum::Pass::new(config.model_type_map_enum),
             model_type_map_struct: model_type_map_struct::Pass::new(config.model_type_map_struct),
             model_type_names: model_type_names::Pass::new(config.model_type_names),
             model_type_map: model_type_map::Pass::new(config.model_type_map),
@@ -156,12 +155,12 @@ impl RustLibrary {
             r.run(self.model_type_map_service.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_patterns.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_enum_variants.process(&mut self.model_id_maps, &self.inventory.types))?;
+            r.run(self.model_type_map_enum.process(&self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_enum_variants, &self.inventory.types))?;
             r.run(self.model_type_map_struct_fields.process(&mut self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_map_struct_blittable.process(&self.model_type_kinds))?;
-            r.run(self.model_type_map_enum.process(&self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_enum_variants, &self.inventory.types))?;
             r.run(self.model_type_map_struct.process(&self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_struct_fields, &self.model_type_map_struct_blittable, &self.inventory.types))?;
-            r.run(self.model_type_names.process())?;
-            r.run(self.model_type_map.process())?;
+            r.run(self.model_type_names.process(&self.model_id_maps, &self.inventory.types))?;
+            r.run(self.model_type_map.process(&self.model_type_kinds, &self.model_type_names))?;
             r.run(self.model_final.process())?;
 
             let post_model = PostModelPass::default();

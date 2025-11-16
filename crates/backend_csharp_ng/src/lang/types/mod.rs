@@ -42,6 +42,7 @@ pub use enums::{DataEnum, Variant};
 pub use pattern::TypePattern;
 pub use primitive::Primitive;
 
+#[derive(Debug, Clone)]
 pub enum TypeKind {
     Primitive(Primitive),
     Array(Array),

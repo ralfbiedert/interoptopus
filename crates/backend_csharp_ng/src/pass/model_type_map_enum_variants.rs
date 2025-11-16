@@ -2,7 +2,7 @@
 
 use crate::lang::types::Variant;
 use crate::model::TypeId;
-use crate::pass::Outcome::{Changed, Unchanged};
+use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, model_id_maps};
 use interoptopus::lang;
 use std::collections::HashMap;

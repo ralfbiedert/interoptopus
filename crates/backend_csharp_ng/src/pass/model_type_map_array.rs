@@ -2,7 +2,7 @@
 
 use crate::lang::types::{Array, TypeKind};
 use crate::model::TypeId;
-use crate::pass::Outcome::{Changed, Unchanged};
+use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, model_id_maps, model_type_kinds};
 use interoptopus::lang;
 

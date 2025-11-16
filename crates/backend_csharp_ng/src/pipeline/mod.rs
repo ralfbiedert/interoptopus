@@ -3,7 +3,6 @@ mod rust;
 
 use crate::Error;
 use crate::pass::{ModelResult, Outcome};
-pub use csharp::{CsLibrary, CsLibraryConfig};
 pub use rust::{IntermediateOutputPasses, RustLibrary, RustLibraryBuilder, RustLibraryConfig};
 
 pub struct PassRunner {

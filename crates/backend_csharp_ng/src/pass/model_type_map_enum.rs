@@ -1,7 +1,7 @@
 //! Creates DataEnum types from computed enum variants.
 
 use crate::lang::types::{DataEnum, TypeKind};
-use crate::pass::Outcome::{Changed, Unchanged};
+use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, model_id_maps, model_type_kinds, model_type_map_enum_variants};
 use interoptopus::lang;
 

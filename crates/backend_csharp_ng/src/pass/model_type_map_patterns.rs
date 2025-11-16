@@ -4,7 +4,7 @@ use crate::lang::function::Signature;
 use crate::lang::types::csharp;
 use crate::lang::types::{TypeKind, TypePattern};
 use crate::model::TypeId;
-use crate::pass::Outcome::{Changed, Unchanged};
+use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, model_id_maps, model_type_kinds};
 use interoptopus::lang;
 use interoptopus::lang::types::TypeInfo;
