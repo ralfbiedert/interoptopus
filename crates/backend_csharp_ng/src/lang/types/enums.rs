@@ -5,7 +5,7 @@ pub struct Variant {
     pub name: String,
     pub docs: Docs,
     pub tag: usize,
-    pub ty: TypeId,
+    pub ty: Option<TypeId>,
 }
 
 pub struct DataEnum {
