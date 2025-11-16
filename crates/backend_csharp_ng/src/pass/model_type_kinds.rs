@@ -30,4 +30,12 @@ impl Pass {
     pub fn iter(&self) -> impl Iterator<Item = (&TypeId, &TypeKind)> {
         self.kinds.iter()
     }
+
+    pub fn contains(&self, id: &TypeId) -> bool {
+        self.kinds.contains_key(id)
+    }
+
+    pub fn get(&self, id: TypeId) -> Option<&TypeKind> {
+        self.kinds.get(&id)
+    }
 }

@@ -38,8 +38,8 @@ impl Pass {
                 continue;
             };
 
-            // Check if we've already created the composite
-            if matches!(kinds.iter().find(|(id, _)| **id == cs_id).map(|(_, k)| k), Some(TypeKind::Composite(_))) {
+            // Check if we've already processed this type
+            if kinds.contains(&cs_id) {
                 continue;
             }
 

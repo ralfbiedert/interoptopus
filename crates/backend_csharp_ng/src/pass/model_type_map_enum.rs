@@ -37,8 +37,8 @@ impl Pass {
                 continue;
             };
 
-            // Check if we've already created the data enum
-            if matches!(kinds.iter().find(|(id, _)| **id == cs_id).map(|(_, k)| k), Some(TypeKind::DataEnum(_))) {
+            // Check if we've already processed this type
+            if kinds.contains(&cs_id) {
                 continue;
             }
 
@@ -50,9 +50,7 @@ impl Pass {
             };
 
             // Create the data enum
-            let data_enum = DataEnum {
-                variants: variants.clone(),
-            };
+            let data_enum = DataEnum { variants: variants.clone() };
 
             kinds.set_kind(cs_id, TypeKind::DataEnum(data_enum));
             outcome = Changed;
