@@ -6,6 +6,7 @@ pub mod model_final;
 pub mod model_id_maps;
 pub mod model_type_kinds;
 pub mod model_type_map;
+pub mod model_type_map_array;
 pub mod model_type_map_delegate;
 pub mod model_type_map_enum_variants;
 pub mod model_type_map_pointer;

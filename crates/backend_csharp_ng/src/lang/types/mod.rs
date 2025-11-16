@@ -26,6 +26,7 @@
 //   indicated for each type it its intended to be generated, and with that enum definitively
 //   declaring what other parts of the code can expect to exist.
 
+mod array;
 mod composite;
 mod csharp;
 mod enums;
@@ -35,6 +36,7 @@ mod primitive;
 use crate::lang::function::Signature;
 use crate::model::TypeId;
 
+pub use array::Array;
 pub use composite::{Composite, CompositeKind, Field};
 pub use enums::{DataEnum, Variant};
 pub use pattern::TypePattern;
@@ -42,6 +44,7 @@ pub use primitive::Primitive;
 
 pub enum TypeKind {
     Primitive(Primitive),
+    Array(Array),
     DataEnum(DataEnum),
     Composite(Composite),
     Delegate(Signature),

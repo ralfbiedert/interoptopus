@@ -1,8 +1,8 @@
 use crate::Error;
 use crate::pass::{
-    OutputResult, meta_info, model_final, model_id_maps, model_type_kinds, model_type_map, model_type_map_delegate, model_type_map_enum_variants,
-    model_type_map_pointer, model_type_map_primitives, model_type_map_service, model_type_map_struct_fields, model_type_names, output_final,
-    output_header, output_master,
+    OutputResult, meta_info, model_final, model_id_maps, model_type_kinds, model_type_map, model_type_map_array, model_type_map_delegate,
+    model_type_map_enum_variants, model_type_map_pointer, model_type_map_primitives, model_type_map_service, model_type_map_struct_fields,
+    model_type_names, output_final, output_header, output_master,
 };
 use crate::pipeline::{RustLibraryBuilder, loop_model_passes_until_done};
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
@@ -16,6 +16,7 @@ pub struct RustLibraryConfig {
     pub model_id_maps: model_id_maps::Config,
     pub model_type_kinds: model_type_kinds::Config,
     pub model_type_map_primitives: model_type_map_primitives::Config,
+    pub model_type_map_array: model_type_map_array::Config,
     pub model_type_map_delegate: model_type_map_delegate::Config,
     pub model_type_map_pointer: model_type_map_pointer::Config,
     pub model_type_map_service: model_type_map_service::Config,
@@ -43,6 +44,7 @@ pub struct RustLibrary {
     model_id_maps: model_id_maps::Pass,
     model_type_kinds: model_type_kinds::Pass,
     model_type_map_primitives: model_type_map_primitives::Pass,
+    model_type_map_array: model_type_map_array::Pass,
     model_type_map_delegate: model_type_map_delegate::Pass,
     model_type_map_pointer: model_type_map_pointer::Pass,
     model_type_map_service: model_type_map_service::Pass,
@@ -90,6 +92,7 @@ impl RustLibrary {
             model_id_maps: model_id_maps::Pass::new(config.model_id_maps),
             model_type_kinds: model_type_kinds::Pass::new(config.model_type_kinds),
             model_type_map_primitives: model_type_map_primitives::Pass::new(config.model_type_map_primitives),
+            model_type_map_array: model_type_map_array::Pass::new(config.model_type_map_array),
             model_type_map_delegate: model_type_map_delegate::Pass::new(config.model_type_map_delegate),
             model_type_map_pointer: model_type_map_pointer::Pass::new(config.model_type_map_pointer),
             model_type_map_service: model_type_map_service::Pass::new(config.model_type_map_service),
@@ -135,6 +138,7 @@ impl RustLibrary {
             r.run(self.model_id_maps.process())?;
             r.run(self.model_type_kinds.process())?;
             r.run(self.model_type_map_primitives.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_array.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_delegate.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_pointer.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_service.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
