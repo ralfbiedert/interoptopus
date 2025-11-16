@@ -6,6 +6,7 @@ pub mod model_final;
 pub mod model_id_maps;
 pub mod model_type_kinds;
 pub mod model_type_map;
+pub mod model_type_map_enum_variants;
 pub mod model_type_map_primitives;
 pub mod model_type_map_struct_fields;
 pub mod model_type_names;
@@ -20,10 +21,8 @@ pub enum Outcome {
 }
 
 impl Outcome {
-    pub fn cng(&self, o: &mut bool) {
-        if *self == Self::Changed {
-            *o = true;
-        }
+    pub fn changed(&mut self) {
+        *self = Outcome::Changed;
     }
 }
 

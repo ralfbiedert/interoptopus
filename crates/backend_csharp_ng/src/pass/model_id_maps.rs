@@ -30,4 +30,8 @@ impl Pass {
     pub(crate) fn set_rust_to_cs(&mut self, rust_id: interoptopus::inventory::TypeId, cs_id: TypeId) {
         self.rs_to_cs.insert(rust_id, cs_id);
     }
+
+    pub(crate) fn get_cs_from_rust(&self, rust_id: interoptopus::inventory::TypeId) -> Option<TypeId> {
+        self.rs_to_cs.get(&rust_id).copied()
+    }
 }

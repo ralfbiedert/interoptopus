@@ -20,33 +20,59 @@ impl Pass {
     }
 
     pub fn process(&mut self, id_map: &mut model_id_maps::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
-        for (rust_id, ty) in rs_types {
-            let cs_fields = match &ty.kind {
-                lang::types::TypeKind::Struct(x) => {
-                    // Convert each Rust field to a C# field
-                    x.fields
-                        .iter()
-                        .map(|rust| {
-                            // Convert the field's type ID from Rust to C#
-                            let cs_field_type_id = TypeId::from_id(rust.ty.id());
+        let mut outcome = Unchanged;
 
-                            Field { name: rust.name.clone(), docs: rust.docs.clone(), visibility: map_visibility(rust.visibility), ty: cs_field_type_id }
-                        })
-                        .collect()
-                }
+        for (rust_id, ty) in rs_types {
+            let rust_struct = match &ty.kind {
+                lang::types::TypeKind::Struct(x) => x,
                 _ => continue,
             };
 
+            // Create C# TypeId for the struct itself
             let cs_id = TypeId::from_id(rust_id.id());
+
+            // Skip if we've already processed this struct
+            if self.fields.contains_key(&cs_id) {
+                continue;
+            }
+
+            // Try to convert all fields
+            let mut cs_fields = Vec::new();
+            let mut all_fields_available = true;
+
+            for rust_field in &rust_struct.fields {
+                // Look up the C# TypeId for this field's type
+                let Some(cs_field_type_id) = id_map.get_cs_from_rust(rust_field.ty) else {
+                    // Field type not yet mapped, skip this struct for now
+                    all_fields_available = false;
+                    break;
+                };
+
+                cs_fields.push(Field {
+                    name: rust_field.name.clone(),
+                    docs: rust_field.docs.clone(),
+                    visibility: map_visibility(rust_field.visibility),
+                    ty: cs_field_type_id,
+                });
+            }
+
+            if !all_fields_available {
+                // We couldn't process this struct yet, will try again next iteration
+                outcome.changed();
+                continue;
+            }
+
+            // All fields available, register the struct
             id_map.set_rust_to_cs(*rust_id, cs_id);
             self.fields.insert(cs_id, cs_fields);
+            outcome.changed();
         }
 
-        Ok(Unchanged)
+        Ok(outcome)
     }
 }
 
-fn map_visibility(visibility: interoptopus::lang::meta::Visibility) -> crate::lang::meta::Visibility {
+fn map_visibility(visibility: lang::meta::Visibility) -> crate::lang::meta::Visibility {
     use crate::lang::meta::Visibility as CsVis;
     use interoptopus::lang::meta::Visibility as RsVis;
 

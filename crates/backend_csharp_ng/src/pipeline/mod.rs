@@ -17,7 +17,7 @@ impl PassRunner {
 
     pub fn run(&mut self, x: ModelResult) -> Result<(), Error> {
         match x {
-            Ok(Outcome::Changed) => self.outcome = Outcome::Changed,
+            Ok(Outcome::Changed) => self.outcome.changed(),
             Ok(Outcome::Unchanged) => {}
             Err(e) => return Err(e),
         }
@@ -26,12 +26,21 @@ impl PassRunner {
 }
 
 pub fn loop_model_passes_until_done(mut f: impl FnMut(&mut PassRunner) -> Result<(), Error>) -> Result<(), Error> {
+    const PASS_LIMIT: u32 = 100;
+    let mut counter = 0;
+
     loop {
         let mut pass_runner = PassRunner::new();
+
         f(&mut pass_runner)?;
 
         if pass_runner.outcome == Outcome::Unchanged {
             break;
+        }
+
+        counter += 1;
+        if counter > PASS_LIMIT {
+            return Err(Error::PassLimit);
         }
     }
     Ok(())

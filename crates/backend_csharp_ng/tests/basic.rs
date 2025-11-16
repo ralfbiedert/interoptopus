@@ -17,6 +17,7 @@ fn rust_library_builder() {
 fn real_inventory() {
     let reference_project = include_str!("inventory/reference_project.json");
     let inventory: RustInventory = serde_json::from_str::<RustInventory>(reference_project).unwrap();
-    let o = RustLibrary::new(inventory).process().unwrap();
-    dbg!(o);
+    let library = RustLibrary::new(inventory);
+    let result = library.process();
+    dbg!(result.unwrap());
 }
