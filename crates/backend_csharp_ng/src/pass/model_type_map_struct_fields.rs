@@ -1,6 +1,7 @@
 //! ...
 
-use crate::lang::types::{Composite, TypeKind};
+use std::collections::HashMap;
+use crate::lang::types::{Composite, Field, TypeKind};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, model_id_maps, model_type_kinds};
@@ -9,11 +10,13 @@ use interoptopus::lang;
 #[derive(Default)]
 pub struct Config {}
 
-pub struct Pass {}
+pub struct Pass {
+    fields: HashMap<TypeId, Vec<Field>>,
+}
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {}
+        Self { fields: Default::default() }
     }
 
     pub fn process(&mut self, id_map: &mut model_id_maps::Pass, kinds: &mut model_type_kinds::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {

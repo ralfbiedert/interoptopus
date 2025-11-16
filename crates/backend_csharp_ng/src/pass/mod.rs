@@ -7,7 +7,7 @@ pub mod model_id_maps;
 pub mod model_type_kinds;
 pub mod model_type_map;
 pub mod model_type_map_primitives;
-mod model_type_map_structs;
+mod model_type_map_struct_fields;
 pub mod model_type_names;
 pub mod output_final;
 pub mod output_header;
