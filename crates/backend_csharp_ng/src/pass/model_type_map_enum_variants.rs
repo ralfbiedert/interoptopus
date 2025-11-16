@@ -42,10 +42,7 @@ impl Pass {
 
             for (index, rust_variant) in rust_enum.variants.iter().enumerate() {
                 let (tag, cs_variant_type_id) = match &rust_variant.kind {
-                    lang::types::VariantKind::Unit(tag) => {
-                        // Unit variant: use explicit tag, use TypeId(0) for "no data"
-                        (*tag, None)
-                    }
+                    lang::types::VariantKind::Unit(tag) => (*tag, None),
                     lang::types::VariantKind::Tuple(rust_type_id) => {
                         // Tuple variant: use index as tag, look up the C# TypeId
                         let Some(cs_type_id) = id_map.get_cs_from_rust(*rust_type_id) else {
