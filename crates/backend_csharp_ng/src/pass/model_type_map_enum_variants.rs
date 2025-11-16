@@ -45,7 +45,7 @@ impl Pass {
                     lang::types::VariantKind::Unit(tag) => (*tag, None),
                     lang::types::VariantKind::Tuple(rust_type_id) => {
                         // Tuple variant: use index as tag, look up the C# TypeId
-                        let Some(cs_type_id) = id_map.get_cs_from_rust(*rust_type_id) else {
+                        let Some(cs_type_id) = id_map.cs_from_rust(*rust_type_id) else {
                             // Variant type not yet mapped, skip this enum for now
                             all_variants_available = false;
                             break;
@@ -58,15 +58,13 @@ impl Pass {
             }
 
             if !all_variants_available {
-                // We couldn't process this enum yet, will try again next iteration
-                outcome = Changed;
                 continue;
             }
 
             // All variants available, register the enum
             id_map.set_rust_to_cs(*rust_id, cs_id);
             self.variants.insert(cs_id, cs_variants);
-            outcome = Changed;
+            outcome.changed();
         }
 
         Ok(outcome)

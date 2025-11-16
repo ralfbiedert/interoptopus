@@ -30,7 +30,7 @@ impl Pass {
             };
 
             // Check if we already processed this pattern
-            if id_map.get_cs_from_rust(*rust_id).is_some() {
+            if id_map.cs_from_rust(*rust_id).is_some() {
                 continue;
             }
 
@@ -47,36 +47,31 @@ impl Pass {
 
                 // Patterns with one type parameter
                 lang::types::TypePattern::Slice(rust_ty) => {
-                    let Some(cs_ty) = id_map.get_cs_from_rust(*rust_ty) else {
-                        outcome = Changed;
+                    let Some(cs_ty) = id_map.cs_from_rust(*rust_ty) else {
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::Slice(cs_ty))
                 }
                 lang::types::TypePattern::SliceMut(rust_ty) => {
-                    let Some(cs_ty) = id_map.get_cs_from_rust(*rust_ty) else {
-                        outcome = Changed;
+                    let Some(cs_ty) = id_map.cs_from_rust(*rust_ty) else {
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::SliceMut(cs_ty))
                 }
                 lang::types::TypePattern::Vec(rust_ty) => {
-                    let Some(cs_ty) = id_map.get_cs_from_rust(*rust_ty) else {
-                        outcome = Changed;
+                    let Some(cs_ty) = id_map.cs_from_rust(*rust_ty) else {
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::Vec(cs_ty))
                 }
                 lang::types::TypePattern::Option(rust_ty) => {
-                    let Some(cs_ty) = id_map.get_cs_from_rust(*rust_ty) else {
-                        outcome = Changed;
+                    let Some(cs_ty) = id_map.cs_from_rust(*rust_ty) else {
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::Option(cs_ty))
                 }
                 lang::types::TypePattern::AsyncCallback(rust_ty) => {
-                    let Some(cs_ty) = id_map.get_cs_from_rust(*rust_ty) else {
-                        outcome = Changed;
+                    let Some(cs_ty) = id_map.cs_from_rust(*rust_ty) else {
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::AsyncCallback(cs_ty))
@@ -84,12 +79,10 @@ impl Pass {
 
                 // Result pattern with two type parameters
                 lang::types::TypePattern::Result(rust_ok, rust_err) => {
-                    let Some(cs_ok) = id_map.get_cs_from_rust(*rust_ok) else {
-                        outcome = Changed;
+                    let Some(cs_ok) = id_map.cs_from_rust(*rust_ok) else {
                         continue;
                     };
-                    let Some(cs_err) = id_map.get_cs_from_rust(*rust_err) else {
-                        outcome = Changed;
+                    let Some(cs_err) = id_map.cs_from_rust(*rust_err) else {
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::Result(cs_ok, cs_err))
@@ -98,8 +91,7 @@ impl Pass {
                 // NamedCallback with signature
                 lang::types::TypePattern::NamedCallback(rust_sig) => {
                     // Convert return type
-                    let Some(cs_rval) = id_map.get_cs_from_rust(rust_sig.rval) else {
-                        outcome = Changed;
+                    let Some(cs_rval) = id_map.cs_from_rust(rust_sig.rval) else {
                         continue;
                     };
 
@@ -108,7 +100,7 @@ impl Pass {
                     let mut all_args_available = true;
 
                     for rust_arg in &rust_sig.arguments {
-                        let Some(cs_arg_type) = id_map.get_cs_from_rust(rust_arg.ty) else {
+                        let Some(cs_arg_type) = id_map.cs_from_rust(rust_arg.ty) else {
                             all_args_available = false;
                             break;
                         };
@@ -117,7 +109,6 @@ impl Pass {
                     }
 
                     if !all_args_available {
-                        outcome = Changed;
                         continue;
                     }
 
@@ -134,7 +125,7 @@ impl Pass {
 
             id_map.set_rust_to_cs(*rust_id, cs_id);
             kinds.set_kind(cs_id, TypeKind::TypePattern(cs_pattern));
-            outcome = Changed;
+            outcome.changed();
         }
 
         Ok(outcome)

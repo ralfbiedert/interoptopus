@@ -42,7 +42,7 @@ impl Pass {
 
             for rust_field in &rust_struct.fields {
                 // Look up the C# TypeId for this field's type
-                let Some(cs_field_type_id) = id_map.get_cs_from_rust(rust_field.ty) else {
+                let Some(cs_field_type_id) = id_map.cs_from_rust(rust_field.ty) else {
                     // Field type not yet mapped, skip this struct for now
                     all_fields_available = false;
                     break;
@@ -57,8 +57,6 @@ impl Pass {
             }
 
             if !all_fields_available {
-                // We couldn't process this struct yet, will try again next iteration
-                outcome.changed();
                 continue;
             }
 

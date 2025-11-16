@@ -1,9 +1,8 @@
 use crate::Error;
 use crate::pass::{
-    OutputResult, meta_info, model_final, model_id_maps, model_type_kinds, model_type_map, model_type_map_array, model_type_map_delegate,
-    model_type_map_enum, model_type_map_enum_variants, model_type_map_patterns, model_type_map_pointer, model_type_map_primitives,
-    model_type_map_service, model_type_map_struct, model_type_map_struct_blittable, model_type_map_struct_fields, model_type_names,
-    output_final, output_header, output_master,
+    OutputResult, meta_info, model_final, model_id_maps, model_type_kinds, model_type_map, model_type_map_array, model_type_map_delegate, model_type_map_enum,
+    model_type_map_enum_variants, model_type_map_patterns, model_type_map_pointer, model_type_map_primitives, model_type_map_service, model_type_map_struct,
+    model_type_map_struct_blittable, model_type_map_struct_fields, model_type_names, output_final, output_header, output_master,
 };
 use crate::pipeline::{RustLibraryBuilder, loop_model_passes_until_done};
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
@@ -148,7 +147,7 @@ impl RustLibrary {
         #[rustfmt::skip]
         loop_model_passes_until_done(|r| {
             r.run(self.meta_info.process())?;
-            r.run(self.model_id_maps.process())?;
+            r.run(self.model_id_maps.process(&self.inventory.types))?;
             r.run(self.model_type_kinds.process())?;
             r.run(self.model_type_map_primitives.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_array.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;

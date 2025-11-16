@@ -30,12 +30,12 @@ impl Pass {
             let cs_id = TypeId::from_id(rust_id.id());
 
             // Check if we already processed this delegate
-            if id_map.get_cs_from_rust(*rust_id).is_some() {
+            if id_map.cs_from_rust(*rust_id).is_some() {
                 continue;
             }
 
             // Try to convert the signature's return type and all argument types
-            let Some(cs_rval) = id_map.get_cs_from_rust(rust_signature.rval) else {
+            let Some(cs_rval) = id_map.cs_from_rust(rust_signature.rval) else {
                 // Return type not yet mapped, skip for now
                 outcome = Changed;
                 continue;
@@ -45,7 +45,7 @@ impl Pass {
             let mut all_args_available = true;
 
             for rust_arg in &rust_signature.arguments {
-                let Some(cs_arg_type) = id_map.get_cs_from_rust(rust_arg.ty) else {
+                let Some(cs_arg_type) = id_map.cs_from_rust(rust_arg.ty) else {
                     // Argument type not yet mapped, skip this delegate for now
                     all_args_available = false;
                     break;
@@ -55,8 +55,6 @@ impl Pass {
             }
 
             if !all_args_available {
-                // We couldn't process this delegate yet, will try again next iteration
-                outcome = Changed;
                 continue;
             }
 
@@ -65,7 +63,7 @@ impl Pass {
 
             id_map.set_rust_to_cs(*rust_id, cs_id);
             kinds.set_kind(cs_id, TypeKind::Delegate(cs_signature));
-            outcome = Changed;
+            outcome.changed();
         }
 
         Ok(outcome)

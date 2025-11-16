@@ -31,9 +31,7 @@ impl Pass {
             }
 
             // Get the C# TypeId
-            let Some(cs_id) = id_map.get_cs_from_rust(*rust_id) else {
-                // Type not yet mapped, skip
-                outcome = Changed;
+            let Some(cs_id) = id_map.cs_from_rust(*rust_id) else {
                 continue;
             };
 
@@ -44,8 +42,6 @@ impl Pass {
 
             // Get the converted variants
             let Some(variants) = variants_pass.get_variants(cs_id) else {
-                // Variants not yet available, skip
-                outcome = Changed;
                 continue;
             };
 
@@ -53,7 +49,7 @@ impl Pass {
             let data_enum = DataEnum { variants: variants.clone() };
 
             kinds.set_kind(cs_id, TypeKind::DataEnum(data_enum));
-            outcome = Changed;
+            outcome.changed();
         }
 
         Ok(outcome)

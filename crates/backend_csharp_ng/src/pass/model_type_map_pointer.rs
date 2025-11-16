@@ -30,21 +30,19 @@ impl Pass {
             let cs_id = TypeId::from_id(rust_id.id());
 
             // Check if we already processed this pointer
-            if id_map.get_cs_from_rust(*rust_id).is_some() {
+            if id_map.cs_from_rust(*rust_id).is_some() {
                 continue;
             }
 
             // Try to convert the pointee type
-            let Some(cs_pointee_id) = id_map.get_cs_from_rust(*rust_pointee_id) else {
-                // Pointee type not yet mapped, skip for now
-                outcome = Changed;
+            let Some(cs_pointee_id) = id_map.cs_from_rust(*rust_pointee_id) else {
                 continue;
             };
 
             // Register the pointer type
             id_map.set_rust_to_cs(*rust_id, cs_id);
             kinds.set_kind(cs_id, TypeKind::Pointer(cs_pointee_id));
-            outcome = Changed;
+            outcome.changed();
         }
 
         Ok(outcome)

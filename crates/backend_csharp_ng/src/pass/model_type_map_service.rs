@@ -29,14 +29,14 @@ impl Pass {
             let cs_id = TypeId::from_id(rust_id.id());
 
             // Check if we already processed this service
-            if id_map.get_cs_from_rust(*rust_id).is_some() {
+            if id_map.cs_from_rust(*rust_id).is_some() {
                 continue;
             }
 
             // Register the service type (no dependencies to check)
             id_map.set_rust_to_cs(*rust_id, cs_id);
             kinds.set_kind(cs_id, TypeKind::Service);
-            outcome = Changed;
+            outcome.changed();
         }
 
         Ok(outcome)

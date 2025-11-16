@@ -32,7 +32,7 @@ impl Pass {
             };
 
             // Get the C# TypeId
-            let Some(cs_id) = id_map.get_cs_from_rust(*rust_id) else {
+            let Some(cs_id) = id_map.cs_from_rust(*rust_id) else {
                 // Type not yet mapped, skip
                 outcome = Changed;
                 continue;
@@ -45,27 +45,19 @@ impl Pass {
 
             // Get the converted fields
             let Some(fields) = fields_pass.get_fields(cs_id) else {
-                // Fields not yet available, skip
-                outcome = Changed;
                 continue;
             };
 
             // Get the blittability
             let Some(kind) = blittable_pass.blittable(cs_id) else {
-                // Blittability not yet determined, skip
-                outcome = Changed;
                 continue;
             };
 
             // Create the composite
-            let composite = Composite {
-                fields: fields.clone(),
-                repr: rust_struct.repr,
-                kind,
-            };
+            let composite = Composite { fields: fields.clone(), repr: rust_struct.repr, kind };
 
             kinds.set_kind(cs_id, TypeKind::Composite(composite));
-            outcome = Changed;
+            outcome.changed();
         }
 
         Ok(outcome)

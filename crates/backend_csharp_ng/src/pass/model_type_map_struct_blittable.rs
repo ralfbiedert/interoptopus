@@ -39,17 +39,13 @@ impl Pass {
             // Determine if this type is blittable
             let blittable = match type_kind {
                 // Arrays are blittable if element type is blittable
-                TypeKind::Array(arr) => {
-                    match self.blittable.get(&arr.ty) {
-                        Some(CompositeKind::Blittable) => true,
-                        Some(CompositeKind::Disposable) => false,
-                        None => {
-                            // Element type not yet determined, skip for now
-                            outcome = Changed;
-                            continue;
-                        }
+                TypeKind::Array(arr) => match self.blittable.get(&arr.ty) {
+                    Some(CompositeKind::Blittable) => true,
+                    Some(CompositeKind::Disposable) => false,
+                    None => {
+                        continue;
                     }
-                }
+                },
 
                 TypeKind::Delegate(_) => true,
                 TypeKind::Primitive(_) => true,
@@ -83,8 +79,6 @@ impl Pass {
                                     break;
                                 }
                                 None => {
-                                    // Variant type not yet determined, skip for now
-                                    outcome = Changed;
                                     all_blittable = true; // Placeholder, we'll continue the loop
                                     break;
                                 }
@@ -111,8 +105,6 @@ impl Pass {
                                 break;
                             }
                             None => {
-                                // Field type not yet determined, skip for now
-                                outcome = Changed;
                                 all_blittable = true; // Placeholder, we'll continue
                                 break;
                             }
@@ -132,7 +124,7 @@ impl Pass {
 
             let kind = if blittable { CompositeKind::Blittable } else { CompositeKind::Disposable };
             self.blittable.insert(*cs_id, kind);
-            outcome = Changed;
+            outcome.changed();
         }
 
         Ok(outcome)

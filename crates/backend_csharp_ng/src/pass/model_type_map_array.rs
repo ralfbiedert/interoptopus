@@ -29,26 +29,21 @@ impl Pass {
             let cs_id = TypeId::from_id(rust_id.id());
 
             // Check if we already processed this array
-            if id_map.get_cs_from_rust(*rust_id).is_some() {
+            if id_map.cs_from_rust(*rust_id).is_some() {
                 continue;
             }
 
             // Try to convert the element type
-            let Some(cs_element_type) = id_map.get_cs_from_rust(rust_array.ty) else {
-                // Element type not yet mapped, skip for now
-                outcome = Changed;
+            let Some(cs_element_type) = id_map.cs_from_rust(rust_array.ty) else {
                 continue;
             };
 
             // Create the C# array with mapped element type
-            let cs_array = Array {
-                ty: cs_element_type,
-                len: rust_array.len,
-            };
+            let cs_array = Array { ty: cs_element_type, len: rust_array.len };
 
             id_map.set_rust_to_cs(*rust_id, cs_id);
             kinds.set_kind(cs_id, TypeKind::Array(cs_array));
-            outcome = Changed;
+            outcome.changed();
         }
 
         Ok(outcome)
