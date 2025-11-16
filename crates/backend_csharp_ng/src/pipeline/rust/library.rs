@@ -1,7 +1,7 @@
 use crate::Error;
 use crate::pass::{
-    OutputResult, meta_info, model_final, model_id_maps, model_type_kinds, model_type_map, model_type_map_primitives, model_type_names, output_final, output_header,
-    output_master,
+    OutputResult, meta_info, model_final, model_id_maps, model_type_kinds, model_type_map, model_type_map_primitives, model_type_map_struct_fields, model_type_names,
+    output_final, output_header, output_master,
 };
 use crate::pipeline::{RustLibraryBuilder, loop_model_passes_until_done};
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
@@ -15,6 +15,7 @@ pub struct RustLibraryConfig {
     pub model_id_maps: model_id_maps::Config,
     pub model_type_kinds: model_type_kinds::Config,
     pub model_type_map_primitives: model_type_map_primitives::Config,
+    pub model_type_map_struct_fields: model_type_map_struct_fields::Config,
     pub model_type_names: model_type_names::Config,
     pub model_type_map: model_type_map::Config,
     pub model_final: model_final::Config,
@@ -37,6 +38,7 @@ pub struct RustLibrary {
     model_id_maps: model_id_maps::Pass,
     model_type_kinds: model_type_kinds::Pass,
     model_type_map_primitives: model_type_map_primitives::Pass,
+    model_type_map_struct_fields: model_type_map_struct_fields::Pass,
     model_type_names: model_type_names::Pass,
     model_type_map: model_type_map::Pass,
     model_final: model_final::Pass,
@@ -79,6 +81,7 @@ impl RustLibrary {
             model_id_maps: model_id_maps::Pass::new(config.model_id_maps),
             model_type_kinds: model_type_kinds::Pass::new(config.model_type_kinds),
             model_type_map_primitives: model_type_map_primitives::Pass::new(config.model_type_map_primitives),
+            model_type_map_struct_fields: model_type_map_struct_fields::Pass::new(config.model_type_map_struct_fields),
             model_type_names: model_type_names::Pass::new(config.model_type_names),
             model_type_map: model_type_map::Pass::new(config.model_type_map),
             model_final: model_final::Pass::new(config.model_final),
@@ -119,6 +122,7 @@ impl RustLibrary {
             r.run(self.model_id_maps.process())?;
             r.run(self.model_type_kinds.process())?;
             r.run(self.model_type_map_primitives.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_struct_fields.process(&mut self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_names.process())?;
             r.run(self.model_type_map.process())?;
             r.run(self.model_final.process())?;

@@ -1,11 +1,11 @@
 //! ...
 
-use std::collections::HashMap;
 use crate::lang::types::{Composite, Field, TypeKind};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, model_id_maps, model_type_kinds};
 use interoptopus::lang;
+use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct Config {}
@@ -19,23 +19,19 @@ impl Pass {
         Self { fields: Default::default() }
     }
 
-    pub fn process(&mut self, id_map: &mut model_id_maps::Pass, kinds: &mut model_type_kinds::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(&mut self, id_map: &mut model_id_maps::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
         for (rust_id, ty) in rs_types {
-            let composite = match ty.kind {
+            let composite = match &ty.kind {
                 lang::types::TypeKind::Struct(x) => {
-                    let x = Composite { fields: vec![], repr: x.repr, kind: };
-
-                    x
+                    // TODO
                 }
                 _ => continue,
             };
 
             let cs_id = TypeId::from_id(rust_id.id());
             id_map.set_rust_to_cs(*rust_id, cs_id);
-            kinds.set_kind(cs_id, TypeKind::Composite(composite));
         }
 
         Ok(Unchanged)
     }
 }
-
