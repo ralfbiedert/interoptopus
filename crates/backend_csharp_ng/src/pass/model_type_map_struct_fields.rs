@@ -70,6 +70,10 @@ impl Pass {
 
         Ok(outcome)
     }
+
+    pub fn get_fields(&self, ty: TypeId) -> Option<&Vec<Field>> {
+        self.fields.get(&ty)
+    }
 }
 
 fn map_visibility(visibility: lang::meta::Visibility) -> crate::lang::meta::Visibility {

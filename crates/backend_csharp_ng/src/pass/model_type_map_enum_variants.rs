@@ -71,4 +71,8 @@ impl Pass {
 
         Ok(outcome)
     }
+
+    pub fn get_variants(&self, ty: TypeId) -> Option<&Vec<Variant>> {
+        self.variants.get(&ty)
+    }
 }
