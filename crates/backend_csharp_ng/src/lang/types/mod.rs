@@ -28,7 +28,7 @@
 
 mod array;
 mod composite;
-mod csharp;
+pub mod csharp;
 mod enums;
 mod pattern;
 mod primitive;
