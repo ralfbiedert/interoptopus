@@ -13,6 +13,7 @@ pub mod model_type_map_patterns;
 pub mod model_type_map_pointer;
 pub mod model_type_map_primitives;
 pub mod model_type_map_service;
+pub mod model_type_map_struct_blittable;
 pub mod model_type_map_struct_fields;
 pub mod model_type_names;
 pub mod output_final;

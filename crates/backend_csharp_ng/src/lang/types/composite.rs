@@ -3,7 +3,7 @@ use crate::model::TypeId;
 use interoptopus::lang::meta::Docs;
 use interoptopus::lang::types::Repr;
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CompositeKind {
     Blittable,
     Disposable,

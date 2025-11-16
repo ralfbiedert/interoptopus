@@ -26,4 +26,8 @@ impl Pass {
     pub fn set_kind(&mut self, id: TypeId, kind: TypeKind) {
         self.kinds.insert(id, kind);
     }
+
+    pub fn iter(&self) -> impl Iterator<Item = (&TypeId, &TypeKind)> {
+        self.kinds.iter()
+    }
 }
