@@ -1,0 +1,73 @@
+//! Maps Rust function pointers to C# delegates.
+
+use crate::lang::function::Signature;
+use crate::lang::types::TypeKind;
+use crate::model::TypeId;
+use crate::pass::Outcome::{Changed, Unchanged};
+use crate::pass::{ModelResult, model_id_maps, model_type_kinds};
+use interoptopus::lang;
+
+#[derive(Default)]
+pub struct Config {}
+
+pub struct Pass {}
+
+impl Pass {
+    pub fn new(_: Config) -> Self {
+        Self {}
+    }
+
+    pub fn process(&mut self, id_map: &mut model_id_maps::Pass, kinds: &mut model_type_kinds::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+        let mut outcome = Unchanged;
+
+        for (rust_id, ty) in rs_types {
+            let rust_signature = match &ty.kind {
+                lang::types::TypeKind::FnPointer(sig) => sig,
+                _ => continue,
+            };
+
+            // Create C# TypeId for the delegate
+            let cs_id = TypeId::from_id(rust_id.id());
+
+            // Check if we already processed this delegate
+            if id_map.get_cs_from_rust(*rust_id).is_some() {
+                continue;
+            }
+
+            // Try to convert the signature's return type and all argument types
+            let Some(cs_rval) = id_map.get_cs_from_rust(rust_signature.rval) else {
+                // Return type not yet mapped, skip for now
+                outcome = Changed;
+                continue;
+            };
+
+            let mut cs_arguments = Vec::new();
+            let mut all_args_available = true;
+
+            for rust_arg in &rust_signature.arguments {
+                let Some(cs_arg_type) = id_map.get_cs_from_rust(rust_arg.ty) else {
+                    // Argument type not yet mapped, skip this delegate for now
+                    all_args_available = false;
+                    break;
+                };
+
+                cs_arguments.push(crate::lang::function::Argument { name: rust_arg.name.clone(), ty: cs_arg_type });
+            }
+
+            if !all_args_available {
+                // We couldn't process this delegate yet, will try again next iteration
+                outcome = Changed;
+                continue;
+            }
+
+            // All types available, create the delegate signature
+            let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
+
+            id_map.set_rust_to_cs(*rust_id, cs_id);
+            kinds.set_kind(cs_id, TypeKind::Delegate(cs_signature));
+            outcome = Changed;
+        }
+
+        Ok(outcome)
+    }
+}

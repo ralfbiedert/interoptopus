@@ -19,6 +19,7 @@ impl Pass {
     }
 
     pub fn process(&mut self) -> ModelResult {
+        dbg!(self.kinds.len());
         Ok(Unchanged)
     }
 
