@@ -31,7 +31,7 @@ impl Pass {
         }
     }
 
-    pub fn process(&mut self, kinds: &model_type_kinds::Pass) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut super::PassMeta, kinds: &model_type_kinds::Pass) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (cs_id, type_kind) in kinds.iter() {

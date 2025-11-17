@@ -21,12 +21,13 @@ impl Pass {
         }
     }
 
-    pub fn process(&mut self, id_map: &model_id_maps::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut super::PassMeta, id_map: &model_id_maps::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
             // Get the C# TypeId
             let Some(cs_id) = id_map.cs_from_rust(*rust_id) else {
+                pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_id));
                 continue;
             };
 

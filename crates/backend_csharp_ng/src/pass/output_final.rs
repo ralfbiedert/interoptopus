@@ -20,7 +20,7 @@ impl Pass {
         }
     }
 
-    pub fn process(&mut self, output: &mut Multibuf, output_master: &output_master::Pass, intermediary: &IntermediateOutputPasses) -> OutputResult {
+    pub fn process(&mut self, _pass_meta: &mut super::PassMeta, output: &mut Multibuf, output_master: &output_master::Pass, intermediary: &IntermediateOutputPasses) -> OutputResult {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(OutputKind::Csharp) {

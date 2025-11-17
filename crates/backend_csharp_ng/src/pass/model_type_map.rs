@@ -21,7 +21,7 @@ impl Pass {
         }
     }
 
-    pub fn process(&mut self, kinds: &model_type_kinds::Pass, names: &model_type_names::Pass) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut super::PassMeta, kinds: &model_type_kinds::Pass, names: &model_type_names::Pass) -> ModelResult {
         let mut outcome = Unchanged;
 
         // Iterate through all kinds and create Types
@@ -34,6 +34,7 @@ impl Pass {
             // Get the name for this type
             let Some(name) = names.get_name(*type_id) else {
                 // Name not yet available, skip
+                pass_meta.lost_found.missing(self.info, super::MissingItem::CsType(*type_id));
                 continue;
             };
 

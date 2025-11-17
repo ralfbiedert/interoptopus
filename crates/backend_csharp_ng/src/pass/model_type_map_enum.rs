@@ -21,6 +21,7 @@ impl Pass {
 
     pub fn process(
         &mut self,
+        pass_meta: &mut super::PassMeta,
         id_map: &model_id_maps::Pass,
         kinds: &mut model_type_kinds::Pass,
         variants_pass: &model_type_map_enum_variants::Pass,
@@ -36,6 +37,7 @@ impl Pass {
 
             // Get the C# TypeId
             let Some(cs_id) = id_map.cs_from_rust(*rust_id) else {
+                pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_id));
                 continue;
             };
 
@@ -46,6 +48,7 @@ impl Pass {
 
             // Get the converted variants
             let Some(variants) = variants_pass.get_variants(cs_id) else {
+                pass_meta.lost_found.missing(self.info, super::MissingItem::CsType(cs_id));
                 continue;
             };
 

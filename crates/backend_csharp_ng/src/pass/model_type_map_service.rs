@@ -20,7 +20,7 @@ impl Pass {
         }
     }
 
-    pub fn process(&mut self, id_map: &mut model_id_maps::Pass, kinds: &mut model_type_kinds::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut super::PassMeta, id_map: &mut model_id_maps::Pass, kinds: &mut model_type_kinds::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {

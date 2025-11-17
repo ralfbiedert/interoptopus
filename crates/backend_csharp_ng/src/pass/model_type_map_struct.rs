@@ -21,6 +21,7 @@ impl Pass {
 
     pub fn process(
         &mut self,
+        pass_meta: &mut super::PassMeta,
         id_map: &model_id_maps::Pass,
         kinds: &mut model_type_kinds::Pass,
         fields_pass: &model_type_map_struct_fields::Pass,
@@ -38,6 +39,7 @@ impl Pass {
             // Get the C# TypeId
             let Some(cs_id) = id_map.cs_from_rust(*rust_id) else {
                 // Type not yet mapped, skip
+                pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_id));
                 outcome = Changed;
                 continue;
             };
@@ -49,11 +51,13 @@ impl Pass {
 
             // Get the converted fields
             let Some(fields) = fields_pass.get_fields(cs_id) else {
+                pass_meta.lost_found.missing(self.info, super::MissingItem::CsType(cs_id));
                 continue;
             };
 
             // Get the blittability
             let Some(kind) = blittable_pass.blittable(cs_id) else {
+                pass_meta.lost_found.missing(self.info, super::MissingItem::CsType(cs_id));
                 continue;
             };
 

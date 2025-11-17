@@ -68,4 +68,21 @@ impl LostAndFound {
     pub fn missing(&mut self, origin: PassInfo, item: MissingItem) {
         self.entries.push(Missing { origin, item });
     }
+
+    pub fn print(&self) {
+        for missing in &self.entries {
+            println!("Missing in {:?}: {:?}", missing.origin.name, missing.item);
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct PassMeta {
+    pub lost_found: LostAndFound,
+}
+
+impl PassMeta {
+    pub fn clear(&mut self) {
+        self.lost_found.entries.clear();
+    }
 }

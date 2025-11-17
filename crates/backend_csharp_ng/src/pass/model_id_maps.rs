@@ -25,7 +25,7 @@ impl Pass {
         }
     }
 
-    pub fn process(&mut self, _: &Types) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut super::PassMeta, _: &Types) -> ModelResult {
         Ok(Unchanged)
     }
 

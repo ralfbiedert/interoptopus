@@ -32,7 +32,7 @@ impl Pass {
         }
     }
 
-    pub fn process(&mut self) -> OutputResult {
+    pub fn process(&mut self, _pass_meta: &mut super::PassMeta) -> OutputResult {
         // TODO: for each possible file, create an entry
         self.outputs.push(Output { name: "Foo.cs".to_string(), kind: OutputKind::Csharp });
         Ok(())

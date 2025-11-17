@@ -1,11 +1,11 @@
-use crate::Error;
 use crate::pass::{
-    OutputResult, meta_info, model_final, model_id_maps, model_type_kinds, model_type_map, model_type_map_array, model_type_map_delegate, model_type_map_enum,
-    model_type_map_enum_variants, model_type_map_patterns, model_type_map_pointer, model_type_map_primitives, model_type_map_service, model_type_map_struct,
-    model_type_map_struct_blittable, model_type_map_struct_fields, model_type_names, output_final, output_header, output_master,
+    meta_info, model_final, model_id_maps, model_type_kinds, model_type_map, model_type_map_array, model_type_map_delegate, model_type_map_enum, model_type_map_enum_variants, model_type_map_patterns,
+    model_type_map_pointer, model_type_map_primitives, model_type_map_service, model_type_map_struct, model_type_map_struct_blittable, model_type_map_struct_fields,
+    model_type_names, output_final, output_header, output_master, OutputResult, PassMeta,
 };
-use crate::pipeline::{RustLibraryBuilder, loop_model_passes_until_done};
+use crate::pipeline::{loop_model_passes_until_done, RustLibraryBuilder};
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
+use crate::Error;
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
@@ -141,27 +141,29 @@ impl RustLibrary {
 
     pub fn process(mut self) -> Result<Multibuf, Error> {
         self.plugin_init_pass();
+        let mut pass_meta = PassMeta::default();
 
         // Model passes
         #[rustfmt::skip]
         loop_model_passes_until_done(|r| {
-            r.run(self.meta_info.process())?;
-            r.run(self.model_id_maps.process(&self.inventory.types))?;
-            r.run(self.model_type_kinds.process())?;
-            r.run(self.model_type_map_primitives.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_array.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_delegate.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_pointer.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_service.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_patterns.process(&mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_enum_variants.process(&mut self.model_id_maps, &self.inventory.types))?;
-            r.run(self.model_type_map_enum.process(&self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_enum_variants, &self.inventory.types))?;
-            r.run(self.model_type_map_struct_fields.process(&mut self.model_id_maps, &self.inventory.types))?;
-            r.run(self.model_type_map_struct_blittable.process(&self.model_type_kinds))?;
-            r.run(self.model_type_map_struct.process(&self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_struct_fields, &self.model_type_map_struct_blittable, &self.inventory.types))?;
-            r.run(self.model_type_names.process(&self.model_id_maps, &self.inventory.types))?;
-            r.run(self.model_type_map.process(&self.model_type_kinds, &self.model_type_names))?;
-            r.run(self.model_final.process())?;
+            pass_meta.clear();
+            r.run(self.meta_info.process(&mut pass_meta))?;
+            r.run(self.model_id_maps.process(&mut pass_meta, &self.inventory.types))?;
+            r.run(self.model_type_kinds.process(&mut pass_meta))?;
+            r.run(self.model_type_map_primitives.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_array.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_delegate.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_pointer.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_service.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_patterns.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_enum_variants.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.types))?;
+            r.run(self.model_type_map_enum.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_enum_variants, &self.inventory.types))?;
+            r.run(self.model_type_map_struct_fields.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.types))?;
+            r.run(self.model_type_map_struct_blittable.process(&mut pass_meta, &self.model_type_kinds))?;
+            r.run(self.model_type_map_struct.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_struct_fields, &self.model_type_map_struct_blittable, &self.inventory.types))?;
+            r.run(self.model_type_names.process(&mut pass_meta, &self.model_id_maps, &self.inventory.types))?;
+            r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
+            r.run(self.model_final.process(&mut pass_meta))?;
 
             let post_model = PostModelPass::default();
             for plugin in self.plugins.iter_mut() {
@@ -170,13 +172,16 @@ impl RustLibrary {
             Ok(())
         })?;
 
+        pass_meta.lost_found.print();
+
         // Output passes
-        self.output_master.process()?;
-        self.output_passes.header.process(&self.output_master, &self.meta_info)?;
+        self.output_master.process(&mut pass_meta)?;
+        self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.plugin_post_output_pass()?;
 
         // Final output pass(es)
-        self.output_final.process(&mut self.output, &self.output_master, &self.output_passes)?;
+        self.output_final
+            .process(&mut pass_meta, &mut self.output, &self.output_master, &self.output_passes)?;
 
         Ok(self.output)
     }

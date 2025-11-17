@@ -24,7 +24,7 @@ impl Pass {
         }
     }
 
-    pub fn process(&mut self, id_map: &mut model_id_maps::Pass, kinds: &mut model_type_kinds::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut super::PassMeta, id_map: &mut model_id_maps::Pass, kinds: &mut model_type_kinds::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
@@ -52,30 +52,35 @@ impl Pass {
                 // Patterns with one type parameter
                 lang::types::TypePattern::Slice(rust_ty) => {
                     let Some(cs_ty) = id_map.cs_from_rust(*rust_ty) else {
+                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ty));
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::Slice(cs_ty))
                 }
                 lang::types::TypePattern::SliceMut(rust_ty) => {
                     let Some(cs_ty) = id_map.cs_from_rust(*rust_ty) else {
+                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ty));
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::SliceMut(cs_ty))
                 }
                 lang::types::TypePattern::Vec(rust_ty) => {
                     let Some(cs_ty) = id_map.cs_from_rust(*rust_ty) else {
+                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ty));
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::Vec(cs_ty))
                 }
                 lang::types::TypePattern::Option(rust_ty) => {
                     let Some(cs_ty) = id_map.cs_from_rust(*rust_ty) else {
+                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ty));
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::Option(cs_ty))
                 }
                 lang::types::TypePattern::AsyncCallback(rust_ty) => {
                     let Some(cs_ty) = id_map.cs_from_rust(*rust_ty) else {
+                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ty));
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::AsyncCallback(cs_ty))
@@ -84,9 +89,11 @@ impl Pass {
                 // Result pattern with two type parameters
                 lang::types::TypePattern::Result(rust_ok, rust_err) => {
                     let Some(cs_ok) = id_map.cs_from_rust(*rust_ok) else {
+                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ok));
                         continue;
                     };
                     let Some(cs_err) = id_map.cs_from_rust(*rust_err) else {
+                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_err));
                         continue;
                     };
                     (TypeId::from_id(rust_id.id()), TypePattern::Result(cs_ok, cs_err))
@@ -96,6 +103,7 @@ impl Pass {
                 lang::types::TypePattern::NamedCallback(rust_sig) => {
                     // Convert return type
                     let Some(cs_rval) = id_map.cs_from_rust(rust_sig.rval) else {
+                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(rust_sig.rval));
                         continue;
                     };
 
@@ -105,6 +113,7 @@ impl Pass {
 
                     for rust_arg in &rust_sig.arguments {
                         let Some(cs_arg_type) = id_map.cs_from_rust(rust_arg.ty) else {
+                            pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(rust_arg.ty));
                             all_args_available = false;
                             break;
                         };

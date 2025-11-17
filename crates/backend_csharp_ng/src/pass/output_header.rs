@@ -21,7 +21,7 @@ impl Pass {
         }
     }
 
-    pub fn process(&mut self, output_master: &output_master::Pass, meta_info: &meta_info::Pass) -> OutputResult {
+    pub fn process(&mut self, _pass_meta: &mut super::PassMeta, output_master: &output_master::Pass, meta_info: &meta_info::Pass) -> OutputResult {
         let templates = output_master.templates();
 
         for output in output_master.outputs_of(OutputKind::Csharp) {
