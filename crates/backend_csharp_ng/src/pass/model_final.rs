@@ -3,19 +3,23 @@
 //! and we might lose ability to reuse them in "Rust" and "Csharp" library models.
 
 use crate::model::RustModel;
-use crate::pass::ModelResult;
+use crate::pass::{ModelResult, PassInfo};
 use crate::pass::Outcome::Unchanged;
 
 #[derive(Default)]
 pub struct Config {}
 
 pub struct Pass {
+    info: PassInfo,
     rust_model: RustModel,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { rust_model: Default::default() }
+        Self {
+            info: PassInfo { name: "model_final" },
+            rust_model: Default::default(),
+        }
     }
 
     pub fn process(&mut self) -> ModelResult {

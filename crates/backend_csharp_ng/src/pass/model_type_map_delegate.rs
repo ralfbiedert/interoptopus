@@ -4,17 +4,21 @@ use crate::lang::function::Signature;
 use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{ModelResult, model_id_maps, model_type_kinds};
+use crate::pass::{ModelResult, PassInfo, model_id_maps, model_type_kinds};
 use interoptopus::lang;
 
 #[derive(Default)]
 pub struct Config {}
 
-pub struct Pass {}
+pub struct Pass {
+    info: PassInfo,
+}
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {}
+        Self {
+            info: PassInfo { name: "model_type_map_delegate" },
+        }
     }
 
     pub fn process(&mut self, id_map: &mut model_id_maps::Pass, kinds: &mut model_type_kinds::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {

@@ -1,18 +1,23 @@
 //! ...
 
-use crate::pass::{ModelResult, Outcome};
+use crate::pass::{ModelResult, Outcome, PassInfo};
 
 #[derive(Default)]
 pub struct Config {}
 
 pub struct Pass {
+    info: PassInfo,
     interop_dll_name: String,
     interop_hash: String,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { interop_dll_name: String::new(), interop_hash: String::new() }
+        Self {
+            info: PassInfo { name: "meta_info" },
+            interop_dll_name: String::new(),
+            interop_hash: String::new(),
+        }
     }
 
     pub fn process(&mut self) -> ModelResult {

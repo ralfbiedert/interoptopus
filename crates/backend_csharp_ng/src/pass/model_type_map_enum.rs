@@ -2,17 +2,21 @@
 
 use crate::lang::types::{DataEnum, TypeKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{ModelResult, model_id_maps, model_type_kinds, model_type_map_enum_variants};
+use crate::pass::{ModelResult, PassInfo, model_id_maps, model_type_kinds, model_type_map_enum_variants};
 use interoptopus::lang;
 
 #[derive(Default)]
 pub struct Config {}
 
-pub struct Pass {}
+pub struct Pass {
+    info: PassInfo,
+}
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {}
+        Self {
+            info: PassInfo { name: "model_type_map_enum" },
+        }
     }
 
     pub fn process(

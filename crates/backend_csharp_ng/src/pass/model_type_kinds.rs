@@ -2,7 +2,7 @@
 
 use crate::lang::types::TypeKind;
 use crate::model::TypeId;
-use crate::pass::ModelResult;
+use crate::pass::{ModelResult, PassInfo};
 use crate::pass::Outcome::Unchanged;
 use std::collections::HashMap;
 
@@ -10,12 +10,16 @@ use std::collections::HashMap;
 pub struct Config {}
 
 pub struct Pass {
+    info: PassInfo,
     kinds: HashMap<TypeId, TypeKind>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { kinds: Default::default() }
+        Self {
+            info: PassInfo { name: "model_type_kinds" },
+            kinds: Default::default(),
+        }
     }
 
     pub fn process(&mut self) -> ModelResult {

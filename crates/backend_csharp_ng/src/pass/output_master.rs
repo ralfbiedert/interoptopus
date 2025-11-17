@@ -2,7 +2,7 @@
 
 use crate::dispatch::Dispatch;
 use crate::output::{Output, OutputKind};
-use crate::pass::OutputResult;
+use crate::pass::{OutputResult, PassInfo};
 use crate::template::templates;
 use interoptopus_backends::template::TemplateEngine;
 
@@ -18,13 +18,18 @@ impl Default for Config {
 }
 
 pub struct Pass {
+    info: PassInfo,
     config: Config,
     outputs: Vec<Output>,
 }
 
 impl Pass {
     pub fn new(config: Config) -> Self {
-        Self { config, outputs: vec![] }
+        Self {
+            info: PassInfo { name: "output_master" },
+            config,
+            outputs: vec![],
+        }
     }
 
     pub fn process(&mut self) -> OutputResult {

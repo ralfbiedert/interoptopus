@@ -1,7 +1,7 @@
 //! Writes top-level file header.
 
 use crate::output::{Output, OutputKind};
-use crate::pass::{OutputResult, meta_info, output_master};
+use crate::pass::{OutputResult, PassInfo, meta_info, output_master};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -9,12 +9,16 @@ use std::collections::HashMap;
 pub struct Config {}
 
 pub struct Pass {
+    info: PassInfo,
     headers: HashMap<Output, String>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { headers: Default::default() }
+        Self {
+            info: PassInfo { name: "output_header" },
+            headers: Default::default(),
+        }
     }
 
     pub fn process(&mut self, output_master: &output_master::Pass, meta_info: &meta_info::Pass) -> OutputResult {

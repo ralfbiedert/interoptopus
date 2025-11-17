@@ -1,3 +1,4 @@
+use crate::model::TypeId;
 use crate::Error;
 use std::cmp::PartialEq;
 
@@ -36,3 +37,35 @@ impl Outcome {
 
 pub type ModelResult = Result<Outcome, Error>;
 pub type OutputResult = Result<(), Error>;
+
+#[derive(Debug, Copy, Clone)]
+pub struct PassInfo {
+    pub name: &'static str,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum MissingItem {
+    CsType(TypeId),
+    RustType(interoptopus::inventory::TypeId),
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct Missing {
+    pub origin: PassInfo,
+    pub item: MissingItem,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct LostAndFound {
+    entries: Vec<Missing>,
+}
+
+impl LostAndFound {
+    pub fn clear(&mut self) {
+        self.entries.clear();
+    }
+
+    pub fn missing(&mut self, origin: PassInfo, item: MissingItem) {
+        self.entries.push(Missing { origin, item });
+    }
+}

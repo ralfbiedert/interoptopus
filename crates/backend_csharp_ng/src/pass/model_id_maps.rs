@@ -1,7 +1,7 @@
 //! Introduces C# TypeIDs and converts a Rust `TypeId` into a C# one.
 
 use crate::model::TypeId;
-use crate::pass::ModelResult;
+use crate::pass::{ModelResult, PassInfo};
 use crate::pass::Outcome::Unchanged;
 use interoptopus::inventory::Types;
 use std::collections::HashMap;
@@ -13,14 +13,16 @@ type RsToCs = HashMap<interoptopus::inventory::TypeId, TypeId>;
 type CsToRs = HashMap<TypeId, interoptopus::inventory::TypeId>;
 
 pub struct Pass {
+    info: PassInfo,
     rs_to_cs: RsToCs,
 }
 
-impl Pass {}
-
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { rs_to_cs: Default::default() }
+        Self {
+            info: PassInfo { name: "model_id_maps" },
+            rs_to_cs: Default::default(),
+        }
     }
 
     pub fn process(&mut self, _: &Types) -> ModelResult {

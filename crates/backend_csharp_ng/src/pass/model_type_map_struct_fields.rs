@@ -3,7 +3,7 @@
 use crate::lang::types::Field;
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{ModelResult, model_id_maps};
+use crate::pass::{ModelResult, PassInfo, model_id_maps};
 use interoptopus::lang;
 use std::collections::HashMap;
 
@@ -11,12 +11,16 @@ use std::collections::HashMap;
 pub struct Config {}
 
 pub struct Pass {
+    info: PassInfo,
     fields: HashMap<TypeId, Vec<Field>>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { fields: Default::default() }
+        Self {
+            info: PassInfo { name: "model_type_map_struct_fields" },
+            fields: Default::default(),
+        }
     }
 
     pub fn process(&mut self, id_map: &mut model_id_maps::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {

@@ -1,7 +1,7 @@
 //! Last output step where a buffer is fully materialized.
 
 use crate::output::OutputKind;
-use crate::pass::{OutputResult, output_master};
+use crate::pass::{OutputResult, PassInfo, output_master};
 use crate::pipeline::IntermediateOutputPasses;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;
@@ -9,11 +9,15 @@ use interoptopus_backends::template::Context;
 #[derive(Default)]
 pub struct Config {}
 
-pub struct Pass {}
+pub struct Pass {
+    info: PassInfo,
+}
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {}
+        Self {
+            info: PassInfo { name: "output_final" },
+        }
     }
 
     pub fn process(&mut self, output: &mut Multibuf, output_master: &output_master::Pass, intermediary: &IntermediateOutputPasses) -> OutputResult {

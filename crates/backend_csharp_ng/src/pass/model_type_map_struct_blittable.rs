@@ -12,19 +12,23 @@
 use crate::lang::types::{CompositeKind, TypeKind};
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{ModelResult, model_type_kinds};
+use crate::pass::{ModelResult, PassInfo, model_type_kinds};
 use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct Config {}
 
 pub struct Pass {
+    info: PassInfo,
     blittable: HashMap<TypeId, CompositeKind>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { blittable: Default::default() }
+        Self {
+            info: PassInfo { name: "model_type_map_struct_blittable" },
+            blittable: Default::default(),
+        }
     }
 
     pub fn process(&mut self, kinds: &model_type_kinds::Pass) -> ModelResult {

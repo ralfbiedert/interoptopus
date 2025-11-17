@@ -2,19 +2,23 @@
 
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{ModelResult, model_id_maps};
+use crate::pass::{ModelResult, PassInfo, model_id_maps};
 use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct Config {}
 
 pub struct Pass {
+    info: PassInfo,
     names: HashMap<TypeId, String>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { names: Default::default() }
+        Self {
+            info: PassInfo { name: "model_type_names" },
+            names: Default::default(),
+        }
     }
 
     pub fn process(&mut self, id_map: &model_id_maps::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
