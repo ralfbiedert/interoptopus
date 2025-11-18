@@ -4,6 +4,7 @@ use std::cmp::PartialEq;
 
 pub mod meta_info;
 pub mod model_final;
+pub mod model_fn_map;
 pub mod model_id_maps;
 pub mod model_type_kinds;
 pub mod model_type_map;

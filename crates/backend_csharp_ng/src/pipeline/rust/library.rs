@@ -1,7 +1,7 @@
 use crate::pass::{
-    meta_info, model_final, model_id_maps, model_type_kinds, model_type_map, model_type_map_array, model_type_map_delegate, model_type_map_enum, model_type_map_enum_variants, model_type_map_patterns,
-    model_type_map_pointer, model_type_map_primitives, model_type_map_service, model_type_map_struct, model_type_map_struct_blittable, model_type_map_struct_fields,
-    model_type_names, output_final, output_header, output_master, OutputResult, PassMeta,
+    meta_info, model_final, model_fn_map, model_id_maps, model_type_kinds, model_type_map, model_type_map_array, model_type_map_delegate, model_type_map_enum, model_type_map_enum_variants,
+    model_type_map_patterns, model_type_map_pointer, model_type_map_primitives, model_type_map_service, model_type_map_struct, model_type_map_struct_blittable,
+    model_type_map_struct_fields, model_type_names, output_final, output_header, output_master, OutputResult, PassMeta,
 };
 use crate::pipeline::{loop_model_passes_until_done, RustLibraryBuilder};
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
@@ -28,6 +28,7 @@ pub struct RustLibraryConfig {
     pub model_type_map_struct: model_type_map_struct::Config,
     pub model_type_names: model_type_names::Config,
     pub model_type_map: model_type_map::Config,
+    pub model_fn_map: model_fn_map::Config,
     pub model_final: model_final::Config,
     pub output_master: output_master::Config,
     pub output_header: output_header::Config,
@@ -60,6 +61,7 @@ pub struct RustLibrary {
     model_type_map_struct: model_type_map_struct::Pass,
     model_type_names: model_type_names::Pass,
     model_type_map: model_type_map::Pass,
+    model_fn_map: model_fn_map::Pass,
     model_final: model_final::Pass,
 
     // First output pass determining files to be produced
@@ -111,6 +113,7 @@ impl RustLibrary {
             model_type_map_struct: model_type_map_struct::Pass::new(config.model_type_map_struct),
             model_type_names: model_type_names::Pass::new(config.model_type_names),
             model_type_map: model_type_map::Pass::new(config.model_type_map),
+            model_fn_map: model_fn_map::Pass::new(config.model_fn_map),
             model_final: model_final::Pass::new(config.model_final),
             output_master: output_master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses { header: output_header::Pass::new(config.output_header) },
@@ -163,6 +166,7 @@ impl RustLibrary {
             r.run(self.model_type_map_struct.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_struct_fields, &self.model_type_map_struct_blittable, &self.inventory.types))?;
             r.run(self.model_type_names.process(&mut pass_meta, &self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
+            r.run(self.model_fn_map.process(&mut pass_meta,  &self.inventory.functions))?;
             r.run(self.model_final.process(&mut pass_meta))?;
 
             let post_model = PostModelPass::default();
