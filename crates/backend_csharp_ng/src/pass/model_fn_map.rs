@@ -80,12 +80,4 @@ impl Pass {
 
         Ok(outcome)
     }
-
-    pub fn get_function(&self, fn_id: FunctionId) -> Option<&Function> {
-        self.functions.get(&fn_id)
-    }
-
-    pub fn functions(&self) -> &HashMap<FunctionId, Function> {
-        &self.functions
-    }
 }
