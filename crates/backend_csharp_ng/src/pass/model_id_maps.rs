@@ -1,39 +1,38 @@
 //! Introduces C# TypeIDs and converts a Rust `TypeId` into a C# one.
 
-use crate::model::TypeId;
-use crate::pass::{ModelResult, PassInfo};
+use crate::model::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
+use crate::pass::{ModelResult, PassInfo};
 use interoptopus::inventory::Types;
 use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct Config {}
 
-type RsToCs = HashMap<interoptopus::inventory::TypeId, TypeId>;
-type CsToRs = HashMap<TypeId, interoptopus::inventory::TypeId>;
-
 pub struct Pass {
     info: PassInfo,
-    rs_to_cs: RsToCs,
+    ty: HashMap<interoptopus::inventory::TypeId, TypeId>,
+    fns: HashMap<interoptopus::inventory::FunctionId, FunctionId>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: "model_id_maps" },
-            rs_to_cs: Default::default(),
-        }
+        Self { info: PassInfo { name: "model_id_maps" }, ty: Default::default(), fns: Default::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut super::PassMeta, _: &Types) -> ModelResult {
         Ok(Unchanged)
     }
 
-    pub(crate) fn set_rust_to_cs(&mut self, rust_id: interoptopus::inventory::TypeId, cs_id: TypeId) {
-        self.rs_to_cs.insert(rust_id, cs_id);
+    pub(crate) fn set_ty(&mut self, rust_id: interoptopus::inventory::TypeId, cs_id: TypeId) {
+        self.ty.insert(rust_id, cs_id);
     }
 
-    pub(crate) fn cs_from_rust(&self, rust_id: interoptopus::inventory::TypeId) -> Option<TypeId> {
-        self.rs_to_cs.get(&rust_id).copied()
+    pub(crate) fn set_fns(&mut self, rust_id: interoptopus::inventory::FunctionId, cs_id: FunctionId) {
+        self.fns.insert(rust_id, cs_id);
+    }
+
+    pub(crate) fn ty(&self, rust_id: interoptopus::inventory::TypeId) -> Option<TypeId> {
+        self.ty.get(&rust_id).copied()
     }
 }

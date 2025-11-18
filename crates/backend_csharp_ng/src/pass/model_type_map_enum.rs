@@ -2,7 +2,7 @@
 
 use crate::lang::types::{DataEnum, TypeKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{ModelResult, PassInfo, model_id_maps, model_type_kinds, model_type_map_enum_variants};
+use crate::pass::{model_id_maps, model_type_kinds, model_type_map_enum_variants, ModelResult, PassInfo};
 use interoptopus::lang;
 
 #[derive(Default)]
@@ -14,9 +14,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: "model_type_map_enum" },
-        }
+        Self { info: PassInfo { name: "model_type_map_enum" } }
     }
 
     pub fn process(
@@ -36,7 +34,7 @@ impl Pass {
             }
 
             // Get the C# TypeId
-            let Some(cs_id) = id_map.cs_from_rust(*rust_id) else {
+            let Some(cs_id) = id_map.ty(*rust_id) else {
                 pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_id));
                 continue;
             };

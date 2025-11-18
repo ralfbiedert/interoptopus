@@ -3,7 +3,7 @@
 use crate::lang::types::Field;
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{ModelResult, PassInfo, model_id_maps};
+use crate::pass::{model_id_maps, ModelResult, PassInfo};
 use interoptopus::lang;
 use std::collections::HashMap;
 
@@ -17,10 +17,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: "model_type_map_struct_fields" },
-            fields: Default::default(),
-        }
+        Self { info: PassInfo { name: "model_type_map_struct_fields" }, fields: Default::default() }
     }
 
     pub fn process(&mut self, pass_meta: &mut super::PassMeta, id_map: &mut model_id_maps::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
@@ -46,7 +43,7 @@ impl Pass {
 
             for rust_field in &rust_struct.fields {
                 // Look up the C# TypeId for this field's type
-                let Some(cs_field_type_id) = id_map.cs_from_rust(rust_field.ty) else {
+                let Some(cs_field_type_id) = id_map.ty(rust_field.ty) else {
                     // Field type not yet mapped, skip this struct for now
                     pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(rust_field.ty));
                     all_fields_available = false;
@@ -66,7 +63,7 @@ impl Pass {
             }
 
             // All fields available, register the struct
-            id_map.set_rust_to_cs(*rust_id, cs_id);
+            id_map.set_ty(*rust_id, cs_id);
             self.fields.insert(cs_id, cs_fields);
             outcome.changed();
         }

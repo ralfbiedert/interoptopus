@@ -3,7 +3,7 @@
 use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{ModelResult, PassInfo, model_id_maps, model_type_kinds};
+use crate::pass::{model_id_maps, model_type_kinds, ModelResult, PassInfo};
 use interoptopus::lang;
 
 #[derive(Default)]
@@ -15,12 +15,16 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: "model_type_map_pointer" },
-        }
+        Self { info: PassInfo { name: "model_type_map_pointer" } }
     }
 
-    pub fn process(&mut self, pass_meta: &mut super::PassMeta, id_map: &mut model_id_maps::Pass, kinds: &mut model_type_kinds::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(
+        &mut self,
+        pass_meta: &mut super::PassMeta,
+        id_map: &mut model_id_maps::Pass,
+        kinds: &mut model_type_kinds::Pass,
+        rs_types: &interoptopus::inventory::Types,
+    ) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
@@ -34,18 +38,18 @@ impl Pass {
             let cs_id = TypeId::from_id(rust_id.id());
 
             // Check if we already processed this pointer
-            if id_map.cs_from_rust(*rust_id).is_some() {
+            if id_map.ty(*rust_id).is_some() {
                 continue;
             }
 
             // Try to convert the pointee type
-            let Some(cs_pointee_id) = id_map.cs_from_rust(*rust_pointee_id) else {
+            let Some(cs_pointee_id) = id_map.ty(*rust_pointee_id) else {
                 pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_pointee_id));
                 continue;
             };
 
             // Register the pointer type
-            id_map.set_rust_to_cs(*rust_id, cs_id);
+            id_map.set_ty(*rust_id, cs_id);
             kinds.set_kind(cs_id, TypeKind::Pointer(cs_pointee_id));
             outcome.changed();
         }

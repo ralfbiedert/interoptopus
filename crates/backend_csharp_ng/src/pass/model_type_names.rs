@@ -1,8 +1,8 @@
 //! Builds a map of C# TypeId to type names (using Rust names for now).
 
 use crate::model::TypeId;
-use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{ModelResult, PassInfo, model_id_maps};
+use crate::pass::Outcome::Unchanged;
+use crate::pass::{model_id_maps, ModelResult, PassInfo};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -15,10 +15,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: "model_type_names" },
-            names: Default::default(),
-        }
+        Self { info: PassInfo { name: "model_type_names" }, names: Default::default() }
     }
 
     pub fn process(&mut self, pass_meta: &mut super::PassMeta, id_map: &model_id_maps::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
@@ -26,7 +23,7 @@ impl Pass {
 
         for (rust_id, ty) in rs_types {
             // Get the C# TypeId
-            let Some(cs_id) = id_map.cs_from_rust(*rust_id) else {
+            let Some(cs_id) = id_map.ty(*rust_id) else {
                 pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_id));
                 continue;
             };

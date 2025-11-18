@@ -4,7 +4,7 @@ use crate::lang::function::Signature;
 use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{ModelResult, PassInfo, model_id_maps, model_type_kinds};
+use crate::pass::{model_id_maps, model_type_kinds, ModelResult, PassInfo};
 use interoptopus::lang;
 
 #[derive(Default)]
@@ -16,12 +16,16 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: "model_type_map_delegate" },
-        }
+        Self { info: PassInfo { name: "model_type_map_delegate" } }
     }
 
-    pub fn process(&mut self, pass_meta: &mut super::PassMeta, id_map: &mut model_id_maps::Pass, kinds: &mut model_type_kinds::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(
+        &mut self,
+        pass_meta: &mut super::PassMeta,
+        id_map: &mut model_id_maps::Pass,
+        kinds: &mut model_type_kinds::Pass,
+        rs_types: &interoptopus::inventory::Types,
+    ) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
@@ -34,12 +38,12 @@ impl Pass {
             let cs_id = TypeId::from_id(rust_id.id());
 
             // Check if we already processed this delegate
-            if id_map.cs_from_rust(*rust_id).is_some() {
+            if id_map.ty(*rust_id).is_some() {
                 continue;
             }
 
             // Try to convert the signature's return type and all argument types
-            let Some(cs_rval) = id_map.cs_from_rust(rust_signature.rval) else {
+            let Some(cs_rval) = id_map.ty(rust_signature.rval) else {
                 // Return type not yet mapped, skip for now
                 pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(rust_signature.rval));
                 outcome = Changed;
@@ -50,7 +54,7 @@ impl Pass {
             let mut all_args_available = true;
 
             for rust_arg in &rust_signature.arguments {
-                let Some(cs_arg_type) = id_map.cs_from_rust(rust_arg.ty) else {
+                let Some(cs_arg_type) = id_map.ty(rust_arg.ty) else {
                     // Argument type not yet mapped, skip this delegate for now
                     pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(rust_arg.ty));
                     all_args_available = false;
@@ -67,7 +71,7 @@ impl Pass {
             // All types available, create the delegate signature
             let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
 
-            id_map.set_rust_to_cs(*rust_id, cs_id);
+            id_map.set_ty(*rust_id, cs_id);
             kinds.set_kind(cs_id, TypeKind::Delegate(cs_signature));
             outcome.changed();
         }

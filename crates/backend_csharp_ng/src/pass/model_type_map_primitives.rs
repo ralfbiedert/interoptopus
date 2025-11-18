@@ -4,7 +4,7 @@ use crate::lang::types;
 use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{ModelResult, PassInfo, model_id_maps, model_type_kinds};
+use crate::pass::{model_id_maps, model_type_kinds, ModelResult, PassInfo};
 use interoptopus::lang;
 use interoptopus::lang::types::Primitive;
 
@@ -17,12 +17,16 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: "model_type_map_primitives" },
-        }
+        Self { info: PassInfo { name: "model_type_map_primitives" } }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut super::PassMeta, id_map: &mut model_id_maps::Pass, kinds: &mut model_type_kinds::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(
+        &mut self,
+        _pass_meta: &mut super::PassMeta,
+        id_map: &mut model_id_maps::Pass,
+        kinds: &mut model_type_kinds::Pass,
+        rs_types: &interoptopus::inventory::Types,
+    ) -> ModelResult {
         for (rust_id, ty) in rs_types {
             let primitive = match ty.kind {
                 lang::types::TypeKind::Primitive(x) => map(x),
@@ -30,7 +34,7 @@ impl Pass {
             };
 
             let cs_id = TypeId::from_id(rust_id.id());
-            id_map.set_rust_to_cs(*rust_id, cs_id);
+            id_map.set_ty(*rust_id, cs_id);
             kinds.set_kind(cs_id, TypeKind::Primitive(primitive));
         }
 
