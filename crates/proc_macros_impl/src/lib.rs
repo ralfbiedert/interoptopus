@@ -9,13 +9,14 @@ mod constant;
 mod docs;
 mod forbidden;
 mod function;
+mod runtime;
 mod service;
 mod skip;
 mod types;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Item, parse2};
+use syn::{parse2, Item};
 
 #[must_use]
 pub fn ffi(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -41,4 +42,9 @@ pub fn ffi(attr: TokenStream, item: TokenStream) -> TokenStream {
     });
 
     handle_result(result)
+}
+
+#[must_use]
+pub fn runtime(attr: TokenStream, item: TokenStream) -> TokenStream {
+    todo!()
 }
