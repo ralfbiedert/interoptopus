@@ -15,7 +15,7 @@ pub type Constants = HashMap<ConstantId, Constant>;
 pub type Services = HashMap<ServiceId, Service>;
 
 #[derive(Default)]
-pub struct RustModel {
+pub struct RustPluginModel {
     pub types: Types,
     pub functions: Functions,
     pub constants: Constants,
@@ -25,7 +25,7 @@ pub struct RustModel {
 
 // TODO: For later
 #[derive(Default)]
-pub struct CsharpModel {
+pub struct CsharpPluginModel {
     pub types: HashMap<TypeId, Type>,
     _guard: PhantomData<()>,
 }
