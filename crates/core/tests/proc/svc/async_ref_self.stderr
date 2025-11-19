@@ -1,0 +1,5 @@
+error: Async methods cannot use &self or &mut self. Use Async<Self> as the first parameter instead.
+  --> tests/proc/svc/async_ref_self.rs:14:22
+   |
+14 |     pub async fn bad(&self) -> ffi::Result<u8, Error> {
+   |                      ^

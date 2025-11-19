@@ -146,8 +146,26 @@ impl ServiceModel {
                 };
 
                 // Validate async methods
-                if is_async && receiver_kind == ReceiverKind::None {
-                    return Err(syn::Error::new_spanned(method.sig.inputs.first(), "Async methods must use Async<Self> as their first parameter"));
+                if is_async {
+                    match receiver_kind {
+                        ReceiverKind::None => {
+                            return Err(syn::Error::new_spanned(
+                                method.sig.inputs.first(),
+                                "Async methods must use Async<Self> as their first parameter"
+                            ));
+                        }
+                        ReceiverKind::Shared | ReceiverKind::Mutable => {
+                            // Find the receiver to point the error at it
+                            let receiver_span = method.sig.inputs.first().map(|arg| arg.span()).unwrap_or_else(|| method.sig.span());
+                            return Err(syn::Error::new(
+                                receiver_span,
+                                "Async methods cannot use &self or &mut self. Use Async<Self> as the first parameter instead."
+                            ));
+                        }
+                        ReceiverKind::AsyncThis => {
+                            // Valid async method
+                        }
+                    }
                 }
 
                 // Async methods are never constructors, regardless of receiver kind

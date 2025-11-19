@@ -30,6 +30,7 @@ fn proc() {
     t.pass("tests/proc/svc/async_basic.rs");
     t.pass("tests/proc/svc/async_double.rs");
     t.compile_fail("tests/proc/svc/async_mut_self.rs");
+    t.compile_fail("tests/proc/svc/async_ref_self.rs");
     t.pass("tests/proc/svc/basic.rs");
     t.pass("tests/proc/svc/ctor.rs");
     t.compile_fail("tests/proc/svc/ctor_rval_bad_self.rs");

@@ -2,7 +2,7 @@ use crate::patterns::result::Error;
 use interoptopus::pattern::asynk::Async;
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::rt::Tokio;
-use interoptopus::{AsyncRuntime, ffi};
+use interoptopus::{ffi, AsyncRuntime};
 
 #[ffi(service)]
 #[derive(AsyncRuntime)]
