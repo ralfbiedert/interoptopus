@@ -79,17 +79,19 @@ unsafe fn service_compute1(
     Error,
 > as ::interoptopus::pattern::result::ResultAs>::AsT<*const Service> {
     unsafe {
-        let instance_arc = ::std::sync::Arc::from_raw(instance);
-        let instance_clone = ::std::sync::Arc::clone(&instance_arc);
-        ::std::mem::forget(instance_arc);
-        let async_this = ::interoptopus::pattern::asynk::Async::new(
-            instance_clone.clone(),
-        );
         use ::interoptopus::pattern::asynk::AsyncRuntime;
-        instance_clone
-            .spawn(move |_| async move {
-                let result = Service::compute1(async_this).await;
-                match result {
+        let _instance_arc = ::std::sync::Arc::from_raw(instance);
+        let _instance_invoke = ::std::sync::Arc::clone(&_instance_arc);
+        let _instance_inside = ::std::sync::Arc::clone(&_instance_arc);
+        ::std::mem::forget(_instance_arc);
+        _instance_invoke
+            .spawn(move |_ctx| async move {
+                let _async_this = ::interoptopus::pattern::asynk::Async::new(
+                    _instance_inside,
+                    _ctx,
+                );
+                let _result = Service::compute1(_async_this).await;
+                match _result {
                     ::interoptopus::ffi::Ok(value) => {
                         callback.call(&value);
                     }
@@ -110,17 +112,19 @@ unsafe fn service_compute2(
     Error,
 > as ::interoptopus::pattern::result::ResultAs>::AsT<*const Service> {
     unsafe {
-        let instance_arc = ::std::sync::Arc::from_raw(instance);
-        let instance_clone = ::std::sync::Arc::clone(&instance_arc);
-        ::std::mem::forget(instance_arc);
-        let async_this = ::interoptopus::pattern::asynk::Async::new(
-            instance_clone.clone(),
-        );
         use ::interoptopus::pattern::asynk::AsyncRuntime;
-        instance_clone
-            .spawn(move |_| async move {
-                let result = Service::compute2(async_this).await;
-                match result {
+        let _instance_arc = ::std::sync::Arc::from_raw(instance);
+        let _instance_invoke = ::std::sync::Arc::clone(&_instance_arc);
+        let _instance_inside = ::std::sync::Arc::clone(&_instance_arc);
+        ::std::mem::forget(_instance_arc);
+        _instance_invoke
+            .spawn(move |_ctx| async move {
+                let _async_this = ::interoptopus::pattern::asynk::Async::new(
+                    _instance_inside,
+                    _ctx,
+                );
+                let _result = Service::compute2(_async_this).await;
+                match _result {
                     ::interoptopus::ffi::Ok(value) => {
                         callback.call(&value);
                     }

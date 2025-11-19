@@ -47,27 +47,39 @@ impl RuntimeModel {
     }
 
     fn find_forward_field(fields: &[Field]) -> syn::Result<ForwardField> {
-        let mut forward_fields = Vec::new();
-
+        // First, look for a field named "runtime"
         for field in fields {
-            let attrs = FieldAttrs::from_field(field)?;
-            if attrs.forward {
-                let name = field.ident.clone().ok_or_else(|| {
-                    syn::Error::new_spanned(field, "Expected named field with #[runtime::forward]")
-                })?;
-                forward_fields.push(ForwardField { name, ty: field.ty.clone() });
+            if let Some(field_name) = &field.ident {
+                if field_name == "runtime" {
+                    return Ok(ForwardField {
+                        name: field_name.clone(),
+                        ty: field.ty.clone(),
+                    });
+                }
             }
         }
 
-        match forward_fields.len() {
+        // If no field named "runtime", look for field with #[runtime] attribute
+        let mut runtime_attr_fields = Vec::new();
+        for field in fields {
+            let attrs = FieldAttrs::from_field(field)?;
+            if attrs.has_runtime_attr {
+                let name = field.ident.clone().ok_or_else(|| {
+                    syn::Error::new_spanned(field, "Expected named field with #[runtime]")
+                })?;
+                runtime_attr_fields.push(ForwardField { name, ty: field.ty.clone() });
+            }
+        }
+
+        match runtime_attr_fields.len() {
             0 => Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
-                "AsyncRuntime requires exactly one field marked with #[runtime::forward]",
+                "AsyncRuntime requires either a field named 'runtime' or a field marked with #[runtime]",
             )),
-            1 => Ok(forward_fields.into_iter().next().unwrap()),
+            1 => Ok(runtime_attr_fields.into_iter().next().unwrap()),
             _ => Err(syn::Error::new(
                 proc_macro2::Span::call_site(),
-                "AsyncRuntime requires exactly one field marked with #[runtime::forward], found multiple",
+                "AsyncRuntime found multiple fields marked with #[runtime], only one is allowed",
             )),
         }
     }

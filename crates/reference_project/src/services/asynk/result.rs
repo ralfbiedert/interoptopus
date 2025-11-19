@@ -7,16 +7,16 @@ use interoptopus::{ffi, AsyncRuntime};
 #[ffi(service)]
 #[derive(AsyncRuntime)]
 pub struct ServiceAsyncResult {
-    #[runtime(forward)]
-    runtime: Tokio,
+    #[runtime]
+    rt: Tokio,
 }
 
 #[ffi]
 impl ServiceAsyncResult {
     pub fn new() -> ffi::Result<Self, Error> {
         result_to_ffi(|| {
-            let runtime = Tokio::new();
-            Ok(Self { runtime })
+            let rt = Tokio::new();
+            Ok(Self { rt })
         })
     }
 

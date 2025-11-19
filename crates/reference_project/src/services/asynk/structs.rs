@@ -8,7 +8,6 @@ use interoptopus::{ffi, AsyncRuntime};
 #[ffi(service)]
 #[derive(AsyncRuntime)]
 pub struct ServiceAsyncStructs {
-    #[runtime(forward)]
     runtime: Tokio,
 }
 
