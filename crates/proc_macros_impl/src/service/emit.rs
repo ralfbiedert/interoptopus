@@ -385,14 +385,14 @@ impl ServiceModel {
                 #async_params
             ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> #where_clause {
                 unsafe {
+                    use ::interoptopus::pattern::asynk::AsyncRuntime;
+
                     let instance_arc = ::std::sync::Arc::from_raw(instance);
                     let instance_clone = ::std::sync::Arc::clone(&instance_arc);
                     ::std::mem::forget(instance_arc); // Don't drop the original
 
-                    let async_this = ::interoptopus::pattern::asynk::Async::new(instance_clone.clone());
-
-                    use ::interoptopus::pattern::asynk::AsyncRuntime;
-                    instance_clone.spawn(move |_| async move {
+                    instance_clone.spawn(move |x| async move {
+                        let async_this = ::interoptopus::pattern::asynk::Async::new(instance_clone.clone(), x);
                         let result = #service_type::#method_name(async_this, #param_names).await;
                         match result {
                             ::interoptopus::ffi::Ok(value) => {

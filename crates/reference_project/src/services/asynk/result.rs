@@ -1,5 +1,5 @@
 use crate::patterns::result::Error;
-use interoptopus::pattern::asynk::{Async, AsyncRuntime};
+use interoptopus::pattern::asynk::Async;
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::rt::Tokio;
 use interoptopus::{ffi, AsyncRuntime};

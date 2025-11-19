@@ -127,18 +127,6 @@ impl<S: AsyncRuntime> Deref for Async<S> {
     }
 }
 
-/// Helper to produce a `AsyncCallback` and `AsyncThreadLocal` from proc macros.
-#[doc(hidden)]
-pub trait AsyncProxy<S: AsyncRuntime, R> {
-    fn new(s: Arc<S>, t: S::T) -> Self;
-}
-
-impl<S: AsyncRuntime> AsyncProxy<S, S::T> for Async<S> {
-    fn new(s: Arc<S>, t: S::T) -> Self {
-        Self::new(s, t)
-    }
-}
-
 /// Helper for async services using `Send` runtimes.
 pub trait AsyncRuntime {
     type T;
