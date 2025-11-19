@@ -387,14 +387,15 @@ impl ServiceModel {
                 unsafe {
                     use ::interoptopus::pattern::asynk::AsyncRuntime;
 
-                    let instance_arc = ::std::sync::Arc::from_raw(instance);
-                    let instance_clone = ::std::sync::Arc::clone(&instance_arc);
-                    ::std::mem::forget(instance_arc); // Don't drop the original
+                    let _instance_arc = ::std::sync::Arc::from_raw(instance);
+                    let _instance_invoke = ::std::sync::Arc::clone(&_instance_arc);
+                    let _instance_inside = ::std::sync::Arc::clone(&_instance_arc);
+                    ::std::mem::forget(_instance_arc); // Don't drop the original
 
-                    instance_clone.spawn(move |x| async move {
-                        let async_this = ::interoptopus::pattern::asynk::Async::new(instance_clone.clone(), x);
-                        let result = #service_type::#method_name(async_this, #param_names).await;
-                        match result {
+                    _instance_invoke.spawn(move |_ctx| async move {
+                        let _async_this = ::interoptopus::pattern::asynk::Async::new(_instance_inside, _ctx);
+                        let _result = #service_type::#method_name(_async_this, #param_names).await;
+                        match _result {
                             ::interoptopus::ffi::Ok(value) => {
                                 callback.call(&value);
                             }
