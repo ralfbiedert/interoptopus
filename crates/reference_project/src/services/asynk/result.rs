@@ -1,19 +1,21 @@
 use crate::patterns::result::Error;
-use interoptopus::ffi;
 use interoptopus::pattern::asynk::{Async, AsyncRuntime};
 use interoptopus::pattern::result::result_to_ffi;
-use tokio::runtime::{Builder, Runtime};
+use interoptopus::rt::Tokio;
+use interoptopus::{ffi, AsyncRuntime};
 
 #[ffi(service)]
+#[derive(AsyncRuntime)]
 pub struct ServiceAsyncResult {
-    runtime: Runtime,
+    #[runtime(forward)]
+    runtime: Tokio,
 }
 
 #[ffi]
 impl ServiceAsyncResult {
     pub fn new() -> ffi::Result<Self, Error> {
         result_to_ffi(|| {
-            let runtime = Builder::new_multi_thread().build().map_err(|_| Error::Fail)?;
+            let runtime = Tokio::new();
             Ok(Self { runtime })
         })
     }
@@ -24,17 +26,5 @@ impl ServiceAsyncResult {
 
     pub async fn fail(_: Async<Self>) -> ffi::Result<(), Error> {
         ffi::Result::Err(Error::Fail)
-    }
-}
-
-impl AsyncRuntime for ServiceAsyncResult {
-    type T = ();
-
-    fn spawn<Fn, F>(&self, f: Fn)
-    where
-        Fn: FnOnce(()) -> F,
-        F: Future<Output = ()> + Send + 'static,
-    {
-        self.runtime.spawn(f(()));
     }
 }
