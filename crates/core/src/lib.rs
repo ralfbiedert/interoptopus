@@ -171,3 +171,6 @@ pub mod inventory;
 pub mod lang;
 pub mod pattern;
 pub mod wire;
+
+#[cfg(feature = "tokio")]
+pub mod rt;
