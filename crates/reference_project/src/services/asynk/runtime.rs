@@ -4,8 +4,10 @@ use interoptopus::pattern::asynk::{Async, AsyncRuntime};
 use interoptopus::pattern::result::result_to_ffi;
 use std::future::Future;
 use tokio::runtime::{Builder, Runtime};
+use crate::services::asynk::basic::ServiceAsyncBasic;
 
 mod rt {
+    use interoptopus::pattern::asynk::AsyncRuntime;
     use std::future::Future;
 
     pub struct Runtime;

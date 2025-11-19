@@ -30,6 +30,7 @@ pub mod services {
     pub mod asynk {
         pub mod basic;
         pub mod result;
+        pub mod runtime;
         pub mod sleep;
         pub mod structs;
         pub mod vecstring;
