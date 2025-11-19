@@ -45,6 +45,11 @@ pub fn ffi(attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 #[must_use]
-pub fn runtime(attr: TokenStream, item: TokenStream) -> TokenStream {
-    todo!()
+pub fn derive_async_runtime(item: TokenStream) -> TokenStream {
+    let handle_result = |result: syn::Result<TokenStream>| match result {
+        Ok(tokens) => tokens,
+        Err(err) => err.to_compile_error(),
+    };
+
+    handle_result(runtime::derive_async_runtime(item))
 }

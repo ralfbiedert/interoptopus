@@ -1,10 +1,4 @@
-use crate::patterns::result::Error;
-use interoptopus::ffi;
-use interoptopus::pattern::asynk::{Async, AsyncRuntime};
-use interoptopus::pattern::result::result_to_ffi;
-use std::future::Future;
-use tokio::runtime::{Builder, Runtime};
-use crate::services::asynk::basic::ServiceAsyncBasic;
+use interoptopus::AsyncRuntime;
 
 mod rt {
     use interoptopus::pattern::asynk::AsyncRuntime;
@@ -15,7 +9,7 @@ mod rt {
     impl AsyncRuntime for Runtime {
         type T = ();
 
-        fn spawn<Fn, F>(&self, f: Fn)
+        fn spawn<Fn, F>(&self, _f: Fn)
         where
             Fn: FnOnce(()) -> F,
             F: Future<Output = ()> + Send + 'static,
@@ -24,20 +18,8 @@ mod rt {
     }
 }
 
-#[ffi(service)]
 #[derive(AsyncRuntime)]
 pub struct ServiceRuntime {
-    #[runtime::forward]
+    #[runtime(forward)]
     runtime: rt::Runtime,
-}
-
-#[ffi]
-impl ServiceAsyncBasic {
-    pub fn new() -> ffi::Result<Self, Error> {
-        todo!()
-    }
-
-    pub async fn call(_: Async<Self>) -> ffi::Result<(), Error> {
-        ffi::Ok(())
-    }
 }
