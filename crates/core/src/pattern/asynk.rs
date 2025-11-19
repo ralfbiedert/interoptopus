@@ -104,17 +104,22 @@ impl<T: WireIO> WireIO for AsyncCallback<T> {
 
 /// Used as `this: AsyncSelf` instead of `self` when using `Send` runtimes.
 /// TODO: Rust 1.91, emit const check that type_id of first async fn parameter equals Async<Service>
-pub struct Async<S> {
+pub struct Async<S: AsyncRuntime> {
     s: Arc<S>, // Self
+    t: S::T,
 }
 
-impl<S> Async<S> {
-    pub fn new(s: Arc<S>) -> Self {
-        Self { s }
+impl<S: AsyncRuntime> Async<S> {
+    pub fn new(s: Arc<S>, t: S::T) -> Self {
+        Self { s, t }
+    }
+
+    pub fn context(&self) -> &S::T {
+        &self.t
     }
 }
 
-impl<S> Deref for Async<S> {
+impl<S: AsyncRuntime> Deref for Async<S> {
     type Target = Arc<S>;
 
     fn deref(&self) -> &Self::Target {
@@ -124,13 +129,13 @@ impl<S> Deref for Async<S> {
 
 /// Helper to produce a `AsyncCallback` and `AsyncThreadLocal` from proc macros.
 #[doc(hidden)]
-pub trait AsyncProxy<S, T> {
-    fn new(s: Arc<S>, t: T) -> Self;
+pub trait AsyncProxy<S: AsyncRuntime, R> {
+    fn new(s: Arc<S>, t: S::T) -> Self;
 }
 
-impl<S, T> AsyncProxy<S, T> for Async<S> {
-    fn new(s: Arc<S>, _: T) -> Self {
-        Self::new(s)
+impl<S: AsyncRuntime> AsyncProxy<S, S::T> for Async<S> {
+    fn new(s: Arc<S>, t: S::T) -> Self {
+        Self::new(s, t)
     }
 }
 
