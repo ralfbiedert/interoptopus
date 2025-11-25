@@ -3,8 +3,7 @@ name = "interoptopus_backend_csharp"
 description = "Generates C# bindings."
 authors.workspace = true
 version.workspace = true
-edition.workspace = true
-rust-version.workspace = true
+edition = "2024"
 license.workspace = true
 keywords = ["ffi", "code-generation", "bindings", "csharp", "dotnet"]
 categories = ["api-bindings", "development-tools::ffi"]
@@ -19,7 +18,6 @@ derive_builder = { workspace = true }
 heck = { workspace = true }
 include_dir = { workspace = true }
 interoptopus = { workspace = true }
-interoptopus_backend_utils = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 tera = { workspace = true }
 netcorehost = "0.18.0" # remove me, just experiment for now
