@@ -63,7 +63,7 @@ pub fn write_pattern_async_trampoline(i: &Interop, w: &mut IndentWriter, asynk: 
     indented!(w, [()], r"internal (AsyncCallbackCommonNative, {task}) NewCall()")?;
     indented!(w, [()], r"{{")?;
     indented!(w, [()()], r"var tcs = new {task_completion_source}();")?;
-    indented!(w, [()()], r"var id = Id++;")?;
+    indented!(w, [()()], r"var id = Interlocked.Increment(ref Id);")?;
     indented!(w, [()()], r"")?;
     indented!(w, [()()], r"lock (InFlight) {{ InFlight.TryAdd(id, tcs); }}")?;
     indented!(w, [()()], r"")?;
