@@ -28,6 +28,7 @@ pub mod patterns {
 pub mod services {
     pub mod asynk {
         pub mod basic;
+        pub mod load;
         pub mod result;
         pub mod sleep;
         pub mod structs;
@@ -203,6 +204,7 @@ pub fn ffi_inventory() -> Inventory {
         .register(extra_type!(types::num::TransparentNum))
         // Services
         .register(pattern!(services::asynk::basic::ServiceAsyncBasic))
+        .register(pattern!(services::asynk::load::ServiceAsyncLoad))
         .register(pattern!(services::asynk::sleep::ServiceAsyncSleep))
         .register(pattern!(services::asynk::vecstring::ServiceAsyncVecString))
         .register(pattern!(services::asynk::result::ServiceAsyncResult))

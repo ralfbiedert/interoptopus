@@ -146,6 +146,9 @@ def init_lib(path):
     c_lib.service_async_basic_call.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultError), ctypes.c_void_p)]
     c_lib.service_async_basic_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_async_basic_new.argtypes = []
+    c_lib.service_async_load_destroy.argtypes = [ctypes.c_void_p]
+    c_lib.service_async_load_load.argtypes = [ctypes.c_void_p, ctypes.c_uint32, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultU32Error), ctypes.c_void_p)]
+    c_lib.service_async_load_new.argtypes = []
     c_lib.service_async_result_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_async_result_fail.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultError), ctypes.c_void_p)]
     c_lib.service_async_result_new.argtypes = []
@@ -352,6 +355,9 @@ def init_lib(path):
     c_lib.service_async_basic_call.restype = ResultError
     c_lib.service_async_basic_destroy.restype = ResultConstPtrServiceAsyncBasicError
     c_lib.service_async_basic_new.restype = ResultConstPtrServiceAsyncBasicError
+    c_lib.service_async_load_destroy.restype = ResultConstPtrServiceAsyncLoadError
+    c_lib.service_async_load_load.restype = ResultError
+    c_lib.service_async_load_new.restype = ResultConstPtrServiceAsyncLoadError
     c_lib.service_async_result_destroy.restype = ResultConstPtrServiceAsyncResultError
     c_lib.service_async_result_fail.restype = ResultError
     c_lib.service_async_result_new.restype = ResultConstPtrServiceAsyncResultError
@@ -2580,6 +2586,16 @@ class ResultConstPtrServiceAsyncBasicError:
     Null = 3
 
 
+class ResultConstPtrServiceAsyncLoadError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
 class ResultConstPtrServiceAsyncResultError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
@@ -3172,6 +3188,32 @@ class ServiceAsyncBasic:
     def call(self, _async_callback):
         """"""
         return c_lib.service_async_basic_call(self._ctx, _async_callback)
+
+
+
+class ServiceAsyncLoad:
+    __api_lock = object()
+
+    def __init__(self, api_lock, ctx):
+        assert(api_lock == ServiceAsyncLoad.__api_lock), "You must create this with a static constructor." 
+        self._ctx = ctx
+
+    @property
+    def _as_parameter_(self):
+        return self._ctx
+
+    @staticmethod
+    def new() -> ServiceAsyncLoad:
+        """"""
+        ctx = c_lib.service_async_load_new().t
+        self = ServiceAsyncLoad(ServiceAsyncLoad.__api_lock, ctx)
+        return self
+
+    def __del__(self):
+        c_lib.service_async_load_destroy(self._ctx, )
+    def load(self, x: int, _async_callback):
+        """"""
+        return c_lib.service_async_load_load(self._ctx, x, _async_callback)
 
 
 
