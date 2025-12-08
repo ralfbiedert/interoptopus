@@ -35,6 +35,8 @@ jobs:
           pip install cffi pytest
       - name: Rust - Install Toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1.15
+        with:
+          components: rustfmt, clippy
       - name: Rust - Build
         run: cargo build --verbose
       - name: Rust - Style
