@@ -23,17 +23,12 @@ pub enum MethodType {
     Destructor,
 }
 
-#[derive(Debug, FromMeta)]
+#[derive(Debug, FromMeta, Default)]
 pub enum OnPanic {
+    #[default]
     FfiError,
     ReturnDefault,
     Abort,
-}
-
-impl Default for OnPanic {
-    fn default() -> Self {
-        Self::FfiError
-    }
 }
 
 #[derive(Default, Debug, FromMeta)]
