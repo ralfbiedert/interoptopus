@@ -2,9 +2,9 @@ name: Rust
 
 on:
   push:
-    branches: [master, test_*]
+    branches: [ master, test_* ]
   pull_request:
-    branches: [master]
+    branches: [ master ]
   workflow_call:
 
 env:
@@ -14,7 +14,7 @@ jobs:
   Build:
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [ windows-latest, ubuntu-latest ]
         # os: [ windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -33,6 +33,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install cffi pytest
+      - name: Rust - Install Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1.15
       - name: Rust - Build
         run: cargo build --verbose
       - name: Rust - Style
