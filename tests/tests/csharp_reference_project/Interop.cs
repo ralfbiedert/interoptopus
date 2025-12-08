@@ -10085,9 +10085,11 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private static void Call(IntPtr data, IntPtr csPtr)
         {
+            throw new Exception("asd");
+
             TaskCompletionSource<uint> tcs;
-            
             lock (InFlight) { InFlight.Remove((ulong) csPtr, out tcs); }
+
             
             var unmanaged = Marshal.PtrToStructure<ResultU32Error.Unmanaged>(data);
             var managed = unmanaged.ToManaged();

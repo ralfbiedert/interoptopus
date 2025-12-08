@@ -1,3 +1,4 @@
+using System;
 using My.Company;
 using My.Company.Common;
 using Xunit;
@@ -16,4 +17,19 @@ public class TestBehavior
     {
         Interop.behavior_sleep(10);
     }
+
+    [Fact]
+    public void behavior_panics()
+    {
+        try
+        {
+             Interop.behavior_panics();
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+
 }
