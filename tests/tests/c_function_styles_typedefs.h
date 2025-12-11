@@ -46,6 +46,8 @@ typedef struct GENERIC4 GENERIC4;
 
 typedef struct SERVICEASYNCBASIC SERVICEASYNCBASIC;
 
+typedef struct SERVICEASYNCLOAD SERVICEASYNCLOAD;
+
 typedef struct SERVICEASYNCRESULT SERVICEASYNCRESULT;
 
 typedef struct SERVICEASYNCSLEEP SERVICEASYNCSLEEP;
@@ -500,6 +502,17 @@ typedef enum RESULTCONSTPTRSERVICEASYNCBASICERROR
     } RESULTCONSTPTRSERVICEASYNCBASICERROR;
 
 /// Result that contains value or an error.
+typedef enum RESULTCONSTPTRSERVICEASYNCLOADERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEASYNCLOADERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEASYNCLOADERROR_NULL = 3,
+    } RESULTCONSTPTRSERVICEASYNCLOADERROR;
+
+/// Result that contains value or an error.
 typedef enum RESULTCONSTPTRSERVICEASYNCRESULTERROR
     {
     /// Element if err is `Ok`.
@@ -785,6 +798,8 @@ typedef enum OPTIONRESULTOPTIONUTF8STRINGERROR
 typedef VEC3F32 (*CALLBACKHUGEVECSLICE)(SLICEVEC3F32 SLICE, const void* CALLBACK_DATA);
 
 typedef void (*fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void)(const RESULTERROR* x0, const void* x1);
+
+typedef void (*fptr_fn_ConstPtrResultU32Error_ConstPtrVoid_rval_void)(const RESULTU32ERROR* x0, const void* x1);
 
 typedef void (*fptr_fn_ConstPtrResultU64Error_ConstPtrVoid_rval_void)(const RESULTU64ERROR* x0, const void* x1);
 
@@ -1151,6 +1166,18 @@ typedef RESULTCONSTPTRSERVICEASYNCBASICERROR (*service_async_basic_destroy)(cons
 typedef RESULTCONSTPTRSERVICEASYNCBASICERROR (*service_async_basic_new)();
 
 typedef RESULTERROR (*service_async_basic_call)(const SERVICEASYNCBASIC*, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+typedef RESULTCONSTPTRSERVICEASYNCLOADERROR (*service_async_load_destroy)(const SERVICEASYNCLOAD*);
+
+typedef RESULTCONSTPTRSERVICEASYNCLOADERROR (*service_async_load_new)();
+
+typedef RESULTERROR (*service_async_load_load)(const SERVICEASYNCLOAD*, uint32_t, fptr_fn_ConstPtrResultU32Error_ConstPtrVoid_rval_void);
 
 ///  Destroys the given instance.
 /// 
