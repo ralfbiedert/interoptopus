@@ -74,7 +74,7 @@ unsafe impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
 }
 
 /// Used as `this: AsyncSelf` instead of `self` when using `Send` runtimes.
-/// TODO: Rust 1.91, emit const check that type_id of first async fn parameter equals Async<Service>
+/// TODO: Rust 1.91, emit const check that `type_id` of first async fn parameter equals Async<Service>
 pub struct Async<S: AsyncRuntime> {
     s: Arc<S>, // Self
     t: S::T,

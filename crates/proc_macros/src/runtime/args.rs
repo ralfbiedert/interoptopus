@@ -5,7 +5,7 @@ pub struct FieldAttrs {
 }
 
 impl FieldAttrs {
-    pub fn from_field(field: &Field) -> syn::Result<Self> {
+    pub fn from_field(field: &Field) -> Self {
         let mut has_runtime_attr = false;
 
         for attr in &field.attrs {
@@ -15,6 +15,6 @@ impl FieldAttrs {
             }
         }
 
-        Ok(Self { has_runtime_attr })
+        Self { has_runtime_attr }
     }
 }

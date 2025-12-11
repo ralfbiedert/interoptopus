@@ -35,17 +35,17 @@ impl RuntimeModel {
     fn find_forward_field(fields: &[Field]) -> syn::Result<ForwardField> {
         // First, look for a field named "runtime"
         for field in fields {
-            if let Some(field_name) = &field.ident {
-                if field_name == "runtime" {
-                    return Ok(ForwardField { name: field_name.clone(), ty: field.ty.clone() });
-                }
+            if let Some(field_name) = &field.ident
+                && field_name == "runtime"
+            {
+                return Ok(ForwardField { name: field_name.clone(), ty: field.ty.clone() });
             }
         }
 
         // If no field named "runtime", look for field with #[runtime] attribute
         let mut runtime_attr_fields = Vec::new();
         for field in fields {
-            let attrs = FieldAttrs::from_field(field)?;
+            let attrs = FieldAttrs::from_field(field);
             if attrs.has_runtime_attr {
                 let name = field
                     .ident

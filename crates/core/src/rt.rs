@@ -7,9 +7,16 @@ pub struct Tokio {
 }
 
 impl Tokio {
+    #[must_use]
     pub fn new() -> Self {
         let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap();
         Self { rt: Arc::new(rt) }
+    }
+}
+
+impl Default for Tokio {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

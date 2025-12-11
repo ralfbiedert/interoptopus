@@ -115,7 +115,6 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
     let mut generics = function.sig.generics.clone();
     let mut inputs = Vec::new();
     let mut arg_names = Vec::new();
-    let mut arg_types = Vec::new();
 
     for lt in impl_block.generics.lifetimes() {
         generics.params.push(GenericParam::Lifetime(lt.clone()));
@@ -155,7 +154,6 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 }
 
                 arg_names.push(quote_spanned!(span_arg=> __context));
-                arg_types.push(quote_spanned!(span_arg=> Self));
             }
             FnArg::Typed(pat) => {
                 let ty = &pat.ty;
@@ -167,8 +165,6 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 let mut replace_self = ReplaceSelf::new(quote_spanned!(span_ty => #service_type));
                 let mut new_ty = ty.clone();
                 replace_self.visit_type_mut(&mut new_ty);
-
-                arg_types.push(quote_spanned!(span_arg=> #new_ty));
 
                 // If this is the first parameter and we have `async`, the method must have
                 // requested an `Arc<T>`. In that case we generate an FFI method asking for `&T`
