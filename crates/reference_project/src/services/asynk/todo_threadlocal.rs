@@ -1,25 +1,26 @@
 use crate::patterns::result::Error;
 use interoptopus::ffi;
+use interoptopus::AsyncRuntime;
 use interoptopus::pattern::asynk::{AsyncRuntime, Async};
 use interoptopus::pattern::result::result_to_ffi;
+use interoptopus::rt::Tokio;
 use interoptopus::{ffi_service, ffi_type};
-use tokio::runtime::{Builder, Runtime};
 
 pub struct ThreadLocal {
     _x: u32,
 }
 
+#[derive(AsyncRuntime)]
 #[ffi_type(opaque)]
 pub struct ServiceAsyncThreadLocal {
-    runtime: Runtime,
+    runtime: Tokio,
 }
 
 #[ffi_service]
 impl ServiceAsyncThreadLocal {
     pub fn new() -> ffi::Result<Self, Error> {
         result_to_ffi(|| {
-            let runtime = Builder::new_multi_thread().build().map_err(|_| Error::Fail)?;
-            Ok(Self { runtime })
+            Ok(Self { runtime: Tokio::new() })
         })
     }
 
@@ -29,18 +30,5 @@ impl ServiceAsyncThreadLocal {
 
     pub async fn call_async_thread_local(_: Async<Self>) -> ffi::Result<(), Error> {
         ffi::Ok(())
-    }
-}
-
-impl AsyncRuntime for ServiceAsyncThreadLocal {
-    type T = ThreadLocal;
-
-    fn spawn<Fn, F>(&self, _: Fn)
-    where
-        Fn: FnOnce(Self::T) -> F,
-        F: Future<Output = ()> + 'static,
-    {
-        // TODO: Run this on another runtime that supports !Send / thread-per-core futures
-        // self.runtime.spawn(f());
     }
 }

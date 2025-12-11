@@ -7,6 +7,7 @@ extern crate proc_macro; // Apparently needed to be imported like this.
 mod constants;
 mod functions;
 mod macros;
+mod runtime;
 mod service;
 mod types;
 mod util;
@@ -339,4 +340,12 @@ pub fn ffi_service(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
+}
+
+#[proc_macro_derive(AsyncRuntime, attributes(runtime))]
+pub fn derive_async_runtime(item: TokenStream) -> TokenStream {
+    match runtime::derive_async_runtime(item.into()) {
+        Ok(tokens) => tokens.into(),
+        Err(err) => err.to_compile_error().into(),
+    }
 }
