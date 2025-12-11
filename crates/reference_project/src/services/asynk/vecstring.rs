@@ -1,8 +1,8 @@
 use crate::patterns::result::Error;
 use crate::types::string::UseString;
-use interoptopus::ffi;
 use interoptopus::AsyncRuntime;
-use interoptopus::pattern::asynk::{AsyncRuntime, Async};
+use interoptopus::ffi;
+use interoptopus::pattern::asynk::{Async, AsyncRuntime};
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::rt::Tokio;
 use interoptopus::{ffi_service, ffi_type};
@@ -16,9 +16,7 @@ pub struct ServiceAsyncVecString {
 #[ffi_service]
 impl ServiceAsyncVecString {
     pub fn new() -> ffi::Result<Self, Error> {
-        result_to_ffi(|| {
-            Ok(Self { runtime: Tokio::new()})
-        })
+        result_to_ffi(|| Ok(Self { runtime: Tokio::new() }))
     }
 
     pub async fn handle_string(_: Async<Self>, s: ffi::String) -> ffi::Result<ffi::String, Error> {

@@ -1,7 +1,7 @@
 use crate::patterns::result::Error;
-use interoptopus::ffi;
 use interoptopus::AsyncRuntime;
-use interoptopus::pattern::asynk::{AsyncRuntime, Async};
+use interoptopus::ffi;
+use interoptopus::pattern::asynk::{Async, AsyncRuntime};
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::rt::Tokio;
 use interoptopus::{ffi_service, ffi_type};
@@ -15,9 +15,7 @@ pub struct ServiceAsyncSleep {
 #[ffi_service]
 impl ServiceAsyncSleep {
     pub fn new() -> ffi::Result<Self, Error> {
-        result_to_ffi(|| {
-            Ok(Self { runtime: Tokio::new() })
-        })
+        result_to_ffi(|| Ok(Self { runtime: Tokio::new() }))
     }
 
     pub async fn return_after_ms(_: Async<Self>, x: u64, ms: u64) -> ffi::Result<u64, Error> {
