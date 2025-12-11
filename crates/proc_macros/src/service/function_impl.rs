@@ -301,8 +301,6 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
         }
         MethodType::Destructor => panic!("Must not happen."),
         MethodType::MethodAsync(_) => {
-            let first = arg_types.first().unwrap();
-
             let block = quote_spanned! { span_body =>
                 // We need &T down below to invoke spawn but override the name, so let's save
                 // it here
@@ -311,12 +309,11 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 // We must convert the element pointer into an Arc, then clone that Arc,
                 // but not drop the original one (which is the responsibility of the
                 // destructor)
-                let __arc_restored = unsafe { ::std::sync::Arc::from_raw(__context) };
+                let __arc_restored = ::std::mem::ManuallyDrop::new(unsafe { ::std::sync::Arc::from_raw(__context) });
                 let __context = ::std::sync::Arc::clone(&__arc_restored);
-                let _ = ::std::sync::Arc::into_raw(__arc_restored);
 
                 let __async_fn = async move |__tlcontext| {
-                    let __context = <#first as ::interoptopus::pattern::asynk::AsyncProxy<_, _>>::new(__context, __tlcontext);
+                    let __context = ::interoptopus::pattern::asynk::Async::new(__context, __tlcontext);
                     let __rval = <#without_lifetimes>::#orig_fn_ident( #(#arg_names),* ).await.into();
                     __async_callback.call(&__rval);
                     // We actually want move semantics for rval for types like `Utf8Strings` that

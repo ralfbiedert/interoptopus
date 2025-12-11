@@ -22,6 +22,7 @@ derive = ["dep:interoptopus_proc"]
 interoptopus_proc = { workspace = true, optional = true }
 log = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
+tokio = { workspace = true, features = ["rt-multi-thread", "io-std"], optional = true }
 
 [dev-dependencies]
 rustc-hash = { workspace = true }

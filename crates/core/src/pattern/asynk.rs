@@ -74,17 +74,23 @@ unsafe impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
 }
 
 /// Used as `this: AsyncSelf` instead of `self` when using `Send` runtimes.
-pub struct AsyncSelf<S> {
+/// TODO: Rust 1.91, emit const check that type_id of first async fn parameter equals Async<Service>
+pub struct Async<S: AsyncRuntime> {
     s: Arc<S>, // Self
+    t: S::T,
 }
 
-impl<S> AsyncSelf<S> {
-    pub fn new(s: Arc<S>) -> Self {
-        Self { s }
+impl<S: AsyncRuntime> Async<S> {
+    pub fn new(s: Arc<S>, t: S::T) -> Self {
+        Self { s, t }
+    }
+
+    pub fn context(&self) -> &S::T {
+        &self.t
     }
 }
 
-impl<S> Deref for AsyncSelf<S> {
+impl<S: AsyncRuntime> Deref for Async<S> {
     type Target = Arc<S>;
 
     fn deref(&self) -> &Self::Target {
@@ -92,62 +98,12 @@ impl<S> Deref for AsyncSelf<S> {
     }
 }
 
-/// Used as `this: AsyncThreadLocal` instead of `self` on `!Send` runtimes.
-pub struct AsyncThreadLocal<S, T> {
-    s: Arc<S>, // Self
-    t: T,      // Thread locals from runtime
-}
-
-impl<S, T> AsyncThreadLocal<S, T> {
-    pub fn new(s: Arc<S>, t: T) -> Self {
-        Self { s, t }
-    }
-
-    pub fn self_instance(&self) -> &Arc<S> {
-        &self.s
-    }
-}
-
-impl<S, T> Deref for AsyncThreadLocal<S, T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.t
-    }
-}
-
-/// Helper to produce a `AsyncCallback` and `AsyncThreadLocal` from proc macros.
-#[doc(hidden)]
-pub trait AsyncProxy<S, T> {
-    fn new(s: Arc<S>, t: T) -> Self;
-}
-
-impl<S, T> AsyncProxy<S, T> for AsyncThreadLocal<S, T> {
-    fn new(s: Arc<S>, t: T) -> Self {
-        Self::new(s, t)
-    }
-}
-
-impl<S, T> AsyncProxy<S, T> for AsyncSelf<S> {
-    fn new(s: Arc<S>, _: T) -> Self {
-        Self::new(s)
-    }
-}
-
 /// Helper for async services using `Send` runtimes.
 pub trait AsyncRuntime {
+    type T;
+
     fn spawn<Fn, F>(&self, f: Fn)
     where
-        Fn: FnOnce(()) -> F,
+        Fn: FnOnce(Self::T) -> F,
         F: Future<Output = ()> + Send + 'static;
-}
-
-/// Helper for async services using `!Send` runtimes.
-pub trait AsyncRuntimeThreadLocal {
-    type ThreadLocal; // Thread local;
-
-    fn spawn<Fn, F>(&self, f: Fn)
-    where
-        Fn: FnOnce(Self::ThreadLocal) -> F + Send + 'static,
-        F: Future<Output = ()> + 'static;
 }
