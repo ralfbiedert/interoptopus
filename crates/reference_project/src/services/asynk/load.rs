@@ -1,6 +1,6 @@
 use crate::patterns::result::Error;
 use interoptopus::ffi;
-use interoptopus::pattern::asynk::{AsyncRuntime, AsyncSelf};
+use interoptopus::pattern::asynk::{AsyncRuntime, Async};
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::{ffi_service, ffi_type};
 use std::future::Future;
@@ -20,12 +20,14 @@ impl ServiceAsyncLoad {
         })
     }
 
-    pub async fn load(_: AsyncSelf<Self>, x: u32) -> ffi::Result<u32, Error> {
+    pub async fn load(_: Async<Self>, x: u32) -> ffi::Result<u32, Error> {
         ffi::Ok(x)
     }
 }
 
 impl AsyncRuntime for ServiceAsyncLoad {
+    type T = ();
+    
     fn spawn<Fn, F>(&self, f: Fn)
     where
         Fn: FnOnce(()) -> F,
