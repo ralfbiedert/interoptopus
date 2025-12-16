@@ -104,6 +104,6 @@ pub trait AsyncRuntime {
 
     fn spawn<Fn, F>(&self, f: Fn)
     where
-        Fn: FnOnce(Self::T) -> F,
+        Fn: FnOnce(Self::T) -> F + Send + 'static,
         F: Future<Output = ()> + Send + 'static;
 }
