@@ -3,7 +3,12 @@ use crate::types::string::UseString;
 use interoptopus::lang::NAMESPACE_COMMON;
 use interoptopus::{callback, ffi, ffi_function, ffi_type};
 use std::ffi::c_void;
+use std::panic::catch_unwind;
 use std::ptr::null;
+
+
+
+
 
 callback!(MyCallback(value: u32) -> u32);
 callback!(MyCallbackNamespaced(value: u32) -> u32, namespace = NAMESPACE_COMMON);
@@ -26,8 +31,13 @@ pub struct DelegateCallback<C> {
 
 #[ffi_function]
 pub fn pattern_callback_1(callback: MyCallback, x: u32) -> u32 {
-    callback.call(x)
+    catch_unwind(|| {})
 }
+
+// #[ffi_function]
+// pub fn pattern_callback_1(callback: MyCallback, x: u32) -> u32 {
+//     callback.call(x)
+// }
 
 #[ffi_function]
 pub fn pattern_callback_2(callback: MyCallbackVoid) -> MyCallbackVoid {
@@ -103,7 +113,7 @@ pub extern "C" fn exposed_sum2(x: i32, y: i32, _: *const c_void) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::{MyCallback, MyCallbackNamespaced};
-    use interoptopus::lang::{NAMESPACE_COMMON, TypeInfo};
+    use interoptopus::lang::{TypeInfo, NAMESPACE_COMMON};
 
     #[test]
     fn namespaces_assigned_correctly() {
@@ -113,4 +123,12 @@ mod tests {
         assert_eq!(ti1.namespace(), Some(""));
         assert_eq!(ti2.namespace(), Some(NAMESPACE_COMMON));
     }
+
+    // ECS?
+    //
+
 }
+
+Plugin!(Ecs, {
+    struct 
+})

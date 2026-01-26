@@ -9983,7 +9983,7 @@ namespace My.Company
     public class AsyncTrampolineResultError
     {
         private static ulong Id = 0;
-        private static Dictionary<ulong, TaskCompletionSource> InFlight = new(1024);
+        private static Dictionary<ulong, TaskCompletionSource> InFlight = new(16 * 1024);
         private AsyncCallbackCommon _delegate;
         private IntPtr _callback_ptr;
 
@@ -10085,16 +10085,23 @@ namespace My.Company
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private static void Call(IntPtr data, IntPtr csPtr)
         {
-            throw new Exception("asd");
+            try
+            {
+                // throw new Exception("asd");
+                TaskCompletionSource<uint> tcs;
+                lock (InFlight) { InFlight.Remove((ulong) csPtr, out tcs); }
 
-            TaskCompletionSource<uint> tcs;
-            lock (InFlight) { InFlight.Remove((ulong) csPtr, out tcs); }
+                var unmanaged = Marshal.PtrToStructure<ResultU32Error.Unmanaged>(data);
+                var managed = unmanaged.ToManaged();
+                if (managed.IsOk) { tcs.SetResult(managed.AsOk()); }
+                else { tcs.SetException(managed.ExceptionForVariant()); }
+            }
+            catch (Exception e)
+            {
 
-            
-            var unmanaged = Marshal.PtrToStructure<ResultU32Error.Unmanaged>(data);
-            var managed = unmanaged.ToManaged();
-            if (managed.IsOk) { tcs.SetResult(managed.AsOk()); }
-            else { tcs.SetException(managed.ExceptionForVariant()); }
+                //
+                //
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]

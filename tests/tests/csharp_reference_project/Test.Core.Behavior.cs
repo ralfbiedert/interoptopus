@@ -21,6 +21,7 @@ public class TestBehavior
     [Fact]
     public void behavior_panics()
     {
+             // Interop.behavior_panics();
         try
         {
              Interop.behavior_panics();

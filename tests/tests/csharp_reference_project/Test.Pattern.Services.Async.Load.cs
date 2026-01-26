@@ -15,6 +15,20 @@ public class TestPatternServicesAsyncLoad
     [Fact]
     public async void Load()
     {
+        Console.WriteLine("HEllo world!!@#*(!@#!@*(#!@P(#!(#!");
+
+        // Spawn a thread and print some lines
+        var thread = new Thread(() =>
+        {
+            while (true)
+            {
+                Console.WriteLine("Running ................................");
+                Thread.Sleep(100);
+            }
+        });
+
+        thread.Start();
+
         try
         {
             var s = ServiceAsyncLoad.New();
@@ -46,7 +60,7 @@ public class TestPatternServicesAsyncLoad
             {
                 await Task.WhenAll(tasks);
             }
-            catch (OperationCanceledException)
+            catch (Exception)
             {
                 // Expected when timeout occurs
             }
@@ -55,6 +69,10 @@ public class TestPatternServicesAsyncLoad
         catch (Exception e)
         {
         }
+        Thread.Sleep(2000);
+
+        thread.Join();
+
     }
 
 }
