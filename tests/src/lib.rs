@@ -13,7 +13,7 @@ macro_rules! validate_output {
     ($folder:expr, $file:expr, $generated:expr) => {
         let file = format!("{}/{}", $folder, $file);
 
-        if std::env::var($crate::UPDATE_BINDINGS).is_ok() {
+        if ::std::env::var($crate::UPDATE_BINDINGS).is_ok() {
             ::std::fs::write(file, $generated).unwrap();
         } else {
             let expected = ::std::fs::read_to_string(file.clone())?;
