@@ -12,6 +12,7 @@ pub mod model_type_map_array;
 pub mod model_type_map_delegate;
 pub mod model_type_map_enum;
 pub mod model_type_map_enum_variants;
+pub mod model_type_map_opaque;
 pub mod model_type_map_patterns;
 pub mod model_type_map_pointer;
 pub mod model_type_map_primitives;
@@ -56,6 +57,7 @@ pub struct Missing {
     pub item: MissingItem,
 }
 
+/// Tracks items not found by passes.
 #[derive(Debug, Clone, Default)]
 pub struct LostAndFound {
     entries: Vec<Missing>,
@@ -77,6 +79,7 @@ impl LostAndFound {
     }
 }
 
+/// Collects common pass and debug information.
 #[derive(Debug, Clone, Default)]
 pub struct PassMeta {
     pub lost_found: LostAndFound,

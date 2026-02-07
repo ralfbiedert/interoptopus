@@ -50,6 +50,7 @@ pub enum TypeKind {
     Composite(Composite),
     Delegate(Signature),
     Service,
+    Opaque,          // Regular opaques, not a service
     Pointer(TypeId), // (can become `ref` in signatures, or `IntPtr` in sigs or fields).
     AsyncHelper(TypeId),
     WireHelper(TypeId), // TODO?

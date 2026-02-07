@@ -1,7 +1,8 @@
 use crate::pass::{
     meta_info, model_final, model_fn_map, model_id_maps, model_type_kinds, model_type_map, model_type_map_array, model_type_map_delegate, model_type_map_enum, model_type_map_enum_variants,
-    model_type_map_patterns, model_type_map_pointer, model_type_map_primitives, model_type_map_service, model_type_map_struct, model_type_map_struct_blittable,
-    model_type_map_struct_fields, model_type_names, output_final, output_header, output_master, OutputResult, PassMeta,
+    model_type_map_opaque, model_type_map_patterns, model_type_map_pointer, model_type_map_primitives, model_type_map_service, model_type_map_struct,
+    model_type_map_struct_blittable, model_type_map_struct_fields, model_type_names, output_final, output_header, output_master, OutputResult,
+    PassMeta,
 };
 use crate::pipeline::{loop_model_passes_until_done, RustLibraryBuilder};
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
@@ -23,6 +24,7 @@ pub struct RustLibraryConfig {
     pub model_type_map_patterns: model_type_map_patterns::Config,
     pub model_type_map_enum_variants: model_type_map_enum_variants::Config,
     pub model_type_map_enum: model_type_map_enum::Config,
+    pub model_type_map_opaque: model_type_map_opaque::Config,
     pub model_type_map_struct_fields: model_type_map_struct_fields::Config,
     pub model_type_map_struct_blittable: model_type_map_struct_blittable::Config,
     pub model_type_map_struct: model_type_map_struct::Config,
@@ -56,6 +58,7 @@ pub struct RustLibrary {
     model_type_map_patterns: model_type_map_patterns::Pass,
     model_type_map_enum_variants: model_type_map_enum_variants::Pass,
     model_type_map_enum: model_type_map_enum::Pass,
+    model_type_map_opaque: model_type_map_opaque::Pass,
     model_type_map_struct_fields: model_type_map_struct_fields::Pass,
     model_type_map_struct_blittable: model_type_map_struct_blittable::Pass,
     model_type_map_struct: model_type_map_struct::Pass,
@@ -108,6 +111,7 @@ impl RustLibrary {
             model_type_map_patterns: model_type_map_patterns::Pass::new(config.model_type_map_patterns),
             model_type_map_enum_variants: model_type_map_enum_variants::Pass::new(config.model_type_map_enum_variants),
             model_type_map_enum: model_type_map_enum::Pass::new(config.model_type_map_enum),
+            model_type_map_opaque: model_type_map_opaque::Pass::new(config.model_type_map_opaque),
             model_type_map_struct_fields: model_type_map_struct_fields::Pass::new(config.model_type_map_struct_fields),
             model_type_map_struct_blittable: model_type_map_struct_blittable::Pass::new(config.model_type_map_struct_blittable),
             model_type_map_struct: model_type_map_struct::Pass::new(config.model_type_map_struct),
@@ -161,6 +165,7 @@ impl RustLibrary {
             r.run(self.model_type_map_patterns.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_enum_variants.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_map_enum.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_enum_variants, &self.inventory.types))?;
+            r.run(self.model_type_map_opaque.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_struct_fields.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_map_struct_blittable.process(&mut pass_meta, &self.model_type_kinds))?;
             r.run(self.model_type_map_struct.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_struct_fields, &self.model_type_map_struct_blittable, &self.inventory.types))?;

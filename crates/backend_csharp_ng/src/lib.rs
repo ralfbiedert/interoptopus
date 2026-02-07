@@ -1,3 +1,6 @@
+#![allow(unused)] // TODO: For now, since lots of bare bones structs
+#![allow(unexpected_cfgs)]
+
 pub mod dispatch;
 pub mod lang;
 pub mod output;

@@ -12,7 +12,7 @@
 use crate::lang::types::{CompositeKind, TypeKind};
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{ModelResult, PassInfo, model_type_kinds};
+use crate::pass::{model_type_kinds, ModelResult, PassInfo};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -25,16 +25,14 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: "model_type_map_struct_blittable" },
-            blittable: Default::default(),
-        }
+        Self { info: PassInfo { name: "model_type_map_struct_blittable" }, blittable: Default::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut super::PassMeta, kinds: &model_type_kinds::Pass) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (cs_id, type_kind) in kinds.iter() {
+            // println!("{cs_id:?}, {type_kind:?}");
             // Skip if we've already determined blittability
             if self.blittable.contains_key(cs_id) {
                 continue;
@@ -55,6 +53,7 @@ impl Pass {
                 TypeKind::Primitive(_) => true,
                 TypeKind::Pointer(_) => true,
                 TypeKind::Service => false,
+                TypeKind::Opaque => false,
 
                 // Type patterns: some are blittable, some are disposable
                 TypeKind::TypePattern(pattern) => {
@@ -127,6 +126,7 @@ impl Pass {
             };
 
             let kind = if blittable { CompositeKind::Blittable } else { CompositeKind::Disposable };
+            // println!("{cs_id:?}, {kind:?}");
             self.blittable.insert(*cs_id, kind);
             outcome.changed();
         }
