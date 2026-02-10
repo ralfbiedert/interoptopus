@@ -35,6 +35,7 @@ pub mod services {
         pub mod todo_bad; // TODO - remove me later
         pub mod todo_threadlocal;
         pub mod vecstring;
+        pub mod async_new;
     }
     pub mod basic;
     pub mod callback;
@@ -204,6 +205,8 @@ pub fn ffi_inventory() -> Inventory {
         .register(extra_type!(types::num::TransparentNum))
         // Services
         .register(pattern!(services::asynk::basic::ServiceAsyncBasic))
+        .register(pattern!(services::asynk::async_new::ServiceAsyncNew))
+        .register(pattern!(services::asynk::async_new::Wrapper))
         .register(pattern!(services::asynk::load::ServiceAsyncLoad))
         .register(pattern!(services::asynk::sleep::ServiceAsyncSleep))
         .register(pattern!(services::asynk::vecstring::ServiceAsyncVecString))

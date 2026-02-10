@@ -1,5 +1,5 @@
 use crate::service::Attributes;
-use crate::util::{ReplaceSelf, extract_doc_lines, purge_lifetimes_from_type};
+use crate::util::{ReplaceSelf, extract_doc_lines, purge_lifetimes_from_type, UnwrapAsync};
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;
@@ -18,6 +18,7 @@ pub struct Descriptor {
 #[allow(dead_code)]
 pub enum MethodType {
     Constructor,
+    ConstructorAsync,
     MethodAsync(AttributeMethodAsync),
     MethodSync(AttributeMethodSync),
     Destructor,
@@ -56,12 +57,16 @@ fn method_type(function: &ImplItemFn) -> MethodType {
     // - not take &self
     // - and not be `async`
     let is_ctor = function.sig.inputs.iter().next().is_none_or(|x| match x {
-        FnArg::Typed(_) if function.sig.asyncness.is_none() => true,
+        FnArg::Typed(_) => true,
         _ => false,
     });
 
-    if is_ctor {
+    if is_ctor && function.sig.asyncness.is_none() {
         return MethodType::Constructor;
+    }
+
+    if is_ctor && function.sig.asyncness.is_some() && attrs.iter().any(|x| format!("{x:?}").contains("ffi_service_method")) {
+        return MethodType::ConstructorAsync;
     }
 
     // Methods that have an `async fn` are always async.
@@ -169,9 +174,20 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 // If this is the first parameter and we have `async`, the method must have
                 // requested an `Arc<T>`. In that case we generate an FFI method asking for `&T`
                 // and then convert it to `Arc<T>` internally.
-                if i == 0 && has_async && !matches!(method_type, MethodType::Constructor) {
+                if i == 0 && has_async && !matches!(method_type, MethodType::Constructor | MethodType::ConstructorAsync) {
                     arg_names.push(quote_spanned!(span_arg=> __context));
                     inputs.push(quote_spanned!(span_arg=> __context: & #service_type));
+                    continue;
+                }
+
+                // If this is the first parameter and we have `async` and are a constructor, the method must have
+                // requested an `Arc<T>`. In that case we generate an FFI method asking for `&T`
+                // and then convert it to `Arc<T>` internally.
+                if i == 0 && has_async && matches!(method_type, MethodType::ConstructorAsync) {
+                    let mut new_ty = ty.clone();
+                    UnwrapAsync.visit_type_mut(&mut new_ty);
+                    arg_names.push(quote_spanned!(span_arg=> __context));
+                    inputs.push(quote_spanned!(span_arg=> __context: & #new_ty));
                     continue;
                 }
 
@@ -321,6 +337,75 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 #method_attributes
 
                 pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, __async_callback: ::interoptopus::pattern::asynk::AsyncCallback<#rval>) -> <#rval as ::interoptopus::pattern::result::ResultAsUnitT>::AsUnitT {
+                    #block
+                }
+            }
+        }
+        MethodType::ConstructorAsync => {
+            let object_construction = if has_async {
+                quote_spanned! { span_service_ty =>
+                    let __boxed = ::std::sync::Arc::new(__res);
+                    let __raw = ::std::sync::Arc::into_raw(__boxed);
+                }
+            } else {
+                quote_spanned! { span_service_ty =>
+                    let __boxed = ::std::boxed::Box::new(__res);
+                    let __raw = ::std::boxed::Box::into_raw(__boxed);
+                }
+            };
+
+            let ctor_result = quote_spanned! {span_rval => <<#service_type as ::interoptopus::pattern::service::ServiceInfo>::CtorResult as ::interoptopus::pattern::result::ResultAsPtr>::AsPtr };
+
+            let context_name = arg_names.first().unwrap();
+
+            let block = quote_spanned! { span_body =>
+                let __context = #context_name;
+
+                let __this = __context;
+
+                // We must convert the element pointer into an Arc, then clone that Arc,
+                // but not drop the original one (which is the responsibility of the
+                // destructor)
+                let __arc_restored = ::std::mem::ManuallyDrop::new(unsafe { ::std::sync::Arc::from_raw(__context) });
+                let __context = ::std::sync::Arc::clone(&__arc_restored);
+
+                // let #context_name = __context;
+
+                let __async_fn = async move |__tlcontext| {
+                    let __context = ::interoptopus::pattern::asynk::Async::new(__context, __tlcontext);
+                    let #context_name = __context;
+                    // let #context_name = &#context_name;
+                    
+                    // TODO: We should catch panics, but we can't since async.
+                    let __result_result = <#service_type>::#orig_fn_ident( #(#arg_names),* ).await;
+
+                    let __rval = match __result_result {
+                        ::interoptopus::pattern::result::Result::Ok(__res) => {
+                            #object_construction
+                            #ctor_result::Ok(__raw)
+                        }
+                        ::interoptopus::pattern::result::Result::Err(__e) => {
+                            #ctor_result::Err(__e)
+                        }
+                        ::interoptopus::pattern::result::Result::Panic => #ctor_result::Panic,
+                        ::interoptopus::pattern::result::Result::Null => #ctor_result::Null,
+                    };
+
+                    __async_callback.call(&__rval);
+                    // We actually want move semantics for rval for types like `Utf8Strings` that
+                    // should be owned by the FFI side now. We therefore forget it here since
+                    // the caller must have moved it out by now.
+                    ::std::mem::forget(__rval);
+                };
+
+                __this.spawn(__async_fn);
+                #ctor_result::Ok(std::ptr::null())
+            };
+
+            quote_spanned! { span_function =>
+                #method_attributes
+
+                pub extern "C" fn #ffi_fn_ident #generics( #(#inputs),*, __async_callback: ::interoptopus::pattern::asynk::AsyncCallback<#ctor_result>) -> #ctor_result {
                     #block
                 }
             }
