@@ -35,20 +35,15 @@ impl VisitMut for UnwrapAsync {
         // First, recurse into children so nested `Async<T>` are handled.
         syn::visit_mut::visit_type_mut(self, ty);
 
-        if let Type::Path(type_path) = ty {
-            if type_path.qself.is_none() {
-                if let Some(last) = type_path.path.segments.last() {
-                    if last.ident == "Async" {
-                        if let PathArguments::AngleBracketed(args) = &last.arguments {
-                            if args.args.len() == 1 {
-                                if let Some(GenericArgument::Type(inner)) = args.args.first() {
-                                    *ty = inner.clone();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        if let Type::Path(type_path) = ty
+            && type_path.qself.is_none()
+            && let Some(last) = type_path.path.segments.last()
+            && last.ident == "Async"
+            && let PathArguments::AngleBracketed(args) = &last.arguments
+            && args.args.len() == 1
+            && let Some(GenericArgument::Type(inner)) = args.args.first()
+        {
+            *ty = inner.clone();
         }
     }
 }
