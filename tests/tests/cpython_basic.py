@@ -149,6 +149,9 @@ def init_lib(path):
     c_lib.service_async_load_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_async_load_load.argtypes = [ctypes.c_void_p, ctypes.c_uint32, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultU32Error), ctypes.c_void_p)]
     c_lib.service_async_load_new.argtypes = []
+    c_lib.service_async_new_call.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultError), ctypes.c_void_p)]
+    c_lib.service_async_new_destroy.argtypes = [ctypes.c_void_p]
+    c_lib.service_async_new_new.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultConstPtrServiceAsyncNewError), ctypes.c_void_p)]
     c_lib.service_async_result_destroy.argtypes = [ctypes.c_void_p]
     c_lib.service_async_result_fail.argtypes = [ctypes.c_void_p, ctypes.CFUNCTYPE(None, ctypes.POINTER(ResultError), ctypes.c_void_p)]
     c_lib.service_async_result_new.argtypes = []
@@ -218,6 +221,8 @@ def init_lib(path):
     c_lib.struct2.argtypes = [Vec3f32, ctypes.POINTER(Tupled)]
     c_lib.struct3.argtypes = [BoolField]
     c_lib.wire_accept_string_2.argtypes = [todo]
+    c_lib.wrapper_destroy.argtypes = [ctypes.c_void_p]
+    c_lib.wrapper_new.argtypes = []
     c_lib.alignment_1.restype = Packed2
     c_lib.array_1.restype = ctypes.c_uint8
     c_lib.array_2.restype = Array
@@ -358,6 +363,9 @@ def init_lib(path):
     c_lib.service_async_load_destroy.restype = ResultConstPtrServiceAsyncLoadError
     c_lib.service_async_load_load.restype = ResultError
     c_lib.service_async_load_new.restype = ResultConstPtrServiceAsyncLoadError
+    c_lib.service_async_new_call.restype = ResultError
+    c_lib.service_async_new_destroy.restype = ResultConstPtrServiceAsyncNewError
+    c_lib.service_async_new_new.restype = ResultConstPtrServiceAsyncNewError
     c_lib.service_async_result_destroy.restype = ResultConstPtrServiceAsyncResultError
     c_lib.service_async_result_fail.restype = ResultError
     c_lib.service_async_result_new.restype = ResultConstPtrServiceAsyncResultError
@@ -427,6 +435,8 @@ def init_lib(path):
     c_lib.struct2.restype = ResultError
     c_lib.struct3.restype = ctypes.c_bool
     c_lib.wire_accept_string_2.restype = 
+    c_lib.wrapper_destroy.restype = ResultConstPtrWrapperError
+    c_lib.wrapper_new.restype = ResultConstPtrWrapperError
 
 
 def interoptopus_string_create(utf8: ctypes.c_void_p, len: int, rval: ctypes.POINTER(Utf8String)) -> int:
@@ -2596,6 +2606,16 @@ class ResultConstPtrServiceAsyncLoadError:
     Null = 3
 
 
+class ResultConstPtrServiceAsyncNewError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
 class ResultConstPtrServiceAsyncResultError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
@@ -2727,6 +2747,16 @@ class ResultConstPtrServiceStringsError:
 
 
 class ResultConstPtrServiceVariousSlicesError:
+    """Result that contains value or an error."""
+    # Element if err is `Ok`.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    # Error value.
+# TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    Panic = 2
+    Null = 3
+
+
+class ResultConstPtrWrapperError:
     """Result that contains value or an error."""
     # Element if err is `Ok`.
 # TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
@@ -3189,6 +3219,54 @@ class ServiceAsyncBasic:
         """"""
         return c_lib.service_async_basic_call(self._ctx, _async_callback)
 
+
+
+class ServiceAsyncNew:
+    __api_lock = object()
+
+    def __init__(self, api_lock, ctx):
+        assert(api_lock == ServiceAsyncNew.__api_lock), "You must create this with a static constructor." 
+        self._ctx = ctx
+
+    @property
+    def _as_parameter_(self):
+        return self._ctx
+
+    @staticmethod
+    def new(_async_callback) -> ServiceAsyncNew:
+        """"""
+        ctx = c_lib.service_async_new_new(_async_callback).t
+        self = ServiceAsyncNew(ServiceAsyncNew.__api_lock, ctx)
+        return self
+
+    def __del__(self):
+        c_lib.service_async_new_destroy(self._ctx, )
+    def call(self, _async_callback):
+        """"""
+        return c_lib.service_async_new_call(self._ctx, _async_callback)
+
+
+
+class Wrapper:
+    __api_lock = object()
+
+    def __init__(self, api_lock, ctx):
+        assert(api_lock == Wrapper.__api_lock), "You must create this with a static constructor." 
+        self._ctx = ctx
+
+    @property
+    def _as_parameter_(self):
+        return self._ctx
+
+    @staticmethod
+    def new() -> Wrapper:
+        """"""
+        ctx = c_lib.wrapper_new().t
+        self = Wrapper(Wrapper.__api_lock, ctx)
+        return self
+
+    def __del__(self):
+        c_lib.wrapper_destroy(self._ctx, )
 
 
 class ServiceAsyncLoad:

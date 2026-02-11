@@ -342,6 +342,28 @@ pub fn ffi_service_method(_attr: TokenStream, item: TokenStream) -> TokenStream 
     item
 }
 
+/// Inside a [`#[ffi_service]`](macro@crate::ffi_service) block, configure the generated FFI helper for an `async` constructor.
+///
+/// This is an optional attribute that can be applied to constructor methods, i.e., methods without a `self` parameter.
+/// It will make the generated FFI method `async` and add an additional parameter of type [`Async<T>`](https://docs.rs/interoptopus/latest/interoptopus/patterns/asynk/struct.Async.html) as the first parameter,
+/// which can be used to drive the async execution on the caller's side.
+///
+/// See the [service module](https://docs.rs/interoptopus/latest/interoptopus/patterns/service/index.html) for an introduction into services and the [asynk pattern](https://docs.rs/interoptopus/latest/interoptopus/patterns/asynk/index.html) for an introduction into async patterns.
+///
+/// # Panic Behavior
+///
+/// Panics are currently always treated as undefined behavior in async methods, since we can't catch them.
+/// This means you must ensure that methods marked with `#[ffi_async_constructor]` will never panic. Failure to do so will lead to undefined behavior.
+/// In the long term we might add an `on_panic` parameter similar to `#[ffi_service_method]` to allow for more flexible panic handling in async methods as well.
+///
+/// # Safety
+///
+/// ⚠️ You must ensure that methods marked with `#[ffi_async_constructor]` will never panic. Failure to do so will lead to undefined behavior.
+#[proc_macro_attribute]
+pub fn ffi_async_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    item
+}
+
 #[proc_macro_derive(AsyncRuntime, attributes(runtime))]
 pub fn derive_async_runtime(item: TokenStream) -> TokenStream {
     match runtime::derive_async_runtime(item.into()) {

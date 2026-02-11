@@ -77,6 +77,7 @@ pub fn write_pattern_service_method(
     };
 
     let mut static_prefix = "";
+    let mut async_ctor = false;
 
     let rval = match async_rval {
         SugaredReturnType::Sync(_) => match method_type {
@@ -92,10 +93,21 @@ pub fn write_pattern_service_method(
             MethodType::Dtor => "void".to_string(),
         },
         SugaredReturnType::Async(Type::Pattern(TypePattern::Result(_))) => {
-            names.pop();
-            types.pop();
-            to_invoke.pop();
-            rval_to_type_async(&async_rval)
+            if method_type == MethodType::Ctor {
+                async_ctor = true;
+                names.pop();
+                types.pop();
+                to_invoke.pop();
+
+                static_prefix = "async static ";
+                //TODO: Use variant of rval_to_type_async
+                format!("Task<{}>", class.the_type().rust_name())
+            } else {
+                names.pop();
+                types.pop();
+                to_invoke.pop();
+                rval_to_type_async(&async_rval)
+            }
         }
         SugaredReturnType::Async(_) => {
             names.pop();
@@ -150,7 +162,11 @@ pub fn write_pattern_service_method(
             indented!(w, [()], r"{fn_call};",)?;
         }
         _ if matches!(method_type, MethodType::Ctor) => {
-            indented!(w, [()], r"self._context = {fn_call}.AsOk();")?;
+            if async_ctor {
+                indented!(w, [()], r"self._context = await {fn_call};")?;
+            } else {
+                indented!(w, [()], r"self._context = {fn_call}.AsOk();")?;
+            }
         }
         _ if matches!(method_type, MethodType::Dtor) => {
             indented!(w, [()], r"{fn_call}.AsOk();")?;

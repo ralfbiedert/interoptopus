@@ -27,6 +27,27 @@ impl VisitMut for ReplaceSelf {
     }
 }
 
+/// A type visitor that replaces all occurrences of `Async<T>` with `T`.
+pub struct UnwrapAsync;
+
+impl VisitMut for UnwrapAsync {
+    fn visit_type_mut(&mut self, ty: &mut Type) {
+        // First, recurse into children so nested `Async<T>` are handled.
+        syn::visit_mut::visit_type_mut(self, ty);
+
+        if let Type::Path(type_path) = ty
+            && type_path.qself.is_none()
+            && let Some(last) = type_path.path.segments.last()
+            && last.ident == "Async"
+            && let PathArguments::AngleBracketed(args) = &last.arguments
+            && args.args.len() == 1
+            && let Some(GenericArgument::Type(inner)) = args.args.first()
+        {
+            *ty = inner.clone();
+        }
+    }
+}
+
 /// Ugly, incomplete function to purge `'a` from a `Generic<'a, T>`.
 ///
 /// TODO, should this be done by visitor as well?
