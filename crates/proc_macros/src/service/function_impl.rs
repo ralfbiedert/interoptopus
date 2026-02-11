@@ -1,5 +1,5 @@
 use crate::service::Attributes;
-use crate::util::{ReplaceSelf, extract_doc_lines, purge_lifetimes_from_type, UnwrapAsync};
+use crate::util::{ReplaceSelf, UnwrapAsync, extract_doc_lines, purge_lifetimes_from_type};
 use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::quote_spanned;
@@ -371,7 +371,7 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
 
                 let __async_fn = async move |__tlcontext| {
                     let __context = ::interoptopus::pattern::asynk::Async::new(__context, __tlcontext);
-                    
+
                     // TODO: We should catch panics, but we can't since async.
                     let __result_result = <#service_type>::#orig_fn_ident( #(#arg_names),* ).await;
 

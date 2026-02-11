@@ -27,6 +27,7 @@ pub mod patterns {
 }
 pub mod services {
     pub mod asynk {
+        pub mod async_new;
         pub mod basic;
         pub mod load;
         pub mod result;
@@ -35,7 +36,6 @@ pub mod services {
         pub mod todo_bad; // TODO - remove me later
         pub mod todo_threadlocal;
         pub mod vecstring;
-        pub mod async_new;
     }
     pub mod basic;
     pub mod callback;
