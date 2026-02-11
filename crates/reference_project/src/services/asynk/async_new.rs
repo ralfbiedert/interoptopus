@@ -1,7 +1,7 @@
 use crate::patterns::result::Error;
 use interoptopus::AsyncRuntime;
 use interoptopus::ffi;
-use interoptopus::ffi_service_method;
+use interoptopus::ffi_async_constructor;
 use interoptopus::pattern::asynk::{Async, AsyncRuntime};
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::rt::Tokio;
@@ -15,7 +15,7 @@ pub struct ServiceAsyncNew {
 
 #[ffi_service]
 impl ServiceAsyncNew {
-    #[ffi_service_method]
+    #[ffi_async_constructor]
     pub async fn new(wrapper: Async<Wrapper>) -> ffi::Result<Self, Error> {
         result_to_ffi(|| Ok(Self { runtime: wrapper.runtime.clone() }))
     }

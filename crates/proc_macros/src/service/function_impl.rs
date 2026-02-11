@@ -65,7 +65,7 @@ fn method_type(function: &ImplItemFn) -> MethodType {
         return MethodType::Constructor;
     }
 
-    if is_ctor && function.sig.asyncness.is_some() && attrs.iter().any(|x| format!("{x:?}").contains("ffi_service_method")) {
+    if is_ctor && function.sig.asyncness.is_some() && attrs.iter().any(|x| format!("{x:?}").contains("ffi_async_constructor")) {
         return MethodType::ConstructorAsync;
     }
 
@@ -369,12 +369,8 @@ pub fn generate_service_method(attributes: &Attributes, impl_block: &ItemImpl, f
                 let __arc_restored = ::std::mem::ManuallyDrop::new(unsafe { ::std::sync::Arc::from_raw(__context) });
                 let __context = ::std::sync::Arc::clone(&__arc_restored);
 
-                // let #context_name = __context;
-
                 let __async_fn = async move |__tlcontext| {
                     let __context = ::interoptopus::pattern::asynk::Async::new(__context, __tlcontext);
-                    let #context_name = __context;
-                    // let #context_name = &#context_name;
                     
                     // TODO: We should catch panics, but we can't since async.
                     let __result_result = <#service_type>::#orig_fn_ident( #(#arg_names),* ).await;
