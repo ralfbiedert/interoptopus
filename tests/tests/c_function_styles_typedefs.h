@@ -48,6 +48,8 @@ typedef struct SERVICEASYNCBASIC SERVICEASYNCBASIC;
 
 typedef struct SERVICEASYNCLOAD SERVICEASYNCLOAD;
 
+typedef struct SERVICEASYNCNEW SERVICEASYNCNEW;
+
 typedef struct SERVICEASYNCRESULT SERVICEASYNCRESULT;
 
 typedef struct SERVICEASYNCSLEEP SERVICEASYNCSLEEP;
@@ -80,6 +82,8 @@ typedef struct SERVICESTRINGS SERVICESTRINGS;
 
 ///  Some struct we want to expose as a class.
 typedef struct SERVICEVARIOUSSLICES SERVICEVARIOUSSLICES;
+
+typedef struct WRAPPER WRAPPER;
 
 ///  UTF-8 string marshalling helper.
 ///  A highly dangerous 'use once type' that has ownership semantics!
@@ -513,6 +517,17 @@ typedef enum RESULTCONSTPTRSERVICEASYNCLOADERROR
     } RESULTCONSTPTRSERVICEASYNCLOADERROR;
 
 /// Result that contains value or an error.
+typedef enum RESULTCONSTPTRSERVICEASYNCNEWERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRSERVICEASYNCNEWERROR_PANIC = 2,
+    RESULTCONSTPTRSERVICEASYNCNEWERROR_NULL = 3,
+    } RESULTCONSTPTRSERVICEASYNCNEWERROR;
+
+/// Result that contains value or an error.
 typedef enum RESULTCONSTPTRSERVICEASYNCRESULTERROR
     {
     /// Element if err is `Ok`.
@@ -665,6 +680,17 @@ typedef enum RESULTCONSTPTRSERVICEVARIOUSSLICESERROR
     RESULTCONSTPTRSERVICEVARIOUSSLICESERROR_PANIC = 2,
     RESULTCONSTPTRSERVICEVARIOUSSLICESERROR_NULL = 3,
     } RESULTCONSTPTRSERVICEVARIOUSSLICESERROR;
+
+/// Result that contains value or an error.
+typedef enum RESULTCONSTPTRWRAPPERERROR
+    {
+    /// Element if err is `Ok`.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    /// Error value.
+    // TODO - OMITTED DATA VARIANT - BINDINGS ARE BROKEN
+    RESULTCONSTPTRWRAPPERERROR_PANIC = 2,
+    RESULTCONSTPTRWRAPPERERROR_NULL = 3,
+    } RESULTCONSTPTRWRAPPERERROR;
 
 /// Result that contains value or an error.
 typedef enum RESULTOPTIONUTF8STRINGERROR
@@ -866,6 +892,8 @@ typedef enum RESULTOPTIONENUMPAYLOADERROR
     } RESULTOPTIONENUMPAYLOADERROR;
 
 typedef void (*CALLBACKCHARARRAY2)(CHARARRAY VALUE, const void* CALLBACK_DATA);
+
+typedef void (*fptr_fn_ConstPtrResultConstPtrServiceAsyncNewError_ConstPtrVoid_rval_void)(const RESULTCONSTPTRSERVICEASYNCNEWERROR* x0, const void* x1);
 
 typedef void (*fptr_fn_ConstPtrResultUseStringError_ConstPtrVoid_rval_void)(const RESULTUSESTRINGERROR* x0, const void* x1);
 
@@ -1166,6 +1194,28 @@ typedef RESULTCONSTPTRSERVICEASYNCBASICERROR (*service_async_basic_destroy)(cons
 typedef RESULTCONSTPTRSERVICEASYNCBASICERROR (*service_async_basic_new)();
 
 typedef RESULTERROR (*service_async_basic_call)(const SERVICEASYNCBASIC*, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+typedef RESULTCONSTPTRSERVICEASYNCNEWERROR (*service_async_new_destroy)(const SERVICEASYNCNEW*);
+
+typedef RESULTCONSTPTRSERVICEASYNCNEWERROR (*service_async_new_new)(const WRAPPER*, fptr_fn_ConstPtrResultConstPtrServiceAsyncNewError_ConstPtrVoid_rval_void);
+
+typedef RESULTERROR (*service_async_new_call)(const SERVICEASYNCNEW*, fptr_fn_ConstPtrResultError_ConstPtrVoid_rval_void);
+
+///  Destroys the given instance.
+/// 
+///  # Safety
+/// 
+///  The passed parameter MUST have been created with the corresponding init function;
+///  passing any other value results in undefined behavior.
+typedef RESULTCONSTPTRWRAPPERERROR (*wrapper_destroy)(const WRAPPER*);
+
+typedef RESULTCONSTPTRWRAPPERERROR (*wrapper_new)();
 
 ///  Destroys the given instance.
 /// 
