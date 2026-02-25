@@ -1,0 +1,13 @@
+[package]
+name = "reference_project_c"
+description = "A reference project for the Interoptopus C backend to test interop generation."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+interoptopus = { path = "../../core" }
