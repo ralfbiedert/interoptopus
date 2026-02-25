@@ -3,10 +3,11 @@ target
 *.rs.bk
 cmake-build-debug
 
-# C
+# C / C++ / CMake
 *.lib
 *.a
 *.o
+**/build/
 
 # C#
 obj
@@ -40,9 +41,12 @@ RESULTS.md
 # OS
 .DS_Store
 
-# Project-specific
+# Project-specific (generated interop files)
 Interop.cs
 Interop.Common.cs
 Interop.Plugin.cs
 Interop.User.cs
+crates/backend_c/tests/reference_project/reference_project.h
+examples/hello_world/bindings_c/hello_world.h
+
 website/public
