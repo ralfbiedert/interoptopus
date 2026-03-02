@@ -32,15 +32,8 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            let rust_pattern = match &ty.kind {
-                lang::types::TypeKind::TypePattern(pattern) => pattern,
-                _ => continue,
-            };
-
-            // Check if we already processed this pattern
-            if id_map.ty(*rust_id).is_some() {
-                continue;
-            }
+            skip_mapped!(id_map, rust_id);
+            let rust_pattern = try_extract_kind!(ty, TypePattern);
 
             // Determine C# TypeId and pattern
             #[rustfmt::skip]

@@ -3,7 +3,6 @@
 use crate::lang::types::{Composite, TypeKind};
 use crate::pass::Outcome::{Changed, Unchanged};
 use crate::pass::{model_id_maps, model_type_kinds, model_type_map_struct_blittable, model_type_map_struct_fields, ModelResult, PassInfo};
-use interoptopus::lang;
 
 #[derive(Default)]
 pub struct Config {}
@@ -29,10 +28,7 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            let rust_struct = match &ty.kind {
-                lang::types::TypeKind::Struct(x) => x,
-                _ => continue,
-            };
+            let rust_struct = try_extract_kind!(ty, Struct);
 
             // Get the C# TypeId
             let Some(cs_id) = id_map.ty(*rust_id) else {

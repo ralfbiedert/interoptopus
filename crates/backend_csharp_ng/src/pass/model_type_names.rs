@@ -22,8 +22,7 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            // Get the C# TypeId
-            let cs_id = resolve!(id_map.ty(*rust_id), pass_meta, self.info, super::MissingItem::RustType(*rust_id));
+            let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, super::MissingItem::RustType(*rust_id));
 
             // Skip if we've already mapped this name
             if self.names.contains_key(&cs_id) {

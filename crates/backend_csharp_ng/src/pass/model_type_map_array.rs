@@ -4,7 +4,6 @@ use crate::lang::types::{Array, TypeKind};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model_id_maps, model_type_kinds, ModelResult, PassInfo};
-use interoptopus::lang;
 
 #[derive(Default)]
 pub struct Config {}
@@ -28,18 +27,9 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            let rust_array = match &ty.kind {
-                lang::types::TypeKind::Array(arr) => arr,
-                _ => continue,
-            };
-
-            // Create C# TypeId for the array
+            skip_mapped!(id_map, rust_id);
+            let rust_array = try_extract_kind!(ty, Array);
             let cs_id = TypeId::from_id(rust_id.id());
-
-            // Check if we already processed this array
-            if id_map.ty(*rust_id).is_some() {
-                continue;
-            }
 
             let cs_element_type = try_resolve!(id_map.ty(rust_array.ty), pass_meta, self.info, super::MissingItem::RustType(rust_array.ty));
 

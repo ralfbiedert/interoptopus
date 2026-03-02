@@ -24,10 +24,7 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            let rust_struct = match &ty.kind {
-                lang::types::TypeKind::Struct(x) => x,
-                _ => continue,
-            };
+            let rust_struct = try_extract_kind!(ty, Struct);
 
             // Create C# TypeId for the struct itself
             let cs_id = TypeId::from_id(rust_id.id());

@@ -2,6 +2,34 @@ use crate::model::TypeId;
 use crate::Error;
 use std::cmp::PartialEq;
 
+/// Extract the inner data from a [`TypeKind`](interoptopus::lang::types::TypeKind) variant,
+/// or `continue` if the type doesn't match.
+///
+/// ```ignore
+/// let rust_array = try_extract_kind!(ty, Array);
+/// ```
+macro_rules! try_extract_kind {
+    ($ty:expr, $variant:ident) => {
+        match &$ty.kind {
+            interoptopus::lang::types::TypeKind::$variant(x) => x,
+            _ => continue,
+        }
+    };
+}
+
+/// Skip this loop iteration if `id_map` already has a mapping for `rust_id`.
+///
+/// ```ignore
+/// skip_mapped!(id_map, rust_id);
+/// ```
+macro_rules! skip_mapped {
+    ($id_map:expr, $rust_id:expr) => {
+        if $id_map.ty(*$rust_id).is_some() {
+            continue;
+        }
+    };
+}
+
 /// Unwrap an `Option`, or report a [`MissingItem`] to the [`PassMeta`] lost-and-found
 /// and `continue` the enclosing loop.
 ///

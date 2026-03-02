@@ -24,10 +24,7 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            let rust_enum = match &ty.kind {
-                lang::types::TypeKind::Enum(x) => x,
-                _ => continue,
-            };
+            let rust_enum = try_extract_kind!(ty, Enum);
 
             // Create C# TypeId for the enum itself
             let cs_id = TypeId::from_id(rust_id.id());

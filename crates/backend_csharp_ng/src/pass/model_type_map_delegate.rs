@@ -5,7 +5,6 @@ use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
 use crate::pass::{model_id_maps, model_type_kinds, ModelResult, PassInfo};
-use interoptopus::lang;
 
 #[derive(Default)]
 pub struct Config {}
@@ -29,18 +28,9 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            let rust_signature = match &ty.kind {
-                lang::types::TypeKind::FnPointer(sig) => sig,
-                _ => continue,
-            };
-
-            // Create C# TypeId for the delegate
+            skip_mapped!(id_map, rust_id);
+            let rust_signature = try_extract_kind!(ty, FnPointer);
             let cs_id = TypeId::from_id(rust_id.id());
-
-            // Check if we already processed this delegate
-            if id_map.ty(*rust_id).is_some() {
-                continue;
-            }
 
             // Try to convert the signature's return type and all argument types
             let Some(cs_rval) = id_map.ty(rust_signature.rval) else {

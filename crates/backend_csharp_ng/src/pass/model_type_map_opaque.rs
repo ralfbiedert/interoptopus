@@ -4,7 +4,6 @@ use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model_id_maps, model_type_kinds, ModelResult, PassInfo};
-use interoptopus::lang;
 
 #[derive(Default)]
 pub struct Config {}
@@ -28,18 +27,14 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
+            skip_mapped!(id_map, rust_id);
+
             match &ty.kind {
-                lang::types::TypeKind::Opaque => {}
+                interoptopus::lang::types::TypeKind::Opaque => {}
                 _ => continue,
             }
 
-            // Create C# TypeId for the service
             let cs_id = TypeId::from_id(rust_id.id());
-
-            // Check if we already processed this service
-            if id_map.ty(*rust_id).is_some() {
-                continue;
-            }
 
             // Register the service type (no dependencies to check)
             id_map.set_ty(*rust_id, cs_id);

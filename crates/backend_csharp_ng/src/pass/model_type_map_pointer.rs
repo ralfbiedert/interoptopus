@@ -28,16 +28,13 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
+            skip_mapped!(id_map, rust_id);
+
             let rust_pointee_id = match &ty.kind {
                 lang::types::TypeKind::ReadPointer(pointee) => pointee,
                 lang::types::TypeKind::ReadWritePointer(pointee) => pointee,
                 _ => continue,
             };
-
-            // Check if we already processed this pointer
-            if id_map.ty(*rust_id).is_some() {
-                continue;
-            }
 
             // Create C# TypeId for the pointer
             let cs_id = TypeId::from_id(rust_id.id());
