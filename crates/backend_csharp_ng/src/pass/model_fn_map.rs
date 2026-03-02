@@ -80,4 +80,8 @@ impl Pass {
 
         Ok(outcome)
     }
+
+    pub fn iter(&self) -> impl Iterator<Item = (&FunctionId, &Function)> {
+        self.functions.iter()
+    }
 }

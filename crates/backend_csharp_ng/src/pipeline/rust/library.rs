@@ -1,8 +1,8 @@
 use crate::pass::{
     meta_info, model_final, model_fn_map, model_id_maps, model_type_kinds, model_type_map, model_type_map_array, model_type_map_delegate, model_type_map_enum, model_type_map_enum_variants,
     model_type_map_opaque, model_type_map_patterns, model_type_map_pointer, model_type_map_primitives, model_type_map_service, model_type_map_struct,
-    model_type_map_struct_blittable, model_type_map_struct_fields, model_type_names, output_final, output_header, output_master, OutputResult,
-    PassMeta,
+    model_type_map_struct_blittable, model_type_map_struct_fields, model_type_names, output_final, output_fn_imports, output_header, output_master,
+    OutputResult, PassMeta,
 };
 use crate::pipeline::{loop_model_passes_until_done, RustLibraryBuilder};
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
@@ -33,12 +33,14 @@ pub struct RustLibraryConfig {
     pub model_fn_map: model_fn_map::Config,
     pub model_final: model_final::Config,
     pub output_master: output_master::Config,
+    pub output_fn_imports: output_fn_imports::Config,
     pub output_header: output_header::Config,
     pub output_final: output_final::Config,
     _hidden: PhantomData<()>,
 }
 
 pub struct IntermediateOutputPasses {
+    pub fn_imports: output_fn_imports::Pass,
     pub header: output_header::Pass,
 }
 
@@ -120,7 +122,10 @@ impl RustLibrary {
             model_fn_map: model_fn_map::Pass::new(config.model_fn_map),
             model_final: model_final::Pass::new(config.model_final),
             output_master: output_master::Pass::new(config.output_master),
-            output_passes: IntermediateOutputPasses { header: output_header::Pass::new(config.output_header) },
+            output_passes: IntermediateOutputPasses {
+                fn_imports: output_fn_imports::Pass::new(config.output_fn_imports),
+                header: output_header::Pass::new(config.output_header),
+            },
             output_final: output_final::Pass::new(config.output_final),
             output: Multibuf::default(),
             plugins: vec![],
@@ -185,6 +190,7 @@ impl RustLibrary {
 
         // Output passes
         self.output_master.process(&mut pass_meta)?;
+        self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.plugin_post_output_pass()?;
 

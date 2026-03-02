@@ -22,6 +22,7 @@ pub mod model_type_map_struct_blittable;
 pub mod model_type_map_struct_fields;
 pub mod model_type_names;
 pub mod output_final;
+pub mod output_fn_imports;
 pub mod output_header;
 pub mod output_master;
 
