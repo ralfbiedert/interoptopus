@@ -1,4 +1,3 @@
-use crate::lang::meta::Visibility;
 use crate::model::TypeId;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -31,6 +30,5 @@ pub struct Overload {
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Function {
     pub name: String,
-    pub visibility: Visibility,
     pub overloads: Vec<Overload>,
 }

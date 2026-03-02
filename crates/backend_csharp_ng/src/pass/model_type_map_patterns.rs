@@ -31,6 +31,30 @@ impl Pass {
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
+        macro_rules! resolve1 {
+            ($rust_ty:expr, $variant:ident) => {{
+                let Some(cs_ty) = id_map.ty(*$rust_ty) else {
+                    pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*$rust_ty));
+                    continue;
+                };
+                (TypeId::from_id(rust_id.id()), TypePattern::$variant(cs_ty))
+            }};
+        }
+
+        macro_rules! resolve2 {
+            ($a:expr, $b:expr, $variant:ident) => {{
+                let Some(cs_a) = id_map.ty(*$a) else {
+                    pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*$a));
+                    continue;
+                };
+                let Some(cs_b) = id_map.ty(*$b) else {
+                    pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*$b));
+                    continue;
+                };
+                (TypeId::from_id(rust_id.id()), TypePattern::$variant(cs_a, cs_b))
+            }};
+        }
+
         for (rust_id, ty) in rs_types {
             let rust_pattern = match &ty.kind {
                 lang::types::TypeKind::TypePattern(pattern) => pattern,
@@ -54,54 +78,14 @@ impl Pass {
                 lang::types::TypePattern::CVoid => (TypeId::from_id(<()>::id().id()), TypePattern::CVoid),
 
                 // Patterns with one type parameter
-                lang::types::TypePattern::Slice(rust_ty) => {
-                    let Some(cs_ty) = id_map.ty(*rust_ty) else {
-                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ty));
-                        continue;
-                    };
-                    (TypeId::from_id(rust_id.id()), TypePattern::Slice(cs_ty))
-                }
-                lang::types::TypePattern::SliceMut(rust_ty) => {
-                    let Some(cs_ty) = id_map.ty(*rust_ty) else {
-                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ty));
-                        continue;
-                    };
-                    (TypeId::from_id(rust_id.id()), TypePattern::SliceMut(cs_ty))
-                }
-                lang::types::TypePattern::Vec(rust_ty) => {
-                    let Some(cs_ty) = id_map.ty(*rust_ty) else {
-                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ty));
-                        continue;
-                    };
-                    (TypeId::from_id(rust_id.id()), TypePattern::Vec(cs_ty))
-                }
-                lang::types::TypePattern::Option(rust_ty) => {
-                    let Some(cs_ty) = id_map.ty(*rust_ty) else {
-                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ty));
-                        continue;
-                    };
-                    (TypeId::from_id(rust_id.id()), TypePattern::Option(cs_ty))
-                }
-                lang::types::TypePattern::AsyncCallback(rust_ty) => {
-                    let Some(cs_ty) = id_map.ty(*rust_ty) else {
-                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ty));
-                        continue;
-                    };
-                    (TypeId::from_id(rust_id.id()), TypePattern::AsyncCallback(cs_ty))
-                }
+                lang::types::TypePattern::Slice(rust_ty) => resolve1!(rust_ty, Slice),
+                lang::types::TypePattern::SliceMut(rust_ty) => resolve1!(rust_ty, SliceMut),
+                lang::types::TypePattern::Vec(rust_ty) => resolve1!(rust_ty, Vec),
+                lang::types::TypePattern::Option(rust_ty) => resolve1!(rust_ty, Option),
+                lang::types::TypePattern::AsyncCallback(rust_ty) => resolve1!(rust_ty, AsyncCallback),
 
                 // Result pattern with two type parameters
-                lang::types::TypePattern::Result(rust_ok, rust_err) => {
-                    let Some(cs_ok) = id_map.ty(*rust_ok) else {
-                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_ok));
-                        continue;
-                    };
-                    let Some(cs_err) = id_map.ty(*rust_err) else {
-                        pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_err));
-                        continue;
-                    };
-                    (TypeId::from_id(rust_id.id()), TypePattern::Result(cs_ok, cs_err))
-                }
+                lang::types::TypePattern::Result(rust_ok, rust_err) => resolve2!(rust_ok, rust_err, Result),
 
                 // NamedCallback with signature
                 lang::types::TypePattern::NamedCallback(rust_sig) => {

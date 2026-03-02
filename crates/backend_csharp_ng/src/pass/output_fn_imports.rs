@@ -26,10 +26,13 @@ impl Pass {
 
             for (id, function) in fn_maps.iter() {
                 let name = &function.name;
-                for overload in function.overloads {
+                for overload in &function.overloads {
                     let mut context = Context::new();
 
                     context.insert("name", name);
+                    context.insert("symbol", name);
+                    context.insert("args", "todo");
+                    context.insert("rval", "todo");
 
                     let import = templates.render("fn_import.cs", &context)?;
                     imports.push(import);

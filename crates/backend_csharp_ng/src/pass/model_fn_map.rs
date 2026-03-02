@@ -71,7 +71,7 @@ impl Pass {
             let overload = Overload { signature: cs_signature, kind: FunctionKind::RustFunction };
 
             // Create the C# function with one overload
-            let cs_function = Function { name: rust_fn.name.clone(), visibility: cs_visibility, overloads: vec![overload] };
+            let cs_function = Function { name: rust_fn.name.clone(), overloads: vec![overload] };
 
             id_map.set_fns(*rust_id, cs_id);
             self.functions.insert(cs_id, cs_function);
