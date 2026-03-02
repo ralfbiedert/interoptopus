@@ -23,10 +23,7 @@ impl Pass {
 
         for (rust_id, ty) in rs_types {
             // Get the C# TypeId
-            let Some(cs_id) = id_map.ty(*rust_id) else {
-                pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_id));
-                continue;
-            };
+            let cs_id = resolve!(id_map.ty(*rust_id), pass_meta, self.info, super::MissingItem::RustType(*rust_id));
 
             // Skip if we've already mapped this name
             if self.names.contains_key(&cs_id) {

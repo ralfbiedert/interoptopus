@@ -34,10 +34,7 @@ impl Pass {
             }
 
             // Translate the signature's return type
-            let Some(cs_rval) = id_map.ty(rust_fn.signature.rval) else {
-                pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(rust_fn.signature.rval));
-                continue;
-            };
+            let cs_rval = try_resolve!(id_map.ty(rust_fn.signature.rval), pass_meta, self.info, super::MissingItem::RustType(rust_fn.signature.rval));
 
             // Translate all argument types
             let mut cs_arguments = Vec::new();

@@ -33,22 +33,13 @@ impl Pass {
                 _ => continue,
             }
 
-            // Get the C# TypeId
-            let Some(cs_id) = id_map.ty(*rust_id) else {
-                pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_id));
-                continue;
-            };
+            let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, super::MissingItem::RustType(*rust_id));
+            let variants = try_resolve!(variants_pass.get_variants(cs_id), pass_meta, self.info, super::MissingItem::CsType(cs_id));
 
             // Check if we've already processed this type
             if kinds.contains(&cs_id) {
                 continue;
             }
-
-            // Get the converted variants
-            let Some(variants) = variants_pass.get_variants(cs_id) else {
-                pass_meta.lost_found.missing(self.info, super::MissingItem::CsType(cs_id));
-                continue;
-            };
 
             // Create the data enum
             let data_enum = DataEnum { variants: variants.clone() };

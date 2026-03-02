@@ -34,19 +34,16 @@ impl Pass {
                 _ => continue,
             };
 
-            // Create C# TypeId for the pointer
-            let cs_id = TypeId::from_id(rust_id.id());
-
             // Check if we already processed this pointer
             if id_map.ty(*rust_id).is_some() {
                 continue;
             }
 
+            // Create C# TypeId for the pointer
+            let cs_id = TypeId::from_id(rust_id.id());
+
             // Try to convert the pointee type
-            let Some(cs_pointee_id) = id_map.ty(*rust_pointee_id) else {
-                pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_pointee_id));
-                continue;
-            };
+            let cs_pointee_id = try_resolve!(id_map.ty(*rust_pointee_id), pass_meta, self.info, super::MissingItem::RustType(*rust_pointee_id));
 
             // Register the pointer type
             id_map.set_ty(*rust_id, cs_id);

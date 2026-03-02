@@ -41,11 +41,7 @@ impl Pass {
                 continue;
             }
 
-            // Try to convert the element type
-            let Some(cs_element_type) = id_map.ty(rust_array.ty) else {
-                pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(rust_array.ty));
-                continue;
-            };
+            let cs_element_type = try_resolve!(id_map.ty(rust_array.ty), pass_meta, self.info, super::MissingItem::RustType(rust_array.ty));
 
             // Create the C# array with mapped element type
             let cs_array = Array { ty: cs_element_type, len: rust_array.len };

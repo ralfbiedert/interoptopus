@@ -22,8 +22,8 @@ impl Pass {
         pass_meta: &mut super::PassMeta,
         id_map: &model_id_maps::Pass,
         kinds: &mut model_type_kinds::Pass,
-        fields_pass: &model_type_map_struct_fields::Pass,
-        blittable_pass: &model_type_map_struct_blittable::Pass,
+        fields: &model_type_map_struct_fields::Pass,
+        blittable: &model_type_map_struct_blittable::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;
@@ -47,17 +47,8 @@ impl Pass {
                 continue;
             }
 
-            // Get the converted fields
-            let Some(fields) = fields_pass.get_fields(cs_id) else {
-                pass_meta.lost_found.missing(self.info, super::MissingItem::CsType(cs_id));
-                continue;
-            };
-
-            // Get the blittability
-            let Some(kind) = blittable_pass.blittable(cs_id) else {
-                pass_meta.lost_found.missing(self.info, super::MissingItem::CsType(cs_id));
-                continue;
-            };
+            let fields = try_resolve!(fields.get_fields(cs_id), pass_meta, self.info, super::MissingItem::CsType(cs_id));
+            let kind = try_resolve!(blittable.blittable(cs_id), pass_meta, self.info, super::MissingItem::CsType(cs_id));
 
             // Create the composite
             let composite = Composite { fields: fields.clone(), repr: rust_struct.repr, kind };
