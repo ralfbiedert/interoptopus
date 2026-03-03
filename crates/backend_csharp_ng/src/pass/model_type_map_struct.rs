@@ -44,8 +44,8 @@ impl Pass {
 
             let fields = try_resolve!(fields.get_fields(cs_id), pass_meta, self.info, super::MissingItem::CsType(cs_id));
 
-            // Create the composite with a default kind; the blittable pass will
-            // determine the actual CompositeKind once this Composite is in `kinds`.
+            // Create the composite; the blittable pass will determine the actual
+            // CompositeKind once this Composite appears in `kinds`.
             let composite = Composite { fields: fields.clone(), repr: rust_struct.repr, kind: CompositeKind::Blittable };
 
             kinds.set_kind(cs_id, TypeKind::Composite(composite));

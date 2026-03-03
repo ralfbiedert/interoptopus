@@ -54,6 +54,8 @@ impl Pass {
                 lang::types::TypePattern::Option(rust_ty) => (TypeId::from_id(rust_id.id()), TypePattern::Option(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, super::MissingItem::RustType(*rust_ty)))),
                 lang::types::TypePattern::AsyncCallback(rust_ty) => (TypeId::from_id(rust_id.id()), TypePattern::AsyncCallback(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, super::MissingItem::RustType(*rust_ty)))),
 
+                lang::types::TypePattern::APIVersion => (TypeId::from_id(rust_id.id()), TypePattern::ApiVersion),
+
                 // Result pattern with two type parameters
                 lang::types::TypePattern::Result(rust_ok, rust_err) => {
                     let cs_ok = try_resolve!(id_map.ty(*rust_ok), pass_meta, self.info, super::MissingItem::RustType(*rust_ok));
@@ -88,11 +90,6 @@ impl Pass {
                     (TypeId::from_id(rust_id.id()), TypePattern::NamedCallback(cs_sig))
                 }
 
-                // APIVersion is Rust-specific and not mapped to C#
-                lang::types::TypePattern::APIVersion => {
-                    // Skip this pattern, it's not represented in C#
-                    continue;
-                }
             };
 
             id_map.set_ty(*rust_id, cs_id);

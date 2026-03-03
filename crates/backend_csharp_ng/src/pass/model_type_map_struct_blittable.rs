@@ -60,6 +60,7 @@ impl Pass {
                     match pattern {
                         TypePattern::Bool | TypePattern::CChar | TypePattern::CVoid => true,
                         TypePattern::CStrPointer => true,
+                        TypePattern::ApiVersion => true,
                         TypePattern::Utf8String => false,
                         TypePattern::Slice(_) | TypePattern::SliceMut(_) | TypePattern::Vec(_) => false,
                         TypePattern::Option(_) | TypePattern::Result(_, _) => false,
