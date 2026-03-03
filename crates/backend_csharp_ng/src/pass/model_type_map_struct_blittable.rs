@@ -32,7 +32,6 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (cs_id, type_kind) in kinds.iter() {
-            // println!("{cs_id:?}, {type_kind:?}");
             // Skip if we've already determined blittability
             if self.blittable.contains_key(cs_id) {
                 continue;

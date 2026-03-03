@@ -1,8 +1,8 @@
 //! Creates Composite types from computed struct fields and blittability.
 
-use crate::lang::types::{Composite, TypeKind};
+use crate::lang::types::{Composite, CompositeKind, TypeKind};
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{model_id_maps, model_type_kinds, model_type_map_struct_blittable, model_type_map_struct_fields, ModelResult, PassInfo};
+use crate::pass::{model_id_maps, model_type_kinds, model_type_map_struct_fields, ModelResult, PassInfo};
 
 #[derive(Default)]
 pub struct Config {}
@@ -22,7 +22,6 @@ impl Pass {
         id_map: &model_id_maps::Pass,
         kinds: &mut model_type_kinds::Pass,
         fields: &model_type_map_struct_fields::Pass,
-        blittable: &model_type_map_struct_blittable::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;
@@ -44,10 +43,10 @@ impl Pass {
             }
 
             let fields = try_resolve!(fields.get_fields(cs_id), pass_meta, self.info, super::MissingItem::CsType(cs_id));
-            let kind = try_resolve!(blittable.blittable(cs_id), pass_meta, self.info, super::MissingItem::CsType(cs_id));
 
-            // Create the composite
-            let composite = Composite { fields: fields.clone(), repr: rust_struct.repr, kind };
+            // Create the composite with a default kind; the blittable pass will
+            // determine the actual CompositeKind once this Composite is in `kinds`.
+            let composite = Composite { fields: fields.clone(), repr: rust_struct.repr, kind: CompositeKind::Blittable };
 
             kinds.set_kind(cs_id, TypeKind::Composite(composite));
             outcome.changed();

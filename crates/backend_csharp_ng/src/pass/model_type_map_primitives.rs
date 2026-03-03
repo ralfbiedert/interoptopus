@@ -5,7 +5,6 @@ use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model_id_maps, model_type_kinds, ModelResult, PassInfo};
-use interoptopus::lang;
 use interoptopus::lang::types::Primitive;
 
 #[derive(Default)]
@@ -28,11 +27,9 @@ impl Pass {
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         for (rust_id, ty) in rs_types {
-            let primitive = match ty.kind {
-                lang::types::TypeKind::Primitive(x) => map(x),
-                _ => continue,
-            };
-
+            skip_mapped!(id_map, rust_id);
+            let primitive = try_extract_kind!(ty, Primitive);
+            let primitive = map(*primitive);
             let cs_id = TypeId::from_id(rust_id.id());
             id_map.set_ty(*rust_id, cs_id);
             kinds.set_kind(cs_id, TypeKind::Primitive(primitive));
