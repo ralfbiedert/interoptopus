@@ -1,7 +1,7 @@
 //! Maps Rust function pointers to C# delegates.
 
 use crate::lang::function::Signature;
-use crate::lang::types::{CsRenderHint, TypeKind};
+use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
 use crate::pass::{model_id_maps, model_type_kinds, ModelResult, PassInfo};
@@ -51,7 +51,7 @@ impl Pass {
                     break;
                 };
 
-                cs_arguments.push(crate::lang::function::Argument { name: rust_arg.name.clone(), ty: cs_arg_type, render_hint: CsRenderHint::Default });
+                cs_arguments.push(crate::lang::function::Argument { name: rust_arg.name.clone(), ty: cs_arg_type });
             }
 
             if !all_args_available {

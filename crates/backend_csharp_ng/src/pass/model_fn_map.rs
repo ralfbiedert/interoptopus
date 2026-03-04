@@ -2,7 +2,6 @@
 
 use crate::lang::function::{Argument, Function, FunctionKind, Overload, Signature};
 use crate::lang::meta::Visibility;
-use crate::lang::types::CsRenderHint;
 use crate::model::FunctionId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model_id_maps, ModelResult, PassInfo};
@@ -48,7 +47,7 @@ impl Pass {
                     break;
                 };
 
-                cs_arguments.push(Argument { name: rust_arg.name.clone(), ty: cs_arg_type, render_hint: CsRenderHint::Default });
+                cs_arguments.push(Argument { name: rust_arg.name.clone(), ty: cs_arg_type });
             }
 
             // Skip this function if not all argument types are available

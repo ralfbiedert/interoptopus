@@ -1,6 +1,6 @@
 //! Maps Rust pointers (ReadPointer, ReadWritePointer) to C# pointers.
 
-use crate::lang::types::TypeKind;
+use crate::lang::types::{Pointer, TypeKind};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model_id_maps, model_type_kinds, ModelResult, PassInfo};
@@ -44,7 +44,7 @@ impl Pass {
 
             // Register the pointer type
             id_map.set_ty(*rust_id, cs_id);
-            kinds.set_kind(cs_id, TypeKind::Pointer(cs_pointee_id));
+            kinds.set_kind(cs_id, TypeKind::Pointer(Pointer::IntPtr(cs_pointee_id)));
             outcome.changed();
         }
 
