@@ -1,7 +1,7 @@
 //! Writes function import declarations.
 
 use crate::output::{Output, OutputKind};
-use crate::pass::{model_fn_map, output_master, OutputResult, PassInfo};
+use crate::pass::{model_fn_map, model_type_names, output_master, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -18,21 +18,31 @@ impl Pass {
         Self { info: PassInfo { name: "output_fn_imports" }, fn_imports: Default::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut super::PassMeta, output_master: &output_master::Pass, fn_maps: &model_fn_map::Pass) -> OutputResult {
+    pub fn process(
+        &mut self,
+        _pass_meta: &mut super::PassMeta,
+        output_master: &output_master::Pass,
+        fn_maps: &model_fn_map::Pass,
+        type_names: &model_type_names::Pass,
+    ) -> OutputResult {
         let templates = output_master.templates();
 
         for output in output_master.outputs_of(OutputKind::Csharp) {
             let mut imports = Vec::new();
 
-            for (id, function) in fn_maps.iter() {
+            for (_id, function) in fn_maps.iter() {
                 let name = &function.name;
                 for overload in &function.overloads {
+                    let rval = type_names
+                        .name(overload.signature.rval)
+                        .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of function `{}`", name)))?;
+
                     let mut context = Context::new();
 
                     context.insert("name", name);
                     context.insert("symbol", name);
                     context.insert("args", "todo");
-                    context.insert("rval", "todo");
+                    context.insert("rval", rval);
 
                     let import = templates.render("fn_import.cs", &context)?;
                     imports.push(import);

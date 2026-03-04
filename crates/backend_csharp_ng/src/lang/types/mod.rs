@@ -37,11 +37,11 @@ mod primitive;
 use crate::lang::function::Signature;
 use crate::model::TypeId;
 
-use crate::lang::types::pointer::Pointer;
 pub use array::Array;
 pub use composite::{Composite, CompositeKind, Field};
 pub use enums::{DataEnum, Variant};
 pub use pattern::TypePattern;
+pub use pointer::Pointer;
 pub use primitive::Primitive;
 
 #[derive(Debug, Clone)]

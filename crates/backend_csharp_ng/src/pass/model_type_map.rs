@@ -29,7 +29,7 @@ impl Pass {
             }
 
             // Get the name for this type
-            let name = try_resolve!(names.get_name(*type_id), pass_meta, self.info, super::MissingItem::CsType(*type_id));
+            let name = try_resolve!(names.name(*type_id), pass_meta, self.info, super::MissingItem::CsType(*type_id));
 
             // Create the Type
             let ty = Type { name: name.clone(), kind: kind.clone() };

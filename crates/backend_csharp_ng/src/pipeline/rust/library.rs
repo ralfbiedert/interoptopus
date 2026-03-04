@@ -174,7 +174,7 @@ impl RustLibrary {
             r.run(self.model_type_map_struct_fields.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_map_struct_blittable.process(&mut pass_meta, &self.model_type_kinds))?;
             r.run(self.model_type_map_struct.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_struct_fields, &self.inventory.types))?;
-            r.run(self.model_type_names.process(&mut pass_meta, &self.model_id_maps, &self.inventory.types))?;
+            r.run(self.model_type_names.process(&mut pass_meta, &self.model_id_maps, &self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
             r.run(self.model_fn_map.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.functions))?;
             r.run(self.model_final.process(&mut pass_meta))?;
@@ -190,7 +190,7 @@ impl RustLibrary {
 
         // Output passes
         self.output_master.process(&mut pass_meta)?;
-        self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map)?;
+        self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.plugin_post_output_pass()?;
 

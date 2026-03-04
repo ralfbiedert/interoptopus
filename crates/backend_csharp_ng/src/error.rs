@@ -4,6 +4,7 @@ use std::fmt::{Display, Formatter};
 pub enum Error {
     PassLimit,
     TemplateError(interoptopus_backends::Error),
+    MissingTypeName(String),
 }
 
 impl Display for Error {
@@ -11,6 +12,7 @@ impl Display for Error {
         match self {
             Error::TemplateError(e) => write!(f, "Template error: {}", e),
             Error::PassLimit => write!(f, "Pass iteration limit reached."),
+            Error::MissingTypeName(ctx) => write!(f, "Missing type name: {}", ctx),
         }
     }
 }
