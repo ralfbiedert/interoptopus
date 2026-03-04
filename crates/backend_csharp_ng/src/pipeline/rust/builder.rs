@@ -19,6 +19,11 @@ impl RustLibraryBuilder {
         self
     }
 
+    pub fn dll_name(mut self, dll_name: impl AsRef<str>) -> Self {
+        self.config.meta_info.dll_name = dll_name.as_ref().to_string();
+        self
+    }
+
     pub fn templates(mut self, templates: TemplateEngine) -> Self {
         self.config.output_master.templates = templates;
         self

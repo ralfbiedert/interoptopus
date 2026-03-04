@@ -190,13 +190,15 @@ impl RustLibrary {
 
         // Output passes
         self.output_master.process(&mut pass_meta)?;
-        self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
+        self.output_passes
+            .fn_imports
+            .process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.plugin_post_output_pass()?;
 
         // Final output pass(es)
         self.output_final
-            .process(&mut pass_meta, &mut self.output, &self.output_master, &self.output_passes)?;
+            .process(&mut pass_meta, &self.meta_info, &mut self.output, &self.output_master, &self.output_passes)?;
 
         Ok(self.output)
     }

@@ -1,7 +1,7 @@
 //! Last output step where a buffer is fully materialized.
 
 use crate::output::OutputKind;
-use crate::pass::{output_master, OutputResult, PassInfo};
+use crate::pass::{meta_info, output_master, OutputResult, PassInfo};
 use crate::pipeline::IntermediateOutputPasses;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;
@@ -21,6 +21,7 @@ impl Pass {
     pub fn process(
         &mut self,
         _pass_meta: &mut super::PassMeta,
+        meta_info: &meta_info::Pass,
         output: &mut Multibuf,
         output_master: &output_master::Pass,
         intermediary: &IntermediateOutputPasses,
@@ -34,6 +35,7 @@ impl Pass {
             let types = ""; // TODO for now
             let fn_imports = intermediary.fn_imports.imports_for(file).unwrap();
 
+            context.insert("dll_name", meta_info.dll_name());
             context.insert("header", header);
             context.insert("types", &types);
             context.insert("fn_imports", &fn_imports);

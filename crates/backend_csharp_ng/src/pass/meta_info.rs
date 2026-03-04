@@ -3,21 +3,19 @@
 use crate::pass::{ModelResult, Outcome, PassInfo};
 
 #[derive(Default)]
-pub struct Config {}
+pub struct Config {
+    pub dll_name: String,
+}
 
 pub struct Pass {
     info: PassInfo,
-    interop_dll_name: String,
-    interop_hash: String,
+    dll_name: String,
+    api_hash: String,
 }
 
 impl Pass {
-    pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: "meta_info" },
-            interop_dll_name: String::new(),
-            interop_hash: String::new(),
-        }
+    pub fn new(config: Config) -> Self {
+        Self { info: PassInfo { name: "meta_info" }, dll_name: config.dll_name, api_hash: String::new() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut super::PassMeta) -> ModelResult {
@@ -25,12 +23,12 @@ impl Pass {
         Ok(Outcome::Unchanged)
     }
 
-    pub fn interop_dll_name(&self) -> &str {
-        &self.interop_dll_name
+    pub fn dll_name(&self) -> &str {
+        &self.dll_name
     }
 
-    pub fn interop_hash(&self) -> &str {
-        &self.interop_hash
+    pub fn api_hash(&self) -> &str {
+        &self.api_hash
     }
 
     pub fn interoptopus_crate(&self) -> &str {

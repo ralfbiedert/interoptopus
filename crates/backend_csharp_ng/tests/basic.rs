@@ -27,7 +27,7 @@ fn real_inventory() {
 fn real_inventory_temp() {
     let reference_project = include_str!("inventory/reference_project.json");
     let inventory: RustInventory = serde_json::from_str::<RustInventory>(reference_project).unwrap();
-    let library = RustLibrary::new(inventory);
+    let library = RustLibrary::builder(inventory).dll_name("foo").build();
     let multibuf = library.process().unwrap();
     let result = multibuf.write_buffer("Foo.cs");
 

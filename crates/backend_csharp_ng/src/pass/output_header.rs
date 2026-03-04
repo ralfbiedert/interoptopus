@@ -1,7 +1,7 @@
 //! Writes top-level file header.
 
 use crate::output::{Output, OutputKind};
-use crate::pass::{OutputResult, PassInfo, meta_info, output_master};
+use crate::pass::{meta_info, output_master, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -15,10 +15,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: "output_header" },
-            headers: Default::default(),
-        }
+        Self { info: PassInfo { name: "output_header" }, headers: Default::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut super::PassMeta, output_master: &output_master::Pass, meta_info: &meta_info::Pass) -> OutputResult {
@@ -27,8 +24,8 @@ impl Pass {
         for output in output_master.outputs_of(OutputKind::Csharp) {
             let mut context = Context::new();
 
-            context.insert("INTEROP_DLL_NAME", meta_info.interop_dll_name());
-            context.insert("INTEROP_HASH", meta_info.interop_hash());
+            context.insert("INTEROP_DLL_NAME", meta_info.dll_name());
+            context.insert("INTEROP_HASH", meta_info.api_hash());
             context.insert("INTEROP_NAMESPACE", "TODO");
             context.insert("INTEROPTOPUS_CRATE", meta_info.interoptopus_crate());
             context.insert("INTEROPTOPUS_VERSION", meta_info.interoptopus_version());
