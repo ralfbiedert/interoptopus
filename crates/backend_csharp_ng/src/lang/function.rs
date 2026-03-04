@@ -1,9 +1,11 @@
+use crate::lang::types::CsRenderHint;
 use crate::model::TypeId;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Argument {
     pub name: String,
     pub ty: TypeId,
+    pub render_hint: CsRenderHint,
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

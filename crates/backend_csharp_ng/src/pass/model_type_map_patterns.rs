@@ -1,7 +1,7 @@
 //! Maps Rust type patterns to C# type patterns.
 
 use crate::lang::function::Signature;
-use crate::lang::types::csharp;
+use crate::lang::types::{csharp, CsRenderHint};
 use crate::lang::types::{TypeKind, TypePattern};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
@@ -79,7 +79,7 @@ impl Pass {
                             break;
                         };
 
-                        cs_arguments.push(crate::lang::function::Argument { name: rust_arg.name.clone(), ty: cs_arg_type });
+                        cs_arguments.push(crate::lang::function::Argument { name: rust_arg.name.clone(), ty: cs_arg_type, render_hint: CsRenderHint::Default });
                     }
 
                     if !all_args_available {

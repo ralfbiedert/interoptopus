@@ -42,6 +42,17 @@ pub use enums::{DataEnum, Variant};
 pub use pattern::TypePattern;
 pub use primitive::Primitive;
 
+/// How a type reference is rendered at a specific position in C#.
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
+pub enum CsRenderHint {
+    /// Render as the type's natural C# form, for references that's `IntPtr`.
+    Default,
+    /// Render as `ref T` (pointer dereferenced in a parameter position).
+    ByRef,
+    /// Render as `out T`.
+    ByOut,
+}
+
 #[derive(Debug, Clone)]
 pub enum TypeKind {
     Primitive(Primitive),

@@ -16,821 +16,825 @@ namespace A {
     public static partial class Interop {
 
         
-        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_multiple_ctors_new_with_string(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_4(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_on_panic_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_vec_1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ascii_pointer_4(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_surrogates_1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_main_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_main_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice_mut")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_various_slices_return_slice_mut(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_basic_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_args_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_args_5(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "behavior_panics_via_result")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo behavior_panics_via_result(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i64")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_i64(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo meta_ambiguous_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_sleep_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i16")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_i16(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_5(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref6")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo ref6(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_u64")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_u64(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ptr2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo ptr2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_basic_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_basic_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_callback_4(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_sleep_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "struct2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo struct2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "struct1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo struct1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_bool")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_bool(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_various_slices_mut_self_ref_slice(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "enums_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo enums_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_test")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_result_test(todo);
-        
         [LibraryImport(NativeLib, EntryPoint = "service_async_basic_call")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial todo service_async_basic_call(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_8")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_vec_8(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_ignoring_methods_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_callbacks_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_main_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_main_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_vec_string_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref7")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo ref7(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_u16")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_u16(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_cchar(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo ref2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_multiple_ctors_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_multiple_ctors_new_without(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_dependent_get")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_dependent_get(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo nested_array_3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_test")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_ignoring_methods_test(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_u32")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_u32(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_callbacks_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_return_cstr")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_strings_return_cstr(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_isize")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_isize(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "meta_renamed")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo meta_renamed(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_slice_5(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_void")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_void(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_various_slices_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate_huge")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_slice_delegate_huge(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo namespaced_inner_slice(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo meta_ambiguous_1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_20547")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo interoptopus_vec_destroy_20547(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1b")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_slice_1b(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_6b(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_6a(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_f32")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_f32(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_vec_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_callback_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_return_slice")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ascii_pointer_return_slice(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_u8")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_u8(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_7")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_vec_7(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "behavior_panics")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo behavior_panics(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_strings_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "fnptr_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo fnptr_1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_callbacks_set_delegate_table(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo ref3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_vec_4(todo);
         
         [LibraryImport(NativeLib, EntryPoint = "ref5")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial todo ref5(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "enums_3")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo enums_3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_bool")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_bool(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_8")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_slice_8(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_various_slices_mut_self_ffi_error(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_slice_1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo namespaced_inner_slice_mut(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_dependent_from_main")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_dependent_from_main(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_const_pointer")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_cchar_const_pointer(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_vec_string_handle_string(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_11")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_11(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "array_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo array_1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_result_slice")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_result_result_slice(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_39561")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo interoptopus_vec_create_39561(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo char_array_3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_result_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ascii_pointer_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "generic_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo generic_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_option")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo namespaced_inner_option(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo ref1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i8")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_i8(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_multiple_ctors_new_with(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_create")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo interoptopus_string_create(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_vec_5(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_slice_3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "generic_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo generic_5(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo ref4(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_slice_delegate(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_slice_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_mut_pointer")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_cchar_mut_pointer(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_callbacks_callback_with_slice(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_result_success")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_result_success(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_args_10")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_args_10(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_ub_on_panic")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_on_panic_return_ub_on_panic(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_multiple_ctors_new_failing(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "namespaced_type")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo namespaced_type(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_basic_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_8719")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo interoptopus_vec_destroy_8719(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i32")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_i32(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_result_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_result_1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_result_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_result_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_basic_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_basic_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_various_slices_mut_self(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "meta_visibility1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo meta_visibility1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_on_panic_return_result(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "array_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo array_3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_clone")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo interoptopus_string_clone(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "generic_1b")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo generic_1b(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo meta_ambiguous_3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_default_value")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_on_panic_return_default_value(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_result_new(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_structs_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_structs_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_return_after_ms")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_sleep_return_after_ms(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_various_slices_mut_self_no_error(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "char_array_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo char_array_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_new_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_strings_new_string(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ptr3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo ptr3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_8")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_callback_8(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "enums_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo enums_4(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "behavior_sleep")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo behavior_sleep(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ascii_pointer_3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_callback_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_strings_callback_string(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_callbacks_invoke_delegates(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_result_3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_structs_process_struct")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_structs_process_struct(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_result_u32")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_result_result_u32(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_75659")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo interoptopus_vec_create_75659(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_vec_string_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_option_1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_callbacks_callback_ffi_return(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_vec_3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_result_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_result_4(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_result_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_result_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_6")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_callback_6(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_f64")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_f64(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ascii_pointer_5(todo);
+        public static partial todo pattern_string_6a(todo);
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_structs_new")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial todo service_async_structs_new(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_8")]
+        [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_8(todo);
+        public static partial todo char_array_3(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
+        [LibraryImport(NativeLib, EntryPoint = "array_1")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo char_array_1(todo);
+        public static partial todo array_1(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_10")]
+        [LibraryImport(NativeLib, EntryPoint = "service_async_result_destroy")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_10(todo);
+        public static partial todo service_async_result_destroy(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_destroy")]
+        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo interoptopus_string_destroy(todo);
+        public static partial todo service_multiple_ctors_new_with_string(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_4")]
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_slice_4(todo);
+        public static partial todo service_various_slices_new(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_void")]
+        [LibraryImport(NativeLib, EntryPoint = "meta_renamed")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_various_slices_mut_self_void(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_slice_6(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_result_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_various_slices_return_slice(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_6")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_vec_6(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "fnptr_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo fnptr_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_result_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_result_result_string(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_result_option_enum")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_result_result_option_enum(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo nested_array_2(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_28290")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo interoptopus_vec_create_28290(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ascii_pointer_1(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_dependent_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_dependent_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_ignoring_methods_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "generic_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo generic_3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_vec_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_vec_string_handle_vec_string(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_various_slices_mut_self_ref_slice_limited(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "generic_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo generic_4(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_85286")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo interoptopus_vec_destroy_85286(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_various_slices_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_on_panic_destroy(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_this_is_ignored")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_ignoring_methods_this_is_ignored(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_callbacks_callback_simple(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_cstr")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_strings_pass_cstr(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_9")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_9(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "struct3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo struct3(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_callback_5(todo);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_option_2(todo);
+        public static partial todo meta_renamed(todo);
         
         [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_91244")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial todo interoptopus_vec_create_91244(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_nested_string")]
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_create")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_async_vec_string_handle_nested_string(todo);
+        public static partial todo interoptopus_string_create(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_7")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_1")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_7(todo);
+        public static partial todo pattern_ascii_pointer_1(todo);
         
         [LibraryImport(NativeLib, EntryPoint = "ptr1")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial todo ptr1(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "generic_1a")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_1")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo generic_1a(todo);
+        public static partial todo pattern_ffi_option_1(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_1")]
+        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_callback_1(todo);
+        public static partial todo service_multiple_ctors_new_without(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "generic_1c")]
+        [LibraryImport(NativeLib, EntryPoint = "ref7")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo generic_1c(todo);
+        public static partial todo ref7(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "primitive_usize")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_const_pointer")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_usize(todo);
+        public static partial todo pattern_ffi_cchar_const_pointer(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "meta_documented")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_bool")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo meta_documented(todo);
+        public static partial todo pattern_ffi_bool(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "nested_array_1")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_4")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo nested_array_1(todo);
+        public static partial todo pattern_ffi_slice_4(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo meta_ambiguous_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_structs_process_struct")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_structs_process_struct(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_void")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_various_slices_mut_self_void(todo);
         
         [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial todo service_various_slices_mut_self_ref(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "alignment_1")]
+        [LibraryImport(NativeLib, EntryPoint = "service_main_new")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo alignment_1(todo);
+        public static partial todo service_main_new(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "array_2")]
+        [LibraryImport(NativeLib, EntryPoint = "primitive_args_5")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo array_2(todo);
+        public static partial todo primitive_args_5(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_1")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_5")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_string_1(todo);
+        public static partial todo pattern_ascii_pointer_5(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
+        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_default_value")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo service_strings_destroy(todo);
+        public static partial todo service_on_panic_return_default_value(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "enums_1")]
+        [LibraryImport(NativeLib, EntryPoint = "service_async_result_success")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo enums_1(todo);
+        public static partial todo service_async_result_success(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_3")]
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_1")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo pattern_ffi_option_3(todo);
+        public static partial todo nested_array_1(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "primitive_void2")]
+        [LibraryImport(NativeLib, EntryPoint = "service_async_result_new")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo primitive_void2(todo);
+        public static partial todo service_async_result_new(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_surrogates_1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_on_panic_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "behavior_panics_via_result")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo behavior_panics_via_result(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_dependent_get")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_dependent_get(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo generic_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_f64")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_f64(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo nested_array_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_dependent_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_dependent_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_basic_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_result_new(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "meta_visibility1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo meta_visibility1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_vec_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_vec_string_handle_vec_string(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_result_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_nested_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_vec_string_handle_nested_string(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1b")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_slice_1b(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_multiple_ctors_new_with(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ref6")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo ref6(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_string_3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_args_10")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_args_10(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_cstr")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_strings_pass_cstr(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_7")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_string_7(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_result_4(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_callback_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_strings_callback_string(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_return_after_ms")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_sleep_return_after_ms(todo);
         
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_9")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial todo pattern_callback_9(todo);
         
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_38053")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial todo interoptopus_vec_destroy_38053(todo);
+        public static partial todo pattern_ffi_slice_1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_7")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_vec_7(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_this_is_ignored")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_ignoring_methods_this_is_ignored(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo namespaced_inner_slice_mut(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_vec_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_u64")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_u64(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_strings_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_usize")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_usize(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_various_slices_mut_self(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_ignoring_methods_new(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ptr3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo ptr3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i16")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_i16(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_result_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_result_result_string(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_callbacks_set_delegate_table(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_vec_1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "behavior_sleep")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo behavior_sleep(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "enums_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo enums_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_callbacks_invoke_delegates(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_callback_4(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_multiple_ctors_new_failing(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_ignoring_methods_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_28290")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo interoptopus_vec_create_28290(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_8719")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo interoptopus_vec_destroy_8719(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ptr2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo ptr2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo char_array_1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_string_5(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_on_panic_return_result(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_sleep_new(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_vec_string_new(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_callbacks_new(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_39561")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo interoptopus_vec_create_39561(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_slice_5(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_u32")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_u32(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_return_slice")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ascii_pointer_return_slice(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_structs_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_structs_destroy(todo);
         
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_9")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial todo pattern_ffi_slice_9(todo);
         
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_slice_8(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_callback_8(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_vec_string_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_6")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_callback_6(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_slice_6(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_slice_3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_on_panic_new(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_test")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_result_test(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "enums_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo enums_1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_result_slice")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_result_result_slice(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_option_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i64")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_i64(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo generic_5(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_callbacks_callback_simple(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_string_4(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_sleep_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_clone")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo interoptopus_string_clone(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_38053")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo interoptopus_vec_destroy_38053(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_1c")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo generic_1c(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "enums_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo enums_3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_result_3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_i8(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_various_slices_mut_self_no_error(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_result_option_enum")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_result_result_option_enum(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_callback_5(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i32")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_i32(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "array_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo array_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_u16")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_u16(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_u8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_u8(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_vec_8(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_callback_1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_1b")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo generic_1b(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_callbacks_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo generic_3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_result_1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_vec_4(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_various_slices_mut_self_ffi_error(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_strings_new(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_dependent_from_main")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_dependent_from_main(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_string_1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ascii_pointer_3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_various_slices_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_void")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_void(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_20547")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo interoptopus_vec_destroy_20547(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_85286")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo interoptopus_vec_destroy_85286(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo namespaced_inner_slice(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_various_slices_mut_self_ref_slice_limited(todo);
+        
         [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial todo pattern_callback_7(todo);
         
+        [LibraryImport(NativeLib, EntryPoint = "ref4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo ref4(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "struct3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo struct3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ref2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo ref2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_api_guard")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_api_guard(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_option")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo namespaced_inner_option(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo generic_4(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_callbacks_callback_with_slice(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ref3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo ref3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "namespaced_type")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo namespaced_type(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "struct1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo struct1(todo);
+        
         [LibraryImport(NativeLib, EntryPoint = "service_async_result_fail")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial todo service_async_result_fail(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "array_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo array_3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_isize")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_isize(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "char_array_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo char_array_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_string_8(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_result_u32")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_result_result_u32(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ref1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo ref1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "meta_documented")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo meta_documented(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_string_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo meta_ambiguous_1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo interoptopus_string_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_10")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_string_10(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_6")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_vec_6(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice_mut")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_various_slices_return_slice_mut(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate_huge")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_slice_delegate_huge(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_option_3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_new_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_strings_new_string(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo nested_array_3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_basic_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_basic_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_bool")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_bool(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_return_cstr")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_strings_return_cstr(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_9")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_string_9(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_basic_new(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_slice_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_basic_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_basic_new(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_f32")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_f32(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "behavior_panics")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo behavior_panics(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_vec_3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_void2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo primitive_void2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_mut_pointer")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_cchar_mut_pointer(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_11")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_string_11(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_test")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_ignoring_methods_test(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_ub_on_panic")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_on_panic_return_ub_on_panic(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "fnptr_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo fnptr_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_callbacks_callback_ffi_return(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "fnptr_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo fnptr_1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_slice_delegate(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_various_slices_return_slice(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ascii_pointer_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_callback_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_async_vec_string_handle_string(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ffi_cchar(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "enums_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo enums_4(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_75659")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo interoptopus_vec_create_75659(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo meta_ambiguous_3(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_various_slices_mut_self_ref_slice(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_1a")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo generic_1a(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_ascii_pointer_4(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_result_2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_vec_5(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "alignment_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo alignment_1(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "struct2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo struct2(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_multiple_ctors_destroy(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo pattern_string_6b(todo);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_main_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial todo service_main_destroy(todo);
         
 
         
