@@ -172,5 +172,8 @@ pub mod lang;
 pub mod pattern;
 pub mod wire;
 
+#[doc(hidden)]
+pub mod proc;
+
 #[cfg(feature = "tokio")]
 pub mod rt;

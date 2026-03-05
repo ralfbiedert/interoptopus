@@ -336,12 +336,13 @@ impl TypeModel {
             let base_name = self.name.to_string();
             quote_spanned! { self.name.span() => #base_name.to_string() }
         } else {
-            // For generic types, generate a meaningful name based on the concrete type
+            // For generic types, generate a meaningful name based on the concrete type.
+            // We strip module paths both from the outer type and from generic parameters,
+            // but must not split on `::` inside angle brackets.
             quote_spanned! { self.name.span() =>
                 {
                     let type_name = std::any::type_name::<Self>();
-                    // Remove the module path and keep only the type name
-                    type_name.split("::").last().unwrap_or(type_name).to_string()
+                    ::interoptopus::proc::strip_module_paths(type_name)
                 }
             }
         };

@@ -14,22 +14,24 @@ fn rust_library_builder() {
 }
 
 #[test]
-fn real_inventory() {
+fn real_inventory() -> Result<(), Box<dyn std::error::Error>> {
     let reference_project = include_str!("inventory/reference_project.json");
-    let inventory: RustInventory = serde_json::from_str::<RustInventory>(reference_project).unwrap();
+    let inventory: RustInventory = serde_json::from_str::<RustInventory>(reference_project)?;
     let library = RustLibrary::new(inventory);
     let result = library.process();
 
-    assert!(result.is_ok())
+    assert!(result.is_ok());
+
+    Ok(())
 }
 
 #[test]
-fn real_inventory_temp() {
+fn real_inventory_temp() -> Result<(), Box<dyn std::error::Error>> {
     let reference_project = include_str!("inventory/reference_project.json");
-    let inventory: RustInventory = serde_json::from_str::<RustInventory>(reference_project).unwrap();
+    let inventory: RustInventory = serde_json::from_str::<RustInventory>(reference_project)?;
     let library = RustLibrary::builder(inventory).dll_name("foo").build();
-    let multibuf = library.process().unwrap();
-    let result = multibuf.write_buffer("Foo.cs");
+    let multibuf = library.process()?;
+    _ = multibuf.write_buffer("Foo.cs")?;
 
-    // result
+    Ok(())
 }
