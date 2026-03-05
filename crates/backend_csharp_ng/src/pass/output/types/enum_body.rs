@@ -46,7 +46,7 @@ impl Pass {
             context.insert("name", name);
             context.insert("struct_or_class", struct_or_class);
 
-            let rendered = templates.render("enum_body.cs", &context)?;
+            let rendered = templates.render("types/enum_body.cs", &context)?;
             self.enum_body.insert(*type_id, rendered);
         }
 

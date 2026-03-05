@@ -31,9 +31,9 @@ pub struct RustLibraryConfig {
     pub model_fn_map: model::fns::Config,
     pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
-    pub output_enum_ty: output::enum_ty::Config,
-    pub output_enum_body: output::enum_body::Config,
-    pub output_enum: output::r#enum::Config,
+    pub output_enum_ty: output::types::enum_ty::Config,
+    pub output_enum_body: output::types::enum_body::Config,
+    pub output_enum: output::types::r#enum::Config,
     pub output_fn_imports: output::fn_import::Config,
     pub output_header: output::header::Config,
     pub output_final: output::r#final::Config,
@@ -41,9 +41,9 @@ pub struct RustLibraryConfig {
 }
 
 pub struct IntermediateOutputPasses {
-    pub enum_ty: output::enum_ty::Pass,
-    pub enum_body: output::enum_body::Pass,
-    pub enums: output::r#enum::Pass,
+    pub enum_ty: output::types::enum_ty::Pass,
+    pub enum_body: output::types::enum_body::Pass,
+    pub enums: output::types::r#enum::Pass,
     pub fn_imports: output::fn_import::Pass,
     pub header: output::header::Pass,
 }
@@ -127,9 +127,9 @@ impl RustLibrary {
             model_final: model::r#final::Pass::new(config.model_final),
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
-                enum_ty: output::enum_ty::Pass::new(config.output_enum_ty),
-                enum_body: output::enum_body::Pass::new(config.output_enum_body),
-                enums: output::r#enum::Pass::new(config.output_enum),
+                enum_ty: output::types::enum_ty::Pass::new(config.output_enum_ty),
+                enum_body: output::types::enum_body::Pass::new(config.output_enum_body),
+                enums: output::types::r#enum::Pass::new(config.output_enum),
                 fn_imports: output::fn_import::Pass::new(config.output_fn_imports),
                 header: output::header::Pass::new(config.output_header),
             },
