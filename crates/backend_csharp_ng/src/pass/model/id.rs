@@ -24,15 +24,15 @@ impl Pass {
         Ok(Unchanged)
     }
 
-    pub(crate) fn set_ty(&mut self, rust_id: interoptopus::inventory::TypeId, cs_id: TypeId) {
+    pub fn set_ty(&mut self, rust_id: interoptopus::inventory::TypeId, cs_id: TypeId) {
         self.ty.insert(rust_id, cs_id);
     }
 
-    pub(crate) fn set_fns(&mut self, rust_id: interoptopus::inventory::FunctionId, cs_id: FunctionId) {
+    pub fn set_fns(&mut self, rust_id: interoptopus::inventory::FunctionId, cs_id: FunctionId) {
         self.fns.insert(rust_id, cs_id);
     }
 
-    pub(crate) fn ty(&self, rust_id: interoptopus::inventory::TypeId) -> Option<TypeId> {
+    pub fn ty(&self, rust_id: interoptopus::inventory::TypeId) -> Option<TypeId> {
         self.ty.get(&rust_id).copied()
     }
 }

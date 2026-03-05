@@ -19,7 +19,7 @@ impl Pass {
     pub fn process(
         &mut self,
         pass_meta: &mut crate::pass::PassMeta,
-        id_map: &model::id_maps::Pass,
+        id_map: &model::id::Pass,
         kinds: &mut model::types::kind::Pass,
         fields: &model::types::kind::struct_fields::Pass,
         rs_types: &interoptopus::inventory::Types,

@@ -1,4 +1,4 @@
 pub mod r#final;
-pub mod fn_map;
-pub mod id_maps;
+pub mod fns;
+pub mod id;
 pub mod types;

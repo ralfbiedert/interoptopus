@@ -12,7 +12,7 @@ use std::marker::PhantomData;
 #[derive(Default)]
 pub struct RustLibraryConfig {
     pub meta_info: meta::info::Config,
-    pub model_id_maps: model::id_maps::Config,
+    pub model_id_maps: model::id::Config,
     pub model_type_kinds: model::types::kind::Config,
     pub model_type_map_primitives: model::types::kind::primitives::Config,
     pub model_type_map_array: model::types::kind::array::Config,
@@ -28,17 +28,17 @@ pub struct RustLibraryConfig {
     pub model_type_map_struct: model::types::kind::r#struct::Config,
     pub model_type_names: model::types::names::Config,
     pub model_type_map: model::types::map::Config,
-    pub model_fn_map: model::fn_map::Config,
+    pub model_fn_map: model::fns::Config,
     pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
-    pub output_fn_imports: output::fn_imports::Config,
+    pub output_fn_imports: output::fn_import::Config,
     pub output_header: output::header::Config,
     pub output_final: output::r#final::Config,
     _hidden: PhantomData<()>,
 }
 
 pub struct IntermediateOutputPasses {
-    pub fn_imports: output::fn_imports::Pass,
+    pub fn_imports: output::fn_import::Pass,
     pub header: output::header::Pass,
 }
 
@@ -48,7 +48,7 @@ pub struct RustLibrary {
 
     // Model passes (transform and enrich data)
     meta_info: meta::info::Pass,
-    model_id_maps: model::id_maps::Pass,
+    model_id_maps: model::id::Pass,
     model_type_kinds: model::types::kind::Pass,
     model_type_map_primitives: model::types::kind::primitives::Pass,
     model_type_map_array: model::types::kind::array::Pass,
@@ -64,7 +64,7 @@ pub struct RustLibrary {
     model_type_map_struct: model::types::kind::r#struct::Pass,
     model_type_names: model::types::names::Pass,
     model_type_map: model::types::map::Pass,
-    model_fn_map: model::fn_map::Pass,
+    model_fn_map: model::fns::Pass,
     model_final: model::r#final::Pass,
 
     // First output pass determining files to be produced
@@ -101,7 +101,7 @@ impl RustLibrary {
         Self {
             inventory,
             meta_info: meta::info::Pass::new(config.meta_info),
-            model_id_maps: model::id_maps::Pass::new(config.model_id_maps),
+            model_id_maps: model::id::Pass::new(config.model_id_maps),
             model_type_kinds: model::types::kind::Pass::new(config.model_type_kinds),
             model_type_map_primitives: model::types::kind::primitives::Pass::new(config.model_type_map_primitives),
             model_type_map_array: model::types::kind::array::Pass::new(config.model_type_map_array),
@@ -117,11 +117,11 @@ impl RustLibrary {
             model_type_map_struct: model::types::kind::r#struct::Pass::new(config.model_type_map_struct),
             model_type_names: model::types::names::Pass::new(config.model_type_names),
             model_type_map: model::types::map::Pass::new(config.model_type_map),
-            model_fn_map: model::fn_map::Pass::new(config.model_fn_map),
+            model_fn_map: model::fns::Pass::new(config.model_fn_map),
             model_final: model::r#final::Pass::new(config.model_final),
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
-                fn_imports: output::fn_imports::Pass::new(config.output_fn_imports),
+                fn_imports: output::fn_import::Pass::new(config.output_fn_imports),
                 header: output::header::Pass::new(config.output_header),
             },
             output_final: output::r#final::Pass::new(config.output_final),

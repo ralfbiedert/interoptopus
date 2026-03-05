@@ -20,7 +20,7 @@ impl Pass {
         Self { info: PassInfo { name: "model_type_map_struct_fields" }, fields: Default::default() }
     }
 
-    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &mut model::id_maps::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &mut model::id::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
