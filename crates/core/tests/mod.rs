@@ -6,6 +6,10 @@ mod inventory {
     mod macros;
 }
 
+mod proc {
+    mod naming;
+}
+
 #[test]
 fn proc() {
     let t = TestCases::new();

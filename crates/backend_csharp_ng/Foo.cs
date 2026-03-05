@@ -18,617 +18,301 @@ namespace A {
         public const string NativeLib = "foo";
 
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_mut_pointer")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void pattern_ffi_slice_3(SliceMutByte slice, CallbackSliceMut callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_callback_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_strings_callback_string(IntPtr instance, Utf8String s, StringCallback cb);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial IntPtr ref1(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError pattern_string_6a(IntPtr _0);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError service_various_slices_mut_self_no_error(IntPtr instance, SliceMutByte slice);
+        public static partial IntPtr pattern_ffi_cchar_mut_pointer(IntPtr ffi_cchar);
         
         [LibraryImport(NativeLib, EntryPoint = "service_result_new")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultIntPtrError service_result_new(IntPtr instance);
         
-        [LibraryImport(NativeLib, EntryPoint = "service_async_result_success")]
+        [LibraryImport(NativeLib, EntryPoint = "ref4")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_result_success(IntPtr instance, AsyncCallbackVoid callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "fnptr_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void fnptr_2(extern "C" fn(CharArray) -> () callback, CharArray x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_main_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_main_new(uint x, IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_result_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultUtf8StringError service_result_result_string(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_multiple_ctors_new_with_string(CStrPtr _0, IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_dependent_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_dependent_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_basic_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_basic_new(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte char_array_3(IntPtr arr);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_result_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError pattern_result_4(ResultVoidError x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "enums_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Utf8String enums_4(String> x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial CStrPtr pattern_ascii_pointer_2();
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_result_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte service_various_slices_mut_self_ref_slice(IntPtr instance, IntPtr x, IntPtr _y, SliceByte _slice);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i8")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte primitive_i8(byte x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "generic_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte generic_2(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial uint pattern_callback_1(MyCallback callback, uint x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial UseString pattern_string_4(UseString x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_usize")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial nuint primitive_usize(nuint x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_void2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void primitive_void2();
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_7")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultUtf8StringError pattern_string_7(SliceUtf8String x, ulong i);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_91244")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long interoptopus_vec_create_91244(IntPtr data, ulong len, IntPtr rval);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_this_is_ignored")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError service_ignoring_methods_this_is_ignored(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr instance, IntPtr x, IntPtr _y, SliceByte _slice, SliceByte _slice2);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_9")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Utf8String pattern_ffi_slice_9(SliceUseString slice);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_result_fail")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_result_fail(IntPtr instance, AsyncCallbackVoid callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_nested_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_vec_string_handle_nested_string(IntPtr instance, Utf8String s, AsyncCallbackUseString callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "array_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Array array_2();
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_on_panic_new(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial uint pattern_ascii_pointer_1(CStrPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_create")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long interoptopus_string_create(IntPtr utf8, ulong len, IntPtr rval);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_new_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_strings_new_string(Utf8String _x, IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial uint pattern_ffi_slice_1(SliceUint ffi_slice);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError service_callbacks_callback_ffi_return(IntPtr instance, SumDelegateReturn callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError pattern_result_2();
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_result_option_enum")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultOptionEnumPayloadError service_result_result_option_enum(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "array_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void array_3(IntPtr arr);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_result_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_async_result_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_async_vec_string_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_u32")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial uint primitive_u32(uint x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_38053")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long interoptopus_vec_destroy_38053(VecVec3f32 _0);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_result_u32")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultUintError service_result_result_u32(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "enums_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial IntPtr enums_3(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_args_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long primitive_args_5(long x0, long x1, long x2, long x3, long x4);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_test")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError service_ignoring_methods_test(IntPtr instance, uint _0);
-        
-        [LibraryImport(NativeLib, EntryPoint = "meta_renamed")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial EnumRenamed meta_renamed(StructRenamed x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Utf8String pattern_string_3();
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial CStrPtr pattern_ascii_pointer_4(CStrPtr x, uint l);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_strings_new(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "generic_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial bool generic_5(Weird1<u32> _x, Weird2<u8, 5> _y);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_on_panic_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_return_after_ms")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_sleep_return_after_ms(IntPtr instance, ulong x, ulong ms, AsyncCallbackUlong callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "generic_1a")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial uint generic_1a(Generic<u32> x, Phantom<u8> _y);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i16")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial short primitive_i16(short x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "generic_1c")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte generic_1c(IntPtr _x, IntPtr y);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_f32")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial float primitive_f32(float x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "enums_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial EnumPayload enums_2(EnumPayload x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial VecByte pattern_vec_4(IntPtr v);
-        
-        [LibraryImport(NativeLib, EntryPoint = "fnptr_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte fnptr_1(extern "C" fn(u8) -> u8 callback, byte x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_bool")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial bool primitive_bool(bool x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void pattern_ffi_slice_5(IntPtr slice, IntPtr slice2);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_6")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial SumDelegate2 pattern_callback_6();
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_callbacks_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "enums_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void enums_1(EnumPayload _0);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, IntPtr o);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_void")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_various_slices_mut_self_void(IntPtr instance, SliceBool _slice);
-        
-        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial bool meta_ambiguous_3(Vec1 x, Vec2 y);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_return_cstr")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial CStrPtr service_strings_return_cstr(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte service_various_slices_mut_self(IntPtr instance, SliceByte slice);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_f64")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial double primitive_f64(double x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "behavior_panics")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void behavior_panics();
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i64")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long primitive_i64(long x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "struct3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial bool struct3(BoolField x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_multiple_ctors_new_failing(byte _some_value, IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_39561")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long interoptopus_vec_create_39561(IntPtr data, ulong len, IntPtr rval);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void ref5(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void pattern_ffi_slice_4(SliceByte _slice, SliceMutByte _slice2);
-        
-        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Vec1 meta_ambiguous_1(Vec1 x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial VecUtf8String pattern_vec_5(VecUtf8String v);
-        
-        [LibraryImport(NativeLib, EntryPoint = "behavior_panics_via_result")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError behavior_panics_via_result();
-        
-        [LibraryImport(NativeLib, EntryPoint = "meta_visibility1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void meta_visibility1(Visibility1 _x, Visibility2 _y);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_8")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void pattern_ffi_slice_8(IntPtr slice, CallbackCharArray2 callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_28290")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long interoptopus_vec_create_28290(IntPtr data, ulong len, IntPtr rval);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ptr3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial IntPtr ptr3(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref7")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void ref7(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "alignment_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Packed2 alignment_1(Packed1 a);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_cstr")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_strings_pass_cstr(IntPtr instance, CStrPtr _0);
-        
-        [LibraryImport(NativeLib, EntryPoint = "struct1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Tupled struct1(Tupled x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "generic_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte generic_3(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void pattern_vec_2(VecByte _0);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Inner pattern_ffi_option_2(OptionInner x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_various_slices_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_85286")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long interoptopus_vec_destroy_85286(VecByte _0);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "behavior_sleep")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void behavior_sleep(ulong millis);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_strings_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError pattern_string_6b(IntPtr y);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial SliceUint service_various_slices_return_slice(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_ub_on_panic")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial CStrPtr service_on_panic_return_ub_on_panic(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_callbacks_new(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void pattern_ffi_slice_6(IntPtr slice, CallbackU8 callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial SliceVec namespaced_inner_slice(SliceVec x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte pattern_ascii_pointer_5(CStrPtr x, uint i);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_8")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void pattern_callback_8(StringCallback cb, NestedStringCallback cb2, Utf8String s);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_vec_string_new(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_sleep_new(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError service_callbacks_invoke_delegates(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_multiple_ctors_new_with(uint some_value, IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1b")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial uint pattern_ffi_slice_1b(SliceMutUint ffi_slice);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_ignoring_methods_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_vec_string_handle_string(IntPtr instance, Utf8String s, AsyncCallbackUtf8String callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte nested_array_3(NestedArray input);
+        public static partial bool ref4(IntPtr x);
         
         [LibraryImport(NativeLib, EntryPoint = "primitive_void")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial void primitive_void();
         
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_8719")]
+        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long interoptopus_vec_destroy_8719(VecUtf8String _0);
+        public static partial ResultIntPtrError service_async_vec_string_handle_string(IntPtr instance, Utf8String s, AsyncCallbackUtf8String callback);
         
-        [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_3")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial CharArray char_array_1();
+        public static partial Utf8String pattern_string_3();
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_2")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_4")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
+        public static partial VecByte pattern_vec_4(IntPtr v);
         
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_20547")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_7")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long interoptopus_vec_destroy_20547(VecEnumPayload _0);
+        public static partial ResultUtf8StringError pattern_string_7(SliceUtf8String x, ulong i);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_3")]
+        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_option")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial OptionOptionResultOptionUtf8StringError pattern_ffi_option_3(OptionOptionResultOptionUtf8StringError x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_structs_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_structs_new(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError service_callbacks_callback_simple(IntPtr instance, MyCallback callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_main_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_main_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_i32")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial int primitive_i32(int x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_8")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial UseSliceAndVec pattern_vec_8(UseSliceAndVec v);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_5")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultUseStringError pattern_string_5(UseString x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial bool ref3(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_clone")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long interoptopus_string_clone(IntPtr utf8, IntPtr rval);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ptr2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial IntPtr ptr2(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_basic_call")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_basic_call(IntPtr instance, AsyncCallbackVoid callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Utf8String pattern_string_1(Utf8String x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_7")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void pattern_vec_7(UseSliceAndVec _0);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_async_sleep_destroy(IntPtr instance);
+        public static partial OptionVec namespaced_inner_option(OptionVec x);
         
         [LibraryImport(NativeLib, EntryPoint = "pattern_string_2")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial uint pattern_string_2(Utf8String x);
         
-        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
+        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_multiple_ctors_destroy(IntPtr instance);
+        public static partial ResultIntPtrError service_multiple_ctors_new_without(IntPtr instance);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_api_guard")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_9")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ApiVersion pattern_api_guard();
+        public static partial Utf8String pattern_ffi_slice_9(SliceUseString slice);
         
-        [LibraryImport(NativeLib, EntryPoint = "meta_documented")]
+        [LibraryImport(NativeLib, EntryPoint = "primitive_isize")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial EnumDocumented meta_documented(StructDocumented _x);
+        public static partial nint primitive_isize(nint x);
         
-        [LibraryImport(NativeLib, EntryPoint = "struct2")]
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_callback_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError struct2(Vec3f32 _a, IntPtr _b);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_const_pointer")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial IntPtr pattern_ffi_cchar_const_pointer(IntPtr ffi_cchar);
+        public static partial void service_strings_callback_string(IntPtr instance, Utf8String s, StringCallback cb);
         
         [LibraryImport(NativeLib, EntryPoint = "service_result_result_slice")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultUintError service_result_result_slice(IntPtr instance, SliceUint slice, ulong i);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_1")]
+        [LibraryImport(NativeLib, EntryPoint = "service_async_result_new")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial OptionInner pattern_ffi_option_1(OptionInner x);
+        public static partial ResultIntPtrError service_async_result_new(IntPtr instance);
         
-        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_return_slice")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_callbacks_set_delegate_table(IntPtr instance, CallbackTable table);
+        public static partial SliceUseCStrPtr pattern_ascii_pointer_return_slice();
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_5")]
+        [LibraryImport(NativeLib, EntryPoint = "service_async_basic_destroy")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial SumDelegate1 pattern_callback_5();
+        public static partial void service_async_basic_destroy(IntPtr instance);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_10")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_9")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void pattern_string_10(Utf8String _0);
+        public static partial ResultUtf8StringError pattern_string_9();
         
-        [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_2")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_basic_destroy(IntPtr instance);
+        public static partial ResultVoidError pattern_result_2();
         
-        [LibraryImport(NativeLib, EntryPoint = "nested_array_1")]
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_8719")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial NestedArray nested_array_1();
+        public static partial long interoptopus_vec_destroy_8719(VecUtf8String _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial CStrPtr pattern_ascii_pointer_4(CStrPtr x, uint l);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ptr3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial IntPtr ptr3(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice_limited")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte service_various_slices_mut_self_ref_slice_limited(IntPtr instance, IntPtr x, IntPtr _y, SliceByte _slice, SliceByte _slice2);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial VecUtf8String pattern_vec_5(VecUtf8String v);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_const_pointer")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial IntPtr pattern_ffi_cchar_const_pointer(IntPtr ffi_cchar);
+        
+        [LibraryImport(NativeLib, EntryPoint = "meta_visibility1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void meta_visibility1(Visibility1 _x, Visibility2 _y);
+        
+        [LibraryImport(NativeLib, EntryPoint = "enums_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void enums_1(EnumPayload _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_failing")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_multiple_ctors_new_failing(byte _some_value, IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_multiple_ctors_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_vec_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_async_vec_string_handle_vec_string(IntPtr instance, VecUtf8String s, AsyncCallbackVecUtf8String callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_structs_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_async_structs_new(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_basic_new(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "char_array_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte char_array_3(IntPtr arr);
+        
+        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Vec1 meta_ambiguous_1(Vec1 x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice_mut")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial SliceMutUint service_various_slices_return_slice_mut(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "fnptr_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte fnptr_1(extern "C" fn(u8) -> u8 callback, byte x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_6")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial SumDelegate2 pattern_callback_6();
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial uint pattern_callback_1(MyCallback callback, uint x);
         
         [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_3")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial CStrPtr pattern_ascii_pointer_3(CStrPtr x);
         
-        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
+        [LibraryImport(NativeLib, EntryPoint = "enums_2")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_ignoring_methods_new(IntPtr instance);
+        public static partial EnumPayload enums_2(EnumPayload x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_void")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_various_slices_mut_self_void(IntPtr instance, SliceBool _slice);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i64")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long primitive_i64(long x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_ignoring_methods_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_callbacks_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial uint pattern_ascii_pointer_1(CStrPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial CStrPtr pattern_ascii_pointer_2();
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultUseStringError pattern_string_5(UseString x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_basic_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_basic_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_6a")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError pattern_string_6a(IntPtr _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte pattern_ffi_slice_delegate(CallbackFFISlice callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_usize")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial nuint primitive_usize(nuint x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_11")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_string_11(IntPtr _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_multiple_ctors_new_with_string(CStrPtr _0, IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_api_guard")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ApiVersion pattern_api_guard();
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_38053")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_destroy_38053(VecVec3f32 _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_vec_2(VecByte _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "struct2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError struct2(Vec3f32 _a, IntPtr _b);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Vec3f32 pattern_ffi_slice_2(SliceVec3f32 ffi_slice, int i);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1b")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial uint pattern_ffi_slice_1b(SliceMutUint ffi_slice);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial uint pattern_ffi_slice_1(SliceUint ffi_slice);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_void2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void primitive_void2();
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_this_is_ignored")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError service_ignoring_methods_this_is_ignored(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_various_slices_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial MyCallbackVoid pattern_callback_2(MyCallbackVoid callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_callback_8(StringCallback cb, NestedStringCallback cb2, Utf8String s);
+        
+        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial SliceVec namespaced_inner_slice(SliceVec x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_ffi_slice_5(IntPtr slice, IntPtr slice2);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte service_various_slices_mut_self(IntPtr instance, SliceByte slice);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate_huge")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_ffi_slice_3(SliceMutByte slice, CallbackSliceMut callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_result_option_enum")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultOptionEnumPayloadError service_result_result_option_enum(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_return_cstr")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial CStrPtr service_strings_return_cstr(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_main_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_main_new(uint x, IntPtr instance);
         
         [LibraryImport(NativeLib, EntryPoint = "nested_array_2")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -638,205 +322,571 @@ namespace A {
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultIntPtrError service_async_structs_process_struct(IntPtr instance, NestedArray x, AsyncCallbackNestedArray callback);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_9")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_4")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultUtf8StringError pattern_string_9();
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref6")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void ref6(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "generic_1b")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte generic_1b(Generic<u8> x, Phantom<u8> _y);
-        
-        [LibraryImport(NativeLib, EntryPoint = "array_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte array_1(Array x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_u16")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ushort primitive_u16(ushort x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long interoptopus_string_destroy(Utf8String utf8);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_basic_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_async_basic_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice_mut")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial SliceMutUint service_various_slices_return_slice_mut(IntPtr instance);
+        public static partial uint pattern_callback_4(MyCallbackNamespaced callback, uint x);
         
         [LibraryImport(NativeLib, EntryPoint = "primitive_args_10")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial long primitive_args_10(long x0, long x1, long x2, long x3, long x4, long x5, long x6, long x7, long x8, long x9);
         
-        [LibraryImport(NativeLib, EntryPoint = "service_basic_new")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_6")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_basic_new(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_result_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_result_new(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial VecByte pattern_vec_1();
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_11")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void pattern_string_11(IntPtr _0);
-        
-        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_vec_string")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_async_vec_string_handle_vec_string(IntPtr instance, VecUtf8String s, AsyncCallbackVecUtf8String callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void pattern_surrogates_1(Local s, IntPtr c);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_6")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial VecVec3f32 pattern_vec_6(VecVec3f32 v);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_result_test")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError service_result_test(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref4")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial bool ref4(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError service_on_panic_return_result(IntPtr instance, uint _0);
-        
-        [LibraryImport(NativeLib, EntryPoint = "char_array_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial CharArray char_array_2(CharArray arr);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_default_value")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial uint service_on_panic_return_default_value(IntPtr instance, uint x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Vec2 meta_ambiguous_2(Vec2 x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_various_slices_new(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError pattern_result_3(ResultVoidError x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_75659")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial long interoptopus_vec_create_75659(IntPtr data, ulong len, IntPtr rval);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_9")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial int pattern_callback_9(Pointers x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultVoidError service_various_slices_mut_self_ffi_error(IntPtr instance, SliceMutByte _slice);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_u8")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte primitive_u8(byte x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_dependent_from_main")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_dependent_from_main(IntPtr main, IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "primitive_isize")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial nint primitive_isize(nint x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_string_8")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultUseStringError pattern_string_8(SliceUseString x, ulong i);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ptr1")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial IntPtr ptr1(IntPtr x);
-        
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar_mut_pointer")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial IntPtr pattern_ffi_cchar_mut_pointer(IntPtr ffi_cchar);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte service_various_slices_mut_self_ref(IntPtr instance, IntPtr x, IntPtr _y);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_async_structs_destroy")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial void service_async_structs_destroy(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_without")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultIntPtrError service_multiple_ctors_new_without(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "service_dependent_get")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial uint service_dependent_get(IntPtr instance);
-        
-        [LibraryImport(NativeLib, EntryPoint = "ref2")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial IntPtr ref2(IntPtr x);
+        public static partial void pattern_ffi_slice_6(IntPtr slice, CallbackU8 callback);
         
         [LibraryImport(NativeLib, EntryPoint = "pattern_vec_3")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial VecByte pattern_vec_3(VecByte v);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_result_1")]
+        [LibraryImport(NativeLib, EntryPoint = "ref1")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultUintError pattern_result_1(ResultUintError x);
+        public static partial IntPtr ref1(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "behavior_sleep")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void behavior_sleep(ulong millis);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_result_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultUtf8StringError service_result_result_string(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_result")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError service_on_panic_return_result(IntPtr instance, uint _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ref3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial bool ref3(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_f32")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial float primitive_f32(float x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultUseStringError pattern_string_8(SliceUseString x, ulong i);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte pattern_ascii_pointer_5(CStrPtr x, uint i);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte primitive_i8(byte x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte generic_2(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial UseSliceAndVec pattern_vec_8(UseSliceAndVec v);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_test")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError service_ignoring_methods_test(IntPtr instance, uint _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "behavior_panics_via_result")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError behavior_panics_via_result();
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_dependent_from_main")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_dependent_from_main(IntPtr main, IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_async_sleep_new(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_callbacks_new(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "array_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Array array_2();
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_args_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long primitive_args_5(long x0, long x1, long x2, long x3, long x4);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_invoke_delegates")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError service_callbacks_invoke_delegates(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Vec2 meta_ambiguous_2(Vec2 x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_on_panic_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial OptionOptionResultOptionUtf8StringError pattern_ffi_option_3(OptionOptionResultOptionUtf8StringError x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_string_destroy(Utf8String utf8);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_async_vec_string_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_75659")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_create_75659(IntPtr data, ulong len, IntPtr rval);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_dependent_get")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial uint service_dependent_get(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "array_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte array_1(Array x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte generic_3(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_test")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError service_result_test(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_no_error")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError service_various_slices_mut_self_no_error(IntPtr instance, SliceMutByte slice);
+        
+        [LibraryImport(NativeLib, EntryPoint = "char_array_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial CharArray char_array_2(CharArray arr);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_return_slice")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial SliceUint service_various_slices_return_slice(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_1a")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial uint generic_1a(Generic<u32> x, Phantom<u8> _y);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_async_sleep_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_result_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_async_result_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "struct1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Tupled struct1(Tupled x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_main_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_main_destroy(IntPtr instance);
         
         [LibraryImport(NativeLib, EntryPoint = "generic_4")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial byte generic_4(IntPtr x);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_7")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial byte pattern_ffi_cchar(byte ffi_cchar);
+        public static partial void pattern_vec_7(UseSliceAndVec _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_20547")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_destroy_20547(VecEnumPayload _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "struct3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial bool struct3(BoolField x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultUintError pattern_result_1(ResultUintError x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_result_u32")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultUintError service_result_result_u32(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError pattern_result_3(ResultVoidError x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "enums_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial IntPtr enums_3(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_ffi_slice_8(IntPtr slice, CallbackCharArray2 callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_structs_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_async_structs_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_u8")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte primitive_u8(byte x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_basic_call")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_async_basic_call(IntPtr instance, AsyncCallbackVoid callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial SumDelegate1 pattern_callback_5();
+        
+        [LibraryImport(NativeLib, EntryPoint = "array_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void array_3(IntPtr arr);
+        
+        [LibraryImport(NativeLib, EntryPoint = "enums_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Utf8String enums_4(String> x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "behavior_panics")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void behavior_panics();
         
         [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_bool")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial bool pattern_ffi_bool(bool ffi_bool);
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ascii_pointer_return_slice")]
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_1")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial SliceUseCStrPtr pattern_ascii_pointer_return_slice();
+        public static partial VecByte pattern_vec_1();
         
-        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_delegate_huge")]
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_new")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSlice callback);
-        
-        [LibraryImport(NativeLib, EntryPoint = "namespaced_type")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial Vec namespaced_type(Vec x);
+        public static partial ResultIntPtrError service_strings_new(IntPtr instance);
         
         [LibraryImport(NativeLib, EntryPoint = "primitive_u64")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ulong primitive_u64(ulong x);
         
+        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_async_vec_string_new(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_clone")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_string_clone(IntPtr utf8, IntPtr rval);
+        
+        [LibraryImport(NativeLib, EntryPoint = "fnptr_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void fnptr_2(extern "C" fn(CharArray) -> () callback, CharArray x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial NestedArray nested_array_1();
+        
+        [LibraryImport(NativeLib, EntryPoint = "ptr2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial IntPtr ptr2(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial UseString pattern_string_4(UseString x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_set_delegate_table")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_callbacks_set_delegate_table(IntPtr instance, CallbackTable table);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ref2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial IntPtr ref2(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_surrogates_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_surrogates_1(Local s, IntPtr c);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_7")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError pattern_callback_7(SumDelegateReturn c1, SumDelegateReturn2 c2, int x, int i, IntPtr o);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial OptionInner pattern_ffi_option_1(OptionInner x);
+        
         [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_with_slice")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial ResultVoidError service_callbacks_callback_with_slice(IntPtr instance, SumDelegateReturn callback, SliceInt input);
         
-        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_option")]
+        [LibraryImport(NativeLib, EntryPoint = "service_async_result_success")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial OptionVec namespaced_inner_option(OptionVec x);
+        public static partial ResultIntPtrError service_async_result_success(IntPtr instance, AsyncCallbackVoid callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ref7")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void ref7(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i16")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial short primitive_i16(short x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ref5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void ref5(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_result_fail")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_async_result_fail(IntPtr instance, AsyncCallbackVoid callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_return_after_ms")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_async_sleep_return_after_ms(IntPtr instance, ulong x, ulong ms, AsyncCallbackUlong callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_multiple_ctors_new_with")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_multiple_ctors_new_with(uint some_value, IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_string_create")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_string_create(IntPtr utf8, ulong len, IntPtr rval);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_option_2")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Inner pattern_ffi_option_2(OptionInner x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_dependent_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_dependent_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_i32")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial int primitive_i32(int x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_nested_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_async_vec_string_handle_nested_string(IntPtr instance, Utf8String s, AsyncCallbackUseString callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_slice_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_ffi_slice_4(SliceByte _slice, SliceMutByte _slice2);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_pass_cstr")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_strings_pass_cstr(IntPtr instance, CStrPtr _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_simple")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError service_callbacks_callback_simple(IntPtr instance, MyCallback callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_on_panic_new(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ptr1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial IntPtr ptr1(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_1c")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte generic_1c(IntPtr _x, IntPtr y);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_destroy_85286")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_destroy_85286(VecByte _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_39561")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_create_39561(IntPtr data, ulong len, IntPtr rval);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_new_string")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_strings_new_string(Utf8String _x, IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_1b")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte generic_1b(Generic<u8> x, Phantom<u8> _y);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_ignoring_methods_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_ignoring_methods_new(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "alignment_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Packed2 alignment_1(Packed1 a);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_strings_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_strings_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_result_destroy")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void service_result_destroy(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_default_value")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial uint service_on_panic_return_default_value(IntPtr instance, uint x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "char_array_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial CharArray char_array_1();
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref_slice")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte service_various_slices_mut_self_ref_slice(IntPtr instance, IntPtr x, IntPtr _y, SliceByte _slice);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_on_panic_return_ub_on_panic")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial CStrPtr service_on_panic_return_ub_on_panic(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_ffi_cchar")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte pattern_ffi_cchar(byte ffi_cchar);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_vec_6")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial VecVec3f32 pattern_vec_6(VecVec3f32 v);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_result_4")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError pattern_result_4(ResultVoidError x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_u16")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ushort primitive_u16(ushort x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "ref6")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void ref6(IntPtr x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_u32")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial uint primitive_u32(uint x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "meta_ambiguous_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial bool meta_ambiguous_3(Vec1 x, Vec2 y);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_1")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Utf8String pattern_string_1(Utf8String x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "namespaced_inner_slice_mut")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial SliceMutVec namespaced_inner_slice_mut(SliceMutVec x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "meta_renamed")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial EnumRenamed meta_renamed(StructRenamed x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_bool")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial bool primitive_bool(bool x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "meta_documented")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial EnumDocumented meta_documented(StructDocumented _x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "generic_5")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial bool generic_5(Weird1<u32> _x, Weird2<u8, 5> _y);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ffi_error")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError service_various_slices_mut_self_ffi_error(IntPtr instance, SliceMutByte _slice);
+        
+        [LibraryImport(NativeLib, EntryPoint = "namespaced_type")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial Vec namespaced_type(Vec x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_28290")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_create_28290(IntPtr data, ulong len, IntPtr rval);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_6b")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError pattern_string_6b(IntPtr y);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_mut_self_ref")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte service_various_slices_mut_self_ref(IntPtr instance, IntPtr x, IntPtr _y);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_string_10")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial void pattern_string_10(Utf8String _0);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_callbacks_callback_ffi_return")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultVoidError service_callbacks_callback_ffi_return(IntPtr instance, SumDelegateReturn callback);
+        
+        [LibraryImport(NativeLib, EntryPoint = "interoptopus_vec_create_91244")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial long interoptopus_vec_create_91244(IntPtr data, ulong len, IntPtr rval);
+        
+        [LibraryImport(NativeLib, EntryPoint = "nested_array_3")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial byte nested_array_3(NestedArray input);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_async_basic_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_async_basic_new(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "service_various_slices_new")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial ResultIntPtrError service_various_slices_new(IntPtr instance);
+        
+        [LibraryImport(NativeLib, EntryPoint = "pattern_callback_9")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial int pattern_callback_9(Pointers x);
+        
+        [LibraryImport(NativeLib, EntryPoint = "primitive_f64")]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public static partial double primitive_f64(double x);
+        
+
+        
+        public partial struct Error
+        {
+            uint _variant;
+    
+        }
+        
+        public partial struct EnumRenamed
+        {
+            uint _variant;
+    
+        }
+        
+        public partial struct EnumDocumented
+        {
+            uint _variant;
+    
+        }
+        
+        public partial struct EnumNum
+        {
+            uint _variant;
+    
+            nuint A;
+    
+            nint C;
+    
+        }
+        
+        public partial class String>
+        {
+            uint _variant;
+    
+            String> A;
+    
+            String> B;
+    
+        }
+        
+        public partial struct EnumPayload
+        {
+            uint _variant;
+    
+            Vec3f32 B;
+    
+            uint C;
+    
+        }
         
 
         
