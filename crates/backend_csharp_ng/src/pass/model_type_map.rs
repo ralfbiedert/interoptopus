@@ -3,7 +3,7 @@
 use crate::lang::types::Type;
 use crate::model::{TypeId, Types};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model_type_kinds, model_type_names, ModelResult, PassInfo};
+use crate::pass::{model_type_kind, model_type_names, ModelResult, PassInfo};
 
 #[derive(Default)]
 pub struct Config {}
@@ -18,7 +18,7 @@ impl Pass {
         Self { info: PassInfo { name: "model_type_map" }, types: Default::default() }
     }
 
-    pub fn process(&mut self, pass_meta: &mut super::PassMeta, kinds: &model_type_kinds::Pass, names: &model_type_names::Pass) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut super::PassMeta, kinds: &model_type_kind::Pass, names: &model_type_names::Pass) -> ModelResult {
         let mut outcome = Unchanged;
 
         // Iterate through all kinds and create Types

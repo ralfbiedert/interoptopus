@@ -4,7 +4,7 @@ use crate::lang::function::Signature;
 use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{model_id_maps, model_type_kinds, ModelResult, PassInfo};
+use crate::pass::{model_id_maps, model_type_kind, ModelResult, PassInfo};
 
 #[derive(Default)]
 pub struct Config {}
@@ -22,7 +22,7 @@ impl Pass {
         &mut self,
         pass_meta: &mut super::PassMeta,
         id_map: &mut model_id_maps::Pass,
-        kinds: &mut model_type_kinds::Pass,
+        kinds: &mut model_type_kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;

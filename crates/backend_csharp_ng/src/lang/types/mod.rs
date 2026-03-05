@@ -38,11 +38,17 @@ use crate::lang::function::Signature;
 use crate::model::TypeId;
 
 pub use array::Array;
-pub use composite::{Composite, CompositeKind, Field};
+pub use composite::{Composite, Field};
 pub use enums::{DataEnum, Variant};
 pub use pattern::TypePattern;
 pub use pointer::Pointer;
 pub use primitive::Primitive;
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub enum Ownership {
+    Blittable,
+    Disposable,
+}
 
 #[derive(Debug, Clone)]
 pub enum TypeKind {

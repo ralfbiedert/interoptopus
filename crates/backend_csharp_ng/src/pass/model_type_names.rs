@@ -3,7 +3,7 @@
 use crate::lang::types::{Primitive, TypeKind, TypePattern};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model_id_maps, model_type_kinds, ModelResult, PassInfo};
+use crate::pass::{model_id_maps, model_type_kind, ModelResult, PassInfo};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -37,7 +37,7 @@ impl Pass {
         &mut self,
         pass_meta: &mut super::PassMeta,
         id_map: &model_id_maps::Pass,
-        kinds: &model_type_kinds::Pass,
+        kinds: &model_type_kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;

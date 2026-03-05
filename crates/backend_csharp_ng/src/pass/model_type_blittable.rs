@@ -9,10 +9,10 @@
 //! - Structs are blittable if all their fields are blittable
 //! - Enums are blittable if all their variant data types are blittable
 
-use crate::lang::types::{CompositeKind, TypeKind};
+use crate::lang::types::{Ownership, TypeKind};
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{model_type_kinds, ModelResult, PassInfo};
+use crate::pass::{model_type_kind, ModelResult, PassInfo};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -20,15 +20,15 @@ pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    blittable: HashMap<TypeId, CompositeKind>,
+    blittable: HashMap<TypeId, Ownership>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model_type_map_struct_blittable" }, blittable: Default::default() }
+        Self { info: PassInfo { name: "model_type_blittable" }, blittable: Default::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut super::PassMeta, kinds: &model_type_kinds::Pass) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut super::PassMeta, kinds: &model_type_kind::Pass) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (cs_id, type_kind) in kinds.iter() {
@@ -41,8 +41,8 @@ impl Pass {
             let blittable = match type_kind {
                 // Arrays are blittable if element type is blittable
                 TypeKind::Array(arr) => match self.blittable.get(&arr.ty) {
-                    Some(CompositeKind::Blittable) => true,
-                    Some(CompositeKind::Disposable) => false,
+                    Some(Ownership::Blittable) => true,
+                    Some(Ownership::Disposable) => false,
                     None => {
                         continue;
                     }
@@ -76,8 +76,8 @@ impl Pass {
                         // Check if variant has associated data
                         if let Some(variant_ty) = variant.ty {
                             match self.blittable.get(&variant_ty) {
-                                Some(CompositeKind::Blittable) => continue,
-                                Some(CompositeKind::Disposable) => {
+                                Some(Ownership::Blittable) => continue,
+                                Some(Ownership::Disposable) => {
                                     all_blittable = false;
                                     break;
                                 }
@@ -102,8 +102,8 @@ impl Pass {
                     let mut all_blittable = true;
                     for field in &composite.fields {
                         match self.blittable.get(&field.ty) {
-                            Some(CompositeKind::Blittable) => continue,
-                            Some(CompositeKind::Disposable) => {
+                            Some(Ownership::Blittable) => continue,
+                            Some(Ownership::Disposable) => {
                                 all_blittable = false;
                                 break;
                             }
@@ -125,7 +125,7 @@ impl Pass {
                 TypeKind::AsyncHelper(_) | TypeKind::WireHelper(_) => false,
             };
 
-            let kind = if blittable { CompositeKind::Blittable } else { CompositeKind::Disposable };
+            let kind = if blittable { Ownership::Blittable } else { Ownership::Disposable };
             // println!("{cs_id:?}, {kind:?}");
             self.blittable.insert(*cs_id, kind);
             outcome.changed();
@@ -134,7 +134,7 @@ impl Pass {
         Ok(outcome)
     }
 
-    pub fn blittable(&self, ty: TypeId) -> Option<CompositeKind> {
+    pub fn blittable(&self, ty: TypeId) -> Option<Ownership> {
         self.blittable.get(&ty).copied()
     }
 }

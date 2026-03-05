@@ -1,8 +1,8 @@
 //! Creates Composite types from computed struct fields and blittability.
 
-use crate::lang::types::{Composite, CompositeKind, TypeKind};
+use crate::lang::types::{Composite, TypeKind};
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{model_id_maps, model_type_kinds, model_type_map_struct_fields, ModelResult, PassInfo};
+use crate::pass::{model_id_maps, model_type_kind, model_type_map_struct_fields, ModelResult, PassInfo};
 
 #[derive(Default)]
 pub struct Config {}
@@ -20,7 +20,7 @@ impl Pass {
         &mut self,
         pass_meta: &mut super::PassMeta,
         id_map: &model_id_maps::Pass,
-        kinds: &mut model_type_kinds::Pass,
+        kinds: &mut model_type_kind::Pass,
         fields: &model_type_map_struct_fields::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
@@ -44,9 +44,7 @@ impl Pass {
 
             let fields = try_resolve!(fields.get_fields(cs_id), pass_meta, self.info, super::MissingItem::CsType(cs_id));
 
-            // Create the composite; the blittable pass will determine the actual
-            // CompositeKind once this Composite appears in `kinds`.
-            let composite = Composite { fields: fields.clone(), repr: rust_struct.repr, kind: CompositeKind::Blittable };
+            let composite = Composite { fields: fields.clone(), repr: rust_struct.repr };
 
             kinds.set_kind(cs_id, TypeKind::Composite(composite));
             outcome.changed();

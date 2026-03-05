@@ -2,7 +2,7 @@
 
 use crate::lang::types::{DataEnum, TypeKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model_id_maps, model_type_kinds, model_type_map_enum_variants, ModelResult, PassInfo};
+use crate::pass::{model_id_maps, model_type_kind, model_type_map_enum_variants, ModelResult, PassInfo};
 use interoptopus::lang;
 
 #[derive(Default)]
@@ -21,7 +21,7 @@ impl Pass {
         &mut self,
         pass_meta: &mut super::PassMeta,
         id_map: &model_id_maps::Pass,
-        kinds: &mut model_type_kinds::Pass,
+        kinds: &mut model_type_kind::Pass,
         variants_pass: &model_type_map_enum_variants::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
