@@ -22,7 +22,7 @@ impl Pass {
         pass_meta: &mut crate::pass::PassMeta,
         id_map: &model::id_maps::Pass,
         kinds: &mut model::types::kind::Pass,
-        variants_pass: &model::types::map::enum_variants::Pass,
+        variants_pass: &model::types::kind::enum_variants::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;

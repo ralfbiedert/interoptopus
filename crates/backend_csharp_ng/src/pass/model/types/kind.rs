@@ -1,5 +1,17 @@
 //! ...
 
+pub mod array;
+pub mod delegate;
+pub mod r#enum;
+pub mod enum_variants;
+pub mod opaque;
+pub mod patterns;
+pub mod pointer;
+pub mod primitives;
+pub mod service;
+pub mod r#struct;
+pub mod struct_fields;
+
 use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::{ModelResult, PassInfo};

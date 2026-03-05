@@ -21,7 +21,7 @@ impl Pass {
         pass_meta: &mut crate::pass::PassMeta,
         id_map: &model::id_maps::Pass,
         kinds: &mut model::types::kind::Pass,
-        fields: &model::types::map::struct_fields::Pass,
+        fields: &model::types::kind::struct_fields::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;
