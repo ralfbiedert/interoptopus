@@ -72,8 +72,8 @@ impl Pass {
                 // DataEnum: blittable if all variant data types are blittable
                 TypeKind::DataEnum(data_enum) => {
                     let mut all_blittable = true;
+                    let mut pending = false;
                     for variant in &data_enum.variants {
-                        // Check if variant has associated data
                         if let Some(variant_ty) = variant.ty {
                             match self.blittable.get(&variant_ty) {
                                 Some(Ownership::Blittable) => continue,
@@ -82,15 +82,14 @@ impl Pass {
                                     break;
                                 }
                                 None => {
-                                    all_blittable = true; // Placeholder, we'll continue the loop
+                                    pending = true;
                                     break;
                                 }
                             }
                         }
-                        // Unit variants don't affect blittability
                     }
 
-                    if outcome == Changed {
+                    if pending {
                         continue;
                     }
 
@@ -100,6 +99,7 @@ impl Pass {
                 // Composite: blittable if all fields are blittable
                 TypeKind::Composite(composite) => {
                     let mut all_blittable = true;
+                    let mut pending = false;
                     for field in &composite.fields {
                         match self.blittable.get(&field.ty) {
                             Some(Ownership::Blittable) => continue,
@@ -108,13 +108,13 @@ impl Pass {
                                 break;
                             }
                             None => {
-                                all_blittable = true; // Placeholder, we'll continue
+                                pending = true;
                                 break;
                             }
                         }
                     }
 
-                    if outcome == Changed {
+                    if pending {
                         continue;
                     }
 
