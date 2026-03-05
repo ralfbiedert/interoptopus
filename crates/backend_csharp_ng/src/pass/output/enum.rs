@@ -25,6 +25,7 @@ impl Pass {
         output_master: &output::master::Pass,
         kinds: &model::types::kind::Pass,
         enum_ty: &output::enum_ty::Pass,
+        enum_body: &output::enum_body::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -41,8 +42,13 @@ impl Pass {
                     continue;
                 };
 
+                let Some(body) = enum_body.get(*type_id) else {
+                    continue;
+                };
+
                 let mut context = Context::new();
                 context.insert("enum_definition", enum_definition);
+                context.insert("enum_body", body);
 
                 let rendered = templates.render("enum.cs", &context)?;
                 rendered_enums.push(rendered);

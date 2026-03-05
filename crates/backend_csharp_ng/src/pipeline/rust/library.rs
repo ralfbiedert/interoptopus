@@ -32,6 +32,7 @@ pub struct RustLibraryConfig {
     pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
     pub output_enum_ty: output::enum_ty::Config,
+    pub output_enum_body: output::enum_body::Config,
     pub output_enum: output::r#enum::Config,
     pub output_fn_imports: output::fn_import::Config,
     pub output_header: output::header::Config,
@@ -41,6 +42,7 @@ pub struct RustLibraryConfig {
 
 pub struct IntermediateOutputPasses {
     pub enum_ty: output::enum_ty::Pass,
+    pub enum_body: output::enum_body::Pass,
     pub enums: output::r#enum::Pass,
     pub fn_imports: output::fn_import::Pass,
     pub header: output::header::Pass,
@@ -126,6 +128,7 @@ impl RustLibrary {
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
                 enum_ty: output::enum_ty::Pass::new(config.output_enum_ty),
+                enum_body: output::enum_body::Pass::new(config.output_enum_body),
                 enums: output::r#enum::Pass::new(config.output_enum),
                 fn_imports: output::fn_import::Pass::new(config.output_fn_imports),
                 header: output::header::Pass::new(config.output_header),
@@ -195,7 +198,8 @@ impl RustLibrary {
         // Output passes
         self.output_master.process(&mut pass_meta)?;
         self.output_passes.enum_ty.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable)?;
-        self.output_passes.enums.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.enum_ty)?;
+        self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable)?;
+        self.output_passes.enums.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.enum_ty, &self.output_passes.enum_body)?;
         self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.plugin_post_output_pass()?;
