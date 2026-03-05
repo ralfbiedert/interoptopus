@@ -21,7 +21,7 @@ This runs tests and regenerates bindings for all target languages.
 
 ### Working with Individual Crates
 - `cargo build -p interoptopus` - Build core crate
-- `cargo test -p interoptopus_backend_csharp` - Test C# backend
+- `cargo test -p backend_csharp_ng` - Test C# backend (next-gen)
 - `cargo check --workspace` - Quick check all crates
 
 ## Architecture
@@ -74,31 +74,51 @@ Key modules:
 
 ### New C# Backend (`backend_csharp_ng`)
 
-The next-gen C# backend uses a **multi-pass pipeline** architecture. Processing happens in `RustLibrary::process()` and flows through two phases, model passes and output passes. Model passes build a well-defined data and interop model iteratively - once done, the resulting interop layer is uniquely specified. The output passes then render the model into a final output format via the help of tera templates.  
+The next-gen C# backend uses a **multi-pass pipeline** architecture. Processing happens in `RustLibrary::process()` and flows through two phases, model passes and output passes. Model passes build a well-defined data and interop model iteratively — once done, the resulting interop layer is uniquely specified. The output passes then render the model into a final output format via Tera templates.
 
+**Pass directory structure** (`crates/backend_csharp_ng/src/pass/`):
+```
+pass/
+├── mod.rs              # Shared types (Outcome, PassMeta, PassInfo, MissingItem) + macros
+├── meta/
+│   └── info.rs         # DLL name, hash, version metadata
+├── model/
+│   ├── final.rs        # Sentinel pass for convergence
+│   ├── fn_map.rs       # Converts function signatures (args + return types)
+│   ├── id_maps.rs      # Creates Rust→C# ID mappings for types and functions
+│   └── types/
+│       ├── blittable.rs  # Determines blittable vs disposable ownership per type
+│       ├── kind.rs       # Stores TypeKind per C# type ID + submodule declarations
+│       ├── kind/         # Per-category type mapping passes:
+│       │   ├── array.rs, delegate.rs, enum.rs, enum_variants.rs,
+│       │   ├── opaque.rs, patterns.rs, pointer.rs, primitives.rs,
+│       │   ├── service.rs, struct.rs, struct_fields.rs
+│       ├── map.rs        # Assembles final Type { name, kind } objects
+│       └── names.rs      # Assigns C# type names to all mapped types
+└── output/
+    ├── enum_ty.rs      # Renders per-enum type definitions via enum_ty.cs template
+    ├── enum.rs         # Groups enum renders per output file via enum.cs template
+    ├── fn_import.rs    # Renders function import declarations
+    ├── header.rs       # File headers
+    ├── master.rs       # Determines which files to generate, holds template engine
+    └── final.rs        # Assembles everything into a Multibuf (filename→content map)
+```
 
 **Model Passes** (iterative, loop until convergence):
-All model passes run in a loop. Each pass returns `Outcome::Changed` or `Outcome::Unchanged`. The loop repeats until every pass returns `Unchanged`, meaning all dependencies are resolved. This lets passes declare dependencies implicitly — if a type isn't mapped yet, the pass skips it and picks it up on the next iteration.
+All model passes run in a loop via `loop_model_passes_until_done`. Each pass returns `Outcome::Changed` or `Outcome::Unchanged`. The loop repeats until every pass returns `Unchanged`, meaning all dependencies are resolved. This lets passes declare dependencies implicitly — if a type isn't mapped yet, the pass skips it and picks it up on the next iteration. Three macros in `pass/mod.rs` support this: `try_extract_kind!`, `skip_mapped!`, and `try_resolve!`.
 
-Key model passes include:
-1. `meta_info` — DLL name, hash, version metadata
-2. `model_id_maps` — Creates Rust→C# ID mappings for types and functions
-3. `model_type_kinds` — Stores `TypeKind` per C# type ID
-4. `model_type_map_*` — A family of passes that each handle one Rust type category:
-   - `primitives` (u32→UInt), `array`, `delegate` (fn pointers), `pointer`, `service`, `patterns` (Slice/Option/String/Vec), `enum_variants`, `enum`, `opaque`, `struct_fields`, `struct_blittable` (layout safety), `struct`
-5. `model_type_names` — Assigns C# type names to all mapped types
-6. `model_type_map` — Assembles final `Type { name, kind }` objects
-7. `model_fn_map` — Converts function signatures (args + return types)
-
+Cross-references between passes use path-based types (e.g., `model::types::kind::Pass`, `model::id::Pass`). Each pass file imports `model`/`meta`/`output` from `crate::pass` and uses paths from there.
 
 **Output Passes** (sequential, run once after convergence):
-1. `output_master` — Determines which files to generate
-2. `output_fn_imports` + `output_header` — Render function imports and file headers via Tera templates
-3. `output_final` — Assembles everything into a `Multibuf` (filename→content map)
+Output passes run after model convergence. They render model data through Tera templates. The pattern is typically two-level: a "type" pass renders individual items (e.g., `enum_ty` renders each enum), then a grouping pass collects results per output file (e.g., `enum` groups all enum renders per `Output`). The `final` pass assembles all intermediary results into the `Multibuf`.
+
+Output passes are held in `IntermediateOutputPasses` (defined in `pipeline/rust/library.rs`) so they can be passed as a group to the final pass.
+
+**Blittability**: The `model::types::blittable` pass computes `Ownership::Blittable` or `Ownership::Disposable` for every type. Primitives, pointers, and delegates are blittable. Composites and enums are blittable if all their fields/variants are. This runs iteratively (convergence loop) so compound types resolve after their dependencies.
 
 **Extension points**: Plugins implement `RustLibraryPlugin` with hooks at `init`, `post_model`, and `post_output`.
 
-**Templates**: `.tera` files are packed into a tar archive at build time (via `build.rs`), embedded in the binary, and rendered with the Tera engine from `interoptopus_backends`.
+**Templates**: `.cs` template files are packed into a tar archive at build time (via `build.rs`), embedded in the binary, and rendered with the Tera engine from `interoptopus_backends`.
 
 ## Key Patterns
 
