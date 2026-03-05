@@ -9,6 +9,10 @@ namespace A {
         {{ fn | indent(prefix = "        ") }}
         {% endfor %}
 
+        {% for enum in enums %}
+        {{ enum }}
+        {% endfor %}
+
         {{ types | indent }}
     }
 }
