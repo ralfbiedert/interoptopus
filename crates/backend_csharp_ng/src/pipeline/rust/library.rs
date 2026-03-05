@@ -1,9 +1,7 @@
-use crate::pass::{
-    meta_info, model_final, model_fn_map, model_id_maps, model_type_blittable, model_type_kind, model_type_map, model_type_map_array, model_type_map_delegate, model_type_map_enum,
-    model_type_map_enum_variants, model_type_map_opaque, model_type_map_patterns, model_type_map_pointer, model_type_map_primitives, model_type_map_service,
-    model_type_map_struct, model_type_map_struct_fields, model_type_names, output_final, output_fn_imports, output_header, output_master,
-    OutputResult, PassMeta,
-};
+use crate::pass::meta;
+use crate::pass::model;
+use crate::pass::output;
+use crate::pass::{OutputResult, PassMeta};
 use crate::pipeline::{loop_model_passes_until_done, RustLibraryBuilder};
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
 use crate::Error;
@@ -13,35 +11,35 @@ use std::marker::PhantomData;
 
 #[derive(Default)]
 pub struct RustLibraryConfig {
-    pub meta_info: meta_info::Config,
-    pub model_id_maps: model_id_maps::Config,
-    pub model_type_kinds: model_type_kind::Config,
-    pub model_type_map_primitives: model_type_map_primitives::Config,
-    pub model_type_map_array: model_type_map_array::Config,
-    pub model_type_map_delegate: model_type_map_delegate::Config,
-    pub model_type_map_pointer: model_type_map_pointer::Config,
-    pub model_type_map_service: model_type_map_service::Config,
-    pub model_type_map_patterns: model_type_map_patterns::Config,
-    pub model_type_map_enum_variants: model_type_map_enum_variants::Config,
-    pub model_type_map_enum: model_type_map_enum::Config,
-    pub model_type_map_opaque: model_type_map_opaque::Config,
-    pub model_type_map_struct_fields: model_type_map_struct_fields::Config,
-    pub model_type_blittable: model_type_blittable::Config,
-    pub model_type_map_struct: model_type_map_struct::Config,
-    pub model_type_names: model_type_names::Config,
-    pub model_type_map: model_type_map::Config,
-    pub model_fn_map: model_fn_map::Config,
-    pub model_final: model_final::Config,
-    pub output_master: output_master::Config,
-    pub output_fn_imports: output_fn_imports::Config,
-    pub output_header: output_header::Config,
-    pub output_final: output_final::Config,
+    pub meta_info: meta::info::Config,
+    pub model_id_maps: model::id_maps::Config,
+    pub model_type_kinds: model::types::kind::Config,
+    pub model_type_map_primitives: model::types::map::primitives::Config,
+    pub model_type_map_array: model::types::map::array::Config,
+    pub model_type_map_delegate: model::types::map::delegate::Config,
+    pub model_type_map_pointer: model::types::map::pointer::Config,
+    pub model_type_map_service: model::types::map::service::Config,
+    pub model_type_map_patterns: model::types::map::patterns::Config,
+    pub model_type_map_enum_variants: model::types::map::enum_variants::Config,
+    pub model_type_map_enum: model::types::map::r#enum::Config,
+    pub model_type_map_opaque: model::types::map::opaque::Config,
+    pub model_type_map_struct_fields: model::types::map::struct_fields::Config,
+    pub model_type_blittable: model::types::blittable::Config,
+    pub model_type_map_struct: model::types::map::r#struct::Config,
+    pub model_type_names: model::types::names::Config,
+    pub model_type_map: model::types::map::Config,
+    pub model_fn_map: model::fn_map::Config,
+    pub model_final: model::r#final::Config,
+    pub output_master: output::master::Config,
+    pub output_fn_imports: output::fn_imports::Config,
+    pub output_header: output::header::Config,
+    pub output_final: output::r#final::Config,
     _hidden: PhantomData<()>,
 }
 
 pub struct IntermediateOutputPasses {
-    pub fn_imports: output_fn_imports::Pass,
-    pub header: output_header::Pass,
+    pub fn_imports: output::fn_imports::Pass,
+    pub header: output::header::Pass,
 }
 
 pub struct RustLibrary {
@@ -49,28 +47,28 @@ pub struct RustLibrary {
     inventory: RustInventory,
 
     // Model passes (transform and enrich data)
-    meta_info: meta_info::Pass,
-    model_id_maps: model_id_maps::Pass,
-    model_type_kinds: model_type_kind::Pass,
-    model_type_map_primitives: model_type_map_primitives::Pass,
-    model_type_map_array: model_type_map_array::Pass,
-    model_type_map_delegate: model_type_map_delegate::Pass,
-    model_type_map_pointer: model_type_map_pointer::Pass,
-    model_type_map_service: model_type_map_service::Pass,
-    model_type_map_patterns: model_type_map_patterns::Pass,
-    model_type_map_enum_variants: model_type_map_enum_variants::Pass,
-    model_type_map_enum: model_type_map_enum::Pass,
-    model_type_map_opaque: model_type_map_opaque::Pass,
-    model_type_map_struct_fields: model_type_map_struct_fields::Pass,
-    model_type_blittable: model_type_blittable::Pass,
-    model_type_map_struct: model_type_map_struct::Pass,
-    model_type_names: model_type_names::Pass,
-    model_type_map: model_type_map::Pass,
-    model_fn_map: model_fn_map::Pass,
-    model_final: model_final::Pass,
+    meta_info: meta::info::Pass,
+    model_id_maps: model::id_maps::Pass,
+    model_type_kinds: model::types::kind::Pass,
+    model_type_map_primitives: model::types::map::primitives::Pass,
+    model_type_map_array: model::types::map::array::Pass,
+    model_type_map_delegate: model::types::map::delegate::Pass,
+    model_type_map_pointer: model::types::map::pointer::Pass,
+    model_type_map_service: model::types::map::service::Pass,
+    model_type_map_patterns: model::types::map::patterns::Pass,
+    model_type_map_enum_variants: model::types::map::enum_variants::Pass,
+    model_type_map_enum: model::types::map::r#enum::Pass,
+    model_type_map_opaque: model::types::map::opaque::Pass,
+    model_type_map_struct_fields: model::types::map::struct_fields::Pass,
+    model_type_blittable: model::types::blittable::Pass,
+    model_type_map_struct: model::types::map::r#struct::Pass,
+    model_type_names: model::types::names::Pass,
+    model_type_map: model::types::map::Pass,
+    model_fn_map: model::fn_map::Pass,
+    model_final: model::r#final::Pass,
 
     // First output pass determining files to be produced
-    output_master: output_master::Pass,
+    output_master: output::master::Pass,
 
     // Most other output passes. Ideally these should have no cross-dependencies,
     // only depending on the models above. The last output stages (e.g., output_master)
@@ -81,7 +79,7 @@ pub struct RustLibrary {
 
     // Last output stage(s). Writes a `.cs` file (later possibly other files w. other
     // master stages) into the Multibuf.
-    output_final: output_final::Pass,
+    output_final: output::r#final::Pass,
 
     // Output
     output: Multibuf,
@@ -102,31 +100,31 @@ impl RustLibrary {
     pub(crate) fn with_config(inventory: RustInventory, config: RustLibraryConfig) -> Self {
         Self {
             inventory,
-            meta_info: meta_info::Pass::new(config.meta_info),
-            model_id_maps: model_id_maps::Pass::new(config.model_id_maps),
-            model_type_kinds: model_type_kind::Pass::new(config.model_type_kinds),
-            model_type_map_primitives: model_type_map_primitives::Pass::new(config.model_type_map_primitives),
-            model_type_map_array: model_type_map_array::Pass::new(config.model_type_map_array),
-            model_type_map_delegate: model_type_map_delegate::Pass::new(config.model_type_map_delegate),
-            model_type_map_pointer: model_type_map_pointer::Pass::new(config.model_type_map_pointer),
-            model_type_map_service: model_type_map_service::Pass::new(config.model_type_map_service),
-            model_type_map_patterns: model_type_map_patterns::Pass::new(config.model_type_map_patterns),
-            model_type_map_enum_variants: model_type_map_enum_variants::Pass::new(config.model_type_map_enum_variants),
-            model_type_map_enum: model_type_map_enum::Pass::new(config.model_type_map_enum),
-            model_type_map_opaque: model_type_map_opaque::Pass::new(config.model_type_map_opaque),
-            model_type_map_struct_fields: model_type_map_struct_fields::Pass::new(config.model_type_map_struct_fields),
-            model_type_blittable: model_type_blittable::Pass::new(config.model_type_blittable),
-            model_type_map_struct: model_type_map_struct::Pass::new(config.model_type_map_struct),
-            model_type_names: model_type_names::Pass::new(config.model_type_names),
-            model_type_map: model_type_map::Pass::new(config.model_type_map),
-            model_fn_map: model_fn_map::Pass::new(config.model_fn_map),
-            model_final: model_final::Pass::new(config.model_final),
-            output_master: output_master::Pass::new(config.output_master),
+            meta_info: meta::info::Pass::new(config.meta_info),
+            model_id_maps: model::id_maps::Pass::new(config.model_id_maps),
+            model_type_kinds: model::types::kind::Pass::new(config.model_type_kinds),
+            model_type_map_primitives: model::types::map::primitives::Pass::new(config.model_type_map_primitives),
+            model_type_map_array: model::types::map::array::Pass::new(config.model_type_map_array),
+            model_type_map_delegate: model::types::map::delegate::Pass::new(config.model_type_map_delegate),
+            model_type_map_pointer: model::types::map::pointer::Pass::new(config.model_type_map_pointer),
+            model_type_map_service: model::types::map::service::Pass::new(config.model_type_map_service),
+            model_type_map_patterns: model::types::map::patterns::Pass::new(config.model_type_map_patterns),
+            model_type_map_enum_variants: model::types::map::enum_variants::Pass::new(config.model_type_map_enum_variants),
+            model_type_map_enum: model::types::map::r#enum::Pass::new(config.model_type_map_enum),
+            model_type_map_opaque: model::types::map::opaque::Pass::new(config.model_type_map_opaque),
+            model_type_map_struct_fields: model::types::map::struct_fields::Pass::new(config.model_type_map_struct_fields),
+            model_type_blittable: model::types::blittable::Pass::new(config.model_type_blittable),
+            model_type_map_struct: model::types::map::r#struct::Pass::new(config.model_type_map_struct),
+            model_type_names: model::types::names::Pass::new(config.model_type_names),
+            model_type_map: model::types::map::Pass::new(config.model_type_map),
+            model_fn_map: model::fn_map::Pass::new(config.model_fn_map),
+            model_final: model::r#final::Pass::new(config.model_final),
+            output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
-                fn_imports: output_fn_imports::Pass::new(config.output_fn_imports),
-                header: output_header::Pass::new(config.output_header),
+                fn_imports: output::fn_imports::Pass::new(config.output_fn_imports),
+                header: output::header::Pass::new(config.output_header),
             },
-            output_final: output_final::Pass::new(config.output_final),
+            output_final: output::r#final::Pass::new(config.output_final),
             output: Multibuf::default(),
             plugins: vec![],
         }

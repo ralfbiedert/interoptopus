@@ -3,7 +3,7 @@
 use crate::lang::types::{Primitive, TypeKind, TypePattern};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model_id_maps, model_type_kind, ModelResult, PassInfo};
+use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -21,7 +21,7 @@ macro_rules! resolve_name {
         match $self.names.get(&$id) {
             Some(n) => n.as_str(),
             None => {
-                $pass_meta.lost_found.missing($self.info, super::MissingItem::CsType($id));
+                $pass_meta.lost_found.missing($self.info, crate::pass::MissingItem::CsType($id));
                 continue;
             }
         }
@@ -35,22 +35,22 @@ impl Pass {
 
     pub fn process(
         &mut self,
-        pass_meta: &mut super::PassMeta,
-        id_map: &model_id_maps::Pass,
-        kinds: &model_type_kind::Pass,
+        pass_meta: &mut crate::pass::PassMeta,
+        id_map: &model::id_maps::Pass,
+        kinds: &model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, super::MissingItem::RustType(*rust_id));
+            let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
 
             // Skip if we've already mapped this name
             if self.names.contains_key(&cs_id) {
                 continue;
             }
 
-            let cs_kind = try_resolve!(kinds.get(cs_id), pass_meta, self.info, super::MissingItem::CsType(cs_id));
+            let cs_kind = try_resolve!(kinds.get(cs_id), pass_meta, self.info, crate::pass::MissingItem::CsType(cs_id));
 
             let cs_name = match cs_kind {
                 TypeKind::Primitive(p) => primitive_name(p).to_string(),

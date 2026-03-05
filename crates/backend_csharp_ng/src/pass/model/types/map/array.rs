@@ -3,7 +3,7 @@
 use crate::lang::types::{Array, TypeKind};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model_id_maps, model_type_kind, ModelResult, PassInfo};
+use crate::pass::{model, ModelResult, PassInfo};
 
 #[derive(Default)]
 pub struct Config {}
@@ -19,9 +19,9 @@ impl Pass {
 
     pub fn process(
         &mut self,
-        pass_meta: &mut super::PassMeta,
-        id_map: &mut model_id_maps::Pass,
-        kinds: &mut model_type_kind::Pass,
+        pass_meta: &mut crate::pass::PassMeta,
+        id_map: &mut model::id_maps::Pass,
+        kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;
@@ -31,7 +31,7 @@ impl Pass {
             let rust_array = try_extract_kind!(ty, Array);
             let cs_id = TypeId::from_id(rust_id.id());
 
-            let cs_element_type = try_resolve!(id_map.ty(rust_array.ty), pass_meta, self.info, super::MissingItem::RustType(rust_array.ty));
+            let cs_element_type = try_resolve!(id_map.ty(rust_array.ty), pass_meta, self.info, crate::pass::MissingItem::RustType(rust_array.ty));
 
             // Create the C# array with mapped element type
             let cs_array = Array { ty: cs_element_type, len: rust_array.len };

@@ -22,7 +22,7 @@ impl Pass {
         }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut super::PassMeta) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta) -> ModelResult {
         Ok(Unchanged)
     }
 

@@ -4,7 +4,7 @@ use crate::lang::function::{Argument, Function, FunctionKind, Overload, Signatur
 use crate::lang::meta::Visibility;
 use crate::model::FunctionId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model_id_maps, ModelResult, PassInfo};
+use crate::pass::{model, ModelResult, PassInfo};
 use interoptopus::inventory::Functions;
 use std::collections::HashMap;
 
@@ -21,7 +21,7 @@ impl Pass {
         Self { info: PassInfo { name: "model_fn_map" }, functions: Default::default() }
     }
 
-    pub fn process(&mut self, pass_meta: &mut super::PassMeta, id_map: &mut model_id_maps::Pass, rs_functions: &Functions) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &mut model::id_maps::Pass, rs_functions: &Functions) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, rust_fn) in rs_functions {
@@ -34,7 +34,7 @@ impl Pass {
             }
 
             // Translate the signature's return type
-            let cs_rval = try_resolve!(id_map.ty(rust_fn.signature.rval), pass_meta, self.info, super::MissingItem::RustType(rust_fn.signature.rval));
+            let cs_rval = try_resolve!(id_map.ty(rust_fn.signature.rval), pass_meta, self.info, crate::pass::MissingItem::RustType(rust_fn.signature.rval));
 
             // Translate all argument types
             let mut cs_arguments = Vec::new();
@@ -42,7 +42,7 @@ impl Pass {
 
             for rust_arg in &rust_fn.signature.arguments {
                 let Some(cs_arg_type) = id_map.ty(rust_arg.ty) else {
-                    pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(rust_arg.ty));
+                    pass_meta.lost_found.missing(self.info, crate::pass::MissingItem::RustType(rust_arg.ty));
                     all_args_available = false;
                     break;
                 };

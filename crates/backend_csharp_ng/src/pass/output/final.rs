@@ -1,7 +1,7 @@
 //! Last output step where a buffer is fully materialized.
 
 use crate::output::OutputKind;
-use crate::pass::{meta_info, output_master, OutputResult, PassInfo};
+use crate::pass::{meta, output, OutputResult, PassInfo};
 use crate::pipeline::IntermediateOutputPasses;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;
@@ -20,10 +20,10 @@ impl Pass {
 
     pub fn process(
         &mut self,
-        _pass_meta: &mut super::PassMeta,
-        meta_info: &meta_info::Pass,
+        _pass_meta: &mut crate::pass::PassMeta,
+        meta_info: &meta::info::Pass,
         output: &mut Multibuf,
-        output_master: &output_master::Pass,
+        output_master: &output::master::Pass,
         intermediary: &IntermediateOutputPasses,
     ) -> OutputResult {
         let templates = output_master.templates();

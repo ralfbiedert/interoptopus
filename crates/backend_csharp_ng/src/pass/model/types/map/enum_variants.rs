@@ -3,7 +3,7 @@
 use crate::lang::types::Variant;
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model_id_maps, ModelResult, PassInfo};
+use crate::pass::{model, ModelResult, PassInfo};
 use interoptopus::lang;
 use std::collections::HashMap;
 
@@ -20,7 +20,7 @@ impl Pass {
         Self { info: PassInfo { name: "model_type_map_enum_variants" }, variants: Default::default() }
     }
 
-    pub fn process(&mut self, pass_meta: &mut super::PassMeta, id_map: &mut model_id_maps::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &mut model::id_maps::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
@@ -45,7 +45,7 @@ impl Pass {
                         // Tuple variant: use index as tag, look up the C# TypeId
                         let Some(cs_type_id) = id_map.ty(*rust_type_id) else {
                             // Variant type not yet mapped, skip this enum for now
-                            pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(*rust_type_id));
+                            pass_meta.lost_found.missing(self.info, crate::pass::MissingItem::RustType(*rust_type_id));
                             all_variants_available = false;
                             break;
                         };

@@ -1,7 +1,7 @@
 //! Writes function import declarations.
 
 use crate::output::{Output, OutputKind};
-use crate::pass::{model_fn_map, model_type_names, output_master, OutputResult, PassInfo};
+use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -20,10 +20,10 @@ impl Pass {
 
     pub fn process(
         &mut self,
-        _pass_meta: &mut super::PassMeta,
-        output_master: &output_master::Pass,
-        fn_maps: &model_fn_map::Pass,
-        type_names: &model_type_names::Pass,
+        _pass_meta: &mut crate::pass::PassMeta,
+        output_master: &output::master::Pass,
+        fn_maps: &model::fn_map::Pass,
+        type_names: &model::types::names::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 

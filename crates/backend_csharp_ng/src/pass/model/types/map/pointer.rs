@@ -3,7 +3,7 @@
 use crate::lang::types::{Pointer, TypeKind};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model_id_maps, model_type_kind, ModelResult, PassInfo};
+use crate::pass::{model, ModelResult, PassInfo};
 use interoptopus::lang;
 
 #[derive(Default)]
@@ -20,9 +20,9 @@ impl Pass {
 
     pub fn process(
         &mut self,
-        pass_meta: &mut super::PassMeta,
-        id_map: &mut model_id_maps::Pass,
-        kinds: &mut model_type_kind::Pass,
+        pass_meta: &mut crate::pass::PassMeta,
+        id_map: &mut model::id_maps::Pass,
+        kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;
@@ -40,7 +40,7 @@ impl Pass {
             let cs_id = TypeId::from_id(rust_id.id());
 
             // Try to convert the pointee type
-            let cs_pointee_id = try_resolve!(id_map.ty(*rust_pointee_id), pass_meta, self.info, super::MissingItem::RustType(*rust_pointee_id));
+            let cs_pointee_id = try_resolve!(id_map.ty(*rust_pointee_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_pointee_id));
 
             // Register the pointer type
             id_map.set_ty(*rust_id, cs_id);

@@ -52,29 +52,9 @@ macro_rules! try_resolve {
     };
 }
 
-pub mod meta_info;
-pub mod model_final;
-pub mod model_fn_map;
-pub mod model_id_maps;
-pub mod model_type_blittable;
-pub mod model_type_kind;
-pub mod model_type_map;
-pub mod model_type_map_array;
-pub mod model_type_map_delegate;
-pub mod model_type_map_enum;
-pub mod model_type_map_enum_variants;
-pub mod model_type_map_opaque;
-pub mod model_type_map_patterns;
-pub mod model_type_map_pointer;
-pub mod model_type_map_primitives;
-pub mod model_type_map_service;
-pub mod model_type_map_struct;
-pub mod model_type_map_struct_fields;
-pub mod model_type_names;
-pub mod output_final;
-pub mod output_fn_imports;
-pub mod output_header;
-pub mod output_master;
+pub mod meta;
+pub mod model;
+pub mod output;
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Outcome {

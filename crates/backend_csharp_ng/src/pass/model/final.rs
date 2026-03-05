@@ -19,7 +19,7 @@ impl Pass {
         Self { info: PassInfo { name: "model_final" }, rust_model: Default::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut super::PassMeta) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta) -> ModelResult {
         // TODO ...
         Ok(Unchanged)
     }

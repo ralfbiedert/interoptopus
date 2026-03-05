@@ -4,7 +4,7 @@ use crate::lang::types;
 use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model_id_maps, model_type_kind, ModelResult, PassInfo};
+use crate::pass::{model, ModelResult, PassInfo};
 use interoptopus::lang::types::Primitive;
 
 #[derive(Default)]
@@ -21,9 +21,9 @@ impl Pass {
 
     pub fn process(
         &mut self,
-        _pass_meta: &mut super::PassMeta,
-        id_map: &mut model_id_maps::Pass,
-        kinds: &mut model_type_kind::Pass,
+        _pass_meta: &mut crate::pass::PassMeta,
+        id_map: &mut model::id_maps::Pass,
+        kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         for (rust_id, ty) in rs_types {

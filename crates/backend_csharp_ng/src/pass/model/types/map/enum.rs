@@ -2,7 +2,7 @@
 
 use crate::lang::types::{DataEnum, TypeKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model_id_maps, model_type_kind, model_type_map_enum_variants, ModelResult, PassInfo};
+use crate::pass::{model, ModelResult, PassInfo};
 use interoptopus::lang;
 
 #[derive(Default)]
@@ -19,10 +19,10 @@ impl Pass {
 
     pub fn process(
         &mut self,
-        pass_meta: &mut super::PassMeta,
-        id_map: &model_id_maps::Pass,
-        kinds: &mut model_type_kind::Pass,
-        variants_pass: &model_type_map_enum_variants::Pass,
+        pass_meta: &mut crate::pass::PassMeta,
+        id_map: &model::id_maps::Pass,
+        kinds: &mut model::types::kind::Pass,
+        variants_pass: &model::types::map::enum_variants::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;
@@ -33,8 +33,8 @@ impl Pass {
                 _ => continue,
             }
 
-            let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, super::MissingItem::RustType(*rust_id));
-            let variants = try_resolve!(variants_pass.get_variants(cs_id), pass_meta, self.info, super::MissingItem::CsType(cs_id));
+            let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
+            let variants = try_resolve!(variants_pass.get_variants(cs_id), pass_meta, self.info, crate::pass::MissingItem::CsType(cs_id));
 
             // Check if we've already processed this type
             if kinds.contains(&cs_id) {

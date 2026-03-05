@@ -4,7 +4,7 @@ use crate::lang::function::Signature;
 use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{model_id_maps, model_type_kind, ModelResult, PassInfo};
+use crate::pass::{model, ModelResult, PassInfo};
 
 #[derive(Default)]
 pub struct Config {}
@@ -20,9 +20,9 @@ impl Pass {
 
     pub fn process(
         &mut self,
-        pass_meta: &mut super::PassMeta,
-        id_map: &mut model_id_maps::Pass,
-        kinds: &mut model_type_kind::Pass,
+        pass_meta: &mut crate::pass::PassMeta,
+        id_map: &mut model::id_maps::Pass,
+        kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;
@@ -35,7 +35,7 @@ impl Pass {
             // Try to convert the signature's return type and all argument types
             let Some(cs_rval) = id_map.ty(rust_signature.rval) else {
                 // Return type not yet mapped, skip for now
-                pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(rust_signature.rval));
+                pass_meta.lost_found.missing(self.info, crate::pass::MissingItem::RustType(rust_signature.rval));
                 outcome = Changed;
                 continue;
             };
@@ -46,7 +46,7 @@ impl Pass {
             for rust_arg in &rust_signature.arguments {
                 let Some(cs_arg_type) = id_map.ty(rust_arg.ty) else {
                     // Argument type not yet mapped, skip this delegate for now
-                    pass_meta.lost_found.missing(self.info, super::MissingItem::RustType(rust_arg.ty));
+                    pass_meta.lost_found.missing(self.info, crate::pass::MissingItem::RustType(rust_arg.ty));
                     all_args_available = false;
                     break;
                 };

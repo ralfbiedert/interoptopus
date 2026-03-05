@@ -20,7 +20,7 @@ impl Pass {
         Self { info: PassInfo { name: "model_id_maps" }, ty: Default::default(), fns: Default::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut super::PassMeta, _: &Types) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, _: &Types) -> ModelResult {
         Ok(Unchanged)
     }
 

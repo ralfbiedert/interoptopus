@@ -12,7 +12,7 @@
 use crate::lang::types::{Ownership, TypeKind};
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{model_type_kind, ModelResult, PassInfo};
+use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -28,7 +28,7 @@ impl Pass {
         Self { info: PassInfo { name: "model_type_blittable" }, blittable: Default::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut super::PassMeta, kinds: &model_type_kind::Pass) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, kinds: &model::types::kind::Pass) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (cs_id, type_kind) in kinds.iter() {

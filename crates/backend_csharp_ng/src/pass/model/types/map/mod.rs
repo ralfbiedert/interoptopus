@@ -1,9 +1,21 @@
 //! Creates the final Type instances from TypeKind and names.
 
+pub mod array;
+pub mod delegate;
+pub mod r#enum;
+pub mod enum_variants;
+pub mod opaque;
+pub mod patterns;
+pub mod pointer;
+pub mod primitives;
+pub mod service;
+pub mod r#struct;
+pub mod struct_fields;
+
 use crate::lang::types::Type;
 use crate::model::{TypeId, Types};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model_type_kind, model_type_names, ModelResult, PassInfo};
+use crate::pass::{model, ModelResult, PassInfo};
 
 #[derive(Default)]
 pub struct Config {}
@@ -18,7 +30,7 @@ impl Pass {
         Self { info: PassInfo { name: "model_type_map" }, types: Default::default() }
     }
 
-    pub fn process(&mut self, pass_meta: &mut super::PassMeta, kinds: &model_type_kind::Pass, names: &model_type_names::Pass) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, kinds: &model::types::kind::Pass, names: &model::types::names::Pass) -> ModelResult {
         let mut outcome = Unchanged;
 
         // Iterate through all kinds and create Types
@@ -29,7 +41,7 @@ impl Pass {
             }
 
             // Get the name for this type
-            let name = try_resolve!(names.name(*type_id), pass_meta, self.info, super::MissingItem::CsType(*type_id));
+            let name = try_resolve!(names.name(*type_id), pass_meta, self.info, crate::pass::MissingItem::CsType(*type_id));
 
             // Create the Type
             let ty = Type { name: name.clone(), kind: kind.clone() };
