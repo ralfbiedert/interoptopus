@@ -33,6 +33,7 @@ pub struct RustLibraryConfig {
     pub output_master: output::master::Config,
     pub output_enum_ty: output::types::enum_ty::Config,
     pub output_enum_body: output::types::enum_body::Config,
+    pub output_enum_body_unmanaged: output::types::enum_body_unmanaged_variant::Config,
     pub output_enum: output::types::r#enum::Config,
     pub output_fn_imports: output::fn_import::Config,
     pub output_header: output::header::Config,
@@ -42,6 +43,7 @@ pub struct RustLibraryConfig {
 
 pub struct IntermediateOutputPasses {
     pub enum_ty: output::types::enum_ty::Pass,
+    pub enum_body_unmanaged: output::types::enum_body_unmanaged_variant::Pass,
     pub enum_body: output::types::enum_body::Pass,
     pub enums: output::types::r#enum::Pass,
     pub fn_imports: output::fn_import::Pass,
@@ -128,6 +130,7 @@ impl RustLibrary {
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
                 enum_ty: output::types::enum_ty::Pass::new(config.output_enum_ty),
+                enum_body_unmanaged: output::types::enum_body_unmanaged_variant::Pass::new(config.output_enum_body_unmanaged),
                 enum_body: output::types::enum_body::Pass::new(config.output_enum_body),
                 enums: output::types::r#enum::Pass::new(config.output_enum),
                 fn_imports: output::fn_import::Pass::new(config.output_fn_imports),
@@ -198,7 +201,8 @@ impl RustLibrary {
         // Output passes
         self.output_master.process(&mut pass_meta)?;
         self.output_passes.enum_ty.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable)?;
-        self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable)?;
+        self.output_passes.enum_body_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable)?;
+        self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable, &self.output_passes.enum_body_unmanaged)?;
         self.output_passes.enums.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.enum_ty, &self.output_passes.enum_body)?;
         self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;

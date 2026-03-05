@@ -60,6 +60,8 @@ impl Pass {
                 }
             }
 
+            imports.sort();
+
             self.fn_imports.insert(output.clone(), imports);
         }
 

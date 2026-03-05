@@ -54,6 +54,8 @@ impl Pass {
                 rendered_enums.push(rendered);
             }
 
+            rendered_enums.sort();
+
             self.enums.insert(file.clone(), rendered_enums);
         }
 
