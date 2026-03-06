@@ -20,13 +20,26 @@ impl Multibuf {
         self.buffers.get(name)
     }
 
-    pub fn write_buffer(&self, path: &str) -> Result<(), std::io::Error> {
-        let path = Path::new(path);
-        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
-        let content = self.buffers.get(name).ok_or_else(|| {
-            std::io::Error::new(std::io::ErrorKind::NotFound, format!("buffer '{}' not found", name))
-        })?;
-        fs::write(path, content)?;
+    pub fn write_buffer(&self, name: &str) -> Result<(), std::io::Error> {
+        self.write_buffer_to(".", name)
+    }
+
+    /// Writes the named buffer to a destination path, joining `dir` and `name`.
+    pub fn write_buffer_to(&self, dir: impl AsRef<Path>, name: &str) -> Result<(), std::io::Error> {
+        let content = self
+            .buffers
+            .get(name)
+            .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, format!("buffer '{}' not found", name)))?;
+        fs::write(dir.as_ref().join(name), content)?;
+        Ok(())
+    }
+
+    /// Writes all buffers into the given directory.
+    pub fn write_buffers_to(&self, dir: impl AsRef<Path>) -> Result<(), std::io::Error> {
+        let dir = dir.as_ref();
+        for (name, content) in &self.buffers {
+            fs::write(dir.join(name), content)?;
+        }
         Ok(())
     }
 

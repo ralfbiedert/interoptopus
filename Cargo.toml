@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/*",
+    "examples/hello_world",
     # TODO: DELETE THIS SECTION - Excluded for now while refactoring
     # "examples/real_project_layout/*",
     # "tests",

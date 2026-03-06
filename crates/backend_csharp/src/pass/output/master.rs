@@ -25,16 +25,12 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(config: Config) -> Self {
-        Self {
-            info: PassInfo { name: file!() },
-            config,
-            outputs: vec![],
-        }
+        Self { info: PassInfo { name: file!() }, config, outputs: vec![] }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta) -> OutputResult {
         // TODO: for each possible file, create an entry
-        self.outputs.push(Output { name: "Foo.cs".to_string(), kind: OutputKind::Csharp });
+        self.outputs.push(Output { name: "Interop.cs".to_string(), kind: OutputKind::Csharp });
         Ok(())
     }
 

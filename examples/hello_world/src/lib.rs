@@ -28,13 +28,11 @@ fn generate_bindings() -> Result<(), Box<dyn std::error::Error>> {
         .register(function!(my_function))
         .validate();
 
-    let multibuf = RustLibrary::builder(inventory)
+    RustLibrary::builder(inventory)
         .dll_name("hello_world")
         .build()
-        .process()?;
-
-    // _ = multibuf.write_buffer("bindings/Interop.cs")?;
-    _ = multibuf.write_buffer("Foo.cs")?;
+        .process()?
+        .write_buffers_to("bindings/")?;
 
     Ok(())
 }
