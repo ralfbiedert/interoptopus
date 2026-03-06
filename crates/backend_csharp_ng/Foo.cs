@@ -840,133 +840,13 @@ namespace A {
         
 
         
-        public partial class Layer3<String>
-        {
-            uint _variant;
-            Layer1<String> A;
-            Layer2<String> B;
-        }
-
-
-        public partial class Layer3<String> : IDisposable
-        {
-            [StructLayout(LayoutKind.Sequential)]
-            internal unsafe struct UnmanagedA
-            {
-                internal uint _variant;
-                internal Layer1<String>.Unmanaged _A;
-            }
-    
-            [StructLayout(LayoutKind.Sequential)]
-            internal unsafe struct UnmanagedB
-            {
-                internal uint _variant;
-                internal Layer2<String>.Unmanaged _B;
-            }
-    
-
-            [StructLayout(LayoutKind.Explicit)]
-            public unsafe struct Unmanaged
-            {
-                [FieldOffset(0)]
-                internal uint _variant;
-
-                [FieldOffset(0)]
-                internal UnmanagedA _A;
-
-                [FieldOffset(0)]
-                internal UnmanagedB _B;
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                internal Layer3<String> ToManaged()
-                {
-                    var _managed = new Layer3<String>();
-                    _managed._variant = _variant;
-                    if (_variant == 0) _managed._A = _A._A.IntoManaged();
-                    if (_variant == 1) _managed._B = _B._B.IntoManaged();
-                    return _managed;
-                }
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            internal Unmanaged IntoUnmanaged()
-            {
-                var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
-                if (_variant == 0) _unmanaged._A._A = _A.IntoUnmanaged();
-                if (_variant == 1) _unmanaged._B._B = _B.IntoUnmanaged();
-                return _unmanaged;
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            internal Unmanaged AsUnmanaged()
-            {
-                var _unmanaged = new Unmanaged();
-                _unmanaged._variant = _variant;
-                if (_variant == 0) _unmanaged._A._A = _A.AsUnmanaged();
-                if (_variant == 1) _unmanaged._B._B = _B.AsUnmanaged();
-                return _unmanaged;
-            }
-
-            // Ctors
-            public static Layer3<String> A(Layer1<String> value) => new() { _variant = 0, _A = value };
-            public static Layer3<String> B(Layer2<String> value) => new() { _variant = 1, _B = value };
-
-            // Checks
-            public bool IsA => _variant == 0;
-            public bool IsB => _variant == 1;
-
-            // Conversions
-            public Layer1<String> AsA() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _A; } }
-            public Layer2<String> AsB() { if (_variant != 1) { throw ExceptionForVariant(); } else { return _B; } }
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public override string ToString()
-            {
-                if (_variant == 0) return "A(...)";
-                if (_variant == 1) return "B(...)";
-                throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
-            }
-
-            [CustomMarshaller(typeof(Layer3<String>), MarshalMode.Default, typeof(Marshaller))]
-            private struct MarshallerMeta { }
-
-            public ref struct Marshaller
-            {
-                private Layer3<String> _managed;
-                private Unmanaged _unmanaged;
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public Marshaller(Layer3<String> managed) { _managed = managed; }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public void FromManaged(Layer3<String> managed) { _managed = managed; }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public Layer3<String> ToManaged() { return _unmanaged.ToManaged(); }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public void Free() {}
-            }
-
-        }
-        
-        public partial struct EnumDocumented
+        public partial class EnumDocumented
         {
             uint _variant;
         }
 
 
-        public partial struct EnumDocumented
+        public partial class EnumDocumented
         {
 
             [StructLayout(LayoutKind.Explicit)]
@@ -1056,7 +936,7 @@ namespace A {
 
         }
         
-        public partial struct EnumNum
+        public partial class EnumNum
         {
             uint _variant;
             nuint A;
@@ -1064,7 +944,7 @@ namespace A {
         }
 
 
-        public partial struct EnumNum
+        public partial class EnumNum
         {
             [StructLayout(LayoutKind.Sequential)]
             internal unsafe struct UnmanagedA
@@ -1180,7 +1060,7 @@ namespace A {
 
         }
         
-        public partial struct EnumPayload
+        public partial class EnumPayload
         {
             uint _variant;
             Vec3f32 B;
@@ -1188,13 +1068,13 @@ namespace A {
         }
 
 
-        public partial struct EnumPayload
+        public partial class EnumPayload
         {
             [StructLayout(LayoutKind.Sequential)]
             internal unsafe struct UnmanagedB
             {
                 internal uint _variant;
-                internal Vec3f32 _B;
+                internal Vec3f32.Unmanaged _B;
             }
     
             [StructLayout(LayoutKind.Sequential)]
@@ -1304,13 +1184,13 @@ namespace A {
 
         }
         
-        public partial struct EnumRenamed
+        public partial class EnumRenamed
         {
             uint _variant;
         }
 
 
-        public partial struct EnumRenamed
+        public partial class EnumRenamed
         {
 
             [StructLayout(LayoutKind.Explicit)]
@@ -1392,13 +1272,13 @@ namespace A {
 
         }
         
-        public partial struct Error
+        public partial class Error
         {
             uint _variant;
         }
 
 
-        public partial struct Error
+        public partial class Error
         {
 
             [StructLayout(LayoutKind.Explicit)]
@@ -1473,6 +1353,126 @@ namespace A {
 
                 [MethodImpl(MethodImplOptions.AggressiveOptimization)]
                 public Error ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Layer3<String>
+        {
+            uint _variant;
+            Layer1<String> A;
+            Layer2<String> B;
+        }
+
+
+        public partial class Layer3<String> : IDisposable
+        {
+            [StructLayout(LayoutKind.Sequential)]
+            internal unsafe struct UnmanagedA
+            {
+                internal uint _variant;
+                internal Layer1<String>.Unmanaged _A;
+            }
+    
+            [StructLayout(LayoutKind.Sequential)]
+            internal unsafe struct UnmanagedB
+            {
+                internal uint _variant;
+                internal Layer2<String>.Unmanaged _B;
+            }
+    
+
+            [StructLayout(LayoutKind.Explicit)]
+            public unsafe struct Unmanaged
+            {
+                [FieldOffset(0)]
+                internal uint _variant;
+
+                [FieldOffset(0)]
+                internal UnmanagedA _A;
+
+                [FieldOffset(0)]
+                internal UnmanagedB _B;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Layer3<String> ToManaged()
+                {
+                    var _managed = new Layer3<String>();
+                    _managed._variant = _variant;
+                    if (_variant == 0) _managed._A = _A._A.IntoManaged();
+                    if (_variant == 1) _managed._B = _B._B.IntoManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged IntoUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                if (_variant == 0) _unmanaged._A._A = _A.IntoUnmanaged();
+                if (_variant == 1) _unmanaged._B._B = _B.IntoUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                if (_variant == 0) _unmanaged._A._A = _A.AsUnmanaged();
+                if (_variant == 1) _unmanaged._B._B = _B.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            // Ctors
+            public static Layer3<String> A(Layer1<String> value) => new() { _variant = 0, _A = value };
+            public static Layer3<String> B(Layer2<String> value) => new() { _variant = 1, _B = value };
+
+            // Checks
+            public bool IsA => _variant == 0;
+            public bool IsB => _variant == 1;
+
+            // Conversions
+            public Layer1<String> AsA() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _A; } }
+            public Layer2<String> AsB() { if (_variant != 1) { throw ExceptionForVariant(); } else { return _B; } }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                if (_variant == 0) return "A(...)";
+                if (_variant == 1) return "B(...)";
+                throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+            }
+
+            [CustomMarshaller(typeof(Layer3<String>), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+
+            public ref struct Marshaller
+            {
+                private Layer3<String> _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Layer3<String> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Layer3<String> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Layer3<String> ToManaged() { return _unmanaged.ToManaged(); }
 
                 [MethodImpl(MethodImplOptions.AggressiveOptimization)]
                 public void Free() {}

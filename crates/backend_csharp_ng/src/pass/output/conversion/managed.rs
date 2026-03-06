@@ -78,16 +78,4 @@ impl Pass {
         }
     }
 
-    pub fn struct_or_class(&self, ty: TypeId) -> &'static str {
-        match self.conversions.get(&ty) {
-            Some(ManagedConversion::AsIs) => "struct",
-            Some(ManagedConversion::To) => "class",
-            Some(ManagedConversion::Into) => "class",
-            None => panic!("Unknown conversion for type {:?}", ty),
-        }
-    }
-
-    pub fn is_as_is(&self, ty: TypeId) -> bool {
-        matches!(self.conversions.get(&ty), Some(ManagedConversion::AsIs))
-    }
 }
