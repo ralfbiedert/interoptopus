@@ -1,14 +1,22 @@
 // Ctors
-public static EnumPayload A => new() { _variant = 0 };
-public static EnumPayload B(Vec3f32 value) => new() { _variant = 1, _B = value };
-public static EnumPayload C(uint value) => new() { _variant = 2, _C = value };
+{%- for v in variants %}
+{%- if v.has_payload %}
+public static {{ name }} {{ v.name }}({{ v.type }} value) => new() { _variant = {{ v.id }}, _{{ v.name }} = value };
+{%- else %}
+public static {{ name }} {{ v.name }} => new() { _variant = {{ v.id }} };
+{%- endif %}
+{%- endfor %}
 
-// checks
-public bool IsA => _variant == 0;
-public bool IsB => _variant == 1;
-public bool IsC => _variant == 2;
+// Checks
+{%- for v in variants %}
+public bool Is{{ v.name }} => _variant == {{ v.id }};
+{%- endfor %}
 
-// conversions
-public void AsA() { if (_variant != 0) throw ExceptionForVariant(); }
-public Vec3f32 AsB() { if (_variant != 1) { throw ExceptionForVariant(); } else { return _B; } }
-public uint AsC() { if (_variant != 2) { throw ExceptionForVariant(); } else { return _C; } }
+// Conversions
+{%- for v in variants %}
+{%- if v.has_payload %}
+public {{ v.type }} As{{ v.name }}() { if (_variant != {{ v.id }}) { throw ExceptionForVariant(); } else { return _{{ v.name }}; } }
+{%- else %}
+public void As{{ v.name }}() { if (_variant != {{ v.id }}) throw ExceptionForVariant(); }
+{%- endif %}
+{%- endfor %}

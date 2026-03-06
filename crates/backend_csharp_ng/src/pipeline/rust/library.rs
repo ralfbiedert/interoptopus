@@ -41,6 +41,8 @@ pub struct RustLibraryConfig {
     pub output_enum_body_unmanaged: output::types::enums::body_unmanaged::Config,
     pub output_enum_body_to_unmanaged: output::types::enums::body_to_unmanaged::Config,
     pub output_enum_body_as_unmanaged: output::types::enums::body_as_unmanaged::Config,
+    pub output_enum_body_ctors: output::types::enums::body_ctors::Config,
+    pub output_enum_body_tostring: output::types::enums::body_tostring::Config,
     pub output_enum: output::types::enums::all::Config,
     pub output_fn_imports: output::fns::import::Config,
     pub output_header: output::header::Config,
@@ -55,6 +57,8 @@ pub struct IntermediateOutputPasses {
     pub enum_body_unmanaged: output::types::enums::body_unmanaged::Pass,
     pub enum_body_to_unmanaged: output::types::enums::body_to_unmanaged::Pass,
     pub enum_body_as_unmanaged: output::types::enums::body_as_unmanaged::Pass,
+    pub enum_body_ctors: output::types::enums::body_ctors::Pass,
+    pub enum_body_tostring: output::types::enums::body_tostring::Pass,
     pub enum_body: output::types::enums::body::Pass,
     pub enums: output::types::enums::all::Pass,
     pub fn_imports: output::fns::import::Pass,
@@ -152,6 +156,8 @@ impl RustLibrary {
                 enum_body_unmanaged: output::types::enums::body_unmanaged::Pass::new(config.output_enum_body_unmanaged),
                 enum_body_to_unmanaged: output::types::enums::body_to_unmanaged::Pass::new(config.output_enum_body_to_unmanaged),
                 enum_body_as_unmanaged: output::types::enums::body_as_unmanaged::Pass::new(config.output_enum_body_as_unmanaged),
+                enum_body_ctors: output::types::enums::body_ctors::Pass::new(config.output_enum_body_ctors),
+                enum_body_tostring: output::types::enums::body_tostring::Pass::new(config.output_enum_body_tostring),
                 enum_body: output::types::enums::body::Pass::new(config.output_enum_body),
                 enums: output::types::enums::all::Pass::new(config.output_enum),
                 fn_imports: output::fns::import::Pass::new(config.output_fn_imports),
@@ -230,7 +236,9 @@ impl RustLibrary {
         self.output_passes.enum_body_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
         self.output_passes.enum_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
         self.output_passes.enum_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
-        self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable, &self.output_passes.enum_body_unmanaged_variant, &self.output_passes.enum_body_unmanaged, &self.output_passes.enum_body_to_unmanaged, &self.output_passes.enum_body_as_unmanaged)?;
+        self.output_passes.enum_body_ctors.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names)?;
+        self.output_passes.enum_body_tostring.process(&mut pass_meta, &self.output_master, &self.model_type_kinds)?;
+        self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable, &self.output_passes.enum_body_unmanaged_variant, &self.output_passes.enum_body_unmanaged, &self.output_passes.enum_body_to_unmanaged, &self.output_passes.enum_body_as_unmanaged, &self.output_passes.enum_body_ctors, &self.output_passes.enum_body_tostring)?;
         self.output_passes.enums.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.enum_ty, &self.output_passes.enum_body)?;
         self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;

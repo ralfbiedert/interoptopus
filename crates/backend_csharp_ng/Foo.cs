@@ -907,6 +907,57 @@ namespace A {
                 if (_variant == 1) _unmanaged._B._B = _B.AsUnmanaged();
                 return _unmanaged;
             }
+
+            // Ctors
+            public static Layer3<String> A(Layer1<String> value) => new() { _variant = 0, _A = value };
+            public static Layer3<String> B(Layer2<String> value) => new() { _variant = 1, _B = value };
+
+            // Checks
+            public bool IsA => _variant == 0;
+            public bool IsB => _variant == 1;
+
+            // Conversions
+            public Layer1<String> AsA() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _A; } }
+            public Layer2<String> AsB() { if (_variant != 1) { throw ExceptionForVariant(); } else { return _B; } }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                if (_variant == 0) return "A(...)";
+                if (_variant == 1) return "B(...)";
+                throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+            }
+
+            [CustomMarshaller(typeof(Layer3<String>), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+
+            public ref struct Marshaller
+            {
+                private Layer3<String> _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Layer3<String> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Layer3<String> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Layer3<String> ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
         }
         
         public partial struct EnumDocumented
@@ -948,6 +999,61 @@ namespace A {
                 _unmanaged._variant = _variant;
                 return _unmanaged;
             }
+
+            // Ctors
+            public static EnumDocumented A( value) => new() { _variant = 0, _A = value };
+            public static EnumDocumented B( value) => new() { _variant = 0, _B = value };
+            public static EnumDocumented C( value) => new() { _variant = 0, _C = value };
+
+            // Checks
+            public bool IsA => _variant == 0;
+            public bool IsB => _variant == 0;
+            public bool IsC => _variant == 0;
+
+            // Conversions
+            public  AsA() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _A; } }
+            public  AsB() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _B; } }
+            public  AsC() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _C; } }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                if (_variant == 0) return "A(...)";
+                if (_variant == 0) return "B(...)";
+                if (_variant == 0) return "C(...)";
+                throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+            }
+
+            [CustomMarshaller(typeof(EnumDocumented), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+
+            public ref struct Marshaller
+            {
+                private EnumDocumented _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(EnumDocumented managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(EnumDocumented managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public EnumDocumented ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
         }
         
         public partial struct EnumNum
@@ -1017,6 +1123,61 @@ namespace A {
                 if (_variant == 2) _unmanaged._C._C = _C;
                 return _unmanaged;
             }
+
+            // Ctors
+            public static EnumNum A(nuint value) => new() { _variant = 0, _A = value };
+            public static EnumNum B( value) => new() { _variant = 0, _B = value };
+            public static EnumNum C(nint value) => new() { _variant = 2, _C = value };
+
+            // Checks
+            public bool IsA => _variant == 0;
+            public bool IsB => _variant == 0;
+            public bool IsC => _variant == 2;
+
+            // Conversions
+            public nuint AsA() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _A; } }
+            public  AsB() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _B; } }
+            public nint AsC() { if (_variant != 2) { throw ExceptionForVariant(); } else { return _C; } }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                if (_variant == 0) return "A(...)";
+                if (_variant == 0) return "B(...)";
+                if (_variant == 2) return "C(...)";
+                throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+            }
+
+            [CustomMarshaller(typeof(EnumNum), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+
+            public ref struct Marshaller
+            {
+                private EnumNum _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(EnumNum managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(EnumNum managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public EnumNum ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
         }
         
         public partial struct EnumPayload
@@ -1086,6 +1247,61 @@ namespace A {
                 if (_variant == 2) _unmanaged._C._C = _C;
                 return _unmanaged;
             }
+
+            // Ctors
+            public static EnumPayload A( value) => new() { _variant = 0, _A = value };
+            public static EnumPayload B(Vec3f32 value) => new() { _variant = 1, _B = value };
+            public static EnumPayload C(uint value) => new() { _variant = 2, _C = value };
+
+            // Checks
+            public bool IsA => _variant == 0;
+            public bool IsB => _variant == 1;
+            public bool IsC => _variant == 2;
+
+            // Conversions
+            public  AsA() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _A; } }
+            public Vec3f32 AsB() { if (_variant != 1) { throw ExceptionForVariant(); } else { return _B; } }
+            public uint AsC() { if (_variant != 2) { throw ExceptionForVariant(); } else { return _C; } }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                if (_variant == 0) return "A(...)";
+                if (_variant == 1) return "B(...)";
+                if (_variant == 2) return "C(...)";
+                throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+            }
+
+            [CustomMarshaller(typeof(EnumPayload), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+
+            public ref struct Marshaller
+            {
+                private EnumPayload _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(EnumPayload managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(EnumPayload managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public EnumPayload ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
         }
         
         public partial struct EnumRenamed
@@ -1127,6 +1343,53 @@ namespace A {
                 _unmanaged._variant = _variant;
                 return _unmanaged;
             }
+
+            // Ctors
+            public static EnumRenamed X( value) => new() { _variant = 0, _X = value };
+
+            // Checks
+            public bool IsX => _variant == 0;
+
+            // Conversions
+            public  AsX() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _X; } }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                if (_variant == 0) return "X(...)";
+                throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+            }
+
+            [CustomMarshaller(typeof(EnumRenamed), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+
+            public ref struct Marshaller
+            {
+                private EnumRenamed _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(EnumRenamed managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(EnumRenamed managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public EnumRenamed ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
         }
         
         public partial struct Error
@@ -1168,6 +1431,53 @@ namespace A {
                 _unmanaged._variant = _variant;
                 return _unmanaged;
             }
+
+            // Ctors
+            public static Error Fail( value) => new() { _variant = 0, _Fail = value };
+
+            // Checks
+            public bool IsFail => _variant == 0;
+
+            // Conversions
+            public  AsFail() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _Fail; } }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                if (_variant == 0) return "Fail(...)";
+                throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+            }
+
+            [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+
+            public ref struct Marshaller
+            {
+                private Error _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Error managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Error managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Error ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
         }
         
 
