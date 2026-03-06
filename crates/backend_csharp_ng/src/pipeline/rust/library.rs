@@ -40,7 +40,7 @@ pub struct RustLibraryConfig {
     pub output_enum_body_unmanaged_variant: output::types::enum_body_unmanaged_variant::Config,
     pub output_enum_body_unmanaged: output::types::enum_body_unmanaged::Config,
     pub output_enum: output::types::r#enum::Config,
-    pub output_fn_imports: output::fn_import::Config,
+    pub output_fn_imports: output::fns::import::Config,
     pub output_header: output::header::Config,
     pub output_final: output::r#final::Config,
     _hidden: PhantomData<()>,
@@ -53,7 +53,7 @@ pub struct IntermediateOutputPasses {
     pub enum_body_unmanaged: output::types::enum_body_unmanaged::Pass,
     pub enum_body: output::types::enum_body::Pass,
     pub enums: output::types::r#enum::Pass,
-    pub fn_imports: output::fn_import::Pass,
+    pub fn_imports: output::fns::import::Pass,
     pub header: output::header::Pass,
 }
 
@@ -148,7 +148,7 @@ impl RustLibrary {
                 enum_body_unmanaged: output::types::enum_body_unmanaged::Pass::new(config.output_enum_body_unmanaged),
                 enum_body: output::types::enum_body::Pass::new(config.output_enum_body),
                 enums: output::types::r#enum::Pass::new(config.output_enum),
-                fn_imports: output::fn_import::Pass::new(config.output_fn_imports),
+                fn_imports: output::fns::import::Pass::new(config.output_fn_imports),
                 header: output::header::Pass::new(config.output_header),
             },
             output_final: output::r#final::Pass::new(config.output_final),

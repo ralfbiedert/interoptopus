@@ -15,7 +15,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "output_fn_imports" }, fn_imports: Default::default() }
+        Self { info: PassInfo { name: "output_fns_imports" }, fn_imports: Default::default() }
     }
 
     pub fn process(
@@ -55,7 +55,7 @@ impl Pass {
                     context.insert("args", &args);
                     context.insert("rval", rval);
 
-                    let import = templates.render("fn_import.cs", &context)?;
+                    let import = templates.render("fns/import.cs", &context)?;
                     imports.push(import);
                 }
             }
