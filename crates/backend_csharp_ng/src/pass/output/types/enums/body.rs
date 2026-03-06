@@ -26,8 +26,8 @@ impl Pass {
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
         blittable: &model::types::info::deleteme_blittable::Pass,
-        enum_body_unmanaged_variant: &output::types::enum_body_unmanaged_variant::Pass,
-        enum_body_unmanaged: &output::types::enum_body_unmanaged::Pass,
+        enum_body_unmanaged_variant: &output::types::enums::body_unmanaged_variant::Pass,
+        enum_body_unmanaged: &output::types::enums::body_unmanaged::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
