@@ -1,9 +1,10 @@
 [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-internal Unmanaged ToUnmanaged()
+internal Unmanaged {{ to_unmanaged }}()
 {
     var _unmanaged = new Unmanaged();
     _unmanaged._variant = _variant;
-    if (_variant == 1) _unmanaged._B._B = _B.ToUnmanaged();
-    if (_variant == 2) _unmanaged._C._C = _C;
+    {%- for v in variants %}
+    if (_variant == {{ v.id }}) _unmanaged._{{ v.name }}._{{ v.name }} = _{{ v.name }}{{ v.to_unmanaged }};
+    {%- endfor %}
     return _unmanaged;
 }
