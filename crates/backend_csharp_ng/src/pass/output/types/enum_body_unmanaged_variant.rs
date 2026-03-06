@@ -55,7 +55,7 @@ impl Pass {
                 context.insert("variant", &variant.name);
                 context.insert("variant_type", &variant_type);
 
-                let rendered = templates.render("types/enum_body_unmanaged_variant.cs", &context)?;
+                let rendered = templates.render("types/enum/body_unmanaged_variant.cs", &context)?;
                 rendered_variants.push(rendered);
             }
 

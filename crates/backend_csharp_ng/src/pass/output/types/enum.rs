@@ -50,7 +50,7 @@ impl Pass {
                 context.insert("enum_definition", enum_definition);
                 context.insert("enum_body", body);
 
-                let rendered = templates.render("types/enum_all.cs", &context)?;
+                let rendered = templates.render("types/enum/all.cs", &context)?;
                 rendered_enums.push(rendered);
             }
 
