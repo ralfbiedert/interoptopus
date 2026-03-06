@@ -1,6 +1,6 @@
 //! Builds a map of C# TypeId to proper C# type names.
 
-use crate::lang::types::{Primitive, TypeKind, TypePattern};
+use crate::lang::types::{Array, Primitive, TypeKind, TypePattern};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -56,6 +56,10 @@ impl Pass {
             let cs_name = match cs_kind {
                 TypeKind::Primitive(p) => primitive_name(p).to_string(),
                 TypeKind::Pointer(_) => "IntPtr".to_string(),
+                TypeKind::Array(a) => {
+                    let element = resolve_name!(self, a.ty, pass_meta);
+                    format!("{element}[]")
+                }
                 TypeKind::TypePattern(p) => match p {
                     TypePattern::Bool => "bool".to_string(),
                     TypePattern::CChar => "byte".to_string(),
@@ -73,9 +77,9 @@ impl Pass {
                         let err_name = pascal(resolve_name!(self, *err, pass_meta));
                         format!("Result{}{}", ok_name, err_name)
                     }
-                    TypePattern::NamedCallback(_) => ty.name.clone(),
+                    TypePattern::NamedCallback(_) => sanitize_name(&ty.name),
                 },
-                _ => ty.name.clone(),
+                _ => sanitize_name(&ty.name),
             };
 
             self.names.insert(cs_id, cs_name);
@@ -104,6 +108,38 @@ fn pascal(name: &str) -> String {
             result.push(c);
         }
     }
+    result
+}
+
+/// Sanitize a Rust type name into a valid C# identifier.
+///
+/// Strips angle brackets, commas, semicolons, square brackets, and spaces,
+/// then PascalCases the fragments. For example:
+/// - `Weird2<u8, 5>` → `Weird2U85`
+/// - `[u8; 5]` → `U85` (arrays should be handled before reaching this)
+/// - `MyStruct` → `MyStruct` (unchanged)
+fn sanitize_name(name: &str) -> String {
+    let mut result = String::with_capacity(name.len());
+    let mut capitalize_next = true;
+
+    for c in name.chars() {
+        match c {
+            '<' | '>' | ',' | ';' | '[' | ']' | ' ' => {
+                capitalize_next = true;
+            }
+            '_' => {
+                capitalize_next = true;
+            }
+            _ if capitalize_next => {
+                result.extend(c.to_uppercase());
+                capitalize_next = false;
+            }
+            _ => {
+                result.push(c);
+            }
+        }
+    }
+
     result
 }
 
