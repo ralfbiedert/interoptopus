@@ -1482,6 +1482,2752 @@ namespace A {
         
 
         
+        public partial class Array
+        {
+            public [u8; 16] data;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Array
+        {
+            public Array() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal [u8; 16] data;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Array ToManaged()
+                {
+                    var _managed = new Array();
+                    _managed.data = data.ToManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.data = data.ToUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.data = data.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Array { ... }";
+            }
+
+            [CustomMarshaller(typeof(Array), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Array _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Array managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Array managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Array ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class BoolField
+        {
+            public bool val;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class BoolField
+        {
+            public BoolField() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal bool val;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal BoolField ToManaged()
+                {
+                    var _managed = new BoolField();
+                    _managed.val = val;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.val = val;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.val = val;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "BoolField { ... }";
+            }
+
+            [CustomMarshaller(typeof(BoolField), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private BoolField _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(BoolField managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(BoolField managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public BoolField ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class CallbackTable
+        {
+            public MyCallback my_callback;
+            public MyCallbackNamespaced my_callback_namespaced;
+            public MyCallbackVoid my_callback_void;
+            public MyCallbackContextual my_callback_contextual;
+            public SumDelegate1 sum_delegate_1;
+            public SumDelegate2 sum_delegate_2;
+            public SumDelegateReturn sum_delegate_return;
+            public SumDelegateReturn2 sum_delegate_return_2;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class CallbackTable
+        {
+            public CallbackTable() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal MyCallback my_callback;
+                internal MyCallbackNamespaced my_callback_namespaced;
+                internal MyCallbackVoid my_callback_void;
+                internal MyCallbackContextual my_callback_contextual;
+                internal SumDelegate1 sum_delegate_1;
+                internal SumDelegate2 sum_delegate_2;
+                internal SumDelegateReturn sum_delegate_return;
+                internal SumDelegateReturn2 sum_delegate_return_2;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal CallbackTable ToManaged()
+                {
+                    var _managed = new CallbackTable();
+                    _managed.my_callback = my_callback.ToManaged();
+                    _managed.my_callback_namespaced = my_callback_namespaced.ToManaged();
+                    _managed.my_callback_void = my_callback_void.ToManaged();
+                    _managed.my_callback_contextual = my_callback_contextual.ToManaged();
+                    _managed.sum_delegate_1 = sum_delegate_1.ToManaged();
+                    _managed.sum_delegate_2 = sum_delegate_2.ToManaged();
+                    _managed.sum_delegate_return = sum_delegate_return.ToManaged();
+                    _managed.sum_delegate_return_2 = sum_delegate_return_2.ToManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.my_callback = my_callback.ToUnmanaged();
+                _unmanaged.my_callback_namespaced = my_callback_namespaced.ToUnmanaged();
+                _unmanaged.my_callback_void = my_callback_void.ToUnmanaged();
+                _unmanaged.my_callback_contextual = my_callback_contextual.ToUnmanaged();
+                _unmanaged.sum_delegate_1 = sum_delegate_1.ToUnmanaged();
+                _unmanaged.sum_delegate_2 = sum_delegate_2.ToUnmanaged();
+                _unmanaged.sum_delegate_return = sum_delegate_return.ToUnmanaged();
+                _unmanaged.sum_delegate_return_2 = sum_delegate_return_2.ToUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.my_callback = my_callback.AsUnmanaged();
+                _unmanaged.my_callback_namespaced = my_callback_namespaced.AsUnmanaged();
+                _unmanaged.my_callback_void = my_callback_void.AsUnmanaged();
+                _unmanaged.my_callback_contextual = my_callback_contextual.AsUnmanaged();
+                _unmanaged.sum_delegate_1 = sum_delegate_1.AsUnmanaged();
+                _unmanaged.sum_delegate_2 = sum_delegate_2.AsUnmanaged();
+                _unmanaged.sum_delegate_return = sum_delegate_return.AsUnmanaged();
+                _unmanaged.sum_delegate_return_2 = sum_delegate_return_2.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "CallbackTable { ... }";
+            }
+
+            [CustomMarshaller(typeof(CallbackTable), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private CallbackTable _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(CallbackTable managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(CallbackTable managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public CallbackTable ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class CharArray
+        {
+            public FixedString<32> str;
+            public FixedString<32> str_2;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class CharArray
+        {
+            public CharArray() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal FixedString<32> str;
+                internal FixedString<32> str_2;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal CharArray ToManaged()
+                {
+                    var _managed = new CharArray();
+                    _managed.str = str.ToManaged();
+                    _managed.str_2 = str_2.ToManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.str = str.ToUnmanaged();
+                _unmanaged.str_2 = str_2.ToUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.str = str.AsUnmanaged();
+                _unmanaged.str_2 = str_2.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "CharArray { ... }";
+            }
+
+            [CustomMarshaller(typeof(CharArray), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private CharArray _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(CharArray managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(CharArray managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public CharArray ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Container
+        {
+            public Local foreign;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Container
+        {
+            public Container() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal Local foreign;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Container ToManaged()
+                {
+                    var _managed = new Container();
+                    _managed.foreign = foreign.ToManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.foreign = foreign.ToUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.foreign = foreign.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Container { ... }";
+            }
+
+            [CustomMarshaller(typeof(Container), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Container _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Container managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Container managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Container ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class ExtraType<f32>
+        {
+            public float x;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class ExtraType<f32>
+        {
+            public ExtraType<f32>() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal float x;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal ExtraType<f32> ToManaged()
+                {
+                    var _managed = new ExtraType<f32>();
+                    _managed.x = x;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "ExtraType<f32> { ... }";
+            }
+
+            [CustomMarshaller(typeof(ExtraType<f32>), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private ExtraType<f32> _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(ExtraType<f32> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(ExtraType<f32> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public ExtraType<f32> ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class FixedString<32>
+        {
+            public [u8; 32] data;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class FixedString<32>
+        {
+            public FixedString<32>() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal [u8; 32] data;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal FixedString<32> ToManaged()
+                {
+                    var _managed = new FixedString<32>();
+                    _managed.data = data.ToManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.data = data.ToUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.data = data.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "FixedString<32> { ... }";
+            }
+
+            [CustomMarshaller(typeof(FixedString<32>), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private FixedString<32> _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(FixedString<32> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(FixedString<32> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public FixedString<32> ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Generic<u32>
+        {
+            public IntPtr x;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Generic<u32>
+        {
+            public Generic<u32>() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal IntPtr x;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Generic<u32> ToManaged()
+                {
+                    var _managed = new Generic<u32>();
+                    _managed.x = x;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Generic<u32> { ... }";
+            }
+
+            [CustomMarshaller(typeof(Generic<u32>), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Generic<u32> _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Generic<u32> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Generic<u32> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Generic<u32> ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Generic<u8>
+        {
+            public IntPtr x;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Generic<u8>
+        {
+            public Generic<u8>() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal IntPtr x;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Generic<u8> ToManaged()
+                {
+                    var _managed = new Generic<u8>();
+                    _managed.x = x;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Generic<u8> { ... }";
+            }
+
+            [CustomMarshaller(typeof(Generic<u8>), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Generic<u8> _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Generic<u8> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Generic<u8> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Generic<u8> ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class IVec3
+        {
+            public nint x;
+            public nint y;
+            public nint z;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class IVec3
+        {
+            public IVec3() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal nint x;
+                internal nint y;
+                internal nint z;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal IVec3 ToManaged()
+                {
+                    var _managed = new IVec3();
+                    _managed.x = x;
+                    _managed.y = y;
+                    _managed.z = z;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.y = y;
+                _unmanaged.z = z;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.y = y;
+                _unmanaged.z = z;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "IVec3 { ... }";
+            }
+
+            [CustomMarshaller(typeof(IVec3), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private IVec3 _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(IVec3 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(IVec3 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public IVec3 ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Inner
+        {
+            public float x;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Inner
+        {
+            public Inner() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal float x;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Inner ToManaged()
+                {
+                    var _managed = new Inner();
+                    _managed.x = x;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Inner { ... }";
+            }
+
+            [CustomMarshaller(typeof(Inner), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Inner _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Inner managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Inner managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Inner ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Layer1<String>
+        {
+            public OptionUtf8String maybe_1;
+            public VecUtf8String maybe_2;
+            public Utf8String maybe_3;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Layer1<String> : IDisposable
+        {
+            public Layer1<String>() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal OptionUtf8String maybe_1;
+                internal VecUtf8String maybe_2;
+                internal Utf8String maybe_3;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Layer1<String> ToManaged()
+                {
+                    var _managed = new Layer1<String>();
+                    _managed.maybe_1 = maybe_1.IntoManaged();
+                    _managed.maybe_2 = maybe_2.IntoManaged();
+                    _managed.maybe_3 = maybe_3.IntoManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged IntoUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.maybe_1 = maybe_1.IntoUnmanaged();
+                _unmanaged.maybe_2 = maybe_2.IntoUnmanaged();
+                _unmanaged.maybe_3 = maybe_3.IntoUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.maybe_1 = maybe_1.AsUnmanaged();
+                _unmanaged.maybe_2 = maybe_2.AsUnmanaged();
+                _unmanaged.maybe_3 = maybe_3.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Layer1<String> { ... }";
+            }
+
+            [CustomMarshaller(typeof(Layer1<String>), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Layer1<String> _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Layer1<String> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Layer1<String> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Layer1<String> ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Layer2<String>
+        {
+            public Layer1<String> layer_1;
+            public Vec3f32 vec;
+            public EnumPayload the_enum;
+            public VecUtf8String strings;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Layer2<String> : IDisposable
+        {
+            public Layer2<String>() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal Layer1<String> layer_1;
+                internal Vec3f32 vec;
+                internal EnumPayload the_enum;
+                internal VecUtf8String strings;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Layer2<String> ToManaged()
+                {
+                    var _managed = new Layer2<String>();
+                    _managed.layer_1 = layer_1.IntoManaged();
+                    _managed.vec = vec.ToManaged();
+                    _managed.the_enum = the_enum.ToManaged();
+                    _managed.strings = strings.IntoManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged IntoUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.layer_1 = layer_1.IntoUnmanaged();
+                _unmanaged.vec = vec.ToUnmanaged();
+                _unmanaged.the_enum = the_enum.ToUnmanaged();
+                _unmanaged.strings = strings.IntoUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.layer_1 = layer_1.AsUnmanaged();
+                _unmanaged.vec = vec.AsUnmanaged();
+                _unmanaged.the_enum = the_enum.AsUnmanaged();
+                _unmanaged.strings = strings.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Layer2<String> { ... }";
+            }
+
+            [CustomMarshaller(typeof(Layer2<String>), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Layer2<String> _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Layer2<String> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Layer2<String> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Layer2<String> ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Local
+        {
+            public uint x;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Local
+        {
+            public Local() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal uint x;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Local ToManaged()
+                {
+                    var _managed = new Local();
+                    _managed.x = x;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Local { ... }";
+            }
+
+            [CustomMarshaller(typeof(Local), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Local _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Local managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Local managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Local ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class NestedArray
+        {
+            public EnumRenamed field_enum;
+            public Vec3f32 field_vec;
+            public bool field_bool;
+            public int field_int;
+            public [u16; 5] field_array;
+            public [u16; 5] field_array_2;
+            public Array field_struct;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class NestedArray
+        {
+            public NestedArray() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal EnumRenamed field_enum;
+                internal Vec3f32 field_vec;
+                internal bool field_bool;
+                internal int field_int;
+                internal [u16; 5] field_array;
+                internal [u16; 5] field_array_2;
+                internal Array field_struct;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal NestedArray ToManaged()
+                {
+                    var _managed = new NestedArray();
+                    _managed.field_enum = field_enum.ToManaged();
+                    _managed.field_vec = field_vec.ToManaged();
+                    _managed.field_bool = field_bool;
+                    _managed.field_int = field_int;
+                    _managed.field_array = field_array.ToManaged();
+                    _managed.field_array_2 = field_array_2.ToManaged();
+                    _managed.field_struct = field_struct.ToManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.field_enum = field_enum.ToUnmanaged();
+                _unmanaged.field_vec = field_vec.ToUnmanaged();
+                _unmanaged.field_bool = field_bool;
+                _unmanaged.field_int = field_int;
+                _unmanaged.field_array = field_array.ToUnmanaged();
+                _unmanaged.field_array_2 = field_array_2.ToUnmanaged();
+                _unmanaged.field_struct = field_struct.ToUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.field_enum = field_enum.AsUnmanaged();
+                _unmanaged.field_vec = field_vec.AsUnmanaged();
+                _unmanaged.field_bool = field_bool;
+                _unmanaged.field_int = field_int;
+                _unmanaged.field_array = field_array.AsUnmanaged();
+                _unmanaged.field_array_2 = field_array_2.AsUnmanaged();
+                _unmanaged.field_struct = field_struct.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "NestedArray { ... }";
+            }
+
+            [CustomMarshaller(typeof(NestedArray), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private NestedArray _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(NestedArray managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(NestedArray managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public NestedArray ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Packed1
+        {
+            public byte x;
+            public ushort y;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Packed1
+        {
+            public Packed1() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal byte x;
+                internal ushort y;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Packed1 ToManaged()
+                {
+                    var _managed = new Packed1();
+                    _managed.x = x;
+                    _managed.y = y;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.y = y;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.y = y;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Packed1 { ... }";
+            }
+
+            [CustomMarshaller(typeof(Packed1), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Packed1 _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Packed1 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Packed1 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Packed1 ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Packed2
+        {
+            public ushort y;
+            public byte x;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Packed2
+        {
+            public Packed2() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal ushort y;
+                internal byte x;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Packed2 ToManaged()
+                {
+                    var _managed = new Packed2();
+                    _managed.y = y;
+                    _managed.x = x;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.y = y;
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.y = y;
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Packed2 { ... }";
+            }
+
+            [CustomMarshaller(typeof(Packed2), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Packed2 _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Packed2 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Packed2 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Packed2 ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Phantom<u8>
+        {
+            public uint x;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Phantom<u8>
+        {
+            public Phantom<u8>() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal uint x;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Phantom<u8> ToManaged()
+                {
+                    var _managed = new Phantom<u8>();
+                    _managed.x = x;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Phantom<u8> { ... }";
+            }
+
+            [CustomMarshaller(typeof(Phantom<u8>), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Phantom<u8> _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Phantom<u8> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Phantom<u8> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Phantom<u8> ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class StructDocumented
+        {
+            public float x;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class StructDocumented
+        {
+            public StructDocumented() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal float x;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal StructDocumented ToManaged()
+                {
+                    var _managed = new StructDocumented();
+                    _managed.x = x;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "StructDocumented { ... }";
+            }
+
+            [CustomMarshaller(typeof(StructDocumented), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private StructDocumented _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(StructDocumented managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(StructDocumented managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public StructDocumented ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class StructRenamed
+        {
+            public EnumRenamed e;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class StructRenamed
+        {
+            public StructRenamed() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal EnumRenamed e;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal StructRenamed ToManaged()
+                {
+                    var _managed = new StructRenamed();
+                    _managed.e = e.ToManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.e = e.ToUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.e = e.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "StructRenamed { ... }";
+            }
+
+            [CustomMarshaller(typeof(StructRenamed), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private StructRenamed _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(StructRenamed managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(StructRenamed managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public StructRenamed ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class TransparentNum
+        {
+            public nuint field_0;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class TransparentNum
+        {
+            public TransparentNum() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal nuint field_0;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal TransparentNum ToManaged()
+                {
+                    var _managed = new TransparentNum();
+                    _managed.field_0 = field_0;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.field_0 = field_0;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.field_0 = field_0;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "TransparentNum { ... }";
+            }
+
+            [CustomMarshaller(typeof(TransparentNum), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private TransparentNum _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(TransparentNum managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(TransparentNum managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public TransparentNum ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Tupled
+        {
+            public byte field_0;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Tupled
+        {
+            public Tupled() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal byte field_0;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Tupled ToManaged()
+                {
+                    var _managed = new Tupled();
+                    _managed.field_0 = field_0;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.field_0 = field_0;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.field_0 = field_0;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Tupled { ... }";
+            }
+
+            [CustomMarshaller(typeof(Tupled), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Tupled _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Tupled managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Tupled managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Tupled ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class UseCStrPtr
+        {
+            public CStrPtr ascii_string;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class UseCStrPtr
+        {
+            public UseCStrPtr() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal CStrPtr ascii_string;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal UseCStrPtr ToManaged()
+                {
+                    var _managed = new UseCStrPtr();
+                    _managed.ascii_string = ascii_string;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.ascii_string = ascii_string;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.ascii_string = ascii_string;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "UseCStrPtr { ... }";
+            }
+
+            [CustomMarshaller(typeof(UseCStrPtr), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private UseCStrPtr _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(UseCStrPtr managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(UseCStrPtr managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public UseCStrPtr ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class UseSliceAndVec
+        {
+            public SliceUtf8String s1;
+            public VecUtf8String s2;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class UseSliceAndVec : IDisposable
+        {
+            public UseSliceAndVec() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal SliceUtf8String s1;
+                internal VecUtf8String s2;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal UseSliceAndVec ToManaged()
+                {
+                    var _managed = new UseSliceAndVec();
+                    _managed.s1 = s1.ToManaged();
+                    _managed.s2 = s2.IntoManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged IntoUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.s1 = s1.ToUnmanaged();
+                _unmanaged.s2 = s2.IntoUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.s1 = s1.AsUnmanaged();
+                _unmanaged.s2 = s2.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "UseSliceAndVec { ... }";
+            }
+
+            [CustomMarshaller(typeof(UseSliceAndVec), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private UseSliceAndVec _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(UseSliceAndVec managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(UseSliceAndVec managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public UseSliceAndVec ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class UseString
+        {
+            public Utf8String s1;
+            public Utf8String s2;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class UseString : IDisposable
+        {
+            public UseString() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal Utf8String s1;
+                internal Utf8String s2;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal UseString ToManaged()
+                {
+                    var _managed = new UseString();
+                    _managed.s1 = s1.IntoManaged();
+                    _managed.s2 = s2.IntoManaged();
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged IntoUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.s1 = s1.IntoUnmanaged();
+                _unmanaged.s2 = s2.IntoUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.s1 = s1.AsUnmanaged();
+                _unmanaged.s2 = s2.AsUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "UseString { ... }";
+            }
+
+            [CustomMarshaller(typeof(UseString), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private UseString _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(UseString managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(UseString managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public UseString ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Vec
+        {
+            public double x;
+            public double z;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Vec
+        {
+            public Vec() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal double x;
+                internal double z;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Vec ToManaged()
+                {
+                    var _managed = new Vec();
+                    _managed.x = x;
+                    _managed.z = z;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.z = z;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.z = z;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Vec { ... }";
+            }
+
+            [CustomMarshaller(typeof(Vec), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Vec _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Vec managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Vec managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Vec ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Vec1
+        {
+            public float x;
+            public float y;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Vec1
+        {
+            public Vec1() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal float x;
+                internal float y;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Vec1 ToManaged()
+                {
+                    var _managed = new Vec1();
+                    _managed.x = x;
+                    _managed.y = y;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.y = y;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.y = y;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Vec1 { ... }";
+            }
+
+            [CustomMarshaller(typeof(Vec1), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Vec1 _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Vec1 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Vec1 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Vec1 ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Vec2
+        {
+            public double x;
+            public double z;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Vec2
+        {
+            public Vec2() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal double x;
+                internal double z;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Vec2 ToManaged()
+                {
+                    var _managed = new Vec2();
+                    _managed.x = x;
+                    _managed.z = z;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.z = z;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.z = z;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Vec2 { ... }";
+            }
+
+            [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Vec2 _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Vec2 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Vec2 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Vec2 ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Vec3f32
+        {
+            public float x;
+            public float y;
+            public float z;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Vec3f32
+        {
+            public Vec3f32() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal float x;
+                internal float y;
+                internal float z;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Vec3f32 ToManaged()
+                {
+                    var _managed = new Vec3f32();
+                    _managed.x = x;
+                    _managed.y = y;
+                    _managed.z = z;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.y = y;
+                _unmanaged.z = z;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                _unmanaged.y = y;
+                _unmanaged.z = z;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Vec3f32 { ... }";
+            }
+
+            [CustomMarshaller(typeof(Vec3f32), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Vec3f32 _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Vec3f32 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Vec3f32 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Vec3f32 ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Visibility1
+        {
+            public byte pblc;
+            public byte prvt;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Visibility1
+        {
+            public Visibility1() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal byte pblc;
+                internal byte prvt;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Visibility1 ToManaged()
+                {
+                    var _managed = new Visibility1();
+                    _managed.pblc = pblc;
+                    _managed.prvt = prvt;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.pblc = pblc;
+                _unmanaged.prvt = prvt;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.pblc = pblc;
+                _unmanaged.prvt = prvt;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Visibility1 { ... }";
+            }
+
+            [CustomMarshaller(typeof(Visibility1), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Visibility1 _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Visibility1 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Visibility1 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Visibility1 ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Visibility2
+        {
+            public byte pblc1;
+            public byte pblc2;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Visibility2
+        {
+            public Visibility2() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal byte pblc1;
+                internal byte pblc2;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Visibility2 ToManaged()
+                {
+                    var _managed = new Visibility2();
+                    _managed.pblc1 = pblc1;
+                    _managed.pblc2 = pblc2;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.pblc1 = pblc1;
+                _unmanaged.pblc2 = pblc2;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.pblc1 = pblc1;
+                _unmanaged.pblc2 = pblc2;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Visibility2 { ... }";
+            }
+
+            [CustomMarshaller(typeof(Visibility2), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Visibility2 _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Visibility2 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Visibility2 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Visibility2 ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Weird1<u32>
+        {
+            public uint x;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Weird1<u32>
+        {
+            public Weird1<u32>() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal uint x;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Weird1<u32> ToManaged()
+                {
+                    var _managed = new Weird1<u32>();
+                    _managed.x = x;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.x = x;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Weird1<u32> { ... }";
+            }
+
+            [CustomMarshaller(typeof(Weird1<u32>), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Weird1<u32> _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Weird1<u32> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Weird1<u32> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Weird1<u32> ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+        public partial class Weird2<u8, 5>
+        {
+            public byte t;
+            public [u8; 5] a;
+            public IntPtr r;
+        }
+
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Weird2<u8, 5>
+        {
+            public Weird2<u8, 5>() { }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public unsafe struct Unmanaged
+            {
+                internal byte t;
+                internal [u8; 5] a;
+                internal IntPtr r;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Weird2<u8, 5> ToManaged()
+                {
+                    var _managed = new Weird2<u8, 5>();
+                    _managed.t = t;
+                    _managed.a = a.ToManaged();
+                    _managed.r = r;
+                    return _managed;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.t = t;
+                _unmanaged.a = a.ToUnmanaged();
+                _unmanaged.r = r;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged.t = t;
+                _unmanaged.a = a.AsUnmanaged();
+                _unmanaged.r = r;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public override string ToString()
+            {
+                return "Weird2<u8, 5> { ... }";
+            }
+
+            [CustomMarshaller(typeof(Weird2<u8, 5>), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta { }
+            public ref struct Marshaller
+            {
+                private Weird2<u8, 5> _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Weird2<u8, 5> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Weird2<u8, 5> managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Weird2<u8, 5> ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+
+        }
+        
+
+        
     }
 }
 

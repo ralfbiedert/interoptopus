@@ -13,6 +13,10 @@ namespace A {
         {{ enum | indent(prefix = "        ") }}
         {% endfor %}
 
+        {% for composite in composites %}
+        {{ composite | indent(prefix = "        ") }}
+        {% endfor %}
+
         {{ types | indent }}
     }
 }

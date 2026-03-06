@@ -35,12 +35,14 @@ impl Pass {
             let types = ""; // TODO for now
             let fn_imports = intermediary.fn_imports.imports_for(file).unwrap();
             let enums = intermediary.enums.enums_for(file).unwrap();
+            let composites = intermediary.composites.composites_for(file).unwrap();
 
             context.insert("dll_name", meta_info.dll_name());
             context.insert("header", header);
             context.insert("types", &types);
             context.insert("fn_imports", &fn_imports);
             context.insert("enums", &enums);
+            context.insert("composites", &composites);
 
             let final_ = templates.render("final.cs", &context)?;
             output.add_buffer(&file.name, final_);

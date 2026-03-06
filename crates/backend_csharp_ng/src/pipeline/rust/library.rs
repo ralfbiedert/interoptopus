@@ -42,6 +42,12 @@ pub struct RustLibraryConfig {
     pub output_enum_body_ctors: output::types::enums::body_ctors::Config,
     pub output_enum_body_tostring: output::types::enums::body_tostring::Config,
     pub output_enum: output::types::enums::all::Config,
+    pub output_composite_ty: output::types::composites::definition::Config,
+    pub output_composite_body: output::types::composites::body::Config,
+    pub output_composite_body_unmanaged: output::types::composites::body_unmanaged::Config,
+    pub output_composite_body_to_unmanaged: output::types::composites::body_to_unmanaged::Config,
+    pub output_composite_body_as_unmanaged: output::types::composites::body_as_unmanaged::Config,
+    pub output_composite: output::types::composites::all::Config,
     pub output_fn_imports: output::fns::import::Config,
     pub output_header: output::header::Config,
     pub output_final: output::r#final::Config,
@@ -59,6 +65,12 @@ pub struct IntermediateOutputPasses {
     pub enum_body_tostring: output::types::enums::body_tostring::Pass,
     pub enum_body: output::types::enums::body::Pass,
     pub enums: output::types::enums::all::Pass,
+    pub composite_ty: output::types::composites::definition::Pass,
+    pub composite_body_unmanaged: output::types::composites::body_unmanaged::Pass,
+    pub composite_body_to_unmanaged: output::types::composites::body_to_unmanaged::Pass,
+    pub composite_body_as_unmanaged: output::types::composites::body_as_unmanaged::Pass,
+    pub composite_body: output::types::composites::body::Pass,
+    pub composites: output::types::composites::all::Pass,
     pub fn_imports: output::fns::import::Pass,
     pub header: output::header::Pass,
 }
@@ -154,6 +166,12 @@ impl RustLibrary {
                 enum_body_tostring: output::types::enums::body_tostring::Pass::new(config.output_enum_body_tostring),
                 enum_body: output::types::enums::body::Pass::new(config.output_enum_body),
                 enums: output::types::enums::all::Pass::new(config.output_enum),
+                composite_ty: output::types::composites::definition::Pass::new(config.output_composite_ty),
+                composite_body_unmanaged: output::types::composites::body_unmanaged::Pass::new(config.output_composite_body_unmanaged),
+                composite_body_to_unmanaged: output::types::composites::body_to_unmanaged::Pass::new(config.output_composite_body_to_unmanaged),
+                composite_body_as_unmanaged: output::types::composites::body_as_unmanaged::Pass::new(config.output_composite_body_as_unmanaged),
+                composite_body: output::types::composites::body::Pass::new(config.output_composite_body),
+                composites: output::types::composites::all::Pass::new(config.output_composite),
                 fn_imports: output::fns::import::Pass::new(config.output_fn_imports),
                 header: output::header::Pass::new(config.output_header),
             },
@@ -232,6 +250,12 @@ impl RustLibrary {
         self.output_passes.enum_body_tostring.process(&mut pass_meta, &self.output_master, &self.model_type_kinds)?;
         self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_managed_conversion, &self.model_type_disposable, &self.output_passes.enum_body_unmanaged_variant, &self.output_passes.enum_body_unmanaged, &self.output_passes.enum_body_to_unmanaged, &self.output_passes.enum_body_as_unmanaged, &self.output_passes.enum_body_ctors, &self.output_passes.enum_body_tostring)?;
         self.output_passes.enums.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.enum_ty, &self.output_passes.enum_body)?;
+        self.output_passes.composite_ty.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_managed_conversion)?;
+        self.output_passes.composite_body_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
+        self.output_passes.composite_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
+        self.output_passes.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
+        self.output_passes.composite_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_managed_conversion, &self.model_type_disposable, &self.output_passes.composite_body_unmanaged, &self.output_passes.composite_body_to_unmanaged, &self.output_passes.composite_body_as_unmanaged)?;
+        self.output_passes.composites.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.composite_ty, &self.output_passes.composite_body)?;
         self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.plugin_post_output_pass()?;
