@@ -15,4 +15,4 @@ core_library_ffi = { path = "../core_library_ffi" }
 [build-dependencies]
 core_library_ffi = { path = "../core_library_ffi" }
 interoptopus = { path = "../../../crates/core" }
-interoptopus_backend_csharp = { path = "../../../crates/backend_csharp" }
+interoptopus_backend_csharp = { path = "../../../crates/backend_csharp_old" }

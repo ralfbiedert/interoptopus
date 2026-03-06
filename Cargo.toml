@@ -8,7 +8,7 @@ members = [
 
 # TODO: DELETE THIS SECTION - Excluded for now while refactoring
 exclude = [
-    "crates/backend_csharp",
+    "crates/backend_csharp_old",
     "crates/backend_c",
     "crates/backend_cpython",
 ]
@@ -27,13 +27,13 @@ version = "0.15.0-alpha.18"
 interoptopus = { path = "crates/core", version = "=0.15.0-alpha.18" }
 interoptopus_proc = { path = "crates/proc_macros", version = "=0.15.0-alpha.18" }
 interoptopus_proc_impl = { path = "crates/proc_macros_impl", version = "=0.15.0-alpha.18" }
-interoptopus_backend_c = { path = "crates/backend_c", version = "=0.15.0-alpha.18" }
-interoptopus_backend_cpython = { path = "crates/backend_cpython", version = "=0.15.0-alpha.18" }
-interoptopus_backend_csharp = { path = "crates/backend_csharp", version = "=0.15.0-alpha.18" }
-interoptopus_backend_csharp_ng = { path = "crates/backend_csharp_ng", version = "=0.15.0-alpha.18" }
+interoptopus_c = { path = "crates/backend_c", version = "=0.15.0-alpha.18" }
+interoptopus_cpython = { path = "crates/backend_cpython", version = "=0.15.0-alpha.18" }
+interoptopus_csharp = { path = "crates/backend_csharp", version = "=0.15.0-alpha.18" }
+interoptopus_csharp_old = { path = "crates/backend_csharp_old", version = "=0.15.0-alpha.18" }
 interoptopus_backends = { path = "crates/backend_utils", version = "=0.15.0-alpha.18" }
 # Not published (no version dependency):
-interoptopus_reference_project = { path = "crates/reference_project" }
+reference_project = { path = "crates/reference_project" }
 
 
 # External

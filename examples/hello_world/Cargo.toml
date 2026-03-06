@@ -12,4 +12,4 @@ crate-type = ["cdylib", "rlib"]
 interoptopus = { path = "../../crates/core" }
 
 [dev-dependencies]
-interoptopus_backend_csharp = { path = "../../crates/backend_csharp" }
+interoptopus_backend_csharp = { path = "../../crates/backend_csharp_old" }

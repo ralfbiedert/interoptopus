@@ -1,5 +1,5 @@
-use backend_csharp_ng::RustLibrary;
 use interoptopus::inventory::RustInventory;
+use interoptopus_csharp::RustLibrary;
 
 #[test]
 fn rust_library() {

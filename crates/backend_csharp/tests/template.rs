@@ -1,5 +1,5 @@
-use backend_csharp_ng::template::templates;
 use interoptopus_backends::template::Context;
+use interoptopus_csharp::template::templates;
 
 #[test]
 fn load_templates() {

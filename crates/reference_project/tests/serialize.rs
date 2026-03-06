@@ -1,4 +1,4 @@
-use interoptopus_reference_project::ffi_inventory;
+use reference_project::ffi_inventory;
 use std::fs;
 
 #[test]

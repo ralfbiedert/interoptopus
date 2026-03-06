@@ -21,7 +21,7 @@ This runs tests and regenerates bindings for all target languages.
 
 ### Working with Individual Crates
 - `cargo build -p interoptopus` - Build core crate
-- `cargo test -p backend_csharp_ng` - Test C# backend (next-gen)
+- `cargo test -p interoptopus_csharp` - Test C# backend (next-gen)
 - `cargo check --workspace` - Quick check all crates
 
 ## Architecture
@@ -33,14 +33,14 @@ crates/
 ├── proc_macros/            # Proc macro crate used by core
 ├── proc_macros_impl/       # Procedural macros (#[ffi_type], #[ffi_function]) incl. testing function
 ├── backend_c/              # C header generation
-├── backend_csharp/         # C# bindings generation
-├── backend_csharp_ng/      # Next-gen C# backend (experimental)
+├── backend_csharp/         # Next-gen C# backend (experimental)
+├── backend_csharp_old/     # Old C# backend
 ├── backend_cpython/        # Python bindings generation
 ├── backend_utils/          # Shared utilities for backends
 └── reference_project/      # Comprehensive test project using all features
 ```
 
-Note: `backend_csharp`, `backend_c`, and `backend_cpython` are currently excluded from the workspace while refactoring is in progress. The active workspace members are `core`, `proc_macros`, `proc_macros_impl`, `backend_csharp_ng`, `backend_utils`, and `reference_project`.
+Note: `backend_csharp`, `backend_c`, and `backend_cpython` are currently excluded from the workspace while refactoring is in progress. The active workspace members are `core`, `proc_macros`, `proc_macros_impl`, `backend_csharp`, `backend_utils`, and `reference_project`.
 
 ### Core Components
 
@@ -72,11 +72,11 @@ Key modules:
 - `services/` - Service pattern examples
 - `constants.rs` - Constant exports
 
-### New C# Backend (`backend_csharp_ng`)
+### New C# Backend (`backend_csharp`)
 
 The next-gen C# backend uses a **multi-pass pipeline** architecture. Processing happens in `RustLibrary::process()` and flows through two phases, model passes and output passes. Model passes build a well-defined data and interop model iteratively — once done, the resulting interop layer is uniquely specified. The output passes then render the model into a final output format via Tera templates.
 
-**Pass directory structure** (`crates/backend_csharp_ng/src/pass/`):
+**Pass directory structure** (`crates/backend_csharp/src/pass/`):
 ```
 pass/
 ├── mod.rs              # Shared types (Outcome, PassMeta, PassInfo, MissingItem) + macros

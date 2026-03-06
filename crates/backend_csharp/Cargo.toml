@@ -1,25 +1,25 @@
 [package]
-name = "interoptopus_backend_csharp"
-description = "Generates C# bindings."
+name = "interoptopus_csharp"
 authors.workspace = true
-version.workspace = true
 edition.workspace = true
-rust-version.workspace = true
 license.workspace = true
-keywords = ["ffi", "code-generation", "bindings", "csharp", "dotnet"]
-categories = ["api-bindings", "development-tools::ffi"]
-documentation = "https://docs.rs/interoptopus_backend_csharp/"
 repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+interoptopus.workspace = true
+interoptopus_backends.workspace = true
+fundle.workspace = true
+include_dir.workspace = true
+
+[build-dependencies]
+interoptopus_backends.workspace = true
+
+[dev-dependencies]
+interoptopus = { workspace = true, features = ["serde"] }
+insta.workspace = true
+serde_json.workspace = true
 
 [lints]
 workspace = true
-
-[dependencies]
-derive_builder = { workspace = true }
-heck = { workspace = true }
-include_dir = { workspace = true }
-interoptopus = { workspace = true }
-interoptopus_backend_utils = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
-tera = { workspace = true }
-netcorehost = "0.18.0" # remove me, just experiment for now

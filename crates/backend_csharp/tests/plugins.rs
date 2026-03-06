@@ -1,12 +1,12 @@
-use backend_csharp_ng::RustLibrary;
-use backend_csharp_ng::pass::Outcome::Unchanged;
-use backend_csharp_ng::pass::{ModelResult, OutputResult};
-use backend_csharp_ng::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
+use interoptopus_csharp::pass::Outcome::Unchanged;
+use interoptopus_csharp::pass::{ModelResult, OutputResult};
+use interoptopus_csharp::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
+use interoptopus_csharp::RustLibrary;
 use std::error::Error;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
 #[derive(Default)]
 pub struct MyPlugin {
