@@ -1,6 +1,6 @@
 //! Renders delegate type definitions through the `all.cs` template, grouped per output file.
 
-use crate::lang::types::{ManagedConversion, Primitive, TypeKind};
+use crate::lang::types::{ManagedConversion, Primitive, TypeKind, TypePattern};
 use crate::model::TypeId;
 use crate::output::{Output, OutputKind};
 use crate::pass::{model, output, OutputResult, PassInfo};
@@ -37,6 +37,7 @@ impl Pass {
             for (type_id, type_kind) in kinds.iter() {
                 let signature = match type_kind {
                     TypeKind::Delegate(sig) => sig,
+                    TypeKind::TypePattern(TypePattern::NamedCallback(sig)) => sig,
                     _ => continue,
                 };
 
@@ -48,7 +49,6 @@ impl Pass {
                 let rval_kind = kinds.get(signature.rval);
                 let rval_managed = names.name(signature.rval).cloned().unwrap_or_else(|| "void".to_string());
                 let is_void = matches!(rval_kind, Some(TypeKind::Primitive(Primitive::Void)));
-                let has_return = !is_void;
 
                 let rval_unmanaged = if is_void {
                     "void".to_string()
@@ -90,7 +90,7 @@ impl Pass {
 
                 let mut context = Context::new();
                 context.insert("name", name);
-                context.insert("has_return", &has_return);
+                context.insert("is_void", &is_void);
                 context.insert("rval_managed", &rval_managed);
                 context.insert("rval_unmanaged", &rval_unmanaged);
                 context.insert("rval_to_unmanaged", &rval_to_unmanaged);

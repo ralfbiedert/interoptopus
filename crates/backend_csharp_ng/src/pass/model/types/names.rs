@@ -79,6 +79,7 @@ impl Pass {
                     }
                     TypePattern::NamedCallback(_) => sanitize_name(&ty.name),
                 },
+                TypeKind::Delegate(_) => sanitize_delegate_name(&ty.name),
                 _ => sanitize_name(&ty.name),
             };
 
@@ -108,6 +109,42 @@ fn pascal(name: &str) -> String {
             result.push(c);
         }
     }
+    result
+}
+
+/// Sanitize a Rust delegate/fn-pointer name into a valid C# identifier.
+///
+/// Strips `extern "C" fn` prefix and all non-alphanumeric characters,
+/// then PascalCases the fragments. For example:
+/// - `extern "C" fn(u8) -> u8` → `FnU8U8`
+/// - `extern "C" fn(Vec3f32) -> ()` → `FnVec3f32`
+fn sanitize_delegate_name(name: &str) -> String {
+    // Strip extern "C" prefix, keep "fn" onwards
+    let stripped = name
+        .strip_prefix("extern \"C\" ")
+        .or_else(|| name.strip_prefix("extern \"C\" "))
+        .unwrap_or(name);
+
+    // Strip return type `-> ()` (void) entirely
+    let stripped = stripped.replace("-> ()", "");
+
+    let mut result = String::with_capacity(stripped.len());
+    let mut capitalize_next = true;
+
+    for c in stripped.chars() {
+        if c.is_alphanumeric() {
+            if capitalize_next {
+                result.extend(c.to_uppercase());
+                capitalize_next = false;
+            } else {
+                result.push(c);
+            }
+        } else {
+            // Any non-alphanumeric char is a word boundary
+            capitalize_next = true;
+        }
+    }
+
     result
 }
 

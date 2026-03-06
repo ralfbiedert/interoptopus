@@ -29,12 +29,20 @@ public partial class {{ name }} : IDisposable
     {
         try
         {
-            {% if has_return %}return _managed({% for arg in args %}{{ arg.name }}{{ arg.to_managed }}{% if not loop.last %}, {% endif %}{% endfor %}){{ rval_to_unmanaged }};{% else %}_managed({% for arg in args %}{{ arg.name }}{{ arg.to_managed }}{% if not loop.last %}, {% endif %}{% endfor %});{% endif %}
+            {% if not is_void %}
+            return _managed({% for arg in args %}{{ arg.name }}{{ arg.to_managed }}{% if not loop.last %}, {% endif %}{% endfor %}){{ rval_to_unmanaged }};
+            {% else %}
+            _managed({% for arg in args %}{{ arg.name }}{{ arg.to_managed }}{% if not loop.last %}, {% endif %}{% endfor %});
+            {% endif %}
         }
         catch (Exception e)
         {
             _exception = e;
-            {% if has_return %}return default;{% else %}return;{% endif %}
+            {% if not is_void %}
+            return default;
+            {% else %}
+            return;
+            {% endif %}
         }
     }
 
@@ -42,7 +50,11 @@ public partial class {{ name }} : IDisposable
     internal {{ rval_managed }} Call({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %})
     {
         var __target = Marshal.GetDelegateForFunctionPointer<{{ name }}Native>(_ptr);
-        {% if has_return %}return __target({% for arg in args %}{{ arg.name }}{{ arg.to_unmanaged }}, {% endfor %}IntPtr.Zero){{ rval_to_managed }};{% else %}__target({% for arg in args %}{{ arg.name }}{{ arg.to_unmanaged }}, {% endfor %}IntPtr.Zero);{% endif %}
+        {% if not is_void %}
+        return __target({% for arg in args %}{{ arg.name }}{{ arg.to_unmanaged }}, {% endfor %}IntPtr.Zero){{ rval_to_managed }};
+        {% else %}
+        __target({% for arg in args %}{{ arg.name }}{{ arg.to_unmanaged }}, {% endfor %}IntPtr.Zero);
+        {% endif %}
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
