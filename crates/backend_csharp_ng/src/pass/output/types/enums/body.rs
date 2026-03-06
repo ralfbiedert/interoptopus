@@ -1,6 +1,6 @@
 //! Renders enum body definitions using the `enum_body.cs` template.
 
-use crate::lang::types::{Ownership, TypeKind};
+use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
@@ -25,7 +25,8 @@ impl Pass {
         output_master: &output::master::Pass,
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
-        blittable: &model::types::info::deleteme_blittable::Pass,
+        managed: &output::conversion::managed::Pass,
+        disposable: &model::types::info::disposable::Pass,
         enum_body_unmanaged_variant: &output::types::enums::body_unmanaged_variant::Pass,
         enum_body_unmanaged: &output::types::enums::body_unmanaged::Pass,
         enum_body_to_unmanaged: &output::types::enums::body_to_unmanaged::Pass,
@@ -43,10 +44,8 @@ impl Pass {
 
             let name = names.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
 
-            let struct_or_class = match blittable.blittable(*type_id) {
-                Some(Ownership::Blittable) => "struct",
-                _ => "class",
-            };
+            let struct_or_class = managed.struct_or_class(*type_id);
+            let is_disposable = disposable.is_disposable(*type_id).unwrap_or(false);
 
             let unmanaged_variants = enum_body_unmanaged_variant.get(*type_id).unwrap_or(&[]);
             let unmanaged = enum_body_unmanaged.get(*type_id).map(|s| s.as_str()).unwrap_or("");
@@ -58,6 +57,7 @@ impl Pass {
             let mut context = Context::new();
             context.insert("name", name);
             context.insert("struct_or_class", struct_or_class);
+            context.insert("is_disposable", &is_disposable);
             context.insert("unmanaged_variants", &unmanaged_variants);
             context.insert("unmanaged", &unmanaged);
             context.insert("to_unmanaged", &to_unmanaged);

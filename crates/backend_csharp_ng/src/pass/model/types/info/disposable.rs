@@ -1,0 +1,48 @@
+//! Determines whether a type should implement `IDisposable` in C#.
+//!
+//! A type is disposable if its `ManagedConversion` is `Into`, meaning it
+//! transfers ownership and holds native resources that must be released.
+
+use crate::lang::types::ManagedConversion;
+use crate::model::TypeId;
+use crate::pass::Outcome::Unchanged;
+use crate::pass::{model, ModelResult, PassInfo};
+use std::collections::HashMap;
+
+#[derive(Default)]
+pub struct Config {}
+
+pub struct Pass {
+    info: PassInfo,
+    disposable: HashMap<TypeId, bool>,
+}
+
+impl Pass {
+    pub fn new(_: Config) -> Self {
+        Self { info: PassInfo { name: file!() }, disposable: Default::default() }
+    }
+
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, managed_conversion: &model::types::info::managed_conversion::Pass, kinds: &model::types::kind::Pass) -> ModelResult {
+        let mut outcome = Unchanged;
+
+        for (type_id, _) in kinds.iter() {
+            if self.disposable.contains_key(type_id) {
+                continue;
+            }
+
+            let Some(mc) = managed_conversion.managed_conversion(*type_id) else {
+                continue;
+            };
+
+            let is_disposable = matches!(mc, ManagedConversion::Into);
+            self.disposable.insert(*type_id, is_disposable);
+            outcome.changed();
+        }
+
+        Ok(outcome)
+    }
+
+    pub fn is_disposable(&self, ty: TypeId) -> Option<bool> {
+        self.disposable.get(&ty).copied()
+    }
+}

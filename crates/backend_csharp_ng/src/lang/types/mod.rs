@@ -54,31 +54,6 @@ pub enum ManagedConversion {
     Into,
 }
 
-// TODO: Do we actually need this? The original code had a separate Reuse and Cleanup (below)
-// which are somewhat orthogonal.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub enum Ownership {
-    Blittable,
-    Disposable,
-}
-
-/// Whether a managed C# value remains valid after converting to its unmanaged FFI representation.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub enum Reuse {
-    /// The value can be copied; the original stays valid (generates `.ToUnmanaged()`).
-    Copy,
-    /// The value is moved; the original is consumed (generates `.IntoUnmanaged()`).
-    Move,
-}
-
-/// Whether a C# type needs cleanup after use.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub enum Cleanup {
-    /// No cleanup needed.
-    None,
-    /// Must call `Dispose()` to free native resources.
-    Disposable,
-}
 
 #[derive(Debug, Clone)]
 pub enum TypeKind {
