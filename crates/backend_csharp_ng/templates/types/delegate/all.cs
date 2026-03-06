@@ -42,7 +42,7 @@ public partial class {{ name }} : IDisposable
     internal {{ rval_managed }} Call({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %})
     {
         var __target = Marshal.GetDelegateForFunctionPointer<{{ name }}Native>(_ptr);
-        {% if has_return %}return __target({% for arg in args %}{{ arg.name }}{{ rval_to_unmanaged }}, {% endfor %}IntPtr.Zero){{ arg.to_managed }};{% else %}__target({% for arg in args %}{{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %}{% if args %}, {% endif %}IntPtr.Zero);{% endif %}
+        {% if has_return %}return __target({% for arg in args %}{{ arg.name }}{{ arg.to_unmanaged }}, {% endfor %}IntPtr.Zero){{ rval_to_managed }};{% else %}__target({% for arg in args %}{{ arg.name }}{{ arg.to_unmanaged }}, {% endfor %}IntPtr.Zero);{% endif %}
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]

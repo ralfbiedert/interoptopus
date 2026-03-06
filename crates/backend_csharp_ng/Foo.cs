@@ -4316,6 +4316,224 @@ namespace A {
 
         }
         
+
+        
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate byte Extern"C"Fn(u8)-U8Native(byte x1, IntPtr callback_data);
+        public delegate byte Extern"C"Fn(u8)-U8Delegate(byte x1);
+
+        public partial class Extern"C"Fn(u8)-U8
+        {
+            private Extern"C"Fn(u8)-U8Delegate _managed;
+            private Extern"C"Fn(u8)-U8Native _native;
+            private IntPtr _ptr;
+            private Exception _exception;
+        }
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Extern"C"Fn(u8)-U8 : IDisposable
+        {
+
+            internal Extern"C"Fn(u8)-U8() { }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Extern"C"Fn(u8)-U8(Extern"C"Fn(u8)-U8Delegate managed)
+            {
+                _managed = managed;
+                _native = CallTrampoline;
+                _ptr = Marshal.GetFunctionPointerForDelegate(_native);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            private byte CallTrampoline(byte x1, IntPtr callback_data)
+            {
+                try
+                {
+                    return _managed(x1);
+                }
+                catch (Exception e)
+                {
+                    _exception = e;
+                    return default;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal byte Call(byte x1)
+            {
+                var __target = Marshal.GetDelegateForFunctionPointer<Extern"C"Fn(u8)-U8Native>(_ptr);
+                return __target(x1, IntPtr.Zero);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Dispose()
+            {
+                if (_exception != null) throw _exception;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var rval = new Unmanaged();
+                rval._callback = _ptr;
+                rval._data = IntPtr.Zero;
+                return rval;
+            }
+
+            [CustomMarshaller(typeof(Extern"C"Fn(u8)-U8), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta {  }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct Unmanaged
+            {
+                internal IntPtr _callback;
+                internal IntPtr _data;
+
+                public Extern"C"Fn(u8)-U8 ToManaged()
+                {
+                    var rval = new Extern"C"Fn(u8)-U8();
+                    rval._ptr = _callback;
+                    return rval;
+                }
+
+            }
+
+            public ref struct Marshaller
+            {
+                private Extern"C"Fn(u8)-U8 _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Extern"C"Fn(u8)-U8 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Extern"C"Fn(u8)-U8 managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Extern"C"Fn(u8)-U8 ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+        }
+        
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void Extern"C"Fn(CharArray)-()Native(CharArray.Unmanaged x1, IntPtr callback_data);
+        public delegate void Extern"C"Fn(CharArray)-()Delegate(CharArray x1);
+
+        public partial class Extern"C"Fn(CharArray)-()
+        {
+            private Extern"C"Fn(CharArray)-()Delegate _managed;
+            private Extern"C"Fn(CharArray)-()Native _native;
+            private IntPtr _ptr;
+            private Exception _exception;
+        }
+
+        [NativeMarshalling(typeof(MarshallerMeta))]
+        public partial class Extern"C"Fn(CharArray)-() : IDisposable
+        {
+
+            internal Extern"C"Fn(CharArray)-()() { }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Extern"C"Fn(CharArray)-()(Extern"C"Fn(CharArray)-()Delegate managed)
+            {
+                _managed = managed;
+                _native = CallTrampoline;
+                _ptr = Marshal.GetFunctionPointerForDelegate(_native);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            private void CallTrampoline(CharArray.Unmanaged x1, IntPtr callback_data)
+            {
+                try
+                {
+                    return _managed(x1.ToManaged());
+                }
+                catch (Exception e)
+                {
+                    _exception = e;
+                    return default;
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal void Call(CharArray x1)
+            {
+                var __target = Marshal.GetDelegateForFunctionPointer<Extern"C"Fn(CharArray)-()Native>(_ptr);
+                return __target(x1.ToUnmanaged(), IntPtr.Zero);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Dispose()
+            {
+                if (_exception != null) throw _exception;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var rval = new Unmanaged();
+                rval._callback = _ptr;
+                rval._data = IntPtr.Zero;
+                return rval;
+            }
+
+            [CustomMarshaller(typeof(Extern"C"Fn(CharArray)-()), MarshalMode.Default, typeof(Marshaller))]
+            private struct MarshallerMeta {  }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct Unmanaged
+            {
+                internal IntPtr _callback;
+                internal IntPtr _data;
+
+                public Extern"C"Fn(CharArray)-() ToManaged()
+                {
+                    var rval = new Extern"C"Fn(CharArray)-()();
+                    rval._ptr = _callback;
+                    return rval;
+                }
+
+            }
+
+            public ref struct Marshaller
+            {
+                private Extern"C"Fn(CharArray)-() _managed;
+                private Unmanaged _unmanaged;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Extern"C"Fn(CharArray)-() managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromManaged(Extern"C"Fn(CharArray)-() managed) { _managed = managed; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public Extern"C"Fn(CharArray)-() ToManaged() { return _unmanaged.ToManaged(); }
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                public void Free() {}
+            }
+        }
+        
     }
 }
 
