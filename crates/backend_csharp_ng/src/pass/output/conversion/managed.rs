@@ -50,4 +50,31 @@ impl Pass {
             None => panic!("Unknown conversion for type {:?}", ty),
         }
     }
+
+    pub fn to_unmanaged_name(&self, ty: TypeId) -> &'static str {
+        match self.conversions.get(&ty) {
+            Some(ManagedConversion::AsIs) => "",
+            Some(ManagedConversion::To) => "ToUnmanaged",
+            Some(ManagedConversion::Into) => "IntoUnmanaged",
+            None => panic!("Unknown conversion for type {:?}", ty),
+        }
+    }
+
+    pub fn to_managed_name(&self, ty: TypeId) -> &'static str {
+        match self.conversions.get(&ty) {
+            Some(ManagedConversion::AsIs) => "",
+            Some(ManagedConversion::To) => "ToManaged",
+            Some(ManagedConversion::Into) => "IntoManaged",
+            None => panic!("Unknown conversion for type {:?}", ty),
+        }
+    }
+
+    pub fn as_unmanaged_suffix(&self, ty: TypeId) -> &'static str {
+        match self.conversions.get(&ty) {
+            Some(ManagedConversion::AsIs) => "",
+            Some(ManagedConversion::To) => ".AsUnmanaged()",
+            Some(ManagedConversion::Into) => ".AsUnmanaged()",
+            None => panic!("Unknown conversion for type {:?}", ty),
+        }
+    }
 }

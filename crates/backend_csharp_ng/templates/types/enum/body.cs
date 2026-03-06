@@ -5,4 +5,10 @@ public partial {{ struct_or_class }} {{ name }}{% if struct_or_class == "class" 
     {% endfor %}
 
     {{ unmanaged | indent }}
+
+    {{ to_unmanaged | indent }}
+
+    {{ as_unmanaged | indent }}
+
+    {{ ctors | indent }}
 }

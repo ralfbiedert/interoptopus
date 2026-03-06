@@ -39,6 +39,8 @@ pub struct RustLibraryConfig {
     pub output_enum_body: output::types::enums::body::Config,
     pub output_enum_body_unmanaged_variant: output::types::enums::body_unmanaged_variant::Config,
     pub output_enum_body_unmanaged: output::types::enums::body_unmanaged::Config,
+    pub output_enum_body_to_unmanaged: output::types::enums::body_to_unmanaged::Config,
+    pub output_enum_body_as_unmanaged: output::types::enums::body_as_unmanaged::Config,
     pub output_enum: output::types::enums::all::Config,
     pub output_fn_imports: output::fns::import::Config,
     pub output_header: output::header::Config,
@@ -51,6 +53,8 @@ pub struct IntermediateOutputPasses {
     pub enum_ty: output::types::enums::data_ty::Pass,
     pub enum_body_unmanaged_variant: output::types::enums::body_unmanaged_variant::Pass,
     pub enum_body_unmanaged: output::types::enums::body_unmanaged::Pass,
+    pub enum_body_to_unmanaged: output::types::enums::body_to_unmanaged::Pass,
+    pub enum_body_as_unmanaged: output::types::enums::body_as_unmanaged::Pass,
     pub enum_body: output::types::enums::body::Pass,
     pub enums: output::types::enums::all::Pass,
     pub fn_imports: output::fns::import::Pass,
@@ -146,6 +150,8 @@ impl RustLibrary {
                 enum_ty: output::types::enums::data_ty::Pass::new(config.output_enum_ty),
                 enum_body_unmanaged_variant: output::types::enums::body_unmanaged_variant::Pass::new(config.output_enum_body_unmanaged_variant),
                 enum_body_unmanaged: output::types::enums::body_unmanaged::Pass::new(config.output_enum_body_unmanaged),
+                enum_body_to_unmanaged: output::types::enums::body_to_unmanaged::Pass::new(config.output_enum_body_to_unmanaged),
+                enum_body_as_unmanaged: output::types::enums::body_as_unmanaged::Pass::new(config.output_enum_body_as_unmanaged),
                 enum_body: output::types::enums::body::Pass::new(config.output_enum_body),
                 enums: output::types::enums::all::Pass::new(config.output_enum),
                 fn_imports: output::fns::import::Pass::new(config.output_fn_imports),
@@ -222,7 +228,9 @@ impl RustLibrary {
         self.output_passes.enum_ty.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable)?;
         self.output_passes.enum_body_unmanaged_variant.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable)?;
         self.output_passes.enum_body_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
-        self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable, &self.output_passes.enum_body_unmanaged_variant, &self.output_passes.enum_body_unmanaged)?;
+        self.output_passes.enum_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
+        self.output_passes.enum_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
+        self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable, &self.output_passes.enum_body_unmanaged_variant, &self.output_passes.enum_body_unmanaged, &self.output_passes.enum_body_to_unmanaged, &self.output_passes.enum_body_as_unmanaged)?;
         self.output_passes.enums.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.enum_ty, &self.output_passes.enum_body)?;
         self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;

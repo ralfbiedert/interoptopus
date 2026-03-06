@@ -887,6 +887,26 @@ namespace A {
                     return _managed;
                 }
             }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged IntoUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                if (_variant == 0) _unmanaged._A._A = _A.IntoUnmanaged();
+                if (_variant == 1) _unmanaged._B._B = _B.IntoUnmanaged();
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                if (_variant == 0) _unmanaged._A._A = _A.AsUnmanaged();
+                if (_variant == 1) _unmanaged._B._B = _B.AsUnmanaged();
+                return _unmanaged;
+            }
         }
         
         public partial struct EnumDocumented
@@ -911,6 +931,22 @@ namespace A {
                     _managed._variant = _variant;
                     return _managed;
                 }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                return _unmanaged;
             }
         }
         
@@ -961,6 +997,26 @@ namespace A {
                     return _managed;
                 }
             }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                if (_variant == 0) _unmanaged._A._A = _A;
+                if (_variant == 2) _unmanaged._C._C = _C;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                if (_variant == 0) _unmanaged._A._A = _A;
+                if (_variant == 2) _unmanaged._C._C = _C;
+                return _unmanaged;
+            }
         }
         
         public partial struct EnumPayload
@@ -1010,6 +1066,26 @@ namespace A {
                     return _managed;
                 }
             }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                if (_variant == 1) _unmanaged._B._B = _B.ToUnmanaged();
+                if (_variant == 2) _unmanaged._C._C = _C;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                if (_variant == 1) _unmanaged._B._B = _B.AsUnmanaged();
+                if (_variant == 2) _unmanaged._C._C = _C;
+                return _unmanaged;
+            }
         }
         
         public partial struct EnumRenamed
@@ -1035,6 +1111,22 @@ namespace A {
                     return _managed;
                 }
             }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                return _unmanaged;
+            }
         }
         
         public partial struct Error
@@ -1059,6 +1151,22 @@ namespace A {
                     _managed._variant = _variant;
                     return _managed;
                 }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged ToUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                return _unmanaged;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Unmanaged AsUnmanaged()
+            {
+                var _unmanaged = new Unmanaged();
+                _unmanaged._variant = _variant;
+                return _unmanaged;
             }
         }
         

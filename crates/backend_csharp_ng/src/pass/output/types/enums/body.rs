@@ -28,6 +28,8 @@ impl Pass {
         blittable: &model::types::info::deleteme_blittable::Pass,
         enum_body_unmanaged_variant: &output::types::enums::body_unmanaged_variant::Pass,
         enum_body_unmanaged: &output::types::enums::body_unmanaged::Pass,
+        enum_body_to_unmanaged: &output::types::enums::body_to_unmanaged::Pass,
+        enum_body_as_unmanaged: &output::types::enums::body_as_unmanaged::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -46,12 +48,16 @@ impl Pass {
 
             let unmanaged_variants = enum_body_unmanaged_variant.get(*type_id).unwrap_or(&[]);
             let unmanaged = enum_body_unmanaged.get(*type_id).map(|s| s.as_str()).unwrap_or("");
+            let to_unmanaged = enum_body_to_unmanaged.get(*type_id).map(|s| s.as_str()).unwrap_or("");
+            let as_unmanaged = enum_body_as_unmanaged.get(*type_id).map(|s| s.as_str()).unwrap_or("");
 
             let mut context = Context::new();
             context.insert("name", name);
             context.insert("struct_or_class", struct_or_class);
             context.insert("unmanaged_variants", &unmanaged_variants);
             context.insert("unmanaged", &unmanaged);
+            context.insert("to_unmanaged", &to_unmanaged);
+            context.insert("as_unmanaged", &as_unmanaged);
 
             let rendered = templates.render("types/enum/body.cs", &context)?;
             self.enum_body.insert(*type_id, rendered);
