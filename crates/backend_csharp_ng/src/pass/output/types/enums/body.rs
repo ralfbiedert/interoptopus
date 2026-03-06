@@ -44,7 +44,8 @@ impl Pass {
 
             let name = names.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
 
-            let struct_or_class = struct_class.struct_or_class(*type_id);
+            let ty = *type_id;
+            let struct_or_class = if struct_class.is_struct(ty) { "struct" } else { "class" };
             let is_disposable = disposable.is_disposable(*type_id).unwrap_or(false);
 
             let unmanaged_variants = enum_body_unmanaged_variant.get(*type_id).unwrap_or(&[]);
