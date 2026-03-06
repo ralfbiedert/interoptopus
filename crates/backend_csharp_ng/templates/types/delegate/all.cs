@@ -1,13 +1,13 @@
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-public delegate void {{ name }}Native(TODO: FOR_EACH_ARG_UNMANAGED, IntPtr callback_data); // 'True' native callback signature
-public delegate void {{ name }}Delegate(TODO: FOR_EACH_ARG); // Our C# signature
+public delegate {{ rval_unmanaged }} {{ name }}Native({% for arg in args %}{{ arg.unmanaged_type }} {{ arg.name }}, {% endfor %}IntPtr callback_data);
+public delegate {{ rval_managed }} {{ name }}Delegate({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %});
 
 public partial class {{ name }}
 {
-    private {{ name }}Delegate _managed; // C# callback
-    private {{ name }}Native _native; // Native callback
-    private IntPtr _ptr; // Raw function pointer of native callback
-    private Exception _exception; // Set if the callback encountered an Exception
+    private {{ name }}Delegate _managed;
+    private {{ name }}Native _native;
+    private IntPtr _ptr;
+    private Exception _exception;
 }
 
 [NativeMarshalling(typeof(MarshallerMeta))]
@@ -24,38 +24,30 @@ public partial class {{ name }} : IDisposable
         _ptr = Marshal.GetFunctionPointerForDelegate(_native);
     }
 
-    // Helper to invoke managed code from the native invocation.
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    private TODO: RVAL_UNMANAGED CallTrampoline(TODO: FOR_EACH_ARG_UNMANAGED, IntPtr callback_data)
+    private {{ rval_unmanaged }} CallTrampoline({% for arg in args %}{{ arg.unmanaged_type }} {{ arg.name }}, {% endfor %}IntPtr callback_data)
     {
-        // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
         try
         {
-            _managed(TODO: FOR_EACH_ARG_CONVERT_TO_MANAGED) TODO_TO_UNMANAGED;
+            {% if has_return %}return _managed({% for arg in args %}{{ arg.name }}{{ arg.to_managed }}{% if not loop.last %}, {% endif %}{% endfor %}){{ rval_to_unmanaged }};{% else %}_managed({% for arg in args %}{{ arg.name }}{{ arg.to_managed }}{% if not loop.last %}, {% endif %}{% endfor %});{% endif %}
         }
         catch (Exception e)
         {
             _exception = e;
-            return;
+            {% if has_return %}return default;{% else %}return;{% endif %}
         }
     }
 
-    // Invokes the callback.
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    internal TODO:RVAL Call(TODO: FOR_EACH_ARG)
+    internal {{ rval_managed }} Call({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %})
     {
         var __target = Marshal.GetDelegateForFunctionPointer<{{ name }}Native>(_ptr);
-        // TODO - let's do this later
-        // __target(x, y);
-        return TODO:NOTHING_OR_default;
+        {% if has_return %}return __target({% for arg in args %}{{ arg.name }}{{ rval_to_unmanaged }}, {% endfor %}IntPtr.Zero){{ arg.to_managed }};{% else %}__target({% for arg in args %}{{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %}{% if args %}, {% endif %}IntPtr.Zero);{% endif %}
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public void Dispose()
     {
-        // This means when the callback was invoked from Rust C# had an exception which
-        // we caught (otherwise C# might not re-enter Rust, and we leak memory). Now is
-        // the time to rethrow it.
         if (_exception != null) throw _exception;
     }
 

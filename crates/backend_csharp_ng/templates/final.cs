@@ -16,6 +16,10 @@ namespace A {
         {% for composite in composites %}
         {{ composite | indent(prefix = "        ") }}
         {% endfor %}
+
+        {% for delegate in delegates %}
+        {{ delegate | indent(prefix = "        ") }}
+        {% endfor %}
     }
 }
 

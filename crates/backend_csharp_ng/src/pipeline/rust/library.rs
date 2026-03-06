@@ -50,6 +50,7 @@ pub struct RustLibraryConfig {
     pub output_composite_body_to_unmanaged: output::types::composites::body_to_unmanaged::Config,
     pub output_composite_body_as_unmanaged: output::types::composites::body_as_unmanaged::Config,
     pub output_composite: output::types::composites::all::Config,
+    pub output_delegates: output::types::delegates::all::Config,
     pub output_fn_imports: output::fns::import::Config,
     pub output_header: output::header::Config,
     pub output_final: output::r#final::Config,
@@ -74,6 +75,7 @@ pub struct IntermediateOutputPasses {
     pub composite_body_as_unmanaged: output::types::composites::body_as_unmanaged::Pass,
     pub composite_body: output::types::composites::body::Pass,
     pub composites: output::types::composites::all::Pass,
+    pub delegates: output::types::delegates::all::Pass,
     pub fn_imports: output::fns::import::Pass,
     pub header: output::header::Pass,
 }
@@ -178,6 +180,7 @@ impl RustLibrary {
                 composite_body_as_unmanaged: output::types::composites::body_as_unmanaged::Pass::new(config.output_composite_body_as_unmanaged),
                 composite_body: output::types::composites::body::Pass::new(config.output_composite_body),
                 composites: output::types::composites::all::Pass::new(config.output_composite),
+                delegates: output::types::delegates::all::Pass::new(config.output_delegates),
                 fn_imports: output::fns::import::Pass::new(config.output_fn_imports),
                 header: output::header::Pass::new(config.output_header),
             },
@@ -264,6 +267,7 @@ impl RustLibrary {
         self.output_passes.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke, &self.output_passes.conversion_fields)?;
         self.output_passes.composite_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class, &self.model_type_disposable, &self.output_passes.composite_body_unmanaged, &self.output_passes.composite_body_to_unmanaged, &self.output_passes.composite_body_as_unmanaged)?;
         self.output_passes.composites.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.composite_ty, &self.output_passes.composite_body)?;
+        self.output_passes.delegates.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
         self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.plugin_post_output_pass()?;
