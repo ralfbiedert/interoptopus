@@ -4,6 +4,7 @@ use crate::lang::types::{Pointer, TypeKind};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
+use crate::{skip_mapped, try_resolve};
 use interoptopus::lang;
 
 #[derive(Default)]

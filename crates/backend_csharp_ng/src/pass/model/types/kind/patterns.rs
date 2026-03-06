@@ -6,6 +6,7 @@ use crate::lang::types::{TypeKind, TypePattern};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
+use crate::{skip_mapped, try_extract_kind, try_resolve};
 use interoptopus::lang;
 use interoptopus::lang::types::TypeInfo;
 use std::ffi::c_char;

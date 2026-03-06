@@ -5,6 +5,7 @@ use crate::lang::meta::Visibility;
 use crate::model::FunctionId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
+use crate::try_resolve;
 use interoptopus::inventory::Functions;
 use std::collections::HashMap;
 

@@ -3,6 +3,7 @@
 use crate::lang::types::{Composite, TypeKind};
 use crate::pass::Outcome::{Changed, Unchanged};
 use crate::pass::{model, ModelResult, PassInfo};
+use crate::{try_extract_kind, try_resolve};
 
 #[derive(Default)]
 pub struct Config {}

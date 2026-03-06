@@ -3,6 +3,7 @@
 use crate::lang::types::{DataEnum, TypeKind};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
+use crate::try_resolve;
 use interoptopus::lang;
 
 #[derive(Default)]

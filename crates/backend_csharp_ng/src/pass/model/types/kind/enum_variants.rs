@@ -4,6 +4,7 @@ use crate::lang::types::Variant;
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
+use crate::try_extract_kind;
 use interoptopus::lang;
 use std::collections::HashMap;
 

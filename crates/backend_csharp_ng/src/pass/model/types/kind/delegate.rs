@@ -5,6 +5,7 @@ use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
 use crate::pass::{model, ModelResult, PassInfo};
+use crate::{skip_mapped, try_extract_kind};
 
 #[derive(Default)]
 pub struct Config {}

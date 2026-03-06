@@ -4,6 +4,7 @@ use crate::lang::types::{Primitive, TypeKind, TypePattern};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
+use crate::try_resolve;
 use std::collections::HashMap;
 
 #[derive(Default)]

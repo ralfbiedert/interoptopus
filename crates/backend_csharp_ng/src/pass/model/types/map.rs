@@ -4,6 +4,7 @@ use crate::lang::types::Type;
 use crate::model::{TypeId, Types};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
+use crate::try_resolve;
 
 #[derive(Default)]
 pub struct Config {}

@@ -14,8 +14,8 @@ pub mod struct_fields;
 
 use crate::lang::types::TypeKind;
 use crate::model::TypeId;
-use crate::pass::{ModelResult, PassInfo};
 use crate::pass::Outcome::Unchanged;
+use crate::pass::{ModelResult, PassInfo};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -28,10 +28,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: file!() },
-            kinds: Default::default(),
-        }
+        Self { info: PassInfo { name: file!() }, kinds: Default::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta) -> ModelResult {
