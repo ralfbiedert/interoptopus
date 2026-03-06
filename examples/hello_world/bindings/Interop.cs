@@ -12,6 +12,10 @@
 // </auto-generated>
 
 
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+
 namespace A {
     public static partial class Interop {
 
@@ -23,9 +27,6 @@ namespace A {
         public static partial Vec2 my_function(Vec2 input);
         
 
-        
-
-        
         public partial class Vec2
         {
             public float x;

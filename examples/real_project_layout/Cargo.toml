@@ -10,9 +10,9 @@ name = "example"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-interoptopus = { path = "../../crates/core" }
+interoptopus.workspace = true
 
 [dev-dependencies]
-interoptopus_backend_csharp = { path = "../../crates/backend_csharp_old" }
-interoptopus_backend_c = { path = "../../crates/backend_c" }
-interoptopus_backend_cpython = { path = "../../crates/backend_cpython" }
+interoptopus_csharp.workspace = true
+interoptopus_c.workspace = true
+interoptopus_cpython.workspace = true

@@ -1,6 +1,5 @@
 use interoptopus::ffi;
 use interoptopus::inventory::RustInventory;
-use interoptopus_csharp::RustLibrary;
 
 /// A simple type in our FFI layer.
 #[ffi]
@@ -21,6 +20,7 @@ pub fn my_function(input: Vec2) -> Vec2 {
 fn generate_bindings() -> Result<(), Box<dyn std::error::Error>> {
     use interoptopus::function;
     use interoptopus::inventory::Inventory;
+    use interoptopus_csharp::RustLibrary;
 
     // In a real project this should be a freestanding `my_inventory()` function inside
     // your FFI or build crate.

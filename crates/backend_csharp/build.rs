@@ -9,5 +9,4 @@ fn main() {
     pack_assets(out_file, "templates/").unwrap();
 
     println!("cargo:rerun-if-changed=templates/");
-    println!("cargo:warning=Packed assets to {}", out_path.display());
 }
