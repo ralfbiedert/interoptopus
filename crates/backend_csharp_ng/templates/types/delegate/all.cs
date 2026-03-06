@@ -1,23 +1,23 @@
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-public delegate void SumDelegateReturn2Native(int x, int y, IntPtr callback_data); // 'True' native callback signature
-public delegate void SumDelegateReturn2Delegate(int x, int y); // Our C# signature
+public delegate void {{ name }}Native(TODO: FOR_EACH_ARG_UNMANAGED, IntPtr callback_data); // 'True' native callback signature
+public delegate void {{ name }}Delegate(TODO: FOR_EACH_ARG); // Our C# signature
 
-public partial class SumDelegateReturn2
+public partial class {{ name }}
 {
-    private SumDelegateReturn2Delegate _managed; // C# callback
-    private SumDelegateReturn2Native _native; // Native callback
+    private {{ name }}Delegate _managed; // C# callback
+    private {{ name }}Native _native; // Native callback
     private IntPtr _ptr; // Raw function pointer of native callback
     private Exception _exception; // Set if the callback encountered an Exception
 }
 
 [NativeMarshalling(typeof(MarshallerMeta))]
-public partial class SumDelegateReturn2 : IDisposable
+public partial class {{ name }} : IDisposable
 {
 
-    internal SumDelegateReturn2() { }
+    internal {{ name }}() { }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public SumDelegateReturn2(SumDelegateReturn2Delegate managed)
+    public {{ name }}({{ name }}Delegate managed)
     {
         _managed = managed;
         _native = CallTrampoline;
@@ -26,12 +26,12 @@ public partial class SumDelegateReturn2 : IDisposable
 
     // Helper to invoke managed code from the native invocation.
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    private void CallTrampoline(int x, int y, IntPtr callback_data)
+    private TODO: RVAL_UNMANAGED CallTrampoline(TODO: FOR_EACH_ARG_UNMANAGED, IntPtr callback_data)
     {
         // We ignore the last parameter, a generic callback pointer, as it's not needed in C#.
         try
         {
-            _managed(x, y);
+            _managed(TODO: FOR_EACH_ARG_CONVERT_TO_MANAGED) TODO_TO_UNMANAGED;
         }
         catch (Exception e)
         {
@@ -42,12 +42,12 @@ public partial class SumDelegateReturn2 : IDisposable
 
     // Invokes the callback.
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    internal void Call(int x, int y)
+    internal TODO:RVAL Call(TODO: FOR_EACH_ARG)
     {
-        var __target = Marshal.GetDelegateForFunctionPointer<SumDelegateReturn2Native>(_ptr);
-        // TODO
+        var __target = Marshal.GetDelegateForFunctionPointer<{{ name }}Native>(_ptr);
+        // TODO - let's do this later
         // __target(x, y);
-        return;
+        return TODO:NOTHING_OR_default;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -68,7 +68,7 @@ public partial class SumDelegateReturn2 : IDisposable
         return rval;
     }
 
-    [CustomMarshaller(typeof(SumDelegateReturn2), MarshalMode.Default, typeof(Marshaller))]
+    [CustomMarshaller(typeof({{ name }}), MarshalMode.Default, typeof(Marshaller))]
     private struct MarshallerMeta {  }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -77,9 +77,9 @@ public partial class SumDelegateReturn2 : IDisposable
         internal IntPtr _callback;
         internal IntPtr _data;
 
-        public SumDelegateReturn2 ToManaged()
+        public {{ name }} ToManaged()
         {
-            var rval = new SumDelegateReturn2();
+            var rval = new {{ name }}();
             rval._ptr = _callback;
             return rval;
         }
@@ -88,17 +88,17 @@ public partial class SumDelegateReturn2 : IDisposable
 
     public ref struct Marshaller
     {
-        private SumDelegateReturn2 _managed;
+        private {{ name }} _managed;
         private Unmanaged _unmanaged;
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Marshaller(SumDelegateReturn2 managed) { _managed = managed; }
+        public Marshaller({{ name }} managed) { _managed = managed; }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public void FromManaged(SumDelegateReturn2 managed) { _managed = managed; }
+        public void FromManaged({{ name }} managed) { _managed = managed; }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
@@ -107,7 +107,7 @@ public partial class SumDelegateReturn2 : IDisposable
         public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public SumDelegateReturn2 ToManaged() { return _unmanaged.ToManaged(); }
+        public {{ name }} ToManaged() { return _unmanaged.ToManaged(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Free() {}
