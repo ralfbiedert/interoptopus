@@ -15,7 +15,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "output_conversion_managed" }, conversions: Default::default() }
+        Self { info: PassInfo { name: "output/conversion/managed" }, conversions: Default::default() }
     }
 
     pub fn process(

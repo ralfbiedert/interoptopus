@@ -16,7 +16,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "output_enum_ty" }, enum_ty: Default::default() }
+        Self { info: PassInfo { name: "output/types/enum/ty" }, enum_ty: Default::default() }
     }
 
     pub fn process(

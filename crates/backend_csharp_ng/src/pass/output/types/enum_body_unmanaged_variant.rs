@@ -16,7 +16,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "output_enum_body_unmanaged" }, enum_body_unmanaged: Default::default() }
+        Self { info: PassInfo { name: "output/types/enum/body_unmanaged_variant" }, enum_body_unmanaged: Default::default() }
     }
 
     pub fn process(

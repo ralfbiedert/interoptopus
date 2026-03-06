@@ -14,7 +14,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model_type_map_enum" } }
+        Self { info: PassInfo { name: "model/types/kind/enum" } }
     }
 
     pub fn process(

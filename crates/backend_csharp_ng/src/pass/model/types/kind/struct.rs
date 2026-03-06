@@ -13,7 +13,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model_type_map_struct" } }
+        Self { info: PassInfo { name: "model/types/kind/struct" } }
     }
 
     pub fn process(

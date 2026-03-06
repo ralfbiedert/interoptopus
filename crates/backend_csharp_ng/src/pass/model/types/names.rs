@@ -30,7 +30,7 @@ macro_rules! resolve_name {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model_type_names" }, names: Default::default() }
+        Self { info: PassInfo { name: "model/types/names" }, names: Default::default() }
     }
 
     pub fn process(

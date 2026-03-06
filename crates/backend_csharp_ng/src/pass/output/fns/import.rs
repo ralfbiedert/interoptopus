@@ -15,7 +15,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "output_fns_imports" }, fn_imports: Default::default() }
+        Self { info: PassInfo { name: "output/fns/import" }, fn_imports: Default::default() }
     }
 
     pub fn process(

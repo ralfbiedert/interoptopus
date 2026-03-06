@@ -24,7 +24,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model_type_managed_conversion" }, managed_conversion: Default::default() }
+        Self { info: PassInfo { name: "model/types/info/managed_conversion" }, managed_conversion: Default::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, kinds: &model::types::kind::Pass) -> ModelResult {

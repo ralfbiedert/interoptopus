@@ -17,7 +17,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model_type_map_struct_fields" }, fields: Default::default() }
+        Self { info: PassInfo { name: "model/types/kind/struct_fields" }, fields: Default::default() }
     }
 
     pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &mut model::id::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {

@@ -16,7 +16,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model_type_map_primitives" } }
+        Self { info: PassInfo { name: "model/types/kind/primitives" } }
     }
 
     pub fn process(

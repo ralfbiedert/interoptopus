@@ -14,7 +14,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model_type_map_array" } }
+        Self { info: PassInfo { name: "model/types/kind/array" } }
     }
 
     pub fn process(

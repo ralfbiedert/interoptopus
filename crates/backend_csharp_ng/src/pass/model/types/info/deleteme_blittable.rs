@@ -11,7 +11,7 @@
 
 use crate::lang::types::{Ownership, TypeKind};
 use crate::model::TypeId;
-use crate::pass::Outcome::{Changed, Unchanged};
+use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;
 
@@ -25,7 +25,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model_type_blittable" }, blittable: Default::default() }
+        Self { info: PassInfo { name: "model/types/info/deleteme_blittable" }, blittable: Default::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, kinds: &model::types::kind::Pass) -> ModelResult {
