@@ -25,7 +25,7 @@ impl Pass {
         output_master: &output::master::Pass,
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
-        blittable: &model::types::blittable::Pass,
+        blittable: &model::types::info::deleteme_blittable::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -55,7 +55,7 @@ impl Pass {
                 context.insert("variant", &variant.name);
                 context.insert("variant_type", &variant_type);
 
-                let rendered = templates.render("types/enum_body_unmanaged.cs", &context)?;
+                let rendered = templates.render("types/enum_body_unmanaged_variant.cs", &context)?;
                 rendered_variants.push(rendered);
             }
 

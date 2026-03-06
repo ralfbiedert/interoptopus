@@ -24,16 +24,21 @@ pub struct RustLibraryConfig {
     pub model_type_map_enum: model::types::kind::r#enum::Config,
     pub model_type_map_opaque: model::types::kind::opaque::Config,
     pub model_type_map_struct_fields: model::types::kind::struct_fields::Config,
-    pub model_type_blittable: model::types::blittable::Config,
+    pub model_type_blittable: model::types::info::deleteme_blittable::Config,
+    pub model_type_reuse: model::types::info::deleteme_reuse::Config,
+    pub model_type_cleanup: model::types::info::deleteme_cleanup::Config,
+    pub model_type_managed_conversion: model::types::info::managed_conversion::Config,
     pub model_type_map_struct: model::types::kind::r#struct::Config,
     pub model_type_names: model::types::names::Config,
     pub model_type_map: model::types::map::Config,
     pub model_fn_map: model::fns::Config,
     pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
+    pub output_conversion_invoke: output::conversion::managed::Config,
     pub output_enum_ty: output::types::enum_ty::Config,
     pub output_enum_body: output::types::enum_body::Config,
-    pub output_enum_body_unmanaged: output::types::enum_body_unmanaged_variant::Config,
+    pub output_enum_body_unmanaged_variant: output::types::enum_body_unmanaged_variant::Config,
+    pub output_enum_body_unmanaged: output::types::enum_body_unmanaged::Config,
     pub output_enum: output::types::r#enum::Config,
     pub output_fn_imports: output::fn_import::Config,
     pub output_header: output::header::Config,
@@ -42,8 +47,10 @@ pub struct RustLibraryConfig {
 }
 
 pub struct IntermediateOutputPasses {
+    pub conversion_invoke: output::conversion::managed::Pass,
     pub enum_ty: output::types::enum_ty::Pass,
-    pub enum_body_unmanaged: output::types::enum_body_unmanaged_variant::Pass,
+    pub enum_body_unmanaged_variant: output::types::enum_body_unmanaged_variant::Pass,
+    pub enum_body_unmanaged: output::types::enum_body_unmanaged::Pass,
     pub enum_body: output::types::enum_body::Pass,
     pub enums: output::types::r#enum::Pass,
     pub fn_imports: output::fn_import::Pass,
@@ -68,7 +75,10 @@ pub struct RustLibrary {
     model_type_map_enum: model::types::kind::r#enum::Pass,
     model_type_map_opaque: model::types::kind::opaque::Pass,
     model_type_map_struct_fields: model::types::kind::struct_fields::Pass,
-    model_type_blittable: model::types::blittable::Pass,
+    model_type_blittable: model::types::info::deleteme_blittable::Pass,
+    model_type_reuse: model::types::info::deleteme_reuse::Pass,
+    model_type_cleanup: model::types::info::deleteme_cleanup::Pass,
+    model_type_managed_conversion: model::types::info::managed_conversion::Pass,
     model_type_map_struct: model::types::kind::r#struct::Pass,
     model_type_names: model::types::names::Pass,
     model_type_map: model::types::map::Pass,
@@ -121,7 +131,10 @@ impl RustLibrary {
             model_type_map_enum: model::types::kind::r#enum::Pass::new(config.model_type_map_enum),
             model_type_map_opaque: model::types::kind::opaque::Pass::new(config.model_type_map_opaque),
             model_type_map_struct_fields: model::types::kind::struct_fields::Pass::new(config.model_type_map_struct_fields),
-            model_type_blittable: model::types::blittable::Pass::new(config.model_type_blittable),
+            model_type_blittable: model::types::info::deleteme_blittable::Pass::new(config.model_type_blittable),
+            model_type_reuse: model::types::info::deleteme_reuse::Pass::new(config.model_type_reuse),
+            model_type_cleanup: model::types::info::deleteme_cleanup::Pass::new(config.model_type_cleanup),
+            model_type_managed_conversion: model::types::info::managed_conversion::Pass::new(config.model_type_managed_conversion),
             model_type_map_struct: model::types::kind::r#struct::Pass::new(config.model_type_map_struct),
             model_type_names: model::types::names::Pass::new(config.model_type_names),
             model_type_map: model::types::map::Pass::new(config.model_type_map),
@@ -129,8 +142,10 @@ impl RustLibrary {
             model_final: model::r#final::Pass::new(config.model_final),
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
+                conversion_invoke: output::conversion::managed::Pass::new(config.output_conversion_invoke),
                 enum_ty: output::types::enum_ty::Pass::new(config.output_enum_ty),
-                enum_body_unmanaged: output::types::enum_body_unmanaged_variant::Pass::new(config.output_enum_body_unmanaged),
+                enum_body_unmanaged_variant: output::types::enum_body_unmanaged_variant::Pass::new(config.output_enum_body_unmanaged_variant),
+                enum_body_unmanaged: output::types::enum_body_unmanaged::Pass::new(config.output_enum_body_unmanaged),
                 enum_body: output::types::enum_body::Pass::new(config.output_enum_body),
                 enums: output::types::r#enum::Pass::new(config.output_enum),
                 fn_imports: output::fn_import::Pass::new(config.output_fn_imports),
@@ -183,6 +198,9 @@ impl RustLibrary {
             r.run(self.model_type_map_opaque.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_struct_fields.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_blittable.process(&mut pass_meta, &self.model_type_kinds))?;
+            r.run(self.model_type_reuse.process(&mut pass_meta, &self.model_type_kinds))?;
+            r.run(self.model_type_cleanup.process(&mut pass_meta, &self.model_type_kinds))?;
+            r.run(self.model_type_managed_conversion.process(&mut pass_meta, &self.model_type_kinds))?;
             r.run(self.model_type_map_struct.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_struct_fields, &self.inventory.types))?;
             r.run(self.model_type_names.process(&mut pass_meta, &self.model_id_maps, &self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
@@ -200,9 +218,11 @@ impl RustLibrary {
 
         // Output passes
         self.output_master.process(&mut pass_meta)?;
+        self.output_passes.conversion_invoke.process(&mut pass_meta, &self.model_type_managed_conversion, &self.model_type_kinds)?;
         self.output_passes.enum_ty.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable)?;
-        self.output_passes.enum_body_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable)?;
-        self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable, &self.output_passes.enum_body_unmanaged)?;
+        self.output_passes.enum_body_unmanaged_variant.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable)?;
+        self.output_passes.enum_body_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
+        self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_blittable, &self.output_passes.enum_body_unmanaged_variant, &self.output_passes.enum_body_unmanaged)?;
         self.output_passes.enums.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.enum_ty, &self.output_passes.enum_body)?;
         self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;

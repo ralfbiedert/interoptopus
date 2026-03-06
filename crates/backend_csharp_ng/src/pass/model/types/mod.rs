@@ -1,4 +1,4 @@
-pub mod blittable;
+pub mod info;
 pub mod kind;
 pub mod map;
 pub mod names;

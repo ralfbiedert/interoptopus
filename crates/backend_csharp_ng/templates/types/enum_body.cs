@@ -4,5 +4,5 @@ public partial {{ struct_or_class }} {{ name }}{% if struct_or_class == "class" 
     {{ item | indent }}
     {% endfor %}
 
-    {{ unmanaged }}
+    {{ unmanaged | indent }}
 }

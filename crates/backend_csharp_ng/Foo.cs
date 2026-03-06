@@ -864,6 +864,29 @@ namespace A {
                 internal Layer2<String>.Unmanaged _B;
             }
     
+
+            [StructLayout(LayoutKind.Explicit)]
+            public unsafe struct Unmanaged
+            {
+                [FieldOffset(0)]
+                internal uint _variant;
+
+                [FieldOffset(0)]
+                internal UnmanagedA _A;
+
+                [FieldOffset(0)]
+                internal UnmanagedB _B;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Layer3<String> ToManaged()
+                {
+                    var _managed = new Layer3<String>();
+                    _managed._variant = _variant;
+                    if (_variant == 0) _managed._A = _A._A.IntoManaged();
+                    if (_variant == 1) _managed._B = _B._B.IntoManaged();
+                    return _managed;
+                }
+            }
         }
         
         public partial struct EnumDocumented
@@ -874,6 +897,21 @@ namespace A {
 
         public partial struct EnumDocumented
         {
+
+            [StructLayout(LayoutKind.Explicit)]
+            public unsafe struct Unmanaged
+            {
+                [FieldOffset(0)]
+                internal uint _variant;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal EnumDocumented ToManaged()
+                {
+                    var _managed = new EnumDocumented();
+                    _managed._variant = _variant;
+                    return _managed;
+                }
+            }
         }
         
         public partial struct EnumNum
@@ -900,6 +938,29 @@ namespace A {
                 internal nint _C;
             }
     
+
+            [StructLayout(LayoutKind.Explicit)]
+            public unsafe struct Unmanaged
+            {
+                [FieldOffset(0)]
+                internal uint _variant;
+
+                [FieldOffset(0)]
+                internal UnmanagedA _A;
+
+                [FieldOffset(0)]
+                internal UnmanagedC _C;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal EnumNum ToManaged()
+                {
+                    var _managed = new EnumNum();
+                    _managed._variant = _variant;
+                    if (_variant == 0) _managed._A = _A._A;
+                    if (_variant == 2) _managed._C = _C._C;
+                    return _managed;
+                }
+            }
         }
         
         public partial struct EnumPayload
@@ -926,6 +987,29 @@ namespace A {
                 internal uint _C;
             }
     
+
+            [StructLayout(LayoutKind.Explicit)]
+            public unsafe struct Unmanaged
+            {
+                [FieldOffset(0)]
+                internal uint _variant;
+
+                [FieldOffset(0)]
+                internal UnmanagedB _B;
+
+                [FieldOffset(0)]
+                internal UnmanagedC _C;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal EnumPayload ToManaged()
+                {
+                    var _managed = new EnumPayload();
+                    _managed._variant = _variant;
+                    if (_variant == 1) _managed._B = _B._B.ToManaged();
+                    if (_variant == 2) _managed._C = _C._C;
+                    return _managed;
+                }
+            }
         }
         
         public partial struct EnumRenamed
@@ -936,6 +1020,21 @@ namespace A {
 
         public partial struct EnumRenamed
         {
+
+            [StructLayout(LayoutKind.Explicit)]
+            public unsafe struct Unmanaged
+            {
+                [FieldOffset(0)]
+                internal uint _variant;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal EnumRenamed ToManaged()
+                {
+                    var _managed = new EnumRenamed();
+                    _managed._variant = _variant;
+                    return _managed;
+                }
+            }
         }
         
         public partial struct Error
@@ -946,6 +1045,21 @@ namespace A {
 
         public partial struct Error
         {
+
+            [StructLayout(LayoutKind.Explicit)]
+            public unsafe struct Unmanaged
+            {
+                [FieldOffset(0)]
+                internal uint _variant;
+
+                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+                internal Error ToManaged()
+                {
+                    var _managed = new Error();
+                    _managed._variant = _variant;
+                    return _managed;
+                }
+            }
         }
         
 

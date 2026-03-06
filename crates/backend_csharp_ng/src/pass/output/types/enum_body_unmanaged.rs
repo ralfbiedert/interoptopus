@@ -1,6 +1,6 @@
-//! Renders enum type definitions using the `enum_ty.cs` template.
+//! Renders the `Unmanaged` struct for each enum using the `enum_body_unmanaged.cs` template.
 
-use crate::lang::types::{Ownership, TypeKind};
+use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
@@ -11,12 +11,12 @@ pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    enum_ty: HashMap<TypeId, String>,
+    enum_body_unmanaged: HashMap<TypeId, String>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "output_enum_ty" }, enum_ty: Default::default() }
+        Self { info: PassInfo { name: "output_enum_body_unmanaged" }, enum_body_unmanaged: Default::default() }
     }
 
     pub fn process(
@@ -25,7 +25,7 @@ impl Pass {
         output_master: &output::master::Pass,
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
-        blittable: &model::types::info::deleteme_blittable::Pass,
+        managed: &output::conversion::managed::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -37,37 +37,33 @@ impl Pass {
 
             let name = names.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
 
-            let struct_or_class = match blittable.blittable(*type_id) {
-                Some(Ownership::Blittable) => "struct",
-                _ => "class",
-            };
-
-            let variants: Vec<HashMap<&str, &str>> = data_enum
+            let variants: Vec<HashMap<&str, String>> = data_enum
                 .variants
                 .iter()
                 .filter_map(|v| {
-                    let ty = v.ty?;
-                    let ty_name = names.name(ty)?;
+                    let variant_ty = v.ty?;
+                    let to_managed = managed.to_managed_suffix(variant_ty).to_string();
+
                     let mut m = HashMap::new();
-                    m.insert("name", v.name.as_str());
-                    m.insert("type", ty_name.as_str());
+                    m.insert("name", v.name.clone());
+                    m.insert("id", v.tag.to_string());
+                    m.insert("to_managed", to_managed);
                     Some(m)
                 })
                 .collect();
 
             let mut context = Context::new();
             context.insert("name", name);
-            context.insert("struct_or_class", struct_or_class);
             context.insert("variants", &variants);
 
-            let rendered = templates.render("types/enum_ty.cs", &context)?;
-            self.enum_ty.insert(*type_id, rendered);
+            let rendered = templates.render("types/enum_body_unmanaged.cs", &context)?;
+            self.enum_body_unmanaged.insert(*type_id, rendered);
         }
 
         Ok(())
     }
 
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
-        self.enum_ty.get(&type_id)
+        self.enum_body_unmanaged.get(&type_id)
     }
 }
