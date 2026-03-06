@@ -17,7 +17,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model/types/kind/enum_variants" }, variants: Default::default() }
+        Self { info: PassInfo { name: file!() }, variants: Default::default() }
     }
 
     pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &mut model::id::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {

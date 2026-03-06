@@ -15,7 +15,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(config: Config) -> Self {
-        Self { info: PassInfo { name: "meta/info" }, dll_name: config.dll_name, api_hash: String::new() }
+        Self { info: PassInfo { name: file!() }, dll_name: config.dll_name, api_hash: String::new() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta) -> ModelResult {

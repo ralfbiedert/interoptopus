@@ -16,7 +16,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model/final" }, rust_model: Default::default() }
+        Self { info: PassInfo { name: file!() }, rust_model: Default::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta) -> ModelResult {

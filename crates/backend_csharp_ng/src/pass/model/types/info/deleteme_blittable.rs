@@ -25,7 +25,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "model/types/info/deleteme_blittable" }, blittable: Default::default() }
+        Self { info: PassInfo { name: file!() }, blittable: Default::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, kinds: &model::types::kind::Pass) -> ModelResult {

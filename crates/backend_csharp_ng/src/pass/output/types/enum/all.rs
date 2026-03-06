@@ -16,7 +16,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "output/types/enum" }, enums: Default::default() }
+        Self { info: PassInfo { name: file!() }, enums: Default::default() }
     }
 
     pub fn process(

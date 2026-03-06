@@ -26,7 +26,7 @@ pub struct Pass {
 impl Pass {
     pub fn new(config: Config) -> Self {
         Self {
-            info: PassInfo { name: "output/master" },
+            info: PassInfo { name: file!() },
             config,
             outputs: vec![],
         }

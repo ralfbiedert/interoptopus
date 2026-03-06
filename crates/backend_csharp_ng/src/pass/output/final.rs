@@ -15,7 +15,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "output/final" } }
+        Self { info: PassInfo { name: file!() } }
     }
 
     pub fn process(

@@ -1,4 +1,4 @@
-//! Renders enum type definitions using the `enum_ty.cs` template.
+//! Renders enum body definitions using the `enum_body.cs` template.
 
 use crate::lang::types::{Ownership, TypeKind};
 use crate::model::TypeId;
@@ -11,12 +11,12 @@ pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    enum_ty: HashMap<TypeId, String>,
+    enum_body: HashMap<TypeId, String>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: "output/types/enum/ty" }, enum_ty: Default::default() }
+        Self { info: PassInfo { name: file!() }, enum_body: Default::default() }
     }
 
     pub fn process(
@@ -26,14 +26,16 @@ impl Pass {
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
         blittable: &model::types::info::deleteme_blittable::Pass,
+        enum_body_unmanaged_variant: &output::types::enum_body_unmanaged_variant::Pass,
+        enum_body_unmanaged: &output::types::enum_body_unmanaged::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
         for (type_id, type_kind) in kinds.iter() {
-            let data_enum = match type_kind {
-                TypeKind::DataEnum(e) => e,
+            match type_kind {
+                TypeKind::DataEnum(_) => {}
                 _ => continue,
-            };
+            }
 
             let name = names.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
 
@@ -42,32 +44,23 @@ impl Pass {
                 _ => "class",
             };
 
-            let variants: Vec<HashMap<&str, &str>> = data_enum
-                .variants
-                .iter()
-                .filter_map(|v| {
-                    let ty = v.ty?;
-                    let ty_name = names.name(ty)?;
-                    let mut m = HashMap::new();
-                    m.insert("name", v.name.as_str());
-                    m.insert("type", ty_name.as_str());
-                    Some(m)
-                })
-                .collect();
+            let unmanaged_variants = enum_body_unmanaged_variant.get(*type_id).unwrap_or(&[]);
+            let unmanaged = enum_body_unmanaged.get(*type_id).map(|s| s.as_str()).unwrap_or("");
 
             let mut context = Context::new();
             context.insert("name", name);
             context.insert("struct_or_class", struct_or_class);
-            context.insert("variants", &variants);
+            context.insert("unmanaged_variants", &unmanaged_variants);
+            context.insert("unmanaged", &unmanaged);
 
-            let rendered = templates.render("types/enum/ty.cs", &context)?;
-            self.enum_ty.insert(*type_id, rendered);
+            let rendered = templates.render("types/enum/body.cs", &context)?;
+            self.enum_body.insert(*type_id, rendered);
         }
 
         Ok(())
     }
 
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
-        self.enum_ty.get(&type_id)
+        self.enum_body.get(&type_id)
     }
 }
