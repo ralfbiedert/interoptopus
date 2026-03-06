@@ -16,8 +16,6 @@ namespace A {
         {% for composite in composites %}
         {{ composite | indent(prefix = "        ") }}
         {% endfor %}
-
-        {{ types | indent }}
     }
 }
 

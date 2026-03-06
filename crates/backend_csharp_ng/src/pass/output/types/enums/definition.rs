@@ -1,6 +1,6 @@
 //! Renders enum type definitions using the `enum_ty.cs` template.
 
-use crate::lang::types::{ManagedConversion, TypeKind};
+use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
@@ -25,7 +25,7 @@ impl Pass {
         output_master: &output::master::Pass,
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
-        managed_conversion: &model::types::info::managed_conversion::Pass,
+        struct_class: &model::types::info::struct_class::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -37,10 +37,7 @@ impl Pass {
 
             let name = names.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
 
-            let struct_or_class = match managed_conversion.managed_conversion(*type_id) {
-                Some(ManagedConversion::AsIs) => "struct",
-                _ => "class",
-            };
+            let struct_or_class = struct_class.struct_or_class(*type_id);
 
             let variants: Vec<HashMap<&str, &str>> = data_enum
                 .variants

@@ -1,6 +1,6 @@
 //! Renders per-variant unmanaged struct definitions using the `enum_body_unmanaged.cs` template.
 
-use crate::lang::types::{ManagedConversion, TypeKind};
+use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
@@ -25,7 +25,7 @@ impl Pass {
         output_master: &output::master::Pass,
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
-        managed_conversion: &model::types::info::managed_conversion::Pass,
+        struct_class: &model::types::info::struct_class::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -46,9 +46,10 @@ impl Pass {
                     continue;
                 };
 
-                let variant_type = match managed_conversion.managed_conversion(variant_ty) {
-                    Some(ManagedConversion::AsIs) => variant_type_name.to_string(),
-                    _ => format!("{variant_type_name}.Unmanaged"),
+                let variant_type = if struct_class.is_struct(variant_ty) {
+                    variant_type_name.to_string()
+                } else {
+                    format!("{variant_type_name}.Unmanaged")
                 };
 
                 let mut context = Context::new();

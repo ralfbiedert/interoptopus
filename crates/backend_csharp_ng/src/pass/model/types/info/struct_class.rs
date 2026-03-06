@@ -1,0 +1,54 @@
+//! Determines whether a C# type should be emitted as `struct` or `class`.
+//!
+//! Types with `ManagedConversion::AsIs` become structs; all others become classes.
+
+use crate::lang::types::ManagedConversion;
+use crate::model::TypeId;
+use crate::pass::Outcome::Unchanged;
+use crate::pass::{model, ModelResult, PassInfo};
+use std::collections::HashMap;
+
+#[derive(Default)]
+pub struct Config {}
+
+pub struct Pass {
+    info: PassInfo,
+    is_struct: HashMap<TypeId, bool>,
+}
+
+impl Pass {
+    pub fn new(_: Config) -> Self {
+        Self { info: PassInfo { name: file!() }, is_struct: Default::default() }
+    }
+
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, managed_conversion: &model::types::info::managed_conversion::Pass, kinds: &model::types::kind::Pass) -> ModelResult {
+        let mut outcome = Unchanged;
+
+        for (type_id, _) in kinds.iter() {
+            if self.is_struct.contains_key(type_id) {
+                continue;
+            }
+
+            let Some(mc) = managed_conversion.managed_conversion(*type_id) else {
+                continue;
+            };
+
+            self.is_struct.insert(*type_id, matches!(mc, ManagedConversion::AsIs));
+            outcome.changed();
+        }
+
+        Ok(outcome)
+    }
+
+    pub fn is_struct(&self, ty: TypeId) -> bool {
+        self.is_struct.get(&ty).copied().unwrap_or(false)
+    }
+
+    pub fn is_class(&self, ty: TypeId) -> bool {
+        !self.is_struct(ty)
+    }
+
+    pub fn struct_or_class(&self, ty: TypeId) -> &'static str {
+        if self.is_struct(ty) { "struct" } else { "class" }
+    }
+}
