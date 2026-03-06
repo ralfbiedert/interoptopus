@@ -24,7 +24,7 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
         kinds: &model::types::kind::Pass,
-        enum_ty: &output::types::enums::data_ty::Pass,
+        enum_ty: &output::types::enums::definition::Pass,
         enum_body: &output::types::enums::body::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
@@ -50,7 +50,7 @@ impl Pass {
                 context.insert("enum_definition", enum_definition);
                 context.insert("enum_body", body);
 
-                let rendered = templates.render("types/enum/all.cs", &context)?;
+                let rendered = templates.render("types/enums/all.cs", &context)?;
                 rendered_enums.push(rendered);
             }
 

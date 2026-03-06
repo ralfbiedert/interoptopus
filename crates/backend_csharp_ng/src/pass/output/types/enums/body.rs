@@ -65,7 +65,7 @@ impl Pass {
             context.insert("ctors", &ctors);
             context.insert("to_string", &to_string);
 
-            let rendered = templates.render("types/enum/body.cs", &context)?;
+            let rendered = templates.render("types/enums/body.cs", &context)?;
             self.enum_body.insert(*type_id, rendered);
         }
 

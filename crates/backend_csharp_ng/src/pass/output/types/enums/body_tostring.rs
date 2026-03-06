@@ -19,12 +19,7 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, body_tostring: Default::default() }
     }
 
-    pub fn process(
-        &mut self,
-        _pass_meta: &mut crate::pass::PassMeta,
-        output_master: &output::master::Pass,
-        kinds: &model::types::kind::Pass,
-    ) -> OutputResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::master::Pass, kinds: &model::types::kind::Pass) -> OutputResult {
         let templates = output_master.templates();
 
         for (type_id, type_kind) in kinds.iter() {
@@ -48,7 +43,7 @@ impl Pass {
             let mut context = Context::new();
             context.insert("variants", &variants);
 
-            let rendered = templates.render("types/enum/body_tostring.cs", &context)?;
+            let rendered = templates.render("types/enums/body_tostring.cs", &context)?;
             self.body_tostring.insert(*type_id, rendered);
         }
 

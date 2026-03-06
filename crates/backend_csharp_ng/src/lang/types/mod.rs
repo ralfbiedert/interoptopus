@@ -46,8 +46,11 @@ pub use primitive::Primitive;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ManagedConversion {
+    /// Primitive types that convert via language built-ins
     AsIs,
+    /// Conversion via `To...` methods, indicating no ownership transfer.
     To,
+    /// Conversion via `Into...` methods, indicating ownership transfer.
     Into,
 }
 

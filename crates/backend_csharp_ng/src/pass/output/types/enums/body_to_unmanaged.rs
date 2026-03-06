@@ -58,7 +58,7 @@ impl Pass {
             context.insert("to_unmanaged", to_unmanaged);
             context.insert("variants", &variants);
 
-            let rendered = templates.render("types/enum/body_to_unmanaged.cs", &context)?;
+            let rendered = templates.render("types/enums/body_to_unmanaged.cs", &context)?;
             self.body_to_unmanaged.insert(*type_id, rendered);
         }
 

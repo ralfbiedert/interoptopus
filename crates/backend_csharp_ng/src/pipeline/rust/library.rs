@@ -35,7 +35,7 @@ pub struct RustLibraryConfig {
     pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
     pub output_conversion_invoke: output::conversion::managed::Config,
-    pub output_enum_ty: output::types::enums::data_ty::Config,
+    pub output_enum_ty: output::types::enums::definition::Config,
     pub output_enum_body: output::types::enums::body::Config,
     pub output_enum_body_unmanaged_variant: output::types::enums::body_unmanaged_variant::Config,
     pub output_enum_body_unmanaged: output::types::enums::body_unmanaged::Config,
@@ -52,7 +52,7 @@ pub struct RustLibraryConfig {
 
 pub struct IntermediateOutputPasses {
     pub conversion_invoke: output::conversion::managed::Pass,
-    pub enum_ty: output::types::enums::data_ty::Pass,
+    pub enum_ty: output::types::enums::definition::Pass,
     pub enum_body_unmanaged_variant: output::types::enums::body_unmanaged_variant::Pass,
     pub enum_body_unmanaged: output::types::enums::body_unmanaged::Pass,
     pub enum_body_to_unmanaged: output::types::enums::body_to_unmanaged::Pass,
@@ -151,7 +151,7 @@ impl RustLibrary {
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
                 conversion_invoke: output::conversion::managed::Pass::new(config.output_conversion_invoke),
-                enum_ty: output::types::enums::data_ty::Pass::new(config.output_enum_ty),
+                enum_ty: output::types::enums::definition::Pass::new(config.output_enum_ty),
                 enum_body_unmanaged_variant: output::types::enums::body_unmanaged_variant::Pass::new(config.output_enum_body_unmanaged_variant),
                 enum_body_unmanaged: output::types::enums::body_unmanaged::Pass::new(config.output_enum_body_unmanaged),
                 enum_body_to_unmanaged: output::types::enums::body_to_unmanaged::Pass::new(config.output_enum_body_to_unmanaged),
