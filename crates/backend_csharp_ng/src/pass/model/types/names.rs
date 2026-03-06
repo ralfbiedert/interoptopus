@@ -5,6 +5,7 @@ use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::try_resolve;
+use interoptopus_backends::casing::{rust_to_pascal, sanitize_delegate_name, sanitize_rust_name};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -67,20 +68,20 @@ impl Pass {
                     TypePattern::CStrPointer => "CStrPtr".to_string(),
                     TypePattern::Utf8String => "Utf8String".to_string(),
                     TypePattern::ApiVersion => "ApiVersion".to_string(),
-                    TypePattern::Slice(t) => format!("Slice{}", pascal(resolve_name!(self, *t, pass_meta))),
-                    TypePattern::SliceMut(t) => format!("SliceMut{}", pascal(resolve_name!(self, *t, pass_meta))),
-                    TypePattern::Vec(t) => format!("Vec{}", pascal(resolve_name!(self, *t, pass_meta))),
-                    TypePattern::Option(t) => format!("Option{}", pascal(resolve_name!(self, *t, pass_meta))),
-                    TypePattern::AsyncCallback(t) => format!("AsyncCallback{}", pascal(resolve_name!(self, *t, pass_meta))),
+                    TypePattern::Slice(t) => format!("Slice{}", rust_to_pascal(resolve_name!(self, *t, pass_meta))),
+                    TypePattern::SliceMut(t) => format!("SliceMut{}", rust_to_pascal(resolve_name!(self, *t, pass_meta))),
+                    TypePattern::Vec(t) => format!("Vec{}", rust_to_pascal(resolve_name!(self, *t, pass_meta))),
+                    TypePattern::Option(t) => format!("Option{}", rust_to_pascal(resolve_name!(self, *t, pass_meta))),
+                    TypePattern::AsyncCallback(t) => format!("AsyncCallback{}", rust_to_pascal(resolve_name!(self, *t, pass_meta))),
                     TypePattern::Result(ok, err) => {
-                        let ok_name = pascal(resolve_name!(self, *ok, pass_meta));
-                        let err_name = pascal(resolve_name!(self, *err, pass_meta));
+                        let ok_name = rust_to_pascal(resolve_name!(self, *ok, pass_meta));
+                        let err_name = rust_to_pascal(resolve_name!(self, *err, pass_meta));
                         format!("Result{}{}", ok_name, err_name)
                     }
-                    TypePattern::NamedCallback(_) => sanitize_name(&ty.name),
+                    TypePattern::NamedCallback(_) => sanitize_rust_name(&ty.name),
                 },
                 TypeKind::Delegate(_) => sanitize_delegate_name(&ty.name),
-                _ => sanitize_name(&ty.name),
+                _ => sanitize_rust_name(&ty.name),
             };
 
             self.names.insert(cs_id, cs_name);
@@ -93,91 +94,6 @@ impl Pass {
     pub fn name(&self, ty: TypeId) -> Option<&String> {
         self.names.get(&ty)
     }
-}
-
-/// Convert a C# type name to PascalCase for use in composite names.
-fn pascal(name: &str) -> String {
-    let mut result = String::with_capacity(name.len());
-    let mut capitalize_next = true;
-    for c in name.chars() {
-        if c == '_' || c == ' ' {
-            capitalize_next = true;
-        } else if capitalize_next {
-            result.extend(c.to_uppercase());
-            capitalize_next = false;
-        } else {
-            result.push(c);
-        }
-    }
-    result
-}
-
-/// Sanitize a Rust delegate/fn-pointer name into a valid C# identifier.
-///
-/// Strips `extern "C" fn` prefix and all non-alphanumeric characters,
-/// then PascalCases the fragments. For example:
-/// - `extern "C" fn(u8) -> u8` → `FnU8U8`
-/// - `extern "C" fn(Vec3f32) -> ()` → `FnVec3f32`
-fn sanitize_delegate_name(name: &str) -> String {
-    // Strip extern "C" prefix, keep "fn" onwards
-    let stripped = name
-        .strip_prefix("extern \"C\" ")
-        .or_else(|| name.strip_prefix("extern \"C\" "))
-        .unwrap_or(name);
-
-    // Strip return type `-> ()` (void) entirely
-    let stripped = stripped.replace("-> ()", "");
-
-    let mut result = String::with_capacity(stripped.len());
-    let mut capitalize_next = true;
-
-    for c in stripped.chars() {
-        if c.is_alphanumeric() {
-            if capitalize_next {
-                result.extend(c.to_uppercase());
-                capitalize_next = false;
-            } else {
-                result.push(c);
-            }
-        } else {
-            // Any non-alphanumeric char is a word boundary
-            capitalize_next = true;
-        }
-    }
-
-    result
-}
-
-/// Sanitize a Rust type name into a valid C# identifier.
-///
-/// Strips angle brackets, commas, semicolons, square brackets, and spaces,
-/// then PascalCases the fragments. For example:
-/// - `Weird2<u8, 5>` → `Weird2U85`
-/// - `[u8; 5]` → `U85` (arrays should be handled before reaching this)
-/// - `MyStruct` → `MyStruct` (unchanged)
-fn sanitize_name(name: &str) -> String {
-    let mut result = String::with_capacity(name.len());
-    let mut capitalize_next = true;
-
-    for c in name.chars() {
-        match c {
-            '<' | '>' | ',' | ';' | '[' | ']' | ' ' => {
-                capitalize_next = true;
-            }
-            '_' => {
-                capitalize_next = true;
-            }
-            _ if capitalize_next => {
-                result.extend(c.to_uppercase());
-                capitalize_next = false;
-            }
-            _ => {
-                result.push(c);
-            }
-        }
-    }
-
-    result
 }
 
 fn primitive_name(p: &Primitive) -> &'static str {
