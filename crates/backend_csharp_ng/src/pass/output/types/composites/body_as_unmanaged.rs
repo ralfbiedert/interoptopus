@@ -26,6 +26,7 @@ impl Pass {
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
         managed: &output::conversion::managed::Pass,
+        field_conversions: &output::conversion::fields::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -43,14 +44,11 @@ impl Pass {
                 .map(|f| {
                     let as_unmanaged = managed.as_unmanaged_suffix(f.ty).to_string();
 
-                    // AsUnmanaged uses the same conversion as ToUnmanaged for custom types
-                    let custom_to_unmanaged = render_custom_to_unmanaged(templates, kinds, names, &f.name, f.ty);
-
                     let mut m = HashMap::new();
                     m.insert("name", f.name.clone());
                     m.insert("as_unmanaged", as_unmanaged);
-                    if let Some(custom) = custom_to_unmanaged {
-                        m.insert("custom_to_unmanaged", custom);
+                    if let Some(custom) = field_conversions.custom_to_unmanaged(*type_id, &f.name) {
+                        m.insert("custom_to_unmanaged", custom.to_string());
                     }
                     m
                 })
@@ -69,25 +67,5 @@ impl Pass {
 
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
         self.body_as_unmanaged.get(&type_id)
-    }
-}
-
-fn render_custom_to_unmanaged(
-    templates: &interoptopus_backends::template::TemplateEngine,
-    kinds: &model::types::kind::Pass,
-    names: &model::types::names::Pass,
-    field_name: &str,
-    field_ty: TypeId,
-) -> Option<String> {
-    match kinds.get(field_ty)? {
-        TypeKind::Array(a) => {
-            let element_type = names.name(a.ty)?;
-            let mut ctx = Context::new();
-            ctx.insert("field", field_name);
-            ctx.insert("element_type", element_type.as_str());
-            ctx.insert("len", &a.len);
-            templates.render("types/composite/fields/array_to_unmanaged.cs", &ctx).ok()
-        }
-        _ => None,
     }
 }

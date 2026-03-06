@@ -34,6 +34,7 @@ pub struct RustLibraryConfig {
     pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
     pub output_conversion_invoke: output::conversion::managed::Config,
+    pub output_conversion_fields: output::conversion::fields::Config,
     pub output_enum_ty: output::types::enums::definition::Config,
     pub output_enum_body: output::types::enums::body::Config,
     pub output_enum_body_unmanaged_variant: output::types::enums::body_unmanaged_variant::Config,
@@ -57,6 +58,7 @@ pub struct RustLibraryConfig {
 
 pub struct IntermediateOutputPasses {
     pub conversion_invoke: output::conversion::managed::Pass,
+    pub conversion_fields: output::conversion::fields::Pass,
     pub enum_ty: output::types::enums::definition::Pass,
     pub enum_body_unmanaged_variant: output::types::enums::body_unmanaged_variant::Pass,
     pub enum_body_unmanaged: output::types::enums::body_unmanaged::Pass,
@@ -160,6 +162,7 @@ impl RustLibrary {
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
                 conversion_invoke: output::conversion::managed::Pass::new(config.output_conversion_invoke),
+                conversion_fields: output::conversion::fields::Pass::new(config.output_conversion_fields),
                 enum_ty: output::types::enums::definition::Pass::new(config.output_enum_ty),
                 enum_body_unmanaged_variant: output::types::enums::body_unmanaged_variant::Pass::new(config.output_enum_body_unmanaged_variant),
                 enum_body_unmanaged: output::types::enums::body_unmanaged::Pass::new(config.output_enum_body_unmanaged),
@@ -254,10 +257,11 @@ impl RustLibrary {
         self.output_passes.enum_body_tostring.process(&mut pass_meta, &self.output_master, &self.model_type_kinds)?;
         self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class, &self.model_type_disposable, &self.output_passes.enum_body_unmanaged_variant, &self.output_passes.enum_body_unmanaged, &self.output_passes.enum_body_to_unmanaged, &self.output_passes.enum_body_as_unmanaged, &self.output_passes.enum_body_ctors, &self.output_passes.enum_body_tostring)?;
         self.output_passes.enums.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.enum_ty, &self.output_passes.enum_body)?;
+        self.output_passes.conversion_fields.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names)?;
         self.output_passes.composite_ty.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class)?;
-        self.output_passes.composite_body_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
-        self.output_passes.composite_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
-        self.output_passes.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke)?;
+        self.output_passes.composite_body_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke, &self.output_passes.conversion_fields)?;
+        self.output_passes.composite_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke, &self.output_passes.conversion_fields)?;
+        self.output_passes.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.conversion_invoke, &self.output_passes.conversion_fields)?;
         self.output_passes.composite_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class, &self.model_type_disposable, &self.output_passes.composite_body_unmanaged, &self.output_passes.composite_body_to_unmanaged, &self.output_passes.composite_body_as_unmanaged)?;
         self.output_passes.composites.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.composite_ty, &self.output_passes.composite_body)?;
         self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;

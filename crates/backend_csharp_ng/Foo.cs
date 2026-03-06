@@ -1502,7 +1502,13 @@ namespace A {
                 internal Array ToManaged()
                 {
                     var _managed = new Array();
-                    _managed.data = data.ToManaged();
+                    fixed (byte* _fixed = data)
+                    {
+                        _managed.data = new byte[16];
+                        var src = new ReadOnlySpan<byte>(_fixed, 16);
+                        var dst = new Span<byte>(_managed.data, 0, 16);
+                        src.CopyTo(dst);
+                    }
                     return _managed;
                 }
             }
@@ -1511,7 +1517,13 @@ namespace A {
             internal Unmanaged ToUnmanaged()
             {
                 var _unmanaged = new Unmanaged();
-                _unmanaged.data = data.ToUnmanaged();
+                {
+                    if (data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
+                    if (data.Length != 16) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
+                    var src = new ReadOnlySpan<byte>(data, 0, 16);
+                    var dst = new Span<byte>(_unmanaged.data, 16);
+                    src.CopyTo(dst);
+                }
                 return _unmanaged;
             }
 
@@ -1519,7 +1531,13 @@ namespace A {
             internal Unmanaged AsUnmanaged()
             {
                 var _unmanaged = new Unmanaged();
-                _unmanaged.data = data.AsUnmanaged();
+                {
+                    if (data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
+                    if (data.Length != 16) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
+                    var src = new ReadOnlySpan<byte>(data, 0, 16);
+                    var dst = new Span<byte>(_unmanaged.data, 16);
+                    src.CopyTo(dst);
+                }
                 return _unmanaged;
             }
 
@@ -2010,7 +2028,13 @@ namespace A {
                 internal FixedString32 ToManaged()
                 {
                     var _managed = new FixedString32();
-                    _managed.data = data.ToManaged();
+                    fixed (byte* _fixed = data)
+                    {
+                        _managed.data = new byte[32];
+                        var src = new ReadOnlySpan<byte>(_fixed, 32);
+                        var dst = new Span<byte>(_managed.data, 0, 32);
+                        src.CopyTo(dst);
+                    }
                     return _managed;
                 }
             }
@@ -2019,7 +2043,13 @@ namespace A {
             internal Unmanaged ToUnmanaged()
             {
                 var _unmanaged = new Unmanaged();
-                _unmanaged.data = data.ToUnmanaged();
+                {
+                    if (data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
+                    if (data.Length != 32) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
+                    var src = new ReadOnlySpan<byte>(data, 0, 32);
+                    var dst = new Span<byte>(_unmanaged.data, 32);
+                    src.CopyTo(dst);
+                }
                 return _unmanaged;
             }
 
@@ -2027,7 +2057,13 @@ namespace A {
             internal Unmanaged AsUnmanaged()
             {
                 var _unmanaged = new Unmanaged();
-                _unmanaged.data = data.AsUnmanaged();
+                {
+                    if (data == null) { throw new InvalidOperationException("Array 'data' must not be null"); }
+                    if (data.Length != 32) { throw new InvalidOperationException("Array size mismatch for 'data'"); }
+                    var src = new ReadOnlySpan<byte>(data, 0, 32);
+                    var dst = new Span<byte>(_unmanaged.data, 32);
+                    src.CopyTo(dst);
+                }
                 return _unmanaged;
             }
 
@@ -2685,8 +2721,20 @@ namespace A {
                     _managed.field_vec = field_vec.ToManaged();
                     _managed.field_bool = field_bool;
                     _managed.field_int = field_int;
-                    _managed.field_array = field_array.ToManaged();
-                    _managed.field_array_2 = field_array_2.ToManaged();
+                    fixed (ushort* _fixed = field_array)
+                    {
+                        _managed.field_array = new ushort[5];
+                        var src = new ReadOnlySpan<ushort>(_fixed, 5);
+                        var dst = new Span<ushort>(_managed.field_array, 0, 5);
+                        src.CopyTo(dst);
+                    }
+                    fixed (ushort* _fixed = field_array_2)
+                    {
+                        _managed.field_array_2 = new ushort[5];
+                        var src = new ReadOnlySpan<ushort>(_fixed, 5);
+                        var dst = new Span<ushort>(_managed.field_array_2, 0, 5);
+                        src.CopyTo(dst);
+                    }
                     _managed.field_struct = field_struct.ToManaged();
                     return _managed;
                 }
@@ -2700,8 +2748,20 @@ namespace A {
                 _unmanaged.field_vec = field_vec.ToUnmanaged();
                 _unmanaged.field_bool = field_bool;
                 _unmanaged.field_int = field_int;
-                _unmanaged.field_array = field_array.ToUnmanaged();
-                _unmanaged.field_array_2 = field_array_2.ToUnmanaged();
+                {
+                    if (field_array == null) { throw new InvalidOperationException("Array 'field_array' must not be null"); }
+                    if (field_array.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array'"); }
+                    var src = new ReadOnlySpan<ushort>(field_array, 0, 5);
+                    var dst = new Span<ushort>(_unmanaged.field_array, 5);
+                    src.CopyTo(dst);
+                }
+                {
+                    if (field_array_2 == null) { throw new InvalidOperationException("Array 'field_array_2' must not be null"); }
+                    if (field_array_2.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array_2'"); }
+                    var src = new ReadOnlySpan<ushort>(field_array_2, 0, 5);
+                    var dst = new Span<ushort>(_unmanaged.field_array_2, 5);
+                    src.CopyTo(dst);
+                }
                 _unmanaged.field_struct = field_struct.ToUnmanaged();
                 return _unmanaged;
             }
@@ -2714,8 +2774,20 @@ namespace A {
                 _unmanaged.field_vec = field_vec.AsUnmanaged();
                 _unmanaged.field_bool = field_bool;
                 _unmanaged.field_int = field_int;
-                _unmanaged.field_array = field_array.AsUnmanaged();
-                _unmanaged.field_array_2 = field_array_2.AsUnmanaged();
+                {
+                    if (field_array == null) { throw new InvalidOperationException("Array 'field_array' must not be null"); }
+                    if (field_array.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array'"); }
+                    var src = new ReadOnlySpan<ushort>(field_array, 0, 5);
+                    var dst = new Span<ushort>(_unmanaged.field_array, 5);
+                    src.CopyTo(dst);
+                }
+                {
+                    if (field_array_2 == null) { throw new InvalidOperationException("Array 'field_array_2' must not be null"); }
+                    if (field_array_2.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'field_array_2'"); }
+                    var src = new ReadOnlySpan<ushort>(field_array_2, 0, 5);
+                    var dst = new Span<ushort>(_unmanaged.field_array_2, 5);
+                    src.CopyTo(dst);
+                }
                 _unmanaged.field_struct = field_struct.AsUnmanaged();
                 return _unmanaged;
             }
@@ -4163,7 +4235,13 @@ namespace A {
                 {
                     var _managed = new Weird2U85();
                     _managed.t = t;
-                    _managed.a = a.ToManaged();
+                    fixed (byte* _fixed = a)
+                    {
+                        _managed.a = new byte[5];
+                        var src = new ReadOnlySpan<byte>(_fixed, 5);
+                        var dst = new Span<byte>(_managed.a, 0, 5);
+                        src.CopyTo(dst);
+                    }
                     _managed.r = r;
                     return _managed;
                 }
@@ -4174,7 +4252,13 @@ namespace A {
             {
                 var _unmanaged = new Unmanaged();
                 _unmanaged.t = t;
-                _unmanaged.a = a.ToUnmanaged();
+                {
+                    if (a == null) { throw new InvalidOperationException("Array 'a' must not be null"); }
+                    if (a.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'a'"); }
+                    var src = new ReadOnlySpan<byte>(a, 0, 5);
+                    var dst = new Span<byte>(_unmanaged.a, 5);
+                    src.CopyTo(dst);
+                }
                 _unmanaged.r = r;
                 return _unmanaged;
             }
@@ -4184,7 +4268,13 @@ namespace A {
             {
                 var _unmanaged = new Unmanaged();
                 _unmanaged.t = t;
-                _unmanaged.a = a.AsUnmanaged();
+                {
+                    if (a == null) { throw new InvalidOperationException("Array 'a' must not be null"); }
+                    if (a.Length != 5) { throw new InvalidOperationException("Array size mismatch for 'a'"); }
+                    var src = new ReadOnlySpan<byte>(a, 0, 5);
+                    var dst = new Span<byte>(_unmanaged.a, 5);
+                    src.CopyTo(dst);
+                }
                 _unmanaged.r = r;
                 return _unmanaged;
             }

@@ -26,6 +26,7 @@ impl Pass {
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
         managed: &output::conversion::managed::Pass,
+        field_conversions: &output::conversion::fields::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -44,14 +45,12 @@ impl Pass {
                     let ty_name = names.name(f.ty).cloned().unwrap_or_default();
                     let to_managed = managed.to_managed_suffix(f.ty).to_string();
 
-                    let custom_to_managed = render_custom_to_managed(templates, kinds, names, &f.name, f.ty);
-
                     let mut m = HashMap::new();
                     m.insert("name", f.name.clone());
                     m.insert("type", ty_name);
                     m.insert("to_managed", to_managed);
-                    if let Some(custom) = custom_to_managed {
-                        m.insert("custom_to_managed", custom);
+                    if let Some(custom) = field_conversions.custom_to_managed(*type_id, &f.name) {
+                        m.insert("custom_to_managed", custom.to_string());
                     }
                     m
                 })
@@ -70,25 +69,5 @@ impl Pass {
 
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
         self.composite_body_unmanaged.get(&type_id)
-    }
-}
-
-fn render_custom_to_managed(
-    templates: &interoptopus_backends::template::TemplateEngine,
-    kinds: &model::types::kind::Pass,
-    names: &model::types::names::Pass,
-    field_name: &str,
-    field_ty: TypeId,
-) -> Option<String> {
-    match kinds.get(field_ty)? {
-        TypeKind::Array(a) => {
-            let element_type = names.name(a.ty)?;
-            let mut ctx = Context::new();
-            ctx.insert("field", field_name);
-            ctx.insert("element_type", element_type.as_str());
-            ctx.insert("len", &a.len);
-            templates.render("types/composite/fields/array_to_managed.cs", &ctx).ok()
-        }
-        _ => None,
     }
 }
