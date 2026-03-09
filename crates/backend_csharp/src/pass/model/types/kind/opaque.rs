@@ -21,14 +21,13 @@ impl Pass {
     pub fn process(
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
-        id_map: &mut model::id::Pass,
         kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            skip_mapped!(id_map, rust_id);
+            skip_mapped!(kinds, rust_id);
 
             match &ty.kind {
                 interoptopus::lang::types::TypeKind::Opaque => {}
@@ -37,8 +36,7 @@ impl Pass {
 
             let cs_id = TypeId::from_id(rust_id.id());
 
-            // Register the service type (no dependencies to check)
-            id_map.set_ty(*rust_id, cs_id);
+            // Register the opaque type (no dependencies to check)
             kinds.set_kind(cs_id, TypeKind::Opaque);
             outcome.changed();
         }

@@ -22,14 +22,14 @@ impl Pass {
     pub fn process(
         &mut self,
         pass_meta: &mut crate::pass::PassMeta,
-        id_map: &mut model::id::Pass,
+        id_map: &model::id::Pass,
         kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            skip_mapped!(id_map, rust_id);
+            skip_mapped!(kinds, rust_id);
             let rust_signature = try_extract_kind!(ty, FnPointer);
             let cs_id = TypeId::from_id(rust_id.id());
 
@@ -62,7 +62,6 @@ impl Pass {
             // All types available, create the delegate signature
             let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
 
-            id_map.set_ty(*rust_id, cs_id);
             kinds.set_kind(cs_id, TypeKind::Delegate(cs_signature));
             outcome.changed();
         }

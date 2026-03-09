@@ -45,7 +45,7 @@ impl Pass {
 
         for (rust_id, ty) in rs_types {
             let rust_pattern = try_extract_kind!(ty, TypePattern);
-            let cs_id = TypeId::from_id(rust_id.id());
+            let Some(cs_id) = id_map.ty(*rust_id) else { continue };
 
             if self.fallbacks.contains_key(&cs_id) {
                 continue;

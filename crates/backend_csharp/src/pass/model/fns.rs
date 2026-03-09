@@ -22,11 +22,11 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, functions: Default::default() }
     }
 
-    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &mut model::id::Pass, rs_functions: &Functions) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &model::id::Pass, rs_functions: &Functions) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, rust_fn) in rs_functions {
-            // Create C# FunctionId from Rust FunctionId
+            // Create C# FunctionId
             let cs_id = FunctionId::from_id(rust_id.id());
 
             // Skip if we've already processed this function
@@ -71,7 +71,6 @@ impl Pass {
             // Create the C# function with one overload
             let cs_function = Function { name: rust_fn.name.clone(), overloads: vec![overload] };
 
-            id_map.set_fns(*rust_id, cs_id);
             self.functions.insert(cs_id, cs_function);
             outcome.changed();
         }

@@ -1,9 +1,15 @@
 //! Introduces C# TypeIDs and converts a Rust `TypeId` into a C# one.
+//!
+//! Populates all type and function id mappings upfront. The C# TypeId is
+//! always `TypeId::from_id(rust_id.id())`, except for two special pattern
+//! types (CStrPointer, Utf8String) which have predefined C# TypeIds.
 
+use crate::lang::types::csharp;
 use crate::model::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo};
-use interoptopus::inventory::Types;
+use interoptopus::inventory::{Functions, Types};
+use interoptopus::lang;
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -20,19 +26,42 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, ty: Default::default(), fns: Default::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, _: &Types) -> ModelResult {
-        Ok(Unchanged)
-    }
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, rs_types: &Types, rs_functions: &Functions) -> ModelResult {
+        let mut outcome = Unchanged;
 
-    pub fn set_ty(&mut self, rust_id: interoptopus::inventory::TypeId, cs_id: TypeId) {
-        self.ty.insert(rust_id, cs_id);
-    }
+        for (rust_id, ty) in rs_types {
+            if self.ty.contains_key(rust_id) {
+                continue;
+            }
 
-    pub fn set_fns(&mut self, rust_id: interoptopus::inventory::FunctionId, cs_id: FunctionId) {
-        self.fns.insert(rust_id, cs_id);
+            let cs_id = match &ty.kind {
+                lang::types::TypeKind::TypePattern(lang::types::TypePattern::CStrPointer) => csharp::CSTR_PTR,
+                lang::types::TypeKind::TypePattern(lang::types::TypePattern::Utf8String) => csharp::UTF8_STRING,
+                _ => TypeId::from_id(rust_id.id()),
+            };
+
+            self.ty.insert(*rust_id, cs_id);
+            outcome.changed();
+        }
+
+        for (rust_id, _) in rs_functions {
+            if self.fns.contains_key(rust_id) {
+                continue;
+            }
+
+            let cs_id = FunctionId::from_id(rust_id.id());
+            self.fns.insert(*rust_id, cs_id);
+            outcome.changed();
+        }
+
+        Ok(outcome)
     }
 
     pub fn ty(&self, rust_id: interoptopus::inventory::TypeId) -> Option<TypeId> {
         self.ty.get(&rust_id).copied()
+    }
+
+    pub fn fns(&self, rust_id: interoptopus::inventory::FunctionId) -> Option<FunctionId> {
+        self.fns.get(&rust_id).copied()
     }
 }

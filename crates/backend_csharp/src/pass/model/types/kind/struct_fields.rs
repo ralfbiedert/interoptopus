@@ -21,7 +21,7 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, fields: Default::default() }
     }
 
-    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &mut model::id::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &model::id::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
@@ -61,7 +61,6 @@ impl Pass {
             }
 
             // All fields available, register the struct
-            id_map.set_ty(*rust_id, cs_id);
             self.fields.insert(cs_id, cs_fields);
             outcome.changed();
         }

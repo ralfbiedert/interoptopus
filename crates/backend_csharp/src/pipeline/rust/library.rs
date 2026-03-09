@@ -230,26 +230,26 @@ impl RustLibrary {
         loop_model_passes_until_done(|r| {
             pass_meta.clear();
             r.run(self.meta_info.process(&mut pass_meta))?;
-            r.run(self.model_id_maps.process(&mut pass_meta, &self.inventory.types))?;
+            r.run(self.model_id_maps.process(&mut pass_meta, &self.inventory.types, &self.inventory.functions))?;
             r.run(self.model_type_kinds.process(&mut pass_meta))?;
-            r.run(self.model_type_map_primitives.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_array.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_delegate.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_pointer.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_service.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_primitives.process(&mut pass_meta, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_array.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_delegate.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_pointer.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_service.process(&mut pass_meta, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_fallback.process(&mut pass_meta, &self.model_id_maps, &self.inventory.types))?;
-            r.run(self.model_type_map_patterns.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.model_type_fallback, &self.inventory.types))?;
-            r.run(self.model_type_map_enum_variants.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.types))?;
+            r.run(self.model_type_map_patterns.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_fallback, &self.inventory.types))?;
+            r.run(self.model_type_map_enum_variants.process(&mut pass_meta, &self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_map_enum.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_enum_variants, &self.inventory.types))?;
-            r.run(self.model_type_map_opaque.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_struct_fields.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.types))?;
+            r.run(self.model_type_map_opaque.process(&mut pass_meta, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_map_struct_fields.process(&mut pass_meta, &self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_managed_conversion.process(&mut pass_meta, &self.model_type_kinds))?;
             r.run(self.model_type_disposable.process(&mut pass_meta, &self.model_type_managed_conversion, &self.model_type_kinds))?;
             r.run(self.model_type_struct_class.process(&mut pass_meta, &self.model_type_managed_conversion, &self.model_type_kinds))?;
             r.run(self.model_type_map_struct.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_struct_fields, &self.inventory.types))?;
             r.run(self.model_type_names.process(&mut pass_meta, &self.model_id_maps, &self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
-            r.run(self.model_fn_map.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.functions))?;
+            r.run(self.model_fn_map.process(&mut pass_meta, &self.model_id_maps, &self.inventory.functions))?;
             r.run(self.model_final.process(&mut pass_meta))?;
 
             let post_model = PostModelPass::default();
