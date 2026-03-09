@@ -25,6 +25,8 @@ impl Pass {
         for (type_id, type_kind) in kinds.iter() {
             let data_enum = match type_kind {
                 TypeKind::DataEnum(e) => e,
+                TypeKind::TypePattern(TypePattern::Result(_, _, e)) => e,
+                TypeKind::TypePattern(TypePattern::Option(_, e)) => e,
                 _ => continue,
             };
 

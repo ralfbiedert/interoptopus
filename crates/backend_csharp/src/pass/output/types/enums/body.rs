@@ -40,6 +40,8 @@ impl Pass {
         for (type_id, type_kind) in kinds.iter() {
             match type_kind {
                 TypeKind::DataEnum(_) => {}
+                TypeKind::TypePattern(TypePattern::Result(_, _, _)) => {}
+                TypeKind::TypePattern(TypePattern::Option(_, _)) => {}
                 _ => continue,
             }
 
