@@ -2,6 +2,7 @@ pub mod all;
 pub mod body;
 pub mod body_as_unmanaged;
 pub mod body_ctors;
+pub mod body_exception_for_variant;
 pub mod body_to_unmanaged;
 pub mod body_tostring;
 pub mod body_unmanaged;

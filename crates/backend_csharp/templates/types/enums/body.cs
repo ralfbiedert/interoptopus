@@ -10,6 +10,8 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
 
     {{ as_unmanaged | indent }}
 
+    {{ exception_for_variant | indent }}
+
     {{ ctors | indent }}
 
     {{ to_string | indent }}
