@@ -26,7 +26,6 @@ impl Pass {
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
         struct_class: &model::types::info::struct_class::Pass,
-        unmanaged_names: &output::conversion::unmanaged_names::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -48,10 +47,10 @@ impl Pass {
                 .iter()
                 .filter_map(|v| {
                     let ty = v.ty?;
-                    let unmanaged_name = unmanaged_names.name(ty)?;
+                    let ty_name = names.name(ty)?;
                     let mut m = HashMap::new();
                     m.insert("name", v.name.to_string());
-                    m.insert("unmanaged_name", unmanaged_name.clone());
+                    m.insert("type", ty_name.clone());
                     Some(m)
                 })
                 .collect();

@@ -268,7 +268,7 @@ impl RustLibrary {
         self.output_master.process(&mut pass_meta)?;
         self.output_passes.unmanaged_conversion.process(&mut pass_meta, &self.model_type_managed_conversion, &self.model_type_kinds)?;
         self.output_passes.unmanaged_names.process(&mut pass_meta, &self.model_type_names, &self.model_type_managed_conversion, &self.model_type_kinds)?;
-        self.output_passes.enum_ty.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class, &self.output_passes.unmanaged_names)?;
+        self.output_passes.enum_ty.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class)?;
         self.output_passes.enum_body_unmanaged_variant.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_names)?;
         self.output_passes.enum_body_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_conversion)?;
         self.output_passes.enum_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_conversion)?;
