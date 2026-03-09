@@ -1,7 +1,7 @@
 //! Renders `ExceptionForVariant()` method for each enum using the
 //! `body_exception_for_variant.cs` template.
 
-use crate::lang::types::TypeKind;
+use crate::lang::types::{TypeKind, TypePattern};
 use crate::model::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::{Context, Value};

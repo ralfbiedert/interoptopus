@@ -1,6 +1,6 @@
 //! Renders enum type definitions using the `enum_ty.cs` template.
 
-use crate::lang::types::TypeKind;
+use crate::lang::types::{TypeKind, TypePattern};
 use crate::model::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;

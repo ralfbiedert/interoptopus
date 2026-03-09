@@ -1,5 +1,5 @@
 use interoptopus::inventory::{Inventory, RustInventory};
-use interoptopus::{extra_type, ffi};
+use interoptopus::{callback, extra_type, ffi};
 
 /// A simple type in our FFI layer.
 #[ffi]
@@ -10,10 +10,16 @@ pub struct Vec2 {
 
 /// A simple type in our FFI layer.
 #[ffi]
-pub enum Enum {
+pub enum Error {
     A,
     B(u32),
 }
+
+callback!(SumDelegate2(x: i32, y: i32) -> i32);
+callback!(SumDelegateReturn(x: i32, y: i32) -> ffi::Result<(), Error>);
+callback!(SumDelegateReturn2(x: i32, y: i32));
+callback!(Pointers(x: &i32, y: &mut i32));
+callback!(StringCallback(s: ffi::String));
 
 /// Function using the type.
 #[ffi]
@@ -33,7 +39,9 @@ fn generate_bindings() -> Result<(), Box<dyn std::error::Error>> {
     // your FFI or build crate.
     let inventory = RustInventory::new()
         .register(function!(my_function))
-        .register(extra_type!(Enum))
+        .register(extra_type!(Error))
+        .register(extra_type!(SumDelegate2))
+        .register(extra_type!(SumDelegateReturn))
         .validate();
 
     RustLibrary::builder(inventory)

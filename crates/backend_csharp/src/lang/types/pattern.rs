@@ -1,5 +1,5 @@
 use crate::lang::function::Signature;
-use crate::lang::types::TypeId;
+use crate::lang::types::{DataEnum, TypeId};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TypePattern {
@@ -9,8 +9,8 @@ pub enum TypePattern {
     Slice(TypeId),
     SliceMut(TypeId),
     Vec(TypeId),
-    Option(TypeId),
-    Result(TypeId, TypeId),
+    Option(TypeId, DataEnum),
+    Result(TypeId, TypeId, DataEnum),
     Bool,
     CChar,
     CVoid,

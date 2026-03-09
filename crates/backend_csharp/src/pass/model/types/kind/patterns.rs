@@ -8,7 +8,7 @@ use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::{skip_mapped, try_extract_kind, try_resolve};
 use interoptopus::lang;
-use interoptopus::lang::types::TypeInfo;
+use interoptopus::lang::types::{fallback_type, TypeInfo};
 use std::ffi::c_char;
 
 #[derive(Default)]
@@ -59,6 +59,7 @@ impl Pass {
 
                 // Result pattern with two type parameters
                 lang::types::TypePattern::Result(rust_ok, rust_err) => {
+                    let fallback = fallback_type(rust_pattern);
                     let cs_ok = try_resolve!(id_map.ty(*rust_ok), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ok));
                     let cs_err = try_resolve!(id_map.ty(*rust_err), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_err));
                     (TypeId::from_id(rust_id.id()), TypePattern::Result(cs_ok, cs_err))

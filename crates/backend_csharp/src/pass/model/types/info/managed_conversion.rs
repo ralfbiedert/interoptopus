@@ -67,7 +67,7 @@ impl Pass {
                         // Move semantics (ownership transfer)
                         TypePattern::Utf8String => ManagedConversion::Into,
                         TypePattern::Vec(_) => ManagedConversion::Into,
-                        TypePattern::Option(_) | TypePattern::Result(_, _) => ManagedConversion::Into,
+                        TypePattern::Option(_, _) | TypePattern::Result(_, _, _) => ManagedConversion::Into,
                         TypePattern::AsyncCallback(_) => ManagedConversion::Into,
                     }
                 }
