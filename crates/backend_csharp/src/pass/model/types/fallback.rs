@@ -78,16 +78,16 @@ impl Pass {
                     TypeKind::Composite(Composite { fields: vec![field("ptr", cs_ptr), field("len", cs_u64), field("capacity", cs_u64)], repr: Repr::c() })
                 }
                 lang::types::TypePattern::Option(rust_ty) => {
-                    let Some(cs_ty) = id_map.ty(*rust_ty) else { continue };
-                    TypeKind::DataEnum(DataEnum { variants: vec![variant("Some", 0, Some(cs_ty)), variant("None", 1, None)] })
+                    let Some(payload) = resolve_payload(*rust_ty, id_map) else { continue };
+                    TypeKind::DataEnum(DataEnum { variants: vec![variant("Some", 0, payload), variant("None", 1, None)] })
                 }
                 lang::types::TypePattern::Result(rust_ok, rust_err) => {
-                    let Some(cs_ok) = id_map.ty(*rust_ok) else { continue };
-                    let Some(cs_err) = id_map.ty(*rust_err) else { continue };
+                    let Some(ok_payload) = resolve_payload(*rust_ok, id_map) else { continue };
+                    let Some(err_payload) = resolve_payload(*rust_err, id_map) else { continue };
                     TypeKind::DataEnum(DataEnum {
                         variants: vec![
-                            variant("Ok", 0, Some(cs_ok)),
-                            variant("Err", 1, Some(cs_err)),
+                            variant("Ok", 0, ok_payload),
+                            variant("Err", 1, err_payload),
                             variant("Panic", 2, None),
                             variant("Null", 3, None),
                         ],
@@ -125,4 +125,15 @@ fn field(name: &str, ty: TypeId) -> Field {
 
 fn variant(name: &str, tag: usize, ty: Option<TypeId>) -> Variant {
     Variant { name: name.to_string(), docs: Docs::default(), tag, ty }
+}
+
+/// Resolves a Rust type to an optional C# variant payload.
+/// Void types (`()`) become `Some(None)` (no payload), non-void types become
+/// `Some(Some(cs_id))`, and not-yet-mapped types return `None`.
+fn resolve_payload(rust_ty: interoptopus::inventory::TypeId, id_map: &model::id::Pass) -> Option<Option<TypeId>> {
+    if rust_ty == <()>::id() {
+        Some(None)
+    } else {
+        id_map.ty(rust_ty).map(Some)
+    }
 }
