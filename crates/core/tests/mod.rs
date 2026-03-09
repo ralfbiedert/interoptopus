@@ -11,9 +11,12 @@ mod proc {
 }
 
 mod types {
+    mod cstr_ptr;
     mod layout;
     mod option;
+    mod primitive;
     mod result;
+    mod slice;
 }
 
 #[test]

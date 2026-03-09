@@ -158,22 +158,3 @@ impl WireIO for CChar {
         todo!()
     }
 }
-
-#[cfg(test)]
-mod test {
-    use crate::pattern::primitive::Bool;
-    use crate::pattern::primitive::CChar;
-    use std::os::raw::c_char;
-
-    #[test]
-    fn bool_works() {
-        assert!(Bool::TRUE.is());
-        assert!(!Bool::FALSE.is());
-    }
-
-    #[test]
-    fn cchar_works() {
-        assert!(c_char::from(CChar::MAX) == c_char::MAX);
-        assert!(CChar::from(c_char::MAX) == CChar::MAX);
-    }
-}

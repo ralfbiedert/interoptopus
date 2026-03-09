@@ -155,14 +155,3 @@ impl<T: WireIO> WireIO for Option<T> {
         todo!()
     }
 }
-
-#[cfg(test)]
-mod test {
-    use crate::pattern::option::Option;
-
-    #[test]
-    fn can_create() {
-        assert!(Option::Some(100).is_some());
-        assert!(Option::<u8>::None.is_none());
-    }
-}
