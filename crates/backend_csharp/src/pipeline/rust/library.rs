@@ -237,8 +237,8 @@ impl RustLibrary {
             r.run(self.model_type_map_delegate.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_pointer.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_service.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_patterns.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_fallback.process(&mut pass_meta, &self.model_id_maps, &self.inventory.types))?;
+            r.run(self.model_type_map_patterns.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.model_type_fallback, &self.inventory.types))?;
             r.run(self.model_type_map_enum_variants.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_map_enum.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_enum_variants, &self.inventory.types))?;
             r.run(self.model_type_map_opaque.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
