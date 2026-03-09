@@ -17,13 +17,8 @@ use crate::pass::{model, ModelResult, PassInfo};
 use crate::try_extract_kind;
 use interoptopus::lang;
 use interoptopus::lang::meta::Docs;
-use interoptopus::lang::types::{Repr, TypeInfo};
+use interoptopus::lang::types::{type_id_ptr, type_id_ptr_mut, Repr, TypeInfo};
 use std::collections::HashMap;
-
-/// Derive constant for `*const T` from `T`'s TypeId.
-const READ_PTR_DERIVE: u128 = 0x20973BD3D67EF4E0323195B99A01FD5E;
-/// Derive constant for `*mut T` from `T`'s TypeId.
-const WRITE_PTR_DERIVE: u128 = 0x7EE1DB481C7FEAD63EB329E9812A2F68;
 
 #[derive(Default)]
 pub struct Config {}
@@ -66,19 +61,19 @@ impl Pass {
                 lang::types::TypePattern::APIVersion => TypeKind::Primitive(Primitive::ULong),
                 lang::types::TypePattern::Slice(rust_ty) => {
                     // { *const T, u64 }
-                    let Some(cs_ptr) = id_map.ty(rust_ty.derive(READ_PTR_DERIVE)) else { continue };
+                    let Some(cs_ptr) = id_map.ty(type_id_ptr(*rust_ty)) else { continue };
                     let Some(cs_u64) = id_map.ty(u64::id()) else { continue };
                     TypeKind::Composite(Composite { fields: vec![field("ptr", cs_ptr), field("len", cs_u64)], repr: Repr::c() })
                 }
                 lang::types::TypePattern::SliceMut(rust_ty) => {
                     // { *mut T, u64 }
-                    let Some(cs_ptr) = id_map.ty(rust_ty.derive(WRITE_PTR_DERIVE)) else { continue };
+                    let Some(cs_ptr) = id_map.ty(type_id_ptr_mut(*rust_ty)) else { continue };
                     let Some(cs_u64) = id_map.ty(u64::id()) else { continue };
                     TypeKind::Composite(Composite { fields: vec![field("ptr", cs_ptr), field("len", cs_u64)], repr: Repr::c() })
                 }
                 lang::types::TypePattern::Vec(rust_ty) => {
                     // { *mut T, u64, u64 }
-                    let Some(cs_ptr) = id_map.ty(rust_ty.derive(WRITE_PTR_DERIVE)) else { continue };
+                    let Some(cs_ptr) = id_map.ty(type_id_ptr_mut(*rust_ty)) else { continue };
                     let Some(cs_u64) = id_map.ty(u64::id()) else { continue };
                     TypeKind::Composite(Composite { fields: vec![field("ptr", cs_ptr), field("len", cs_u64), field("capacity", cs_u64)], repr: Repr::c() })
                 }

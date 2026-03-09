@@ -17,6 +17,7 @@ mod types {
     mod primitive;
     mod result;
     mod slice;
+    mod std;
 }
 
 #[test]
