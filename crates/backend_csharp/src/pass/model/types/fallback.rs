@@ -1,0 +1,134 @@
+//! Computes the C-level fallback TypeKind for each pattern type.
+//!
+//! For each Rust TypePattern, this stores the equivalent C-level TypeKind
+//! (the "unrolled" representation). Struct-based patterns like Slice become
+//! Composite with ptr/len fields; enum-based patterns like Option/Result
+//! become DataEnum with their variants.
+//!
+//! All inner type references are resolved through the id_map from Rust TypeIds
+//! to C# TypeIds, relying on the convergence loop to retry when dependencies
+//! aren't mapped yet.
+
+use crate::lang::meta::Visibility;
+use crate::lang::types::{Composite, DataEnum, Field, Pointer, Primitive, TypeKind, Variant};
+use crate::model::TypeId;
+use crate::pass::Outcome::Unchanged;
+use crate::pass::{model, ModelResult, PassInfo};
+use crate::try_extract_kind;
+use interoptopus::lang;
+use interoptopus::lang::meta::Docs;
+use interoptopus::lang::types::{Repr, TypeInfo};
+use std::collections::HashMap;
+
+/// Derive constant for `*const T` from `T`'s TypeId.
+const READ_PTR_DERIVE: u128 = 0x20973BD3D67EF4E0323195B99A01FD5E;
+/// Derive constant for `*mut T` from `T`'s TypeId.
+const WRITE_PTR_DERIVE: u128 = 0x7EE1DB481C7FEAD63EB329E9812A2F68;
+
+#[derive(Default)]
+pub struct Config {}
+
+pub struct Pass {
+    info: PassInfo,
+    fallbacks: HashMap<TypeId, TypeKind>,
+}
+
+impl Pass {
+    pub fn new(_: Config) -> Self {
+        Self { info: PassInfo { name: file!() }, fallbacks: Default::default() }
+    }
+
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, id_map: &model::id::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+        let mut outcome = Unchanged;
+
+        // Static Rust TypeIds for commonly needed types and pointers.
+
+        for (rust_id, ty) in rs_types {
+            let rust_pattern = try_extract_kind!(ty, TypePattern);
+
+            let Some(cs_id) = id_map.ty(*rust_id) else { continue };
+
+            if self.fallbacks.contains_key(&cs_id) {
+                continue;
+            }
+
+            let fallback = match rust_pattern {
+                lang::types::TypePattern::CStrPointer => {
+                    // *const c_char
+                    let Some(cs_ptr) = id_map.ty(<*const std::ffi::c_char>::id()) else { continue };
+                    TypeKind::Pointer(Pointer::IntPtr(cs_ptr))
+                }
+                lang::types::TypePattern::Utf8String => {
+                    // { *mut u8, u64, u64 }
+                    let Some(cs_ptr) = id_map.ty(<*mut u8>::id()) else { continue };
+                    let Some(cs_u64) = id_map.ty(u64::id()) else { continue };
+                    TypeKind::Composite(Composite { fields: vec![field("ptr", cs_ptr), field("len", cs_u64), field("capacity", cs_u64)], repr: Repr::c() })
+                }
+                lang::types::TypePattern::APIVersion => TypeKind::Primitive(Primitive::ULong),
+                lang::types::TypePattern::Slice(rust_ty) => {
+                    // { *const T, u64 }
+                    let Some(cs_ptr) = id_map.ty(rust_ty.derive(READ_PTR_DERIVE)) else { continue };
+                    let Some(cs_u64) = id_map.ty(u64::id()) else { continue };
+                    TypeKind::Composite(Composite { fields: vec![field("ptr", cs_ptr), field("len", cs_u64)], repr: Repr::c() })
+                }
+                lang::types::TypePattern::SliceMut(rust_ty) => {
+                    // { *mut T, u64 }
+                    let Some(cs_ptr) = id_map.ty(rust_ty.derive(WRITE_PTR_DERIVE)) else { continue };
+                    let Some(cs_u64) = id_map.ty(u64::id()) else { continue };
+                    TypeKind::Composite(Composite { fields: vec![field("ptr", cs_ptr), field("len", cs_u64)], repr: Repr::c() })
+                }
+                lang::types::TypePattern::Vec(rust_ty) => {
+                    // { *mut T, u64, u64 }
+                    let Some(cs_ptr) = id_map.ty(rust_ty.derive(WRITE_PTR_DERIVE)) else { continue };
+                    let Some(cs_u64) = id_map.ty(u64::id()) else { continue };
+                    TypeKind::Composite(Composite { fields: vec![field("ptr", cs_ptr), field("len", cs_u64), field("capacity", cs_u64)], repr: Repr::c() })
+                }
+                lang::types::TypePattern::Option(rust_ty) => {
+                    let Some(cs_ty) = id_map.ty(*rust_ty) else { continue };
+                    TypeKind::DataEnum(DataEnum { variants: vec![variant("Some", 0, Some(cs_ty)), variant("None", 1, None)] })
+                }
+                lang::types::TypePattern::Result(rust_ok, rust_err) => {
+                    let Some(cs_ok) = id_map.ty(*rust_ok) else { continue };
+                    let Some(cs_err) = id_map.ty(*rust_err) else { continue };
+                    TypeKind::DataEnum(DataEnum {
+                        variants: vec![
+                            variant("Ok", 0, Some(cs_ok)),
+                            variant("Err", 1, Some(cs_err)),
+                            variant("Panic", 2, None),
+                            variant("Null", 3, None),
+                        ],
+                    })
+                }
+                lang::types::TypePattern::Bool => TypeKind::Primitive(Primitive::Byte),
+                lang::types::TypePattern::CChar => TypeKind::Primitive(Primitive::SByte),
+                lang::types::TypePattern::CVoid => TypeKind::Primitive(Primitive::Void),
+                lang::types::TypePattern::NamedCallback(_) | lang::types::TypePattern::AsyncCallback(_) => {
+                    // { *mut c_void, *mut c_void }
+                    let Some(cs_void_ptr) = id_map.ty(<*mut std::ffi::c_void>::id()) else { continue };
+                    TypeKind::Composite(Composite { fields: vec![field("fnptr", cs_void_ptr), field("data", cs_void_ptr)], repr: Repr::c() })
+                }
+            };
+
+            self.fallbacks.insert(cs_id, fallback);
+            outcome.changed();
+        }
+
+        Ok(outcome)
+    }
+
+    pub fn get(&self, id: TypeId) -> Option<&TypeKind> {
+        self.fallbacks.get(&id)
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = (&TypeId, &TypeKind)> {
+        self.fallbacks.iter()
+    }
+}
+
+fn field(name: &str, ty: TypeId) -> Field {
+    Field { name: name.to_string(), docs: Docs::default(), visibility: Visibility::Public, ty }
+}
+
+fn variant(name: &str, tag: usize, ty: Option<TypeId>) -> Variant {
+    Variant { name: name.to_string(), docs: Docs::default(), tag, ty }
+}

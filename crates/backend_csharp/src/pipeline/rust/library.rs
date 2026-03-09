@@ -20,6 +20,7 @@ pub struct RustLibraryConfig {
     pub model_type_map_pointer: model::types::kind::pointer::Config,
     pub model_type_map_service: model::types::kind::service::Config,
     pub model_type_map_patterns: model::types::kind::patterns::Config,
+    pub model_type_fallback: model::types::fallback::Config,
     pub model_type_map_enum_variants: model::types::kind::enum_variants::Config,
     pub model_type_map_enum: model::types::kind::r#enum::Config,
     pub model_type_map_opaque: model::types::kind::opaque::Config,
@@ -100,6 +101,7 @@ pub struct RustLibrary {
     model_type_map_pointer: model::types::kind::pointer::Pass,
     model_type_map_service: model::types::kind::service::Pass,
     model_type_map_patterns: model::types::kind::patterns::Pass,
+    model_type_fallback: model::types::fallback::Pass,
     model_type_map_enum_variants: model::types::kind::enum_variants::Pass,
     model_type_map_enum: model::types::kind::r#enum::Pass,
     model_type_map_opaque: model::types::kind::opaque::Pass,
@@ -155,6 +157,7 @@ impl RustLibrary {
             model_type_map_pointer: model::types::kind::pointer::Pass::new(config.model_type_map_pointer),
             model_type_map_service: model::types::kind::service::Pass::new(config.model_type_map_service),
             model_type_map_patterns: model::types::kind::patterns::Pass::new(config.model_type_map_patterns),
+            model_type_fallback: model::types::fallback::Pass::new(config.model_type_fallback),
             model_type_map_enum_variants: model::types::kind::enum_variants::Pass::new(config.model_type_map_enum_variants),
             model_type_map_enum: model::types::kind::r#enum::Pass::new(config.model_type_map_enum),
             model_type_map_opaque: model::types::kind::opaque::Pass::new(config.model_type_map_opaque),
@@ -235,6 +238,7 @@ impl RustLibrary {
             r.run(self.model_type_map_pointer.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_service.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_patterns.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
+            r.run(self.model_type_fallback.process(&mut pass_meta, &self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_map_enum_variants.process(&mut pass_meta, &mut self.model_id_maps, &self.inventory.types))?;
             r.run(self.model_type_map_enum.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_enum_variants, &self.inventory.types))?;
             r.run(self.model_type_map_opaque.process(&mut pass_meta, &mut self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
