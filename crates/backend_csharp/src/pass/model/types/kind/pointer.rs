@@ -29,7 +29,7 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            skip_mapped!(kinds, rust_id);
+            skip_mapped!(kinds, id_map, rust_id);
 
             let rust_pointee_id = match &ty.kind {
                 lang::types::TypeKind::ReadPointer(pointee) => pointee,
@@ -37,8 +37,8 @@ impl Pass {
                 _ => continue,
             };
 
-            // Create C# TypeId for the pointer
-            let cs_id = TypeId::from_id(rust_id.id());
+            // Resolve C# TypeId for the pointer
+            let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
 
             // Try to convert the pointee type
             let cs_pointee_id = try_resolve!(id_map.ty(*rust_pointee_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_pointee_id));

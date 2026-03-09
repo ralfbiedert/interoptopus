@@ -5,7 +5,7 @@ use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
 use crate::pass::{model, ModelResult, PassInfo};
-use crate::{skip_mapped, try_extract_kind};
+use crate::{skip_mapped, try_extract_kind, try_resolve};
 
 #[derive(Default)]
 pub struct Config {}
@@ -29,9 +29,9 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            skip_mapped!(kinds, rust_id);
+            skip_mapped!(kinds, id_map, rust_id);
             let rust_signature = try_extract_kind!(ty, FnPointer);
-            let cs_id = TypeId::from_id(rust_id.id());
+            let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
 
             // Try to convert the signature's return type and all argument types
             let Some(cs_rval) = id_map.ty(rust_signature.rval) else {

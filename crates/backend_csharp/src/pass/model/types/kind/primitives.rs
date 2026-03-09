@@ -2,10 +2,9 @@
 
 use crate::lang::types;
 use crate::lang::types::TypeKind;
-use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
-use crate::{skip_mapped, try_extract_kind};
+use crate::{skip_mapped, try_extract_kind, try_resolve};
 use interoptopus::lang::types::Primitive;
 
 #[derive(Default)]
@@ -22,15 +21,16 @@ impl Pass {
 
     pub fn process(
         &mut self,
-        _pass_meta: &mut crate::pass::PassMeta,
+        pass_meta: &mut crate::pass::PassMeta,
+        id_map: &model::id::Pass,
         kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         for (rust_id, ty) in rs_types {
-            skip_mapped!(kinds, rust_id);
+            skip_mapped!(kinds, id_map, rust_id);
             let primitive = try_extract_kind!(ty, Primitive);
             let primitive = map(*primitive);
-            let cs_id = TypeId::from_id(rust_id.id());
+            let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
             kinds.set_kind(cs_id, TypeKind::Primitive(primitive));
         }
 

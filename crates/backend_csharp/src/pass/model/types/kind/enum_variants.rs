@@ -27,8 +27,8 @@ impl Pass {
         for (rust_id, ty) in rs_types {
             let rust_enum = try_extract_kind!(ty, Enum);
 
-            // Create C# TypeId for the enum itself
-            let cs_id = TypeId::from_id(rust_id.id());
+            // Resolve C# TypeId for the enum
+            let Some(cs_id) = id_map.ty(*rust_id) else { continue };
 
             // Skip if we've already processed this enum
             if self.variants.contains_key(&cs_id) {

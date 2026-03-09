@@ -28,9 +28,9 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            skip_mapped!(kinds, rust_id);
+            skip_mapped!(kinds, id_map, rust_id);
             let rust_array = try_extract_kind!(ty, Array);
-            let cs_id = TypeId::from_id(rust_id.id());
+            let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
 
             let cs_element_type = try_resolve!(id_map.ty(rust_array.ty), pass_meta, self.info, crate::pass::MissingItem::RustType(rust_array.ty));
 

@@ -26,8 +26,8 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, rust_fn) in rs_functions {
-            // Create C# FunctionId
-            let cs_id = FunctionId::from_id(rust_id.id());
+            // Resolve C# FunctionId
+            let Some(cs_id) = id_map.fns(*rust_id) else { continue };
 
             // Skip if we've already processed this function
             if self.functions.contains_key(&cs_id) {

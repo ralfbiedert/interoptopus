@@ -16,27 +16,13 @@ macro_rules! try_extract_kind {
 
 /// Skip this loop iteration if `kinds` already has a TypeKind for this type's C# id.
 ///
-/// ```ignore
-/// skip_mapped!(kinds, rust_id);
-/// ```
+/// Uses `id_map` to resolve the Rust TypeId to the C# TypeId.
 ///
-/// Two-argument form uses `TypeId::from_id(rust_id.id())`:
-/// ```ignore
-/// skip_mapped!(kinds, rust_id);
-/// ```
-///
-/// Three-argument form uses `id_map` to resolve the C# id (needed when
-/// the C# id may differ from the default derivation):
 /// ```ignore
 /// skip_mapped!(kinds, id_map, rust_id);
 /// ```
 #[macro_export]
 macro_rules! skip_mapped {
-    ($kinds:expr, $rust_id:expr) => {
-        if $kinds.contains(&$crate::model::TypeId::from_id($rust_id.id())) {
-            continue;
-        }
-    };
     ($kinds:expr, $id_map:expr, $rust_id:expr) => {
         if let Some(cs_id) = $id_map.ty(*$rust_id) {
             if $kinds.contains(&cs_id) {

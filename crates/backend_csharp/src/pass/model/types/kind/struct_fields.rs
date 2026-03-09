@@ -27,8 +27,8 @@ impl Pass {
         for (rust_id, ty) in rs_types {
             let rust_struct = try_extract_kind!(ty, Struct);
 
-            // Create C# TypeId for the struct itself
-            let cs_id = TypeId::from_id(rust_id.id());
+            // Resolve C# TypeId for the struct
+            let Some(cs_id) = id_map.ty(*rust_id) else { continue };
 
             // Skip if we've already processed this struct
             if self.fields.contains_key(&cs_id) {

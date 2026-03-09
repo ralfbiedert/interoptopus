@@ -1,10 +1,9 @@
 //! Maps opaque types
 
 use crate::lang::types::TypeKind;
-use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
-use crate::skip_mapped;
+use crate::{skip_mapped, try_resolve};
 
 #[derive(Default)]
 pub struct Config {}
@@ -20,23 +19,23 @@ impl Pass {
 
     pub fn process(
         &mut self,
-        _pass_meta: &mut crate::pass::PassMeta,
+        pass_meta: &mut crate::pass::PassMeta,
+        id_map: &model::id::Pass,
         kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            skip_mapped!(kinds, rust_id);
+            skip_mapped!(kinds, id_map, rust_id);
 
             match &ty.kind {
                 interoptopus::lang::types::TypeKind::Opaque => {}
                 _ => continue,
             }
 
-            let cs_id = TypeId::from_id(rust_id.id());
+            let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
 
-            // Register the opaque type (no dependencies to check)
             kinds.set_kind(cs_id, TypeKind::Opaque);
             outcome.changed();
         }
