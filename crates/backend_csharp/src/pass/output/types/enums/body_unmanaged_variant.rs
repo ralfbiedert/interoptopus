@@ -1,6 +1,6 @@
 //! Renders per-variant unmanaged struct definitions using the `enum_body_unmanaged.cs` template.
 
-use crate::lang::types::{TypeKind, TypePattern};
+use crate::lang::types::{ManagedConversion, TypeKind, TypePattern};
 use crate::model::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
@@ -25,7 +25,7 @@ impl Pass {
         output_master: &output::master::Pass,
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
-        struct_class: &model::types::info::struct_class::Pass,
+        managed_conversion: &model::types::info::managed_conversion::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -48,11 +48,7 @@ impl Pass {
                     continue;
                 };
 
-                let variant_type = if struct_class.is_struct(variant_ty) {
-                    variant_type_name.to_string()
-                } else {
-                    format!("{variant_type_name}.Unmanaged")
-                };
+                let variant_type = unmanaged_type_name(variant_type_name, managed_conversion, variant_ty);
 
                 let mut context = Context::new();
                 context.insert("variant", &variant.name);
@@ -70,5 +66,13 @@ impl Pass {
 
     pub fn get(&self, type_id: TypeId) -> Option<&[String]> {
         self.enum_body_unmanaged.get(&type_id).map(|v| v.as_slice())
+    }
+}
+
+fn unmanaged_type_name(managed_name: &str, managed_conversion: &model::types::info::managed_conversion::Pass, ty: TypeId) -> String {
+    match managed_conversion.managed_conversion(ty) {
+        Some(ManagedConversion::AsIs) => managed_name.to_string(),
+        Some(_) => format!("{}.Unmanaged", managed_name),
+        None => managed_name.to_string(),
     }
 }
