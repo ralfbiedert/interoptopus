@@ -10,6 +10,12 @@ mod proc {
     mod naming;
 }
 
+mod types {
+    mod layout;
+    mod option;
+    mod result;
+}
+
 #[test]
 fn proc() {
     let t = TestCases::new();

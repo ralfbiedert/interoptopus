@@ -2,13 +2,14 @@
 
 use crate::lang::function::Signature;
 use crate::lang::types::csharp;
-use crate::lang::types::{TypeKind, TypePattern};
+use crate::lang::types::{DataEnum, TypeKind, TypePattern, Variant};
 use crate::model::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::{skip_mapped, try_extract_kind, try_resolve};
 use interoptopus::lang;
-use interoptopus::lang::types::{fallback_type, TypeInfo};
+use interoptopus::lang::meta::Docs;
+use interoptopus::lang::types::TypeInfo;
 use std::ffi::c_char;
 
 #[derive(Default)]
@@ -52,17 +53,33 @@ impl Pass {
                 lang::types::TypePattern::Slice(rust_ty) => (TypeId::from_id(rust_id.id()), TypePattern::Slice(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty)))),
                 lang::types::TypePattern::SliceMut(rust_ty) => (TypeId::from_id(rust_id.id()), TypePattern::SliceMut(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty)))),
                 lang::types::TypePattern::Vec(rust_ty) => (TypeId::from_id(rust_id.id()), TypePattern::Vec(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty)))),
-                lang::types::TypePattern::Option(rust_ty) => (TypeId::from_id(rust_id.id()), TypePattern::Option(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty)))),
+                lang::types::TypePattern::Option(rust_ty) => {
+                    let cs_ty = try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty));
+                    let data_enum = DataEnum {
+                        variants: vec![
+                            Variant { name: "Some".to_string(), docs: Docs::default(), tag: 0, ty: Some(cs_ty) },
+                            Variant { name: "None".to_string(), docs: Docs::default(), tag: 1, ty: None },
+                        ],
+                    };
+                    (TypeId::from_id(rust_id.id()), TypePattern::Option(cs_ty, data_enum))
+                }
                 lang::types::TypePattern::AsyncCallback(rust_ty) => (TypeId::from_id(rust_id.id()), TypePattern::AsyncCallback(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty)))),
 
                 lang::types::TypePattern::APIVersion => (TypeId::from_id(rust_id.id()), TypePattern::ApiVersion),
 
                 // Result pattern with two type parameters
                 lang::types::TypePattern::Result(rust_ok, rust_err) => {
-                    let fallback = fallback_type(rust_pattern);
                     let cs_ok = try_resolve!(id_map.ty(*rust_ok), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ok));
                     let cs_err = try_resolve!(id_map.ty(*rust_err), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_err));
-                    (TypeId::from_id(rust_id.id()), TypePattern::Result(cs_ok, cs_err))
+                    let data_enum = DataEnum {
+                        variants: vec![
+                            Variant { name: "Ok".to_string(), docs: Docs::default(), tag: 0, ty: Some(cs_ok) },
+                            Variant { name: "Err".to_string(), docs: Docs::default(), tag: 1, ty: Some(cs_err) },
+                            Variant { name: "Panic".to_string(), docs: Docs::default(), tag: 2, ty: Some(cs_err) },
+                            Variant { name: "Null".to_string(), docs: Docs::default(), tag: 3, ty: Some(cs_err) },
+                        ],
+                    };
+                    (TypeId::from_id(rust_id.id()), TypePattern::Result(cs_ok, cs_err, data_enum))
                 }
 
                 // NamedCallback with signature

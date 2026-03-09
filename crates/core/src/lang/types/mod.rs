@@ -13,7 +13,7 @@ use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::inventory::{Inventory, TypeId};
 pub use array::Array;
 pub use enums::{Enum, Variant, VariantKind};
-pub use pattern::{fallback_type, TypePattern};
+pub use pattern::TypePattern;
 pub use primitive::{Primitive, PrimitiveValue};
 pub use structs::{Field, Struct};
 pub use wire::{WireIO, WireOnly};
