@@ -24,7 +24,9 @@ impl Pass {
         for output in output_master.outputs_of(OutputKind::Csharp) {
             let mut context = Context::new();
 
+            // TODO: Compute correct cross-file imports.
             let extra_imports: Vec<String> = vec![];
+
             context.insert("extra_imports", &extra_imports);
 
             let using = templates.render("using.cs", &context)?;

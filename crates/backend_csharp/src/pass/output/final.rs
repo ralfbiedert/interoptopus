@@ -37,9 +37,11 @@ impl Pass {
             let composites = intermediary.composites.composites_for(file).unwrap();
             let delegates = intermediary.delegates.delegates_for(file).unwrap();
             let util = intermediary.util.utils_for(file).unwrap();
+            let using = intermediary.using.using_for(file).unwrap();
 
             context.insert("dll_name", meta_info.dll_name());
             context.insert("header", header);
+            context.insert("using", using);
             context.insert("fn_imports", &fn_imports);
             context.insert("enums", &enums);
             context.insert("composites", &composites);

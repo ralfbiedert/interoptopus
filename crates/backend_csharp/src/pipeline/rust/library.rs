@@ -54,6 +54,7 @@ pub struct RustLibraryConfig {
     pub output_fn_imports: output::fns::import::Config,
     pub output_header: output::header::Config,
     pub output_util: output::types::util::Config,
+    pub output_using: output::r#using::Config,
     pub output_final: output::r#final::Config,
     _hidden: PhantomData<()>,
 }
@@ -80,6 +81,7 @@ pub struct IntermediateOutputPasses {
     pub fn_imports: output::fns::import::Pass,
     pub header: output::header::Pass,
     pub util: output::types::util::Pass,
+    pub using: output::r#using::Pass,
 }
 
 pub struct RustLibrary {
@@ -186,6 +188,7 @@ impl RustLibrary {
                 fn_imports: output::fns::import::Pass::new(config.output_fn_imports),
                 header: output::header::Pass::new(config.output_header),
                 util: output::types::util::Pass::new(config.output_util),
+                using: output::r#using::Pass::new(config.output_using),
             },
             output_final: output::r#final::Pass::new(config.output_final),
             output: Multibuf::default(),
@@ -274,6 +277,7 @@ impl RustLibrary {
         self.output_passes.fn_imports.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.output_passes.util.process(&mut pass_meta, &self.output_master)?;
+        self.output_passes.using.process(&mut pass_meta, &self.output_master)?;
         self.plugin_post_output_pass()?;
 
         // Final output pass(es)
