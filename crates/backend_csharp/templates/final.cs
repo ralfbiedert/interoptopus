@@ -12,19 +12,21 @@ namespace A {
         {% for fn in fn_imports %}
         {{ fn | indent(prefix = "        ") }}
         {% endfor %}
-
-        {% for enum in enums %}
-        {{ enum | indent(prefix = "        ") }}
-        {% endfor %}
-
-        {% for composite in composites %}
-        {{ composite | indent(prefix = "        ") }}
-        {% endfor %}
-
-        {% for delegate in delegates %}
-        {{ delegate | indent(prefix = "        ") }}
-        {% endfor %}
     }
+
+    {% for enum in enums %}
+    {{ enum | indent }}
+    {% endfor %}
+
+    {% for composite in composites %}
+    {{ composite | indent }}
+    {% endfor %}
+
+    {% for delegate in delegates %}
+    {{ delegate | indent }}
+    {% endfor %}
+
+    {{ util | indent }}
 }
 
 

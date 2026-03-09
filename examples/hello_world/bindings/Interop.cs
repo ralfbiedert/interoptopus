@@ -26,93 +26,202 @@ namespace A {
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static partial Vec2 my_function(Vec2 input);
         
-
-        public partial class Vec2
-        {
-            public float x;
-            public float y;
-        }
-
-
-        [NativeMarshalling(typeof(MarshallerMeta))]
-        public partial class Vec2
-        {
-            public Vec2() { }
-
-            [StructLayout(LayoutKind.Sequential)]
-            public unsafe struct Unmanaged
-            {
-                internal float x;
-                internal float y;
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                internal Vec2 ToManaged()
-                {
-                    var _managed = new Vec2();
-                    _managed.x = x;
-                    _managed.y = y;
-                    return _managed;
-                }
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            internal Unmanaged ToUnmanaged()
-            {
-                var _unmanaged = new Unmanaged();
-                _unmanaged.x = x;
-                _unmanaged.y = y;
-                return _unmanaged;
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            internal Unmanaged AsUnmanaged()
-            {
-                var _unmanaged = new Unmanaged();
-                _unmanaged.x = x;
-                _unmanaged.y = y;
-                return _unmanaged;
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-            public override string ToString()
-            {
-                return "Vec2 { ... }";
-            }
-
-            [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
-            private struct MarshallerMeta { }
-            public ref struct Marshaller
-            {
-                private Vec2 _managed;
-                private Unmanaged _unmanaged;
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public Marshaller(Vec2 managed) { _managed = managed; }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public void FromManaged(Vec2 managed) { _managed = managed; }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public Vec2 ToManaged() { return _unmanaged.ToManaged(); }
-
-                [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-                public void Free() {}
-            }
-
-        }
-        
-
-        
     }
+
+    
+    public partial class Enum
+    {
+        uint _variant;
+        uint B;
+    }
+
+
+    public partial class Enum
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        internal unsafe struct UnmanagedB
+        {
+            internal uint _variant;
+            internal uint _B;
+        }
+    
+
+        [StructLayout(LayoutKind.Explicit)]
+        public unsafe struct Unmanaged
+        {
+            [FieldOffset(0)]
+            internal uint _variant;
+
+            [FieldOffset(0)]
+            internal UnmanagedB _B;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Enum ToManaged()
+            {
+                var _managed = new Enum();
+                _managed._variant = _variant;
+                if (_variant == 1) _managed._B = _B._B;
+                return _managed;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+            if (_variant == 1) _unmanaged._B._B = _B;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged._variant = _variant;
+            if (_variant == 1) _unmanaged._B._B = _B;
+            return _unmanaged;
+        }
+
+        // Ctors
+        public static Enum A( value) => new() { _variant = 0, _A = value };
+        public static Enum B(uint value) => new() { _variant = 1, _B = value };
+
+        // Checks
+        public bool IsA => _variant == 0;
+        public bool IsB => _variant == 1;
+
+        // Conversions
+        public  AsA() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _A; } }
+        public uint AsB() { if (_variant != 1) { throw ExceptionForVariant(); } else { return _B; } }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            if (_variant == 0) return "A(...)";
+            if (_variant == 1) return "B(...)";
+            throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+        }
+
+        [CustomMarshaller(typeof(Enum), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+
+        public ref struct Marshaller
+        {
+            private Enum _managed;
+            private Unmanaged _unmanaged;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Enum managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromManaged(Enum managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Enum ToManaged() { return _unmanaged.ToManaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Free() {}
+        }
+
+    }
+    
+
+    
+    public partial class Vec2
+    {
+        public float x;
+        public float y;
+    }
+
+
+    [NativeMarshalling(typeof(MarshallerMeta))]
+    public partial class Vec2
+    {
+        public Vec2() { }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct Unmanaged
+        {
+            internal float x;
+            internal float y;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            internal Vec2 ToManaged()
+            {
+                var _managed = new Vec2();
+                _managed.x = x;
+                _managed.y = y;
+                return _managed;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged ToUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.y = y;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Unmanaged AsUnmanaged()
+        {
+            var _unmanaged = new Unmanaged();
+            _unmanaged.x = x;
+            _unmanaged.y = y;
+            return _unmanaged;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override string ToString()
+        {
+            return "Vec2 { ... }";
+        }
+
+        [CustomMarshaller(typeof(Vec2), MarshalMode.Default, typeof(Marshaller))]
+        private struct MarshallerMeta { }
+        public ref struct Marshaller
+        {
+            private Vec2 _managed;
+            private Unmanaged _unmanaged;
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Vec2 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromManaged(Vec2 managed) { _managed = managed; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public Vec2 ToManaged() { return _unmanaged.ToManaged(); }
+
+            [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+            public void Free() {}
+        }
+
+    }
+    
+
+    
 }
 
 

@@ -1,11 +1,18 @@
-use interoptopus::ffi;
-use interoptopus::inventory::RustInventory;
+use interoptopus::inventory::{Inventory, RustInventory};
+use interoptopus::{extra_type, ffi};
 
 /// A simple type in our FFI layer.
 #[ffi]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
+}
+
+/// A simple type in our FFI layer.
+#[ffi]
+pub enum Enum {
+    A,
+    B(u32),
 }
 
 /// Function using the type.
@@ -26,6 +33,7 @@ fn generate_bindings() -> Result<(), Box<dyn std::error::Error>> {
     // your FFI or build crate.
     let inventory = RustInventory::new()
         .register(function!(my_function))
+        .register(extra_type!(Enum))
         .validate();
 
     RustLibrary::builder(inventory)
