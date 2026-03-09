@@ -4,4 +4,4 @@ mod macros;
 
 pub use assets::{Assets, pack_assets};
 pub use engine::TemplateEngine;
-pub use tera::Context;
+pub use tera::{Context, Value};

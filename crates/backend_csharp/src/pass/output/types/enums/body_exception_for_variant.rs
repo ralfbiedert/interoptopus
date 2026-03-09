@@ -4,7 +4,7 @@
 use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
-use interoptopus_backends::template::Context;
+use interoptopus_backends::template::{Context, Value};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -35,7 +35,7 @@ impl Pass {
                 _ => continue,
             };
 
-            let variants: Vec<HashMap<&str, String>> = data_enum
+            let variants: Vec<HashMap<&str, Value>> = data_enum
                 .variants
                 .iter()
                 .map(|v| {
@@ -43,10 +43,10 @@ impl Pass {
                     let type_name = v.ty.and_then(|ty| names.name(ty)).cloned().unwrap_or_default();
 
                     let mut m = HashMap::new();
-                    m.insert("name", v.name.clone());
-                    m.insert("id", v.tag.to_string());
-                    m.insert("has_payload", has_payload.to_string());
-                    m.insert("type", type_name);
+                    m.insert("name", Value::String(v.name.clone()));
+                    m.insert("id", Value::Number(v.tag.into()));
+                    m.insert("has_payload", Value::Bool(has_payload));
+                    m.insert("type", Value::String(type_name));
                     m
                 })
                 .collect();
