@@ -1,6 +1,6 @@
 //! Determines whether a C# type should be emitted as `struct` or `class`.
 //!
-//! Types with `ManagedConversion::AsIs` become structs; all others become classes.
+//! Types with `ManagedConversion::AsIs` or `To` become structs; `Into` types become classes.
 
 use crate::lang::types::ManagedConversion;
 use crate::model::TypeId;
@@ -38,7 +38,7 @@ impl Pass {
                 continue;
             };
 
-            self.is_struct.insert(*type_id, matches!(mc, ManagedConversion::AsIs));
+            self.is_struct.insert(*type_id, matches!(mc, ManagedConversion::AsIs | ManagedConversion::To));
             outcome.changed();
         }
 

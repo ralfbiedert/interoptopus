@@ -1,5 +1,5 @@
 use interoptopus::inventory::{Inventory, RustInventory};
-use interoptopus::{callback, extra_type, ffi};
+use interoptopus::{callback, extra_type, ffi, service};
 
 /// A simple type in our FFI layer.
 #[ffi]
@@ -18,13 +18,21 @@ pub enum Error {
 callback!(SumDelegate2(x: i32, y: i32) -> i32);
 callback!(SumDelegateReturn(x: i32, y: i32) -> ffi::Result<(), Error>);
 callback!(SumDelegateReturn2(x: i32, y: i32));
-callback!(Pointers(x: &i32, y: &mut i32));
-callback!(StringCallback(s: ffi::String));
 
 /// Function using the type.
 #[ffi]
 pub fn my_function(input: Vec2) -> Vec2 {
     input
+}
+
+#[ffi(service)]
+pub struct ServiceBasic {}
+
+#[ffi]
+impl ServiceBasic {
+    pub fn new() -> ffi::Result<Self, Error> {
+        ffi::Ok(Self {})
+    }
 }
 
 // We just trick a unit test into producing our bindings, here for C#
@@ -42,6 +50,7 @@ fn generate_bindings() -> Result<(), Box<dyn std::error::Error>> {
         .register(extra_type!(Error))
         .register(extra_type!(SumDelegate2))
         .register(extra_type!(SumDelegateReturn))
+        .register(service!(ServiceBasic))
         .validate();
 
     RustLibrary::builder(inventory)
