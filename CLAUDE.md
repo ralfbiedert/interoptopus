@@ -87,21 +87,37 @@ pass/
 │   ├── fn_map.rs       # Converts function signatures (args + return types)
 │   ├── id_maps.rs      # Creates Rust→C# ID mappings for types and functions
 │   └── types/
-│       ├── blittable.rs  # Determines blittable vs disposable ownership per type
+│       ├── fallback.rs   # Fallback handling for unmapped types
 │       ├── kind.rs       # Stores TypeKind per C# type ID + submodule declarations
 │       ├── kind/         # Per-category type mapping passes:
 │       │   ├── array.rs, delegate.rs, enum.rs, enum_variants.rs,
 │       │   ├── opaque.rs, patterns.rs, pointer.rs, primitives.rs,
 │       │   ├── service.rs, struct.rs, struct_fields.rs
+│       ├── info/
+│       │   ├── managed_conversion.rs  # AsIs/To/Into conversion category per type
+│       │   ├── disposable.rs          # Whether a type needs disposal
+│       │   └── struct_class.rs        # Whether a composite is a struct or class
 │       ├── map.rs        # Assembles final Type { name, kind } objects
 │       └── names.rs      # Assigns C# type names to all mapped types
 └── output/
-    ├── enum_ty.rs      # Renders per-enum type definitions via enum_ty.cs template
-    ├── enum.rs         # Groups enum renders per output file via enum.cs template
-    ├── fn_import.rs    # Renders function import declarations
-    ├── header.rs       # File headers
-    ├── master.rs       # Determines which files to generate, holds template engine
-    └── final.rs        # Assembles everything into a Multibuf (filename→content map)
+    ├── conversion/
+    │   ├── unmanaged_conversion.rs  # Conversion suffix/name methods (ToUnmanaged, ToManaged, etc.)
+    │   ├── unmanaged_names.rs       # Precomputed unmanaged type names (Name.Unmanaged vs plain)
+    │   └── fields.rs               # Per-field custom conversion overrides
+    ├── types/
+    │   ├── enums/          # Enum rendering: definition, body, body_unmanaged, body_unmanaged_variant,
+    │   │                   #   body_to_unmanaged, body_as_unmanaged, body_ctors, body_tostring,
+    │   │                   #   body_exception_for_variant, all
+    │   ├── composites/     # Composite rendering: definition, body, body_unmanaged,
+    │   │                   #   body_to_unmanaged, body_as_unmanaged, all
+    │   ├── delegates/      # Delegate rendering: all
+    │   └── util/           # Utility types (exceptions, utf8string, etc.)
+    ├── fns/
+    │   └── import.rs       # Renders function import declarations
+    ├── master.rs           # Determines which files to generate, holds template engine
+    ├── header.rs           # File headers
+    ├── using.rs            # Using directives
+    └── final.rs            # Assembles everything into a Multibuf (filename→content map)
 ```
 
 **Model Passes** (iterative, loop until convergence):
@@ -114,7 +130,7 @@ Output passes run after model convergence. They render model data through Tera t
 
 Output passes are held in `IntermediateOutputPasses` (defined in `pipeline/rust/library.rs`) so they can be passed as a group to the final pass.
 
-**Blittability**: The `model::types::blittable` pass computes `Ownership::Blittable` or `Ownership::Disposable` for every type. Primitives, pointers, and delegates are blittable. Composites and enums are blittable if all their fields/variants are. This runs iteratively (convergence loop) so compound types resolve after their dependencies.
+**Managed Conversion**: The `model::types::info::managed_conversion` pass assigns each type a `ManagedConversion` category (`AsIs`, `To`, or `Into`) that determines how it marshals between managed and unmanaged representations. The `model::types::info::disposable` pass then uses this to determine which types need disposal. The output `conversion/unmanaged_conversion` pass provides suffix/name query methods (e.g., `.ToUnmanaged()`, `.ToManaged()`), and `conversion/unmanaged_names` precomputes the unmanaged type name for each type (plain name if `AsIs`, `Name.Unmanaged` otherwise).
 
 **Extension points**: Plugins implement `RustLibraryPlugin` with hooks at `init`, `post_model`, and `post_output`.
 
