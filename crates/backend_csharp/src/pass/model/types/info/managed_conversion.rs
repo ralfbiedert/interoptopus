@@ -67,8 +67,34 @@ impl Pass {
                         // Move semantics (ownership transfer)
                         TypePattern::Utf8String => ManagedConversion::Into,
                         TypePattern::Vec(_) => ManagedConversion::Into,
-                        TypePattern::Option(_, _) | TypePattern::Result(_, _, _) => ManagedConversion::Into,
                         TypePattern::AsyncCallback(_) => ManagedConversion::Into,
+
+                        // Option/Result: inspect variant payloads (same logic as DataEnum)
+                        TypePattern::Option(_, e) | TypePattern::Result(_, _, e) => {
+                            let mut has_into = false;
+                            let mut pending = false;
+                            for variant in &e.variants {
+                                if let Some(variant_ty) = variant.ty {
+                                    match self.managed_conversion.get(&variant_ty) {
+                                        Some(ManagedConversion::Into) => {
+                                            has_into = true;
+                                            break;
+                                        }
+                                        Some(_) => continue,
+                                        None => {
+                                            pending = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if pending {
+                                continue;
+                            }
+
+                            if has_into { ManagedConversion::Into } else { ManagedConversion::To }
+                        }
                     }
                 }
 
