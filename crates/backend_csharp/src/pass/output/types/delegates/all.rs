@@ -82,7 +82,7 @@ impl Pass {
                     let mut m = HashMap::new();
                     m.insert("name".to_string(), arg.name.clone());
                     m.insert("managed_type".to_string(), arg_managed.clone());
-                    m.insert("unmanaged_type".to_string(), arg_unmanaged);
+                    m.insert("unmanaged_name".to_string(), arg_unmanaged);
                     m.insert("to_managed".to_string(), to_managed);
                     m.insert("to_unmanaged".to_string(), to_unmanaged);
                     args.push(m);
@@ -92,7 +92,7 @@ impl Pass {
                 context.insert("name", name);
                 context.insert("is_void", &is_void);
                 context.insert("rval_managed", &rval_managed);
-                context.insert("rval_unmanaged", &rval_unmanaged);
+                context.insert("rval_unmanaged_name", &rval_unmanaged);
                 context.insert("rval_to_unmanaged", &rval_to_unmanaged);
                 context.insert("rval_to_managed", &rval_to_managed);
                 context.insert("args", &args);

@@ -2,5 +2,5 @@
 internal unsafe struct Unmanaged{{ variant }}
 {
     internal uint _variant;
-    internal {{ variant_type }} _{{ variant }};
+    internal {{ unmanaged_name }} _{{ variant }};
 }

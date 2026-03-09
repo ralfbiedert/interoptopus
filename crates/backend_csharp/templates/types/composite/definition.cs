@@ -1,6 +1,6 @@
 public partial {{ struct_or_class }} {{ name }}
 {
     {%- for field in fields %}
-    public {{ field.type }} {{ field.name }};
+    public {{ field.unmanaged_name }} {{ field.name }};
     {%- endfor %}
 }

@@ -51,7 +51,7 @@ impl Pass {
                     let unmanaged_name = unmanaged_names.name(ty)?;
                     let mut m = HashMap::new();
                     m.insert("name", v.name.to_string());
-                    m.insert("type", unmanaged_name.clone());
+                    m.insert("unmanaged_name", unmanaged_name.clone());
                     Some(m)
                 })
                 .collect();

@@ -50,7 +50,7 @@ impl Pass {
 
                 let mut context = Context::new();
                 context.insert("variant", &variant.name);
-                context.insert("variant_type", variant_type);
+                context.insert("unmanaged_name", variant_type);
 
                 let rendered = templates.render("types/enums/body_unmanaged_variant.cs", &context)?;
                 rendered_variants.push(rendered);

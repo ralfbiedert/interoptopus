@@ -1,5 +1,5 @@
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-public delegate {{ rval_unmanaged }} {{ name }}Native({% for arg in args %}{{ arg.unmanaged_type }} {{ arg.name }}, {% endfor %}IntPtr callback_data);
+public delegate {{ rval_unmanaged_name }} {{ name }}Native({% for arg in args %}{{ arg.unmanaged_name }} {{ arg.name }}, {% endfor %}IntPtr callback_data);
 public delegate {{ rval_managed }} {{ name }}Delegate({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %});
 
 public partial class {{ name }}
@@ -25,7 +25,7 @@ public partial class {{ name }} : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    private {{ rval_unmanaged }} CallTrampoline({% for arg in args %}{{ arg.unmanaged_type }} {{ arg.name }}, {% endfor %}IntPtr callback_data)
+    private {{ rval_unmanaged_name }} CallTrampoline({% for arg in args %}{{ arg.unmanaged_name }} {{ arg.name }}, {% endfor %}IntPtr callback_data)
     {
         try
         {
