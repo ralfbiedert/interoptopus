@@ -1,8 +1,6 @@
-{{header}}
+{{ header }}
 
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
+{{ using }}
 
 namespace A {
     public static partial class Interop {

@@ -36,6 +36,7 @@ impl Pass {
             let enums = intermediary.enums.enums_for(file).unwrap();
             let composites = intermediary.composites.composites_for(file).unwrap();
             let delegates = intermediary.delegates.delegates_for(file).unwrap();
+            let util = intermediary.util.utils_for(file).unwrap();
 
             context.insert("dll_name", meta_info.dll_name());
             context.insert("header", header);
@@ -43,6 +44,7 @@ impl Pass {
             context.insert("enums", &enums);
             context.insert("composites", &composites);
             context.insert("delegates", &delegates);
+            context.insert("util", &util);
 
             let final_ = templates.render("final.cs", &context)?;
             output.add_buffer(&file.name, final_);
