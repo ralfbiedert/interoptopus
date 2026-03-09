@@ -1,8 +1,131 @@
 use interoptopus::ffi;
+use interoptopus::pattern::api_guard::ApiVersion;
 use std::mem;
+
+const PTR_SIZE: usize = mem::size_of::<*const u8>();
 
 // IF ANY OF THESE TESTS FAIL AFTER A REFACTOR YOU MUST ALSO UPDATE ALL BACKEND CODEGEN
 // TO REFLECT THE CHANGES MADE.
+
+#[test]
+fn api_version() {
+    // repr(transparent) over u64
+    assert_eq!(mem::size_of::<ApiVersion>(), mem::size_of::<u64>());
+    assert_eq!(mem::align_of::<ApiVersion>(), mem::align_of::<u64>());
+
+    let v = ApiVersion::new(0x1234_5678_9ABC_DEF0);
+    let raw = unsafe { *(&v as *const ApiVersion as *const u64) };
+    assert_eq!(raw, 0x1234_5678_9ABC_DEF0);
+}
+
+#[test]
+fn bool() {
+    // repr(transparent) over u8
+    assert_eq!(mem::size_of::<ffi::Bool>(), 1);
+    assert_eq!(mem::align_of::<ffi::Bool>(), 1);
+
+    // 1 = true, 0 = false
+    let raw_t = unsafe { *(&ffi::Bool::TRUE as *const ffi::Bool as *const u8) };
+    let raw_f = unsafe { *(&ffi::Bool::FALSE as *const ffi::Bool as *const u8) };
+    assert_eq!(raw_t, 1);
+    assert_eq!(raw_f, 0);
+}
+
+#[test]
+fn cchar() {
+    // repr(transparent) over c_char (i8/u8)
+    assert_eq!(mem::size_of::<ffi::CChar>(), 1);
+    assert_eq!(mem::align_of::<ffi::CChar>(), 1);
+}
+
+#[test]
+fn cstr_ptr() {
+    // repr(transparent) over *const c_char
+    assert_eq!(mem::size_of::<ffi::CStrPtr>(), PTR_SIZE);
+    assert_eq!(mem::align_of::<ffi::CStrPtr>(), PTR_SIZE);
+
+    // Inner pointer matches the source CStr
+    let cstr = c"hello";
+    let ffi_cstr = ffi::CStrPtr::from_cstr(cstr);
+    let raw_ptr = unsafe { *(&ffi_cstr as *const ffi::CStrPtr as *const *const u8) };
+    assert_eq!(raw_ptr, cstr.as_ptr() as *const u8);
+}
+
+#[test]
+fn utf8_string() {
+    // repr(C): ptr, len, capacity — three pointer-width words
+    assert_eq!(mem::size_of::<ffi::String>(), PTR_SIZE + 8 + 8);
+    assert_eq!(mem::align_of::<ffi::String>(), PTR_SIZE);
+
+    let s = ffi::String::from_string("hello".to_string());
+    let raw = &s as *const ffi::String as *const u8;
+    unsafe {
+        let ptr = *(raw as *const *const u8);
+        let len = *(raw.add(PTR_SIZE) as *const u64);
+        let cap = *(raw.add(PTR_SIZE + 8) as *const u64);
+        assert!(!ptr.is_null());
+        assert_eq!(len, 5);
+        assert!(cap >= 5);
+    }
+    // Prevent drop from double-freeing
+    let _ = s.into_string();
+}
+
+#[test]
+fn slice() {
+    // repr(C): *const T, u64 len (+ ZST PhantomData)
+    assert_eq!(mem::size_of::<ffi::Slice<u8>>(), PTR_SIZE + 8);
+    assert_eq!(mem::align_of::<ffi::Slice<u8>>(), PTR_SIZE);
+    assert_eq!(mem::size_of::<ffi::Slice<u64>>(), PTR_SIZE + 8);
+
+    let data: [u32; 3] = [10, 20, 30];
+    let s = ffi::Slice::from(&data[..]);
+    let raw = &s as *const ffi::Slice<u32> as *const u8;
+    unsafe {
+        let ptr = *(raw as *const *const u32);
+        let len = *(raw.add(PTR_SIZE) as *const u64);
+        assert_eq!(ptr, data.as_ptr());
+        assert_eq!(len, 3);
+    }
+}
+
+#[test]
+fn slice_mut() {
+    // repr(C): *mut T, u64 len (+ ZST PhantomData)
+    assert_eq!(mem::size_of::<ffi::SliceMut<u8>>(), PTR_SIZE + 8);
+    assert_eq!(mem::align_of::<ffi::SliceMut<u8>>(), PTR_SIZE);
+
+    let mut data: [u32; 4] = [1, 2, 3, 4];
+    let expected_ptr = data.as_mut_ptr();
+    let s = ffi::SliceMut::from(&mut data[..]);
+    let raw = &s as *const ffi::SliceMut<u32> as *const u8;
+    unsafe {
+        let ptr = *(raw as *const *mut u32);
+        let len = *(raw.add(PTR_SIZE) as *const u64);
+        assert_eq!(ptr, expected_ptr);
+        assert_eq!(len, 4);
+    }
+}
+
+#[test]
+fn vec() {
+    // repr(C): *mut T, u64 len, u64 capacity
+    assert_eq!(mem::size_of::<ffi::Vec<u8>>(), PTR_SIZE + 8 + 8);
+    assert_eq!(mem::align_of::<ffi::Vec<u8>>(), PTR_SIZE);
+
+    let v = ffi::Vec::from_vec(vec![1u32, 2, 3]);
+    let raw = &v as *const ffi::Vec<u32> as *const u8;
+    unsafe {
+        let ptr = *(raw as *const *const u32);
+        let len = *(raw.add(PTR_SIZE) as *const u64);
+        let cap = *(raw.add(PTR_SIZE + 8) as *const u64);
+        assert!(!ptr.is_null());
+        assert_eq!(len, 3);
+        assert!(cap >= 3);
+    }
+    // Prevent drop from double-freeing
+    let _ = v.into_vec();
+}
 
 #[test]
 fn option() {
