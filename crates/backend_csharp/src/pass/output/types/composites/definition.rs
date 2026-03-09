@@ -1,6 +1,6 @@
 //! Renders composite type definitions using the `definition.cs` template.
 
-use crate::lang::types::{ManagedConversion, TypeKind};
+use crate::lang::types::TypeKind;
 use crate::model::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
@@ -26,7 +26,7 @@ impl Pass {
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
         struct_class: &model::types::info::struct_class::Pass,
-        managed_conversion: &model::types::info::managed_conversion::Pass,
+        unmanaged_names: &output::conversion::unmanaged_names::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -44,11 +44,10 @@ impl Pass {
                 .fields
                 .iter()
                 .filter_map(|f| {
-                    let ty_name = names.name(f.ty)?;
-                    let unmanaged_name = unmanaged_type_name(ty_name, managed_conversion, f.ty);
+                    let unmanaged_name = unmanaged_names.name(f.ty)?;
                     let mut m = HashMap::new();
                     m.insert("name", f.name.to_string());
-                    m.insert("type", unmanaged_name);
+                    m.insert("type", unmanaged_name.clone());
                     Some(m)
                 })
                 .collect();
@@ -67,13 +66,5 @@ impl Pass {
 
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
         self.composite_ty.get(&type_id)
-    }
-}
-
-fn unmanaged_type_name(managed_name: &str, managed_conversion: &model::types::info::managed_conversion::Pass, ty: TypeId) -> String {
-    match managed_conversion.managed_conversion(ty) {
-        Some(ManagedConversion::AsIs) => managed_name.to_string(),
-        Some(_) => format!("{}.Unmanaged", managed_name),
-        None => managed_name.to_string(),
     }
 }

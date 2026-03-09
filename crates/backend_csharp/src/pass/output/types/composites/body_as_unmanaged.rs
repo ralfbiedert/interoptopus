@@ -25,7 +25,7 @@ impl Pass {
         output_master: &output::master::Pass,
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
-        managed: &output::conversion::managed::Pass,
+        managed: &output::conversion::unmanaged_conversion::Pass,
         field_conversions: &output::conversion::fields::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();

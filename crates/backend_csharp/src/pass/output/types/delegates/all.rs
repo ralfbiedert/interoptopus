@@ -1,6 +1,6 @@
 //! Renders delegate type definitions through the `all.cs` template, grouped per output file.
 
-use crate::lang::types::{ManagedConversion, Primitive, TypeKind, TypePattern};
+use crate::lang::types::{Primitive, TypeKind, TypePattern};
 use crate::model::TypeId;
 use crate::output::{Output, OutputKind};
 use crate::pass::{model, output, OutputResult, PassInfo};
@@ -26,8 +26,8 @@ impl Pass {
         output_master: &output::master::Pass,
         kinds: &model::types::kind::Pass,
         names: &model::types::names::Pass,
-        managed_conversion: &model::types::info::managed_conversion::Pass,
-        conversion_invoke: &output::conversion::managed::Pass,
+        unmanaged_names: &output::conversion::unmanaged_names::Pass,
+        unmanaged_conversion: &output::conversion::unmanaged_conversion::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -53,19 +53,19 @@ impl Pass {
                 let rval_unmanaged = if is_void {
                     "void".to_string()
                 } else {
-                    unmanaged_type_name(&rval_managed, managed_conversion, signature.rval)
+                    unmanaged_names.name(signature.rval).cloned().unwrap_or_else(|| rval_managed.clone())
                 };
 
                 let rval_to_unmanaged = if is_void {
                     String::new()
                 } else {
-                    conversion_invoke.to_unmanaged_suffix(signature.rval).to_string()
+                    unmanaged_conversion.to_unmanaged_suffix(signature.rval).to_string()
                 };
 
                 let rval_to_managed = if is_void {
                     String::new()
                 } else {
-                    conversion_invoke.to_managed_suffix(signature.rval).to_string()
+                    unmanaged_conversion.to_managed_suffix(signature.rval).to_string()
                 };
 
                 // Build argument list (excluding callback_data which is always appended in the template)
@@ -75,9 +75,9 @@ impl Pass {
                         continue;
                     };
 
-                    let arg_unmanaged = unmanaged_type_name(arg_managed, managed_conversion, arg.ty);
-                    let to_managed = conversion_invoke.to_managed_suffix(arg.ty).to_string();
-                    let to_unmanaged = conversion_invoke.to_unmanaged_suffix(arg.ty).to_string();
+                    let arg_unmanaged = unmanaged_names.name(arg.ty).cloned().unwrap_or_else(|| arg_managed.clone());
+                    let to_managed = unmanaged_conversion.to_managed_suffix(arg.ty).to_string();
+                    let to_unmanaged = unmanaged_conversion.to_unmanaged_suffix(arg.ty).to_string();
 
                     let mut m = HashMap::new();
                     m.insert("name".to_string(), arg.name.clone());
@@ -111,15 +111,5 @@ impl Pass {
 
     pub fn delegates_for(&self, output: &Output) -> Option<&[String]> {
         self.delegates.get(output).map(|s| s.as_slice())
-    }
-}
-
-/// Returns the unmanaged type name for a given type.
-/// AsIs types use the same name; To/Into types use `Name.Unmanaged`.
-fn unmanaged_type_name(managed_name: &str, managed_conversion: &model::types::info::managed_conversion::Pass, ty: TypeId) -> String {
-    match managed_conversion.managed_conversion(ty) {
-        Some(ManagedConversion::AsIs) => managed_name.to_string(),
-        Some(_) => format!("{}.Unmanaged", managed_name),
-        None => managed_name.to_string(),
     }
 }
