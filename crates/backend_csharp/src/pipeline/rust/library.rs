@@ -33,7 +33,7 @@ pub struct RustLibraryConfig {
     pub model_type_map: model::types::map::Config,
     pub model_fn_all: model::fns::all::Config,
     pub model_fn_originals: model::fns::originals::Config,
-    pub model_fn_overloads: model::fns::overloads::Config,
+    pub model_fn_overload_simple: model::fns::overload_simple::Config,
     pub model_service_map: model::service::map::Config,
     pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
@@ -125,7 +125,7 @@ pub struct RustLibrary {
     model_type_map: model::types::map::Pass,
     model_fn_all: model::fns::all::Pass,
     model_fn_originals: model::fns::originals::Pass,
-    model_fn_overloads: model::fns::overloads::Pass,
+    model_fn_overload_simple: model::fns::overload_simple::Pass,
     model_service_map: model::service::map::Pass,
     model_final: model::r#final::Pass,
 
@@ -184,7 +184,7 @@ impl RustLibrary {
             model_type_map: model::types::map::Pass::new(config.model_type_map),
             model_fn_all: model::fns::all::Pass::new(config.model_fn_all),
             model_fn_originals: model::fns::originals::Pass::new(config.model_fn_originals),
-            model_fn_overloads: model::fns::overloads::Pass::new(config.model_fn_overloads),
+            model_fn_overload_simple: model::fns::overload_simple::Pass::new(config.model_fn_overload_simple),
             model_service_map: model::service::map::Pass::new(config.model_service_map),
             model_final: model::r#final::Pass::new(config.model_final),
             output_master: output::master::Pass::new(config.output_master),
@@ -271,6 +271,7 @@ impl RustLibrary {
             r.run(self.model_type_names.process(&mut pass_meta, &self.model_id_maps, &self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
             r.run(self.model_fn_originals.process(&mut pass_meta, &self.model_id_maps, &mut self.model_fn_all, &self.inventory.functions))?;
+            r.run(self.model_fn_overload_simple.process(&mut pass_meta, &self.model_fn_originals, &mut self.model_fn_all, &self.model_type_kinds, &self.model_type_managed_conversion))?;
             r.run(self.model_service_map.process(&mut pass_meta, &self.model_id_maps, &self.inventory.services))?;
             r.run(self.model_final.process(&mut pass_meta))?;
 
