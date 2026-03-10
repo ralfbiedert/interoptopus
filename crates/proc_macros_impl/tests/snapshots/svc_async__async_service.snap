@@ -46,18 +46,16 @@ unsafe fn service_new() -> <::interoptopus::ffi::Result<
     (),
     Error,
 > as ::interoptopus::pattern::result::ResultAs>::AsT<*const Service> {
-    unsafe {
-        let result = Service::new();
-        match result {
-            ::interoptopus::ffi::Ok(service_instance) => {
-                ::interoptopus::ffi::Ok(
-                    ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance)),
-                )
-            }
-            ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
-            ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
-            ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
+    let result = Service::new();
+    match result {
+        ::interoptopus::ffi::Ok(service_instance) => {
+            ::interoptopus::ffi::Ok(
+                ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance)),
+            )
         }
+        ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
+        ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
+        ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
     }
 }
 #[::interoptopus::ffi]

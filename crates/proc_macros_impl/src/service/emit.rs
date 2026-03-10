@@ -232,16 +232,14 @@ impl ServiceModel {
             #docs
             #[::interoptopus::ffi]
             unsafe fn #function_name #generics(#params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
-                unsafe {
-                    let result = #service_call(#param_names);
-                    match result {
-                        ::interoptopus::ffi::Ok(service_instance) => {
-                            ::interoptopus::ffi::Ok(#into_raw_call)
-                        }
-                        ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
-                        ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
-                        ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
+                let result = #service_call(#param_names);
+                match result {
+                    ::interoptopus::ffi::Ok(service_instance) => {
+                        ::interoptopus::ffi::Ok(#into_raw_call)
                     }
+                    ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
+                    ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
+                    ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
                 }
             }
         }
