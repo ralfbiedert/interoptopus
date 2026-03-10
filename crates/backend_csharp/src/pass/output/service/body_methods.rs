@@ -34,30 +34,28 @@ impl Pass {
             for method_fn_id in &service.methods {
                 let Some(method_fn) = fn_map.get(*method_fn_id) else { continue };
 
-                for overload in &method_fn.overloads {
-                    let Some(rval) = type_names.name(overload.signature.rval) else { continue };
+                let Some(rval) = type_names.name(method_fn.signature.rval) else { continue };
 
-                    // Skip the first argument (instance pointer) — it's passed as _context
-                    let mut args: Vec<HashMap<&str, &str>> = Vec::new();
-                    for arg in overload.signature.arguments.iter().skip(1) {
-                        let Some(arg_ty) = type_names.name(arg.ty) else { continue };
-                        let mut m = HashMap::new();
-                        m.insert("name", arg.name.as_str());
-                        m.insert("ty", arg_ty.as_str());
-                        args.push(m);
-                    }
-
-                    let method_name = method_name_from_interop(&method_fn.name);
-
-                    let mut context = Context::new();
-                    context.insert("rval", rval);
-                    context.insert("method_name", &method_name);
-                    context.insert("interop_name", &method_fn.name);
-                    context.insert("args", &args);
-
-                    let rendered = templates.render("service/body_methods.cs", &context)?;
-                    rendered_methods.push(rendered);
+                // Skip the first argument (instance pointer) — it's passed as _context
+                let mut args: Vec<HashMap<&str, &str>> = Vec::new();
+                for arg in method_fn.signature.arguments.iter().skip(1) {
+                    let Some(arg_ty) = type_names.name(arg.ty) else { continue };
+                    let mut m = HashMap::new();
+                    m.insert("name", arg.name.as_str());
+                    m.insert("ty", arg_ty.as_str());
+                    args.push(m);
                 }
+
+                let method_name = method_name_from_interop(&method_fn.name);
+
+                let mut context = Context::new();
+                context.insert("rval", rval);
+                context.insert("method_name", &method_name);
+                context.insert("interop_name", &method_fn.name);
+                context.insert("args", &args);
+
+                let rendered = templates.render("service/body_methods.cs", &context)?;
+                rendered_methods.push(rendered);
             }
 
             self.body_methods.insert(*service_id, rendered_methods);

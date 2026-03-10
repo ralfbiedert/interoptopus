@@ -1,6 +1,6 @@
 //! Maps functions from Rust to C#.
 
-use crate::lang::function::{Argument, Function, FunctionKind, Overload, Signature};
+use crate::lang::function::{Argument, Function, Signature};
 use crate::lang::meta::Visibility;
 use crate::lang::FunctionId;
 use crate::pass::Outcome::Unchanged;
@@ -65,11 +65,8 @@ impl Pass {
                 interoptopus::lang::meta::Visibility::Private => Visibility::Private,
             };
 
-            // Create a single overload representing the original Rust function
-            let overload = Overload { signature: cs_signature, kind: FunctionKind::RustFunction };
-
-            // Create the C# function with one overload
-            let cs_function = Function { name: rust_fn.name.clone(), overloads: vec![overload] };
+            // Create the C# function
+            let cs_function = Function { name: rust_fn.name.clone(), signature: cs_signature };
 
             self.functions.insert(cs_id, cs_function);
             outcome.changed();

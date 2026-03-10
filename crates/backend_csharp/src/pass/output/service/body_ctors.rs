@@ -36,28 +36,26 @@ impl Pass {
             for ctor_fn_id in &service.ctors {
                 let Some(ctor_fn) = fn_map.get(*ctor_fn_id) else { continue };
 
-                for overload in &ctor_fn.overloads {
-                    let mut args: Vec<HashMap<&str, &str>> = Vec::new();
+                let mut args: Vec<HashMap<&str, &str>> = Vec::new();
 
-                    for arg in &overload.signature.arguments {
-                        let Some(arg_ty) = type_names.name(arg.ty) else { continue };
-                        let mut m = HashMap::new();
-                        m.insert("name", arg.name.as_str());
-                        m.insert("ty", arg_ty.as_str());
-                        args.push(m);
-                    }
-
-                    let method_name = ctor_method_name(&ctor_fn.name);
-
-                    let mut context = Context::new();
-                    context.insert("name", name);
-                    context.insert("method_name", &method_name);
-                    context.insert("interop_name", &ctor_fn.name);
-                    context.insert("args", &args);
-
-                    let rendered = templates.render("service/body_ctors.cs", &context)?;
-                    rendered_ctors.push(rendered);
+                for arg in &ctor_fn.signature.arguments {
+                    let Some(arg_ty) = type_names.name(arg.ty) else { continue };
+                    let mut m = HashMap::new();
+                    m.insert("name", arg.name.as_str());
+                    m.insert("ty", arg_ty.as_str());
+                    args.push(m);
                 }
+
+                let method_name = ctor_method_name(&ctor_fn.name);
+
+                let mut context = Context::new();
+                context.insert("name", name);
+                context.insert("method_name", &method_name);
+                context.insert("interop_name", &ctor_fn.name);
+                context.insert("args", &args);
+
+                let rendered = templates.render("service/body_ctors.cs", &context)?;
+                rendered_ctors.push(rendered);
             }
 
             self.body_ctors.insert(*service_id, rendered_ctors);

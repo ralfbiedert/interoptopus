@@ -32,32 +32,30 @@ impl Pass {
 
             for (_id, function) in fn_maps.iter() {
                 let name = &function.name;
-                for overload in &function.overloads {
-                    let rval = type_names
-                        .name(overload.signature.rval)
-                        .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of function `{}`", name)))?;
+                let rval = type_names
+                    .name(function.signature.rval)
+                    .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of function `{}`", name)))?;
 
-                    let mut args: Vec<HashMap<&str, &str>> = Vec::new();
-                    for arg in &overload.signature.arguments {
-                        let arg_ty = type_names
-                            .name(arg.ty)
-                            .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of function `{}`", arg.name, name)))?;
-                        let mut m = HashMap::new();
-                        m.insert("name", arg.name.as_str());
-                        m.insert("ty", arg_ty.as_str());
-                        args.push(m);
-                    }
-
-                    let mut context = Context::new();
-
-                    context.insert("name", name);
-                    context.insert("symbol", name);
-                    context.insert("args", &args);
-                    context.insert("rval", rval);
-
-                    let import = templates.render("fns/rust.cs", &context)?;
-                    imports.push(import);
+                let mut args: Vec<HashMap<&str, &str>> = Vec::new();
+                for arg in &function.signature.arguments {
+                    let arg_ty = type_names
+                        .name(arg.ty)
+                        .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of function `{}`", arg.name, name)))?;
+                    let mut m = HashMap::new();
+                    m.insert("name", arg.name.as_str());
+                    m.insert("ty", arg_ty.as_str());
+                    args.push(m);
                 }
+
+                let mut context = Context::new();
+
+                context.insert("name", name);
+                context.insert("symbol", name);
+                context.insert("args", &args);
+                context.insert("rval", rval);
+
+                let import = templates.render("fns/rust.cs", &context)?;
+                imports.push(import);
             }
 
             imports.sort();
