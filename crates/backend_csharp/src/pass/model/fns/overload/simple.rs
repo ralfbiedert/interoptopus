@@ -43,14 +43,26 @@ impl Pass {
                 continue;
             }
 
-            // Check if any argument is an IntPtr with a known pointer family
-            let has_eligible_intptr = original_fn.signature.arguments.iter().any(|arg| {
+            // Check if any argument is an IntPtr
+            let has_any_intptr = original_fn.signature.arguments.iter().any(|arg| {
                 matches!(type_kinds.get(arg.ty), Some(TypeKind::Pointer(Pointer::IntPtr(_, _))))
-                    && pointer_overloads.family(arg.ty).is_some()
             });
 
-            if !has_eligible_intptr {
+            // No IntPtr args at all — permanently mark as no overloads needed
+            if !has_any_intptr {
                 self.original_to_overloads.insert(original_id, Vec::new());
+                continue;
+            }
+
+            // Has IntPtr args, but families aren't available yet — skip and retry next iteration
+            let all_families_available = original_fn.signature.arguments.iter().all(|arg| {
+                match type_kinds.get(arg.ty) {
+                    Some(TypeKind::Pointer(Pointer::IntPtr(_, _))) => pointer_overloads.family(arg.ty).is_some(),
+                    _ => true,
+                }
+            });
+
+            if !all_families_available {
                 continue;
             }
 
