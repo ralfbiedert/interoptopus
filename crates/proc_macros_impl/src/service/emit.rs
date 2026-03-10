@@ -217,36 +217,26 @@ impl ServiceModel {
         // Extract error type from the constructor's return type
         let error_type = self.extract_error_type_from_constructor(ctor);
 
-        let constructor_params = if ctor.inputs.is_empty() {
-            quote_spanned! { ctor.name.span() => instance: *mut *const #service_type }
-        } else {
-            quote_spanned! { ctor.name.span() => #params, instance: *mut *const #service_type }
-        };
-
         // Use Box for non-async services, Arc for async services
-        let (wrapper_creation, into_raw_call) = if self.is_async {
-            (
-                quote_spanned! { ctor.name.span() => let arc = ::std::sync::Arc::new(service_instance); },
-                quote_spanned! { ctor.name.span() => ::std::sync::Arc::into_raw(arc) },
-            )
+        let into_raw_call = if self.is_async {
+            quote_spanned! { ctor.name.span() =>
+                ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
+            }
         } else {
-            (
-                quote_spanned! { ctor.name.span() => let boxed = ::std::boxed::Box::new(service_instance); },
-                quote_spanned! { ctor.name.span() => ::std::boxed::Box::into_raw(boxed) },
-            )
+            quote_spanned! { ctor.name.span() =>
+                ::std::boxed::Box::into_raw(::std::boxed::Box::new(service_instance))
+            }
         };
 
         quote_spanned! { ctor.name.span() =>
             #docs
             #[::interoptopus::ffi]
-            unsafe fn #function_name #generics(#constructor_params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
+            unsafe fn #function_name #generics(#params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
                 unsafe {
-                   let result = #service_call(#param_names);
+                    let result = #service_call(#param_names);
                     match result {
                         ::interoptopus::ffi::Ok(service_instance) => {
-                            #wrapper_creation
-                            *instance = #into_raw_call;
-                            ::interoptopus::ffi::Ok(::std::ptr::null())
+                            ::interoptopus::ffi::Ok(#into_raw_call)
                         }
                         ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
                         ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,

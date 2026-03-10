@@ -34,7 +34,7 @@ use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePatte
 use std::any::Any;
 use std::fmt::Debug;
 use std::io::{Read, Write};
-use std::panic::{AssertUnwindSafe, catch_unwind};
+use std::panic::{catch_unwind, AssertUnwindSafe};
 
 /// Extracts a string message from a panic unwind.
 pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
@@ -57,10 +57,6 @@ pub enum Result<T, E> {
     /// Internal variant used when null was passed where it shouldn't.
     Null,
 }
-
-// impl<T: ServiceInfo, E> Result<T, E> {
-//     // pub const ASSERT_CTOR_RVAL: bool = true;
-// }
 
 impl<T, E> ResultAs for Result<T, E> {
     type AsT<X> = Result<X, E>;

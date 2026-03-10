@@ -29,9 +29,7 @@ impl Service {
     }
 }
 #[::interoptopus::ffi]
-unsafe fn service_new(
-    instance: *mut *const Service,
-) -> <::interoptopus::ffi::Result<
+unsafe fn service_new() -> <::interoptopus::ffi::Result<
     (),
     Error,
 > as ::interoptopus::pattern::result::ResultAs>::AsT<*const Service> {
@@ -39,9 +37,9 @@ unsafe fn service_new(
         let result = Service::new();
         match result {
             ::interoptopus::ffi::Ok(service_instance) => {
-                let boxed = ::std::boxed::Box::new(service_instance);
-                *instance = ::std::boxed::Box::into_raw(boxed);
-                ::interoptopus::ffi::Ok(::std::ptr::null())
+                ::interoptopus::ffi::Ok(
+                    ::std::boxed::Box::into_raw(::std::boxed::Box::new(service_instance)),
+                )
             }
             ::interoptopus::ffi::Err(err) => ::interoptopus::ffi::Err(err),
             ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
