@@ -2,9 +2,12 @@
 //!
 //! These overloads are purely for C# signature convenience and don't require
 //! us to emit a function body — C# handles the marshalling natively.
+//!
+//! Uses the `overload::pointer` type pass to look up the `ByRef` sibling TypeId
+//! for each eligible `IntPtr` argument.
 
 use crate::lang::function::{Argument, Function, Signature};
-use crate::lang::types::{ManagedConversion, Pointer, TypeKind};
+use crate::lang::types::{Pointer, TypeKind};
 use crate::lang::FunctionId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -21,11 +24,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: file!() },
-            overloads: Default::default(),
-            original_to_overloads: Default::default(),
-        }
+        Self { info: PassInfo { name: file!() }, overloads: Default::default(), original_to_overloads: Default::default() }
     }
 
     pub fn process(
@@ -34,7 +33,7 @@ impl Pass {
         originals: &model::fns::originals::Pass,
         all: &mut model::fns::all::Pass,
         type_kinds: &model::types::kind::Pass,
-        managed_conversion: &model::types::info::managed_conversion::Pass,
+        pointer_overloads: &model::types::overload::pointer::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
@@ -44,24 +43,25 @@ impl Pass {
                 continue;
             }
 
-            // Check if any argument is an IntPtr pointing to an AsIs type
-            let mut has_eligible_intptr = false;
-            for arg in &original_fn.signature.arguments {
-                if is_eligible_intptr(arg.ty, type_kinds, managed_conversion) {
-                    has_eligible_intptr = true;
-                    break;
-                }
-            }
+            // Check if any argument is an IntPtr with a known pointer family
+            let has_eligible_intptr = original_fn.signature.arguments.iter().any(|arg| {
+                matches!(type_kinds.get(arg.ty), Some(TypeKind::Pointer(Pointer::IntPtr(_, _))))
+                    && pointer_overloads.family(arg.ty).is_some()
+            });
 
             if !has_eligible_intptr {
                 self.original_to_overloads.insert(original_id, Vec::new());
                 continue;
             }
 
-            // Build the overload signature with IntPtr replaced by Ref
+            // Build the overload signature replacing IntPtr args with their ByRef siblings
             let mut overload_args = Vec::new();
             for arg in &original_fn.signature.arguments {
-                let new_ty = intptr_to_ref(arg.ty, type_kinds, managed_conversion);
+                let new_ty = if matches!(type_kinds.get(arg.ty), Some(TypeKind::Pointer(Pointer::IntPtr(_, _)))) {
+                    pointer_overloads.family(arg.ty).map(|f| f.by_ref).unwrap_or(arg.ty)
+                } else {
+                    arg.ty
+                };
                 overload_args.push(Argument { name: arg.name.clone(), ty: new_ty });
             }
 
@@ -85,41 +85,13 @@ impl Pass {
         self.overloads.get(&id)
     }
 
+    pub fn iter(&self) -> impl Iterator<Item = (&FunctionId, &Function)> {
+        self.overloads.iter()
+    }
+
     pub fn overloads_for(&self, original_id: FunctionId) -> Option<&[FunctionId]> {
         self.original_to_overloads.get(&original_id).map(|v| v.as_slice())
     }
-}
-
-/// Returns `true` if the type is a `Pointer::IntPtr` pointing to an `AsIs` type.
-fn is_eligible_intptr(
-    ty: crate::lang::TypeId,
-    type_kinds: &model::types::kind::Pass,
-    managed_conversion: &model::types::info::managed_conversion::Pass,
-) -> bool {
-    let Some(TypeKind::Pointer(Pointer::IntPtr(pointee, _))) = type_kinds.get(ty) else {
-        return false;
-    };
-    matches!(managed_conversion.managed_conversion(*pointee), Some(ManagedConversion::AsIs))
-}
-
-/// If the type is an eligible `IntPtr`, return the corresponding `Ref` type ID.
-/// Otherwise return the type unchanged.
-///
-/// This looks up whether a `Ref` variant already exists in the type kinds pass.
-/// For now we reuse the same TypeId since `Ref(pointee)` should already be mapped.
-fn intptr_to_ref(
-    ty: crate::lang::TypeId,
-    type_kinds: &model::types::kind::Pass,
-    managed_conversion: &model::types::info::managed_conversion::Pass,
-) -> crate::lang::TypeId {
-    if !is_eligible_intptr(ty, type_kinds, managed_conversion) {
-        return ty;
-    }
-
-    // TODO: We need the Ref variant's TypeId. For now we return the same type
-    // since the actual Ref TypeId mapping depends on how pointer types are registered.
-    // This will need to be resolved once we wire up the pointer type registration.
-    ty
 }
 
 /// Derives a unique `FunctionId` for the overload by mixing the original ID with

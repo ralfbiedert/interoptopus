@@ -34,7 +34,7 @@ pub struct RustLibraryConfig {
     pub model_type_map: model::types::map::Config,
     pub model_fn_all: model::fns::all::Config,
     pub model_fn_originals: model::fns::originals::Config,
-    pub model_fn_overload_simple: model::fns::overload_simple::Config,
+    pub model_fn_overload_simple: model::fns::overload::simple::Config,
     pub model_service_map: model::service::map::Config,
     pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
@@ -59,6 +59,7 @@ pub struct RustLibraryConfig {
     pub output_composite: output::types::composites::all::Config,
     pub output_delegates: output::types::delegates::all::Config,
     pub output_fn_imports: output::fns::rust::Config,
+    pub output_fn_overload_simple: output::fns::overload::simple::Config,
     pub output_service_body_ctors: output::service::body_ctors::Config,
     pub output_service_body_methods: output::service::body_methods::Config,
     pub output_services: output::service::all::Config,
@@ -91,6 +92,7 @@ pub struct IntermediateOutputPasses {
     pub composites: output::types::composites::all::Pass,
     pub delegates: output::types::delegates::all::Pass,
     pub fns_rust: output::fns::rust::Pass,
+    pub fns_overload_simple: output::fns::overload::simple::Pass,
     pub service_body_ctors: output::service::body_ctors::Pass,
     pub service_body_methods: output::service::body_methods::Pass,
     pub services: output::service::all::Pass,
@@ -127,7 +129,7 @@ pub struct RustLibrary {
     model_type_map: model::types::map::Pass,
     model_fn_all: model::fns::all::Pass,
     model_fn_originals: model::fns::originals::Pass,
-    model_fn_overload_simple: model::fns::overload_simple::Pass,
+    model_fn_overload_simple: model::fns::overload::simple::Pass,
     model_service_map: model::service::map::Pass,
     model_final: model::r#final::Pass,
 
@@ -187,7 +189,7 @@ impl RustLibrary {
             model_type_map: model::types::map::Pass::new(config.model_type_map),
             model_fn_all: model::fns::all::Pass::new(config.model_fn_all),
             model_fn_originals: model::fns::originals::Pass::new(config.model_fn_originals),
-            model_fn_overload_simple: model::fns::overload_simple::Pass::new(config.model_fn_overload_simple),
+            model_fn_overload_simple: model::fns::overload::simple::Pass::new(config.model_fn_overload_simple),
             model_service_map: model::service::map::Pass::new(config.model_service_map),
             model_final: model::r#final::Pass::new(config.model_final),
             output_master: output::master::Pass::new(config.output_master),
@@ -213,6 +215,7 @@ impl RustLibrary {
                 composites: output::types::composites::all::Pass::new(config.output_composite),
                 delegates: output::types::delegates::all::Pass::new(config.output_delegates),
                 fns_rust: output::fns::rust::Pass::new(config.output_fn_imports),
+                fns_overload_simple: output::fns::overload::simple::Pass::new(config.output_fn_overload_simple),
                 service_body_ctors: output::service::body_ctors::Pass::new(config.output_service_body_ctors),
                 service_body_methods: output::service::body_methods::Pass::new(config.output_service_body_methods),
                 services: output::service::all::Pass::new(config.output_services),
@@ -275,7 +278,7 @@ impl RustLibrary {
             r.run(self.model_type_overload_pointer.process(&mut pass_meta, &mut self.model_type_kinds, &mut self.model_type_names, &mut self.model_type_map))?;
             r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
             r.run(self.model_fn_originals.process(&mut pass_meta, &self.model_id_maps, &mut self.model_fn_all, &self.inventory.functions))?;
-            r.run(self.model_fn_overload_simple.process(&mut pass_meta, &self.model_fn_originals, &mut self.model_fn_all, &self.model_type_kinds, &self.model_type_managed_conversion))?;
+            r.run(self.model_fn_overload_simple.process(&mut pass_meta, &self.model_fn_originals, &mut self.model_fn_all, &self.model_type_kinds, &self.model_type_overload_pointer))?;
             r.run(self.model_service_map.process(&mut pass_meta, &self.model_id_maps, &self.inventory.services))?;
             r.run(self.model_final.process(&mut pass_meta))?;
 
@@ -311,6 +314,7 @@ impl RustLibrary {
         self.output_passes.composites.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.composite_ty, &self.output_passes.composite_body)?;
         self.output_passes.delegates.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_names, &self.output_passes.unmanaged_conversion)?;
         self.output_passes.fns_rust.process(&mut pass_meta, &self.output_master, &self.model_fn_originals, &self.model_type_names)?;
+        self.output_passes.fns_overload_simple.process(&mut pass_meta, &self.output_master, &self.model_fn_overload_simple, &self.model_type_names)?;
         self.output_passes.service_body_ctors.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names)?;
         self.output_passes.service_body_methods.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names)?;
         self.output_passes.services.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.output_passes.service_body_ctors, &self.output_passes.service_body_methods)?;

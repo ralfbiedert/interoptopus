@@ -10,6 +10,10 @@ namespace A {
         {% for fn in fns_rust %}
         {{ fn | indent(prefix = "        ") }}
         {% endfor %}
+
+        {% for fn in fns_overload_simple %}
+        {{ fn | indent(prefix = "        ") }}
+        {% endfor %}
     }
 
     {% for enum in enums %}
