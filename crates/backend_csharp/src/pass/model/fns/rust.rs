@@ -78,6 +78,10 @@ impl Pass {
         Ok(outcome)
     }
 
+    pub fn get(&self, id: FunctionId) -> Option<&Function> {
+        self.functions.get(&id)
+    }
+
     pub fn iter(&self) -> impl Iterator<Item = (&FunctionId, &Function)> {
         self.functions.iter()
     }

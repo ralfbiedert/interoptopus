@@ -24,6 +24,10 @@ namespace A {
     {{ delegate | indent }}
     {% endfor %}
 
+    {% for service in services %}
+    {{ service | indent }}
+    {% endfor %}
+
     {{ util | indent }}
 }
 

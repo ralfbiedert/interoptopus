@@ -36,6 +36,7 @@ impl Pass {
             let enums = intermediary.enums.enums_for(file).unwrap();
             let composites = intermediary.composites.composites_for(file).unwrap();
             let delegates = intermediary.delegates.delegates_for(file).unwrap();
+            let services = intermediary.services.services_for(file).unwrap();
             let util = intermediary.util.utils_for(file).unwrap();
             let using = intermediary.using.using_for(file).unwrap();
 
@@ -46,6 +47,7 @@ impl Pass {
             context.insert("enums", &enums);
             context.insert("composites", &composites);
             context.insert("delegates", &delegates);
+            context.insert("services", &services);
             context.insert("util", &util);
 
             let final_ = templates.render("all.cs", &context)?;

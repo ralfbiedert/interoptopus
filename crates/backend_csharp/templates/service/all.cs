@@ -7,7 +7,7 @@ public partial class {{ name }} : IDisposable
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public void Dispose()
     {
-        Interop.{{ dtor }}(_context).AsOk();
+        Interop.{{ dtor }}(_context);
         _context = IntPtr.Zero;
     }
 
