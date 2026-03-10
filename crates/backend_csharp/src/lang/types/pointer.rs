@@ -9,6 +9,6 @@ pub enum IntPtrHint {
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub enum Pointer {
     IntPtr(TypeId, IntPtrHint),
-    Ref(TypeId),
-    Out(TypeId),
+    ByRef(TypeId),
+    ByOut(TypeId),
 }

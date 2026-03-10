@@ -91,6 +91,10 @@ impl Pass {
         Ok(outcome)
     }
 
+    pub fn set_name(&mut self, ty: TypeId, name: String) {
+        self.names.insert(ty, name);
+    }
+
     pub fn name(&self, ty: TypeId) -> Option<&String> {
         self.names.get(&ty)
     }

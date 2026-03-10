@@ -42,6 +42,10 @@ impl Pass {
         Ok(outcome)
     }
 
+    pub fn register(&mut self, ty: TypeId, t: Type) {
+        self.types.insert(ty, t);
+    }
+
     pub fn ty(&self, ty: TypeId) -> Option<&Type> {
         self.types.get(&ty)
     }
