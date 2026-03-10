@@ -305,7 +305,7 @@ impl RustLibrary {
         self.output_passes.composite_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class, &self.model_type_disposable, &self.output_passes.composite_body_unmanaged, &self.output_passes.composite_body_to_unmanaged, &self.output_passes.composite_body_as_unmanaged)?;
         self.output_passes.composites.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.composite_ty, &self.output_passes.composite_body)?;
         self.output_passes.delegates.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_names, &self.output_passes.unmanaged_conversion)?;
-        self.output_passes.fns_rust.process(&mut pass_meta, &self.output_master, &self.model_fn_all, &self.model_type_names)?;
+        self.output_passes.fns_rust.process(&mut pass_meta, &self.output_master, &self.model_fn_originals, &self.model_type_names)?;
         self.output_passes.service_body_ctors.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names)?;
         self.output_passes.service_body_methods.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names)?;
         self.output_passes.services.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.output_passes.service_body_ctors, &self.output_passes.service_body_methods)?;

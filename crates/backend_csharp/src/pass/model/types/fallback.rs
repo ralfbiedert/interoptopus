@@ -10,7 +10,7 @@
 //! aren't mapped yet.
 
 use crate::lang::meta::Visibility;
-use crate::lang::types::{Composite, DataEnum, Field, Pointer, Primitive, TypeKind, Variant};
+use crate::lang::types::{Composite, DataEnum, Field, IntPtrHint, Pointer, Primitive, TypeKind, Variant};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -50,7 +50,7 @@ impl Pass {
                 lang::types::TypePattern::CStrPointer => {
                     // *const c_char
                     let Some(cs_ptr) = id_map.ty(<*const std::ffi::c_char>::id()) else { continue };
-                    TypeKind::Pointer(Pointer::IntPtr(cs_ptr))
+                    TypeKind::Pointer(Pointer::IntPtr(cs_ptr, IntPtrHint::Read))
                 }
                 lang::types::TypePattern::Utf8String => {
                     // { *mut u8, u64, u64 }
@@ -131,9 +131,5 @@ fn variant(name: &str, tag: usize, ty: Option<TypeId>) -> Variant {
 /// Void types (`()`) become `Some(None)` (no payload), non-void types become
 /// `Some(Some(cs_id))`, and not-yet-mapped types return `None`.
 fn resolve_payload(rust_ty: interoptopus::inventory::TypeId, id_map: &model::id::Pass) -> Option<Option<TypeId>> {
-    if rust_ty == <()>::id() {
-        Some(None)
-    } else {
-        id_map.ty(rust_ty).map(Some)
-    }
+    if rust_ty == <()>::id() { Some(None) } else { id_map.ty(rust_ty).map(Some) }
 }

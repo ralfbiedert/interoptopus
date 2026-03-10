@@ -13,7 +13,7 @@ pub use array::Array;
 pub use composite::{Composite, Field};
 pub use enums::{DataEnum, Variant};
 pub use pattern::TypePattern;
-pub use pointer::Pointer;
+pub use pointer::{IntPtrHint, Pointer};
 pub use primitive::Primitive;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
