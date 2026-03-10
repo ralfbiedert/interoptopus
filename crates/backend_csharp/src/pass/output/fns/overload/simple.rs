@@ -1,4 +1,5 @@
 //! Writes function import declarations for simple overloads.
+//! Simple overloads do not contain a body.
 
 use crate::output::{Output, OutputKind};
 use crate::pass::{model, output, OutputResult, PassInfo};

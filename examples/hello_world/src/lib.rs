@@ -30,6 +30,11 @@ pub fn refref(input: &u32) -> &u32 {
     input
 }
 
+#[ffi]
+pub fn delgt(x: SumDelegateReturn) -> SumDelegateReturn {
+    x
+}
+
 #[ffi(service)]
 pub struct ServiceBasic {}
 
@@ -57,6 +62,7 @@ fn generate_bindings() -> Result<(), Box<dyn std::error::Error>> {
     let inventory = RustInventory::new()
         .register(function!(my_function))
         .register(function!(refref))
+        .register(function!(delgt))
         .register(extra_type!(Error))
         .register(extra_type!(SumDelegate2))
         .register(extra_type!(SumDelegateReturn))
