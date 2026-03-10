@@ -32,6 +32,7 @@ pub struct RustLibraryConfig {
     pub model_type_names: model::types::names::Config,
     pub model_type_map: model::types::map::Config,
     pub model_fn_map: model::fns::rust::Config,
+    pub model_service_map: model::service::map::Config,
     pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
     pub output_unmanaged_conversion: output::conversion::unmanaged_conversion::Config,
@@ -115,6 +116,7 @@ pub struct RustLibrary {
     model_type_names: model::types::names::Pass,
     model_type_map: model::types::map::Pass,
     model_fn_map: model::fns::rust::Pass,
+    model_service_map: model::service::map::Pass,
     model_final: model::r#final::Pass,
 
     // First output pass determining files to be produced
@@ -171,6 +173,7 @@ impl RustLibrary {
             model_type_names: model::types::names::Pass::new(config.model_type_names),
             model_type_map: model::types::map::Pass::new(config.model_type_map),
             model_fn_map: model::fns::rust::Pass::new(config.model_fn_map),
+            model_service_map: model::service::map::Pass::new(config.model_service_map),
             model_final: model::r#final::Pass::new(config.model_final),
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
@@ -233,7 +236,7 @@ impl RustLibrary {
         loop_model_passes_until_done(|r| {
             pass_meta.clear();
             r.run(self.meta_info.process(&mut pass_meta))?;
-            r.run(self.model_id_maps.process(&mut pass_meta, &self.inventory.types, &self.inventory.functions))?;
+            r.run(self.model_id_maps.process(&mut pass_meta, &self.inventory.types, &self.inventory.functions, &self.inventory.services))?;
             r.run(self.model_type_kinds.process(&mut pass_meta))?;
             r.run(self.model_type_map_primitives.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map_array.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
@@ -253,6 +256,7 @@ impl RustLibrary {
             r.run(self.model_type_names.process(&mut pass_meta, &self.model_id_maps, &self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
             r.run(self.model_fn_map.process(&mut pass_meta, &self.model_id_maps, &self.inventory.functions))?;
+            r.run(self.model_service_map.process(&mut pass_meta, &self.model_id_maps, &self.inventory.services))?;
             r.run(self.model_final.process(&mut pass_meta))?;
 
             let post_model = PostModelPass::default();

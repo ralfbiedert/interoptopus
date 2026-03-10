@@ -10,10 +10,10 @@ pub trait ServiceInfo {
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Service {
-    ty: TypeId,
-    ctors: Vec<FunctionId>,
-    destructor: FunctionId,
-    methods: Vec<FunctionId>,
+    pub ty: TypeId,
+    pub ctors: Vec<FunctionId>,
+    pub destructor: FunctionId,
+    pub methods: Vec<FunctionId>,
 }
 
 impl Service {

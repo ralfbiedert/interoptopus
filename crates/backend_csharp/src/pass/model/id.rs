@@ -5,10 +5,10 @@
 //! types (CStrPointer, Utf8String) which have predefined C# TypeIds.
 
 use crate::lang::types::csharp;
-use crate::lang::{FunctionId, TypeId};
+use crate::lang::{FunctionId, ServiceId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo};
-use interoptopus::inventory::{Functions, Types};
+use interoptopus::inventory::{Functions, Services, Types};
 use interoptopus::lang;
 use std::collections::HashMap;
 
@@ -19,14 +19,15 @@ pub struct Pass {
     info: PassInfo,
     ty: HashMap<interoptopus::inventory::TypeId, TypeId>,
     fns: HashMap<interoptopus::inventory::FunctionId, FunctionId>,
+    services: HashMap<interoptopus::inventory::ServiceId, ServiceId>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, ty: Default::default(), fns: Default::default() }
+        Self { info: PassInfo { name: file!() }, ty: Default::default(), fns: Default::default(), services: Default::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, rs_types: &Types, rs_functions: &Functions) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, rs_types: &Types, rs_functions: &Functions, rs_services: &Services) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
@@ -54,6 +55,16 @@ impl Pass {
             outcome.changed();
         }
 
+        for (rust_id, _) in rs_services {
+            if self.services.contains_key(rust_id) {
+                continue;
+            }
+
+            let cs_id = ServiceId::from_id(rust_id.id());
+            self.services.insert(*rust_id, cs_id);
+            outcome.changed();
+        }
+
         Ok(outcome)
     }
 
@@ -63,5 +74,9 @@ impl Pass {
 
     pub fn fns(&self, rust_id: interoptopus::inventory::FunctionId) -> Option<FunctionId> {
         self.fns.get(&rust_id).copied()
+    }
+
+    pub fn service(&self, rust_id: interoptopus::inventory::ServiceId) -> Option<ServiceId> {
+        self.services.get(&rust_id).copied()
     }
 }
