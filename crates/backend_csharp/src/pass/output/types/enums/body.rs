@@ -1,7 +1,7 @@
 //! Renders enum body definitions using the `enum_body.cs` template.
 
 use crate::lang::types::{TypeKind, TypePattern};
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;

@@ -2,7 +2,7 @@
 
 use crate::lang::function::{Argument, Function, FunctionKind, Overload, Signature};
 use crate::lang::meta::Visibility;
-use crate::model::FunctionId;
+use crate::lang::FunctionId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::try_resolve;

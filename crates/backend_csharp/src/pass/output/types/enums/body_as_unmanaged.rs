@@ -1,7 +1,7 @@
 //! Renders the `AsUnmanaged` method for each enum using the `body_as_unmanaged.cs` template.
 
 use crate::lang::types::{TypeKind, TypePattern};
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;

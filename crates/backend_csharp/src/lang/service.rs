@@ -1,4 +1,4 @@
-use crate::model::{FunctionId, TypeId};
+use crate::lang::{FunctionId, TypeId};
 use interoptopus::new_id;
 
 new_id!(ServiceIdCs);

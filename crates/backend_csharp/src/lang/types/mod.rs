@@ -7,7 +7,7 @@ mod pointer;
 mod primitive;
 
 use crate::lang::function::Signature;
-use crate::model::TypeId;
+use crate::lang::TypeId;
 
 pub use array::Array;
 pub use composite::{Composite, Field};

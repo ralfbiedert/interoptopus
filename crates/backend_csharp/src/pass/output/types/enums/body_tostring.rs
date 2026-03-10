@@ -1,7 +1,7 @@
 //! Renders the `ToString` override for each enum using the `body_tostring.cs` template.
 
 use crate::lang::types::{TypeKind, TypePattern};
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::{Context, Value};
 use std::collections::HashMap;

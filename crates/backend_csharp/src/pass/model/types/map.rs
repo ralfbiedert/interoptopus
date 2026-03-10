@@ -1,7 +1,7 @@
 //! Creates the final Type instances from TypeKind and names.
 
 use crate::lang::types::Type;
-use crate::model::{TypeId, Types};
+use crate::lang::{TypeId, Types};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::try_resolve;

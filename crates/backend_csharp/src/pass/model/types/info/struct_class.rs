@@ -3,7 +3,7 @@
 //! Types with `ManagedConversion::AsIs` or `To` become structs; `Into` types become classes.
 
 use crate::lang::types::ManagedConversion;
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;

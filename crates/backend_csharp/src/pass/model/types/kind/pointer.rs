@@ -1,7 +1,7 @@
 //! Maps Rust pointers (ReadPointer, ReadWritePointer) to C# pointers.
 
 use crate::lang::types::{Pointer, TypeKind};
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::{skip_mapped, try_resolve};

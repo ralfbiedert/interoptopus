@@ -1,7 +1,7 @@
 //! Builds a map of C# TypeId to proper C# type names.
 
 use crate::lang::types::{Array, Primitive, TypeKind, TypePattern};
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::try_resolve;

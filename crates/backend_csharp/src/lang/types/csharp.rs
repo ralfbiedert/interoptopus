@@ -1,4 +1,4 @@
-use crate::model::TypeId;
+use crate::lang::TypeId;
 
 // A C# `string`, and the extra generated types `CStrPtr` and `Utf8String`
 pub const STRING: TypeId = TypeId::new(0xBEA1AB15FD5682B7649431E17CB70B61);

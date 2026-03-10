@@ -1,7 +1,7 @@
 //! Maps Rust arrays to C# arrays.
 
 use crate::lang::types::{Array, TypeKind};
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::{skip_mapped, try_extract_kind, try_resolve};

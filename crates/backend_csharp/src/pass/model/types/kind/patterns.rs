@@ -2,7 +2,7 @@
 
 use crate::lang::function::Signature;
 use crate::lang::types::{TypeKind, TypePattern};
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::{skip_mapped, try_extract_kind, try_resolve};

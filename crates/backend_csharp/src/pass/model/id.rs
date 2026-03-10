@@ -5,7 +5,7 @@
 //! types (CStrPointer, Utf8String) which have predefined C# TypeIds.
 
 use crate::lang::types::csharp;
-use crate::model::{FunctionId, TypeId};
+use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo};
 use interoptopus::inventory::{Functions, Types};

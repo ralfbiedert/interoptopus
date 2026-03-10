@@ -1,7 +1,7 @@
 //! Renders composite type definitions using the `definition.cs` template.
 
 use crate::lang::types::TypeKind;
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;

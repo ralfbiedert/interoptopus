@@ -13,7 +13,7 @@ pub mod r#struct;
 pub mod struct_fields;
 
 use crate::lang::types::TypeKind;
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo};
 use std::collections::HashMap;

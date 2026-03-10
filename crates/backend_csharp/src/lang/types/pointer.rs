@@ -1,4 +1,4 @@
-use crate::model::TypeId;
+use crate::lang::TypeId;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub enum Pointer {

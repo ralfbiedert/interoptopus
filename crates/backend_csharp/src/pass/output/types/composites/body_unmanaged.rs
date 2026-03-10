@@ -1,7 +1,7 @@
 //! Renders the `Unmanaged` struct for each composite using the `body_unmanaged.cs` template.
 
 use crate::lang::types::TypeKind;
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;

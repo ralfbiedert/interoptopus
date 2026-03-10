@@ -4,7 +4,7 @@
 //! transfers ownership and holds native resources that must be released.
 
 use crate::lang::types::ManagedConversion;
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;

@@ -2,7 +2,7 @@
 //! TODO - Do we want this? If we have a "final" model, most output stages will use it,
 //! and we might lose ability to reuse them in "Rust" and "Csharp" library models.
 
-use crate::model::RustPluginModel;
+use crate::lang::RustPluginModel;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo};
 

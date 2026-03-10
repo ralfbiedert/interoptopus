@@ -10,7 +10,6 @@ pub mod template;
 
 mod error;
 mod macros;
-mod model;
 mod pipeline;
 
 pub use error::Error;

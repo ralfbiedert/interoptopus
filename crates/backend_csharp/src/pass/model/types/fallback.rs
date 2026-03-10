@@ -11,7 +11,7 @@
 
 use crate::lang::meta::Visibility;
 use crate::lang::types::{Composite, DataEnum, Field, Pointer, Primitive, TypeKind, Variant};
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::try_extract_kind;

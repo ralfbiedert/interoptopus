@@ -1,4 +1,4 @@
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::Error;
 use std::cmp::PartialEq;
 

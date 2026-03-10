@@ -9,7 +9,7 @@
 //! compound/enum is also `Into`.
 
 use crate::lang::types::{ManagedConversion, TypeKind};
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;

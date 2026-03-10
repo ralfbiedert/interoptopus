@@ -1,4 +1,4 @@
-use crate::model::TypeId;
+use crate::lang::TypeId;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Argument {

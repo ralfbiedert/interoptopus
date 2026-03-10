@@ -1,7 +1,7 @@
 //! Provides conversion expressions for managed/unmanaged type marshalling.
 
 use crate::lang::types::ManagedConversion;
-use crate::model::TypeId;
+use crate::lang::TypeId;
 use crate::pass::{model, OutputResult, PassInfo};
 use std::collections::HashMap;
 
