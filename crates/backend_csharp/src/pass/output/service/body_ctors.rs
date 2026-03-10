@@ -37,13 +37,14 @@ impl Pass {
                 let Some(ctor_fn) = fn_map.get(*ctor_fn_id) else { continue };
 
                 for overload in &ctor_fn.overloads {
-                    let mut params = Vec::new();
-                    let mut args = Vec::new();
+                    let mut args: Vec<HashMap<&str, &str>> = Vec::new();
 
                     for arg in &overload.signature.arguments {
                         let Some(arg_ty) = type_names.name(arg.ty) else { continue };
-                        params.push(format!("{} {}", arg_ty, arg.name));
-                        args.push(arg.name.clone());
+                        let mut m = HashMap::new();
+                        m.insert("name", arg.name.as_str());
+                        m.insert("ty", arg_ty.as_str());
+                        args.push(m);
                     }
 
                     let method_name = ctor_method_name(&ctor_fn.name);
@@ -52,8 +53,7 @@ impl Pass {
                     context.insert("name", name);
                     context.insert("method_name", &method_name);
                     context.insert("interop_name", &ctor_fn.name);
-                    context.insert("params", &params.join(", "));
-                    context.insert("args", &args.join(", "));
+                    context.insert("args", &args);
 
                     let rendered = templates.render("service/body_ctors.cs", &context)?;
                     rendered_ctors.push(rendered);
