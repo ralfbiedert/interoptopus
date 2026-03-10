@@ -56,6 +56,7 @@ pub struct RustLibraryConfig {
     pub output_composite: output::types::composites::all::Config,
     pub output_delegates: output::types::delegates::all::Config,
     pub output_fn_imports: output::fns::rust::Config,
+    pub output_service_body_ctors: output::service::body_ctors::Config,
     pub output_services: output::service::all::Config,
     pub output_header: output::header::Config,
     pub output_util: output::types::util::Config,
@@ -86,6 +87,7 @@ pub struct IntermediateOutputPasses {
     pub composites: output::types::composites::all::Pass,
     pub delegates: output::types::delegates::all::Pass,
     pub fns_rust: output::fns::rust::Pass,
+    pub service_body_ctors: output::service::body_ctors::Pass,
     pub services: output::service::all::Pass,
     pub header: output::header::Pass,
     pub util: output::types::util::Pass,
@@ -200,6 +202,7 @@ impl RustLibrary {
                 composites: output::types::composites::all::Pass::new(config.output_composite),
                 delegates: output::types::delegates::all::Pass::new(config.output_delegates),
                 fns_rust: output::fns::rust::Pass::new(config.output_fn_imports),
+                service_body_ctors: output::service::body_ctors::Pass::new(config.output_service_body_ctors),
                 services: output::service::all::Pass::new(config.output_services),
                 header: output::header::Pass::new(config.output_header),
                 util: output::types::util::Pass::new(config.output_util),
@@ -294,7 +297,8 @@ impl RustLibrary {
         self.output_passes.composites.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.composite_ty, &self.output_passes.composite_body)?;
         self.output_passes.delegates.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_names, &self.output_passes.unmanaged_conversion)?;
         self.output_passes.fns_rust.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
-        self.output_passes.services.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_map, &self.model_type_names)?;
+        self.output_passes.service_body_ctors.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_map, &self.model_type_names)?;
+        self.output_passes.services.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_map, &self.model_type_names, &self.output_passes.service_body_ctors)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.output_passes.util.process(&mut pass_meta, &self.output_master)?;
         self.output_passes.using.process(&mut pass_meta, &self.output_master)?;

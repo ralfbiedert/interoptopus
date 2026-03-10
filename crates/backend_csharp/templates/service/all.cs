@@ -4,7 +4,9 @@ public partial class {{ name }} : IDisposable
 
     private {{ name }}() {}
 
-    // TODO: Render ctors
+    {% for ctor in ctors %}
+    {{ ctor | indent(prefix="    ") }}
+    {% endfor %}
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public void Dispose()

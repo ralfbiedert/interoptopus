@@ -1,8 +1,7 @@
-// TODO SHOULD LOOK LIKE THIS
 [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-public static ServiceBasic New()
+public static {{ name }} {{ method_name }}({{ params }})
 {
-    var self = new ServiceBasic();
-    self._context = Interop.service_basic_new().AsOk();
+    var self = new {{ name }}();
+    self._context = Interop.{{ interop_name }}({{ args }}).AsOk();
     return self;
 }

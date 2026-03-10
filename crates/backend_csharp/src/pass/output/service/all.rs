@@ -25,19 +25,22 @@ impl Pass {
         service_map: &model::service::map::Pass,
         fn_map: &model::fns::rust::Pass,
         type_names: &model::types::names::Pass,
+        body_ctors: &output::service::body_ctors::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(OutputKind::Csharp) {
             let mut rendered_services = Vec::new();
 
-            for (_service_id, service) in service_map.iter() {
+            for (service_id, service) in service_map.iter() {
                 let Some(name) = type_names.name(service.ty) else { continue };
                 let Some(dtor_fn) = fn_map.get(service.destructor) else { continue };
+                let ctors = body_ctors.get(*service_id).unwrap_or_default();
 
                 let mut context = Context::new();
                 context.insert("name", name);
                 context.insert("dtor", &dtor_fn.name);
+                context.insert("ctors", &ctors);
 
                 let rendered = templates.render("service/all.cs", &context)?;
                 rendered_services.push(rendered);

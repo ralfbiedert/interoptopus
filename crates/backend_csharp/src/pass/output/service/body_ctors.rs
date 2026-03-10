@@ -1,0 +1,84 @@
+//! Renders constructor methods for each service using the `service/body_ctors.cs` template.
+
+use crate::lang::ServiceId;
+use crate::pass::{model, output, OutputResult, PassInfo};
+use interoptopus_backends::template::Context;
+use std::collections::HashMap;
+
+#[derive(Default)]
+pub struct Config {}
+
+pub struct Pass {
+    info: PassInfo,
+    body_ctors: HashMap<ServiceId, Vec<String>>,
+}
+
+impl Pass {
+    pub fn new(_: Config) -> Self {
+        Self { info: PassInfo { name: file!() }, body_ctors: Default::default() }
+    }
+
+    pub fn process(
+        &mut self,
+        _pass_meta: &mut crate::pass::PassMeta,
+        output_master: &output::master::Pass,
+        service_map: &model::service::map::Pass,
+        fn_map: &model::fns::rust::Pass,
+        type_names: &model::types::names::Pass,
+    ) -> OutputResult {
+        let templates = output_master.templates();
+
+        for (service_id, service) in service_map.iter() {
+            let Some(name) = type_names.name(service.ty) else { continue };
+
+            let mut rendered_ctors = Vec::new();
+
+            for ctor_fn_id in &service.ctors {
+                let Some(ctor_fn) = fn_map.get(*ctor_fn_id) else { continue };
+
+                for overload in &ctor_fn.overloads {
+                    let mut params = Vec::new();
+                    let mut args = Vec::new();
+
+                    for arg in &overload.signature.arguments {
+                        let Some(arg_ty) = type_names.name(arg.ty) else { continue };
+                        params.push(format!("{} {}", arg_ty, arg.name));
+                        args.push(arg.name.clone());
+                    }
+
+                    let method_name = ctor_method_name(&ctor_fn.name);
+
+                    let mut context = Context::new();
+                    context.insert("name", name);
+                    context.insert("method_name", &method_name);
+                    context.insert("interop_name", &ctor_fn.name);
+                    context.insert("params", &params.join(", "));
+                    context.insert("args", &args.join(", "));
+
+                    let rendered = templates.render("service/body_ctors.cs", &context)?;
+                    rendered_ctors.push(rendered);
+                }
+            }
+
+            self.body_ctors.insert(*service_id, rendered_ctors);
+        }
+
+        Ok(())
+    }
+
+    pub fn get(&self, service_id: ServiceId) -> Option<&[String]> {
+        self.body_ctors.get(&service_id).map(|v| v.as_slice())
+    }
+}
+
+/// Derives a C# method name from the interop function name.
+///
+/// E.g., `service_basic_new` → `New`.
+fn ctor_method_name(interop_name: &str) -> String {
+    let method = interop_name.rsplit('_').next().unwrap_or(interop_name);
+    let mut chars = method.chars();
+    match chars.next() {
+        Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
+        None => interop_name.to_string(),
+    }
+}
