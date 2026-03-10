@@ -8,6 +8,10 @@ public partial class {{ name }} : IDisposable
     {{ ctor | indent(prefix="    ") }}
     {% endfor %}
 
+    {% for method in methods %}
+    {{ method | indent(prefix="    ") }}
+    {% endfor %}
+
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public void Dispose()
     {

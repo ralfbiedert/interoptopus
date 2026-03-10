@@ -26,6 +26,7 @@ impl Pass {
         fn_map: &model::fns::rust::Pass,
         type_names: &model::types::names::Pass,
         body_ctors: &output::service::body_ctors::Pass,
+        body_methods: &output::service::body_methods::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -36,11 +37,13 @@ impl Pass {
                 let Some(name) = type_names.name(service.ty) else { continue };
                 let Some(dtor_fn) = fn_map.get(service.destructor) else { continue };
                 let ctors = body_ctors.get(*service_id).unwrap_or_default();
+                let methods = body_methods.get(*service_id).unwrap_or_default();
 
                 let mut context = Context::new();
                 context.insert("name", name);
                 context.insert("dtor", &dtor_fn.name);
                 context.insert("ctors", &ctors);
+                context.insert("methods", &methods);
 
                 let rendered = templates.render("service/all.cs", &context)?;
                 rendered_services.push(rendered);

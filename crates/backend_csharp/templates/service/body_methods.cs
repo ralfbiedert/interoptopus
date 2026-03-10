@@ -1,6 +1,5 @@
-// TODO: Sample method:
 [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-public uint ReturnDefaultValue(uint x)
+public {{ rval }} {{ method_name }}({% for arg in args %}{{arg.ty}} {{arg.name}}{% if not loop.last %}, {% endif %}{% endfor %})
 {
-    return Interop.service_on_panic_return_default_value(_context, x); // TODO: note how we always add a fixed _context
+    return Interop.{{ interop_name }}(_context{% for arg in args %}, {{arg.name}}{% endfor %});
 }

@@ -33,6 +33,10 @@ impl ServiceBasic {
     pub fn new() -> ffi::Result<Self, Error> {
         ffi::Ok(Self {})
     }
+
+    pub fn sum(&self, x: i32, y: i32) -> i32 {
+        x + y
+    }
 }
 
 // We just trick a unit test into producing our bindings, here for C#
