@@ -1,7 +1,7 @@
 //! Maps Rust function pointers to C# delegates.
 
 use crate::lang::function::Signature;
-use crate::lang::types::{Delegate, TypeKind};
+use crate::lang::types::{Delegate, DelegateKind, TypeKind};
 use crate::lang::TypeId;
 use crate::pass::Outcome::{Changed, Unchanged};
 use crate::pass::{model, ModelResult, PassInfo};
@@ -62,7 +62,7 @@ impl Pass {
             // All types available, create the delegate signature
             let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
 
-            kinds.set_kind(cs_id, TypeKind::Delegate(Delegate::Class(cs_signature)));
+            kinds.set_kind(cs_id, TypeKind::Delegate(Delegate { kind: DelegateKind::Class, signature: cs_signature }));
             outcome.changed();
         }
 

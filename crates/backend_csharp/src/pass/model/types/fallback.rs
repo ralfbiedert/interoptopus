@@ -10,7 +10,7 @@
 //! aren't mapped yet.
 
 use crate::lang::meta::Visibility;
-use crate::lang::types::{Composite, DataEnum, Field, IntPtrHint, Pointer, Primitive, TypeKind, Variant};
+use crate::lang::types::{Composite, DataEnum, Field, IntPtrHint, Pointer, PointerKind, Primitive, TypeKind, Variant};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -50,7 +50,7 @@ impl Pass {
                 lang::types::TypePattern::CStrPointer => {
                     // *const c_char
                     let Some(cs_ptr) = id_map.ty(<*const std::ffi::c_char>::id()) else { continue };
-                    TypeKind::Pointer(Pointer::IntPtr(cs_ptr, IntPtrHint::Read))
+                    TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(IntPtrHint::Read), target: cs_ptr })
                 }
                 lang::types::TypePattern::Utf8String => {
                     // { *mut u8, u64, u64 }

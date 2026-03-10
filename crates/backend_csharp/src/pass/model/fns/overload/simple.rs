@@ -7,7 +7,7 @@
 //! for each eligible `IntPtr` argument.
 
 use crate::lang::function::{Argument, Function, Signature};
-use crate::lang::types::{ManagedConversion, Pointer, TypeKind};
+use crate::lang::types::{ManagedConversion, Pointer, PointerKind, TypeKind};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -115,10 +115,10 @@ fn is_eligible_intptr(
     type_kinds: &model::types::kind::Pass,
     managed_conversion: &model::types::info::managed_conversion::Pass,
 ) -> bool {
-    let Some(TypeKind::Pointer(Pointer::IntPtr(pointee, _))) = type_kinds.get(ty) else {
+    let Some(TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target })) = type_kinds.get(ty) else {
         return false;
     };
-    matches!(managed_conversion.managed_conversion(*pointee), Some(ManagedConversion::AsIs | ManagedConversion::To))
+    matches!(managed_conversion.managed_conversion(*target), Some(ManagedConversion::AsIs | ManagedConversion::To))
 }
 
 /// Derives a unique `FunctionId` for the overload by mixing the original ID with

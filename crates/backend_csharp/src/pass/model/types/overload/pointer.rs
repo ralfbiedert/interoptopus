@@ -5,7 +5,7 @@
 //! with fresh TypeIds derived from the original. It registers them in the kind, name,
 //! and map passes, and maintains a family lookup so other passes can find all siblings.
 
-use crate::lang::types::{Pointer, Type, TypeKind};
+use crate::lang::types::{Pointer, PointerKind, Type, TypeKind};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -53,7 +53,7 @@ impl Pass {
         let intptr_types: Vec<(TypeId, TypeId)> = kinds
             .iter()
             .filter_map(|(&type_id, kind)| match kind {
-                TypeKind::Pointer(Pointer::IntPtr(pointee, _)) => Some((type_id, *pointee)),
+                TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target }) => Some((type_id, *target)),
                 _ => None,
             })
             .collect();
@@ -81,16 +81,16 @@ impl Pass {
             let by_out_id = TypeId::from_id(intptr_id.id().derive(0x_6279_6F75_745F_7369)); // "byout_si"
 
             // Register kinds
-            kinds.set_kind(by_ref_id, TypeKind::Pointer(Pointer::ByRef(pointee_id)));
-            kinds.set_kind(by_out_id, TypeKind::Pointer(Pointer::ByOut(pointee_id)));
+            kinds.set_kind(by_ref_id, TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }));
+            kinds.set_kind(by_out_id, TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }));
 
             // Register names
             names.set_name(by_ref_id, format!("ref {pointee_name}"));
             names.set_name(by_out_id, format!("out {pointee_name}"));
 
             // Register in the map pass so they're fully resolved
-            map.register(by_ref_id, Type { name: format!("ref {pointee_name}"), kind: TypeKind::Pointer(Pointer::ByRef(pointee_id)) });
-            map.register(by_out_id, Type { name: format!("out {pointee_name}"), kind: TypeKind::Pointer(Pointer::ByOut(pointee_id)) });
+            map.register(by_ref_id, Type { name: format!("ref {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }) });
+            map.register(by_out_id, Type { name: format!("out {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }) });
 
             // Build family
             let family = Arc::new(Family { intptr: intptr_id, by_ref: by_ref_id, by_out: by_out_id });

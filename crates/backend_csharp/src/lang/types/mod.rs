@@ -11,10 +11,10 @@ use crate::lang::TypeId;
 
 pub use array::Array;
 pub use composite::{Composite, Field};
-pub use delegate::Delegate;
+pub use delegate::{Delegate, DelegateKind};
 pub use enums::{DataEnum, Variant};
 pub use pattern::TypePattern;
-pub use pointer::{IntPtrHint, Pointer};
+pub use pointer::{IntPtrHint, Pointer, PointerKind};
 pub use primitive::Primitive;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

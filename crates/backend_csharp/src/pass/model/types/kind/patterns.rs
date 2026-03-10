@@ -1,7 +1,7 @@
 //! Maps Rust type patterns to C# type patterns.
 
 use crate::lang::function::Signature;
-use crate::lang::types::{TypeKind, TypePattern};
+use crate::lang::types::{Delegate, DelegateKind, TypeKind, TypePattern};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -85,7 +85,7 @@ impl Pass {
                     }
 
                     let cs_sig = Signature { arguments: cs_arguments, rval: cs_rval };
-                    TypePattern::NamedCallback(cs_sig)
+                    TypePattern::NamedCallback(Delegate { kind: DelegateKind::Signature, signature: cs_sig })
                 }
             };
 

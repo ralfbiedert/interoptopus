@@ -35,11 +35,12 @@ impl Pass {
             let mut rendered_delegates = Vec::new();
 
             for (type_id, type_kind) in kinds.iter() {
-                let signature = match type_kind {
-                    TypeKind::Delegate(sig) => sig,
-                    TypeKind::TypePattern(TypePattern::NamedCallback(sig)) => sig,
+                let delegate = match type_kind {
+                    TypeKind::Delegate(d) => d,
+                    TypeKind::TypePattern(TypePattern::NamedCallback(d)) => d,
                     _ => continue,
                 };
+                let signature = &delegate.signature;
 
                 let Some(name) = names.name(*type_id) else {
                     continue;
