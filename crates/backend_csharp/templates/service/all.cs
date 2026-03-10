@@ -4,6 +4,8 @@ public partial class {{ name }} : IDisposable
 
     private {{ name }}() {}
 
+    // TODO: Render ctors
+
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public void Dispose()
     {
