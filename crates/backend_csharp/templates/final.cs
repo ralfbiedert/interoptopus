@@ -7,7 +7,7 @@ namespace A {
 
         public const string NativeLib = "{{ dll_name }}";
 
-        {% for fn in fn_imports %}
+        {% for fn in fns_rust %}
         {{ fn | indent(prefix = "        ") }}
         {% endfor %}
     }

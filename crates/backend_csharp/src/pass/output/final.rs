@@ -32,7 +32,7 @@ impl Pass {
             let mut context = Context::new();
 
             let header = intermediary.header.header_for(file).unwrap();
-            let fn_imports = intermediary.fn_imports.imports_for(file).unwrap();
+            let fns_rust = intermediary.fns_rust.imports_for(file).unwrap();
             let enums = intermediary.enums.enums_for(file).unwrap();
             let composites = intermediary.composites.composites_for(file).unwrap();
             let delegates = intermediary.delegates.delegates_for(file).unwrap();
@@ -42,7 +42,7 @@ impl Pass {
             context.insert("dll_name", meta_info.dll_name());
             context.insert("header", header);
             context.insert("using", using);
-            context.insert("fn_imports", &fn_imports);
+            context.insert("fns_rust", &fns_rust);
             context.insert("enums", &enums);
             context.insert("composites", &composites);
             context.insert("delegates", &delegates);
