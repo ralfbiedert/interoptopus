@@ -48,7 +48,7 @@ impl Pass {
             context.insert("delegates", &delegates);
             context.insert("util", &util);
 
-            let final_ = templates.render("final.cs", &context)?;
+            let final_ = templates.render("all.cs", &context)?;
             output.add_buffer(&file.name, final_);
         }
 

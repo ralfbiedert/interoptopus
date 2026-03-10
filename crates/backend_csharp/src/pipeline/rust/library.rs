@@ -31,7 +31,7 @@ pub struct RustLibraryConfig {
     pub model_type_map_struct: model::types::kind::r#struct::Config,
     pub model_type_names: model::types::names::Config,
     pub model_type_map: model::types::map::Config,
-    pub model_fn_map: model::fns::Config,
+    pub model_fn_map: model::fns::rust::Config,
     pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
     pub output_unmanaged_conversion: output::conversion::unmanaged_conversion::Config,
@@ -58,7 +58,7 @@ pub struct RustLibraryConfig {
     pub output_header: output::header::Config,
     pub output_util: output::types::util::Config,
     pub output_using: output::r#using::Config,
-    pub output_final: output::r#final::Config,
+    pub output_final: output::all::Config,
     _hidden: PhantomData<()>,
 }
 
@@ -114,7 +114,7 @@ pub struct RustLibrary {
     model_type_map_struct: model::types::kind::r#struct::Pass,
     model_type_names: model::types::names::Pass,
     model_type_map: model::types::map::Pass,
-    model_fn_map: model::fns::Pass,
+    model_fn_map: model::fns::rust::Pass,
     model_final: model::r#final::Pass,
 
     // First output pass determining files to be produced
@@ -129,7 +129,7 @@ pub struct RustLibrary {
 
     // Last output stage(s). Writes a `.cs` file (later possibly other files w. other
     // master stages) into the Multibuf.
-    output_final: output::r#final::Pass,
+    output_final: output::all::Pass,
 
     // Output
     output: Multibuf,
@@ -170,7 +170,7 @@ impl RustLibrary {
             model_type_map_struct: model::types::kind::r#struct::Pass::new(config.model_type_map_struct),
             model_type_names: model::types::names::Pass::new(config.model_type_names),
             model_type_map: model::types::map::Pass::new(config.model_type_map),
-            model_fn_map: model::fns::Pass::new(config.model_fn_map),
+            model_fn_map: model::fns::rust::Pass::new(config.model_fn_map),
             model_final: model::r#final::Pass::new(config.model_final),
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
@@ -199,7 +199,7 @@ impl RustLibrary {
                 util: output::types::util::Pass::new(config.output_util),
                 using: output::r#using::Pass::new(config.output_using),
             },
-            output_final: output::r#final::Pass::new(config.output_final),
+            output_final: output::all::Pass::new(config.output_final),
             output: Multibuf::default(),
             plugins: vec![],
         }

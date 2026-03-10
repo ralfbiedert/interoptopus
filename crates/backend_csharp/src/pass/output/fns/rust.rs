@@ -22,7 +22,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        fn_maps: &model::fns::Pass,
+        fn_maps: &model::fns::rust::Pass,
         type_names: &model::types::names::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
@@ -55,7 +55,7 @@ impl Pass {
                     context.insert("args", &args);
                     context.insert("rval", rval);
 
-                    let import = templates.render("fns/import.cs", &context)?;
+                    let import = templates.render("fns/rust.cs", &context)?;
                     imports.push(import);
                 }
             }
