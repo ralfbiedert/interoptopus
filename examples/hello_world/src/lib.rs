@@ -25,6 +25,11 @@ pub fn my_function(input: Vec2) -> Vec2 {
     input
 }
 
+#[ffi]
+pub fn refref(input: &u32) -> &u32 {
+    input
+}
+
 #[ffi(service)]
 pub struct ServiceBasic {}
 
@@ -51,6 +56,7 @@ fn generate_bindings() -> Result<(), Box<dyn std::error::Error>> {
     // your FFI or build crate.
     let inventory = RustInventory::new()
         .register(function!(my_function))
+        .register(function!(refref))
         .register(extra_type!(Error))
         .register(extra_type!(SumDelegate2))
         .register(extra_type!(SumDelegateReturn))
