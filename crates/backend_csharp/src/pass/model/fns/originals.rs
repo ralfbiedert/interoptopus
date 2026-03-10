@@ -1,7 +1,6 @@
-//! Maps functions from Rust to C#.
+//! Maps functions from Rust inventory to C# functions.
 
 use crate::lang::function::{Argument, Function, Signature};
-use crate::lang::meta::Visibility;
 use crate::lang::FunctionId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -22,7 +21,7 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, functions: Default::default() }
     }
 
-    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &model::id::Pass, rs_functions: &Functions) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &model::id::Pass, all: &mut model::fns::all::Pass, rs_functions: &Functions) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, rust_fn) in rs_functions {
@@ -59,15 +58,10 @@ impl Pass {
             // Create the C# signature
             let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
 
-            // Map visibility
-            let cs_visibility = match rust_fn.visibility {
-                interoptopus::lang::meta::Visibility::Public => Visibility::Public,
-                interoptopus::lang::meta::Visibility::Private => Visibility::Private,
-            };
-
             // Create the C# function
             let cs_function = Function { name: rust_fn.name.clone(), signature: cs_signature };
 
+            all.register(cs_id, cs_function.clone());
             self.functions.insert(cs_id, cs_function);
             outcome.changed();
         }

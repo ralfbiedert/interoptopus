@@ -31,7 +31,9 @@ pub struct RustLibraryConfig {
     pub model_type_map_struct: model::types::kind::r#struct::Config,
     pub model_type_names: model::types::names::Config,
     pub model_type_map: model::types::map::Config,
-    pub model_fn_map: model::fns::rust::Config,
+    pub model_fn_all: model::fns::all::Config,
+    pub model_fn_originals: model::fns::originals::Config,
+    pub model_fn_overloads: model::fns::overloads::Config,
     pub model_service_map: model::service::map::Config,
     pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
@@ -121,7 +123,9 @@ pub struct RustLibrary {
     model_type_map_struct: model::types::kind::r#struct::Pass,
     model_type_names: model::types::names::Pass,
     model_type_map: model::types::map::Pass,
-    model_fn_map: model::fns::rust::Pass,
+    model_fn_all: model::fns::all::Pass,
+    model_fn_originals: model::fns::originals::Pass,
+    model_fn_overloads: model::fns::overloads::Pass,
     model_service_map: model::service::map::Pass,
     model_final: model::r#final::Pass,
 
@@ -178,7 +182,9 @@ impl RustLibrary {
             model_type_map_struct: model::types::kind::r#struct::Pass::new(config.model_type_map_struct),
             model_type_names: model::types::names::Pass::new(config.model_type_names),
             model_type_map: model::types::map::Pass::new(config.model_type_map),
-            model_fn_map: model::fns::rust::Pass::new(config.model_fn_map),
+            model_fn_all: model::fns::all::Pass::new(config.model_fn_all),
+            model_fn_originals: model::fns::originals::Pass::new(config.model_fn_originals),
+            model_fn_overloads: model::fns::overloads::Pass::new(config.model_fn_overloads),
             model_service_map: model::service::map::Pass::new(config.model_service_map),
             model_final: model::r#final::Pass::new(config.model_final),
             output_master: output::master::Pass::new(config.output_master),
@@ -264,7 +270,7 @@ impl RustLibrary {
             r.run(self.model_type_map_struct.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_struct_fields, &self.inventory.types))?;
             r.run(self.model_type_names.process(&mut pass_meta, &self.model_id_maps, &self.model_type_kinds, &self.inventory.types))?;
             r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
-            r.run(self.model_fn_map.process(&mut pass_meta, &self.model_id_maps, &self.inventory.functions))?;
+            r.run(self.model_fn_originals.process(&mut pass_meta, &self.model_id_maps, &mut self.model_fn_all, &self.inventory.functions))?;
             r.run(self.model_service_map.process(&mut pass_meta, &self.model_id_maps, &self.inventory.services))?;
             r.run(self.model_final.process(&mut pass_meta))?;
 
@@ -299,10 +305,10 @@ impl RustLibrary {
         self.output_passes.composite_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class, &self.model_type_disposable, &self.output_passes.composite_body_unmanaged, &self.output_passes.composite_body_to_unmanaged, &self.output_passes.composite_body_as_unmanaged)?;
         self.output_passes.composites.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.composite_ty, &self.output_passes.composite_body)?;
         self.output_passes.delegates.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_names, &self.output_passes.unmanaged_conversion)?;
-        self.output_passes.fns_rust.process(&mut pass_meta, &self.output_master, &self.model_fn_map, &self.model_type_names)?;
-        self.output_passes.service_body_ctors.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_map, &self.model_type_names)?;
-        self.output_passes.service_body_methods.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_map, &self.model_type_names)?;
-        self.output_passes.services.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_map, &self.model_type_names, &self.output_passes.service_body_ctors, &self.output_passes.service_body_methods)?;
+        self.output_passes.fns_rust.process(&mut pass_meta, &self.output_master, &self.model_fn_all, &self.model_type_names)?;
+        self.output_passes.service_body_ctors.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names)?;
+        self.output_passes.service_body_methods.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names)?;
+        self.output_passes.services.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.output_passes.service_body_ctors, &self.output_passes.service_body_methods)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.output_passes.util.process(&mut pass_meta, &self.output_master)?;
         self.output_passes.using.process(&mut pass_meta, &self.output_master)?;

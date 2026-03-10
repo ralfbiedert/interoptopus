@@ -22,7 +22,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        fn_maps: &model::fns::rust::Pass,
+        fn_maps: &model::fns::all::Pass,
         type_names: &model::types::names::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
