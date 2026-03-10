@@ -278,7 +278,7 @@ impl RustLibrary {
             r.run(self.model_type_overload_pointer.process(&mut pass_meta, &mut self.model_type_kinds, &mut self.model_type_names, &mut self.model_type_map))?;
             r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
             r.run(self.model_fn_originals.process(&mut pass_meta, &self.model_id_maps, &mut self.model_fn_all, &self.inventory.functions))?;
-            r.run(self.model_fn_overload_simple.process(&mut pass_meta, &self.model_fn_originals, &mut self.model_fn_all, &self.model_type_kinds, &self.model_type_overload_pointer))?;
+            r.run(self.model_fn_overload_simple.process(&mut pass_meta, &self.model_fn_originals, &mut self.model_fn_all, &self.model_type_kinds, &self.model_type_managed_conversion, &self.model_type_overload_pointer))?;
             r.run(self.model_service_map.process(&mut pass_meta, &self.model_id_maps, &self.inventory.services))?;
             r.run(self.model_final.process(&mut pass_meta))?;
 

@@ -7,8 +7,8 @@
 //! for each eligible `IntPtr` argument.
 
 use crate::lang::function::{Argument, Function, Signature};
-use crate::lang::types::{Pointer, TypeKind};
-use crate::lang::FunctionId;
+use crate::lang::types::{ManagedConversion, Pointer, TypeKind};
+use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;
@@ -33,6 +33,7 @@ impl Pass {
         originals: &model::fns::originals::Pass,
         all: &mut model::fns::all::Pass,
         type_kinds: &model::types::kind::Pass,
+        managed_conversion: &model::types::info::managed_conversion::Pass,
         pointer_overloads: &model::types::overload::pointer::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
@@ -43,22 +44,23 @@ impl Pass {
                 continue;
             }
 
-            // Check if any argument is an IntPtr
-            let has_any_intptr = original_fn.signature.arguments.iter().any(|arg| {
-                matches!(type_kinds.get(arg.ty), Some(TypeKind::Pointer(Pointer::IntPtr(_, _))))
+            // Check if any argument is an eligible IntPtr (pointee is AsIs or To, not a class)
+            let has_any_eligible = original_fn.signature.arguments.iter().any(|arg| {
+                is_eligible_intptr(arg.ty, type_kinds, managed_conversion)
             });
 
-            // No IntPtr args at all — permanently mark as no overloads needed
-            if !has_any_intptr {
+            // No eligible IntPtr args — permanently mark as no overloads needed
+            if !has_any_eligible {
                 self.original_to_overloads.insert(original_id, Vec::new());
                 continue;
             }
 
-            // Has IntPtr args, but families aren't available yet — skip and retry next iteration
+            // Has eligible IntPtr args, but families aren't available yet — skip and retry
             let all_families_available = original_fn.signature.arguments.iter().all(|arg| {
-                match type_kinds.get(arg.ty) {
-                    Some(TypeKind::Pointer(Pointer::IntPtr(_, _))) => pointer_overloads.family(arg.ty).is_some(),
-                    _ => true,
+                if is_eligible_intptr(arg.ty, type_kinds, managed_conversion) {
+                    pointer_overloads.family(arg.ty).is_some()
+                } else {
+                    true
                 }
             });
 
@@ -66,10 +68,10 @@ impl Pass {
                 continue;
             }
 
-            // Build the overload signature replacing IntPtr args with their ByRef siblings
+            // Build the overload signature replacing eligible IntPtr args with their ByRef siblings
             let mut overload_args = Vec::new();
             for arg in &original_fn.signature.arguments {
-                let new_ty = if matches!(type_kinds.get(arg.ty), Some(TypeKind::Pointer(Pointer::IntPtr(_, _)))) {
+                let new_ty = if is_eligible_intptr(arg.ty, type_kinds, managed_conversion) {
                     pointer_overloads.family(arg.ty).map(|f| f.by_ref).unwrap_or(arg.ty)
                 } else {
                     arg.ty
@@ -104,6 +106,19 @@ impl Pass {
     pub fn overloads_for(&self, original_id: FunctionId) -> Option<&[FunctionId]> {
         self.original_to_overloads.get(&original_id).map(|v| v.as_slice())
     }
+}
+
+/// Returns `true` if the type is `Pointer::IntPtr` and its pointee has `AsIs` or `To`
+/// managed conversion (i.e., is a struct, not a class).
+fn is_eligible_intptr(
+    ty: TypeId,
+    type_kinds: &model::types::kind::Pass,
+    managed_conversion: &model::types::info::managed_conversion::Pass,
+) -> bool {
+    let Some(TypeKind::Pointer(Pointer::IntPtr(pointee, _))) = type_kinds.get(ty) else {
+        return false;
+    };
+    matches!(managed_conversion.managed_conversion(*pointee), Some(ManagedConversion::AsIs | ManagedConversion::To))
 }
 
 /// Derives a unique `FunctionId` for the overload by mixing the original ID with
