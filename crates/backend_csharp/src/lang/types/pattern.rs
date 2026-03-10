@@ -1,5 +1,4 @@
-use crate::lang::function::Signature;
-use crate::lang::types::{DataEnum, TypeId};
+use crate::lang::types::{DataEnum, Delegate, TypeId};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TypePattern {
@@ -14,6 +13,6 @@ pub enum TypePattern {
     Bool,
     CChar,
     CVoid,
-    NamedCallback(Signature),
+    NamedCallback(Delegate),
     AsyncCallback(TypeId),
 }

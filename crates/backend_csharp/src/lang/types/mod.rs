@@ -1,16 +1,17 @@
 mod array;
 mod composite;
 pub mod csharp;
+mod delegate;
 mod enums;
 mod pattern;
 mod pointer;
 mod primitive;
 
-use crate::lang::function::Signature;
 use crate::lang::TypeId;
 
 pub use array::Array;
 pub use composite::{Composite, Field};
+pub use delegate::Delegate;
 pub use enums::{DataEnum, Variant};
 pub use pattern::TypePattern;
 pub use pointer::{IntPtrHint, Pointer};
@@ -32,7 +33,7 @@ pub enum TypeKind {
     Array(Array),
     DataEnum(DataEnum),
     Composite(Composite),
-    Delegate(Signature),
+    Delegate(Delegate),
     Service,
     Opaque,           // Regular opaques, not a service
     Pointer(Pointer), // (can become `ref` in signatures, or `IntPtr` in sigs or fields).

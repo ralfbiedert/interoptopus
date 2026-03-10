@@ -7,8 +7,14 @@ pub enum IntPtrHint {
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
-pub enum Pointer {
-    IntPtr(TypeId, IntPtrHint),
-    ByRef(TypeId),
-    ByOut(TypeId),
+pub enum PointerKind {
+    IntPtr(IntPtrHint),
+    ByRef,
+    ByOut,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
+pub struct Pointer {
+    pub kind: PointerKind,
+    pub target: TypeId,
 }
