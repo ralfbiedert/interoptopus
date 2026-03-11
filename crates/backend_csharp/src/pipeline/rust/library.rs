@@ -64,6 +64,9 @@ pub struct RustLibraryConfig {
     pub output_fn_overload_simple: output::fns::overload::simple::Config,
     pub output_fn_overload_body: output::fns::overload::body::Config,
     pub output_service_body_ctors: output::service::body_ctors::Config,
+    pub output_service_body_methods_plain: output::service::body_methods_plain::Config,
+    pub output_service_body_methods_ref: output::service::body_methods_ref::Config,
+    pub output_service_body_methods_delegate: output::service::body_methods_delegate::Config,
     pub output_service_body_methods: output::service::body_methods::Config,
     pub output_services: output::service::all::Config,
     pub output_header: output::header::Config,
@@ -98,6 +101,9 @@ pub struct IntermediateOutputPasses {
     pub fns_overload_simple: output::fns::overload::simple::Pass,
     pub fns_overload_body: output::fns::overload::body::Pass,
     pub service_body_ctors: output::service::body_ctors::Pass,
+    pub service_body_methods_plain: output::service::body_methods_plain::Pass,
+    pub service_body_methods_ref: output::service::body_methods_ref::Pass,
+    pub service_body_methods_delegate: output::service::body_methods_delegate::Pass,
     pub service_body_methods: output::service::body_methods::Pass,
     pub services: output::service::all::Pass,
     pub header: output::header::Pass,
@@ -226,6 +232,9 @@ impl RustLibrary {
                 fns_overload_simple: output::fns::overload::simple::Pass::new(config.output_fn_overload_simple),
                 fns_overload_body: output::fns::overload::body::Pass::new(config.output_fn_overload_body),
                 service_body_ctors: output::service::body_ctors::Pass::new(config.output_service_body_ctors),
+                service_body_methods_plain: output::service::body_methods_plain::Pass::new(config.output_service_body_methods_plain),
+                service_body_methods_ref: output::service::body_methods_ref::Pass::new(config.output_service_body_methods_ref),
+                service_body_methods_delegate: output::service::body_methods_delegate::Pass::new(config.output_service_body_methods_delegate),
                 service_body_methods: output::service::body_methods::Pass::new(config.output_service_body_methods),
                 services: output::service::all::Pass::new(config.output_services),
                 header: output::header::Pass::new(config.output_header),
@@ -328,7 +337,10 @@ impl RustLibrary {
         self.output_passes.fns_overload_simple.process(&mut pass_meta, &self.output_master, &self.model_fn_overload_simple, &self.model_type_names)?;
         self.output_passes.fns_overload_body.process(&mut pass_meta, &self.output_master, &self.model_fn_overload_body, &self.model_fn_originals, &self.model_type_names, &self.model_type_kinds, &self.model_type_overload_pointer, &self.model_type_overload_delegate)?;
         self.output_passes.service_body_ctors.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names)?;
-        self.output_passes.service_body_methods.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names)?;
+        self.output_passes.service_body_methods_plain.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names)?;
+        self.output_passes.service_body_methods_ref.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.model_fn_overload_simple)?;
+        self.output_passes.service_body_methods_delegate.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.model_type_kinds, &self.model_fn_overload_body, &self.model_type_overload_pointer, &self.model_type_overload_delegate)?;
+        self.output_passes.service_body_methods.process(&mut pass_meta, &self.model_service_map, &self.output_passes.service_body_methods_plain, &self.output_passes.service_body_methods_ref, &self.output_passes.service_body_methods_delegate)?;
         self.output_passes.services.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.output_passes.service_body_ctors, &self.output_passes.service_body_methods)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.output_passes.util.process(&mut pass_meta, &self.output_master)?;
