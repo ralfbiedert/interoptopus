@@ -6,7 +6,7 @@
 //! Uses the `overload::pointer` type pass to look up the `ByRef` sibling TypeId
 //! for each eligible `IntPtr` argument.
 
-use crate::lang::function::{Argument, Function, Signature};
+use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::types::{ManagedConversion, Pointer, PointerKind, TypeKind};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;

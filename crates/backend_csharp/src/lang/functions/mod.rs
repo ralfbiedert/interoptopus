@@ -1,3 +1,5 @@
+pub mod overload;
+
 use crate::lang::TypeId;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]

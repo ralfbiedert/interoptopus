@@ -4,7 +4,7 @@
 //! renders an overloaded method that accepts bare C# delegates, wraps them into their
 //! class, calls the interop function with `_context`, and disposes the wrappers.
 
-use crate::lang::overload::ArgTransform;
+use crate::lang::functions::overload::ArgTransform;
 use crate::lang::types::{Primitive, TypeKind};
 use crate::lang::FunctionId;
 use crate::pass::{model, output, OutputResult, PassInfo};

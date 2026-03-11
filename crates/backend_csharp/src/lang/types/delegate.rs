@@ -1,4 +1,4 @@
-use crate::lang::function::Signature;
+use crate::lang::functions::Signature;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DelegateKind {

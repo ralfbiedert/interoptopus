@@ -2,10 +2,9 @@ use std::collections::HashMap;
 use std::marker::PhantomData;
 
 pub mod constant;
-pub mod function;
+pub mod functions;
 pub mod id;
 pub mod meta;
-pub mod overload;
 pub mod pattern;
 pub mod service;
 pub mod types;
@@ -13,7 +12,7 @@ pub mod types;
 pub use id::{ConstantId, FunctionId, ServiceId, TypeId};
 
 pub type Types = HashMap<TypeId, types::Type>;
-pub type Functions = HashMap<FunctionId, function::Function>;
+pub type Functions = HashMap<FunctionId, functions::Function>;
 pub type Constants = HashMap<ConstantId, constant::Constant>;
 pub type Services = HashMap<ServiceId, service::Service>;
 

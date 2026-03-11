@@ -1,6 +1,6 @@
 //! Maps functions from Rust inventory to C# functions.
 
-use crate::lang::function::{Argument, Function, Signature};
+use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::FunctionId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};

@@ -5,7 +5,7 @@
 //! resolves all names and types from the originals and type overload passes,
 //! guided by the per-argument transforms from the body overload model pass.
 
-use crate::lang::overload::ArgTransform;
+use crate::lang::functions::overload::ArgTransform;
 use crate::lang::types::{Primitive, TypeKind};
 use crate::output::{Output, OutputKind};
 use crate::pass::{model, output, OutputResult, PassInfo};
@@ -63,7 +63,7 @@ impl Pass {
 }
 
 fn render_body_overload(
-    original_fn: &crate::lang::function::Function,
+    original_fn: &crate::lang::functions::Function,
     transforms: &model::fns::overload::body::FnTransforms,
     type_names: &model::types::names::Pass,
     type_kinds: &model::types::kind::Pass,

@@ -1,6 +1,6 @@
 //! Container for all C# functions (originals + overloads).
 
-use crate::lang::function::Function;
+use crate::lang::functions::Function;
 use crate::lang::FunctionId;
 use std::collections::HashMap;
 

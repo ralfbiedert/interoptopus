@@ -5,7 +5,7 @@
 //! storing them keyed by the original function ID. Output passes use these transforms
 //! together with the originals and type overload passes to render the actual overload.
 
-use crate::lang::overload::{ArgTransform, RvalTransform};
+use crate::lang::functions::overload::{ArgTransform, RvalTransform};
 use crate::lang::types::{DelegateKind, ManagedConversion, Pointer, PointerKind, TypeKind};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
