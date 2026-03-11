@@ -39,7 +39,6 @@ pub struct RustLibraryConfig {
     pub model_type_overload_delegate: model::types::overload::delegate::Config,
     pub model_service_map: model::service::map::Config,
     pub model_service_method_names: model::service::method_names::Config,
-    pub model_final: model::r#final::Config,
     pub output_master: output::master::Config,
     pub output_unmanaged_conversion: output::conversion::unmanaged_conversion::Config,
     pub output_unmanaged_names: output::conversion::unmanaged_names::Config,
@@ -145,7 +144,6 @@ pub struct RustLibrary {
     model_type_overload_delegate: model::types::overload::delegate::Pass,
     model_service_map: model::service::map::Pass,
     model_service_method_names: model::service::method_names::Pass,
-    model_final: model::r#final::Pass,
 
     // First output pass determining files to be produced
     output_master: output::master::Pass,
@@ -208,7 +206,6 @@ impl RustLibrary {
             model_type_overload_delegate: model::types::overload::delegate::Pass::new(config.model_type_overload_delegate),
             model_service_map: model::service::map::Pass::new(config.model_service_map),
             model_service_method_names: model::service::method_names::Pass::new(config.model_service_method_names),
-            model_final: model::r#final::Pass::new(config.model_final),
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
                 unmanaged_conversion: output::conversion::unmanaged_conversion::Pass::new(config.output_unmanaged_conversion),
@@ -304,7 +301,6 @@ impl RustLibrary {
             r.run(self.model_fn_overload_body.process(&mut pass_meta, &self.model_fn_originals, &self.model_type_kinds, &self.model_type_overload_pointer, &self.model_type_overload_delegate, &self.model_type_managed_conversion))?;
             r.run(self.model_service_map.process(&mut pass_meta, &self.model_id_maps, &self.inventory.services))?;
             r.run(self.model_service_method_names.process(&mut pass_meta, &self.model_service_map, &self.model_fn_all, &self.model_type_names))?;
-            r.run(self.model_final.process(&mut pass_meta))?;
 
             let post_model = PostModelPass::default();
             for plugin in self.plugins.iter_mut() {
