@@ -32,15 +32,15 @@ crates/
 ├── core/                   # Main interoptopus crate with core FFI abstractions
 ├── proc_macros/            # Proc macro crate used by core
 ├── proc_macros_impl/       # Procedural macros (#[ffi_type], #[ffi_function]) incl. testing function
-├── backend_c/              # C header generation
+├── backend_c/              # C header generation (defunct for now)
 ├── backend_csharp/         # Next-gen C# backend (experimental)
 ├── backend_csharp_old/     # Old C# backend
-├── backend_cpython/        # Python bindings generation
+├── backend_cpython/        # Python bindings generation (defunct for now)
 ├── backend_utils/          # Shared utilities for backends
 └── reference_project/      # Comprehensive test project using all features
 ```
 
-Note: `backend_csharp`, `backend_c`, and `backend_cpython` are currently excluded from the workspace while refactoring is in progress. The active workspace members are `core`, `proc_macros`, `proc_macros_impl`, `backend_csharp`, `backend_utils`, and `reference_project`.
+Note: `backend_csharp_old`, `backend_c`, and `backend_cpython` are currently excluded from the workspace while refactoring is in progress. The active workspace members are `core`, `proc_macros`, `proc_macros_impl`, `backend_csharp`, `backend_utils`, and `reference_project`.
 
 ### Core Components
 
@@ -59,22 +59,37 @@ Note: `backend_csharp`, `backend_c`, and `backend_cpython` are currently exclude
 
 **Backends**: Transform the `RustInventory` into target language bindings. Each backend uses the Tera template engine with embedded templates and follows a builder pattern: `Interop::builder().inventory(inv).build()?.write_file("out.cs")?`.
 
-### Reference Project
-`crates/reference_project/` contains comprehensive examples of every supported feature. It's used for:
+**Reference Project** (`crates/reference_project/`): Comprehensive examples of every supported feature. Used for:
 - Testing all backends work correctly
 - Demonstrating best practices
 - Validating new features
+- Key modules:
+  - `functions/` - All function patterns
+  - `types/` - Type definitions
+  - `patterns/` - Pattern implementations
+  - `services/` - Service pattern examples
+  - `constants.rs` - Constant exports
 
-Key modules:
-- `functions/` - All function patterns
-- `types/` - Type definitions
-- `patterns/` - Pattern implementations
-- `services/` - Service pattern examples
-- `constants.rs` - Constant exports
 
 ### New C# Backend (`backend_csharp`)
 
-The next-gen C# backend uses a **multi-pass pipeline** architecture. Processing happens in `RustLibrary::process()` and flows through two phases, model passes and output passes. Model passes build a well-defined data and interop model iteratively — once done, the resulting interop layer is uniquely specified. The output passes then render the model into a final output format via Tera templates.
+The next-gen C# backend uses a **multi-pass pipeline** architecture. 
+
+The backend consists of these major items:
+
+- A `lang` module that defines a base ontology of C# constructs the backend supports and can emit. It is the foundation of model passes and all entities there should be minimal and orthogonal to just express what is needed to define a C# FFI boundary.
+- The `pass` module contains model and output passes. 
+  - **Model passes** start with core library 'inventory' types and transform them to a well-defined data and interop model based C# `lang` items. Model passes encode the semantics of the interop files to be produced. 
+    - Each model pass usually holds part of the transformation ('lang') model. The reason they are broken up into smaller units is to allow for incremental processing, make the logic easier to reason about, and allow for re-use of passes later for other codegen purposes.
+    - Model passes should be 'reasonably sized'. If a model pass does or 'knows' too much it should be broken up into smaller passes. Overall passes should not be larger than a few pages of code.  
+    - They are iterative and run until convergence (no more changes are made).
+    - They can use other model passes by getting or setting data from them (preferably mostly getting), but should not depend on or reuse random helper functions from other passes.
+  - **Output passes** take the model and render it into a final output format. Output passes render semantic models into actual, runnable C# code. 
+    - They are primarily based on Tera templates
+    - They are sequential and run after model passes
+    - Output passes might produce several output files, usually reflected as `HashMap<Output, _>`. For example, different types could end up in different `.cs` output files. At the moment this isn't fully supported yet (each pass usually writes all items to every output file, but later we should filter out items that are not needed for a given output)
+  - It is imperative that each pass has correct module documentation at the top of the file. 
+- Modules under `pipeline` wire up passes in the right order to produce actual output. 
 
 **Pass directory structure** (`crates/backend_csharp/src/pass/`):
 ```
@@ -120,7 +135,7 @@ pass/
     └── final.rs            # Assembles everything into a Multibuf (filename→content map)
 ```
 
-**Model Passes** (iterative, loop until convergence):
+**Model Passes**:
 All model passes run in a loop via `loop_model_passes_until_done`. Each pass returns `Outcome::Changed` or `Outcome::Unchanged`. The loop repeats until every pass returns `Unchanged`, meaning all dependencies are resolved. This lets passes declare dependencies implicitly — if a type isn't mapped yet, the pass skips it and picks it up on the next iteration. Three macros in `pass/mod.rs` support this: `try_extract_kind!`, `skip_mapped!`, and `try_resolve!`.
 
 Cross-references between passes use path-based types (e.g., `model::types::kind::Pass`, `model::id::Pass`). Each pass file imports `model`/`meta`/`output` from `crate::pass` and uses paths from there.
@@ -136,40 +151,23 @@ Output passes are held in `IntermediateOutputPasses` (defined in `pipeline/rust/
 
 **Templates**: `.cs` template files are packed into a tar archive at build time (via `build.rs`), embedded in the binary, and rendered with the Tera engine from `interoptopus_backends`.
 
+
+
 ## Key Patterns
 
-### Adding New FFI Functions
 ```rust
+// Types — structs and enums use #[ffi] directly
 #[ffi]
-pub fn my_function(input: MyType) -> Result<Output, Error> {
-    // Implementation
-}
-
-// Register in inventory
-pub fn ffi_inventory() -> RustInventory {
-    RustInventory::new()
-        .register(function!(my_function))
-        .validate()
-}
-```
-
-### FFI-Safe Types
-```rust
-#[ffi]
-pub struct MyStruct {
-    pub field: u32,
-}
+pub struct MyStruct { pub field: u32 }
 
 #[ffi]
-pub enum MyEnum {
-    Variant1,
-    Variant2(u32),
-}
-```
+pub enum MyEnum { Variant1, Variant2(u32) }
 
-### Service Patterns
-Services turn Rust impl blocks into class-like interfaces in target languages:
-```rust
+// Functions
+#[ffi]
+pub fn my_function(input: MyStruct) -> Result<MyEnum, Error> { /* */ }
+
+// Services — impl blocks become class-like interfaces in target languages
 #[ffi]
 pub struct MyService { /* opaque or transparent fields */ }
 
@@ -177,5 +175,13 @@ pub struct MyService { /* opaque or transparent fields */ }
 impl MyService {
     pub fn new() -> Result<Self, Error> { /* */ }
     pub fn method(&self) -> u32 { /* */ }
+}
+
+// Inventory registration
+pub fn ffi_inventory() -> RustInventory {
+    RustInventory::new()
+        .register(function!(my_function))
+        .register(service!(MyService))
+        .validate()
 }
 ```
