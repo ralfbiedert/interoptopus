@@ -31,7 +31,7 @@ pub fn refref(input: &u32) -> &u32 {
 }
 
 #[ffi]
-pub fn delgt(x: SumDelegateReturn) -> SumDelegateReturn {
+pub fn delgt(x: SumDelegateReturn, input: &u32, input2: &mut u32) -> SumDelegateReturn {
     x
 }
 
@@ -46,6 +46,10 @@ impl ServiceBasic {
 
     pub fn sum(&self, x: i32, y: i32) -> i32 {
         x + y
+    }
+
+    pub fn delgt(&mut self, x: SumDelegateReturn, input: &u32, input2: &u32) -> SumDelegateReturn {
+        x
     }
 }
 
