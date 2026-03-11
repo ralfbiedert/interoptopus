@@ -1,18 +1,17 @@
 [workspace]
 members = [
-    "crates/*",
+    "crates/backend_csharp",
+    "crates/backend_utils",
+    "crates/core",
+    "crates/proc_macros",
+    "crates/proc_macros_impl",
+    "crates/reference_project",
     "examples/hello_world",
     # TODO: DELETE THIS SECTION - Excluded for now while refactoring
     # "examples/real_project_layout/*",
     # "tests",
 ]
 
-# TODO: DELETE THIS SECTION - Excluded for now while refactoring
-exclude = [
-    "crates/backend_csharp_old",
-    "crates/backend_c",
-    "crates/backend_cpython",
-]
 resolver = "3"
 
 [workspace.package]
