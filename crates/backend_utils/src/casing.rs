@@ -55,24 +55,27 @@ pub fn sanitize_rust_name(name: &str) -> String {
     result
 }
 
-/// Extracts the last `_`-separated segment of a snake_case name and PascalCases it.
+/// Converts a PascalCase or camelCase name to snake_case.
 ///
-/// Intended for deriving a C# method name from a fully-qualified interop function
-/// name such as `service_basic_sum` → `Sum`.
+/// Inserts `_` before each uppercase letter that follows a lowercase letter or digit,
+/// and lowercases the result.
 ///
 /// # Examples
-/// - `service_basic_sum` → `Sum`
-/// - `service_basic_new` → `New`
-/// - `my_service_do_thing` → `Thing`
-/// - `standalone` → `Standalone`
-/// - `` → ``
-pub fn last_segment_to_pascal(name: &str) -> String {
-    let segment = name.rsplit('_').next().unwrap_or(name);
-    let mut chars = segment.chars();
-    match chars.next() {
-        Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
-        None => name.to_string(),
+/// - `ServiceBasic` → `service_basic`
+/// - `MyHTTPService` → `my_h_t_t_p_service`
+/// - `Vec3` → `vec3`
+pub fn pascal_to_snake(name: &str) -> String {
+    let mut result = String::with_capacity(name.len() + 4);
+    for (i, c) in name.chars().enumerate() {
+        if c.is_uppercase() && i > 0 {
+            let prev = name.as_bytes()[i - 1];
+            if prev.is_ascii_lowercase() || prev.is_ascii_digit() {
+                result.push('_');
+            }
+        }
+        result.extend(c.to_lowercase());
     }
+    result
 }
 
 /// Sanitizes a Rust delegate/fn-pointer name into a valid target-language identifier.
@@ -114,13 +117,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_last_segment_to_pascal() {
-        assert_eq!(last_segment_to_pascal("service_basic_sum"), "Sum");
-        assert_eq!(last_segment_to_pascal("service_basic_new"), "New");
-        assert_eq!(last_segment_to_pascal("my_service_do_thing"), "Thing");
-        assert_eq!(last_segment_to_pascal("standalone"), "Standalone");
-        assert_eq!(last_segment_to_pascal(""), "");
-        assert_eq!(last_segment_to_pascal("a_b"), "B");
+    fn test_pascal_to_snake() {
+        assert_eq!(pascal_to_snake("ServiceBasic"), "service_basic");
+        assert_eq!(pascal_to_snake("Vec3"), "vec3");
+        assert_eq!(pascal_to_snake("MyType"), "my_type");
+        assert_eq!(pascal_to_snake("A"), "a");
+        assert_eq!(pascal_to_snake(""), "");
+        assert_eq!(pascal_to_snake("already_snake"), "already_snake");
     }
 
     #[test]
