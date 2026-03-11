@@ -1,7 +1,6 @@
 //! Maps Rust type patterns to C# type patterns.
 
-use crate::lang::function::Signature;
-use crate::lang::types::{Delegate, DelegateKind, TypeKind, TypePattern};
+use crate::lang::types::{TypeKind, TypePattern};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -64,29 +63,8 @@ impl Pass {
                     TypePattern::Result(cs_ok, cs_err, data_enum.clone())
                 }
 
-                lang::types::TypePattern::NamedCallback(rust_sig) => {
-                    let cs_rval = try_resolve!(id_map.ty(rust_sig.rval), pass_meta, self.info, crate::pass::MissingItem::RustType(rust_sig.rval));
-
-                    let mut cs_arguments = Vec::new();
-                    let mut all_args_available = true;
-
-                    for rust_arg in &rust_sig.arguments {
-                        let Some(cs_arg_type) = id_map.ty(rust_arg.ty) else {
-                            pass_meta.lost_found.missing(self.info, crate::pass::MissingItem::RustType(rust_arg.ty));
-                            all_args_available = false;
-                            break;
-                        };
-
-                        cs_arguments.push(crate::lang::function::Argument { name: rust_arg.name.clone(), ty: cs_arg_type });
-                    }
-
-                    if !all_args_available {
-                        continue;
-                    }
-
-                    let cs_sig = Signature { arguments: cs_arguments, rval: cs_rval };
-                    TypePattern::NamedCallback(Delegate { kind: DelegateKind::Signature, signature: cs_sig })
-                }
+                // NamedCallback is handled by the delegate kind pass, not here.
+                lang::types::TypePattern::NamedCallback(_) => continue,
             };
 
             kinds.set_kind(cs_id, TypeKind::TypePattern(cs_pattern));

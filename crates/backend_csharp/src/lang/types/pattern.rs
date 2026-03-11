@@ -1,4 +1,4 @@
-use crate::lang::types::{DataEnum, Delegate, TypeId};
+use crate::lang::types::{DataEnum, TypeId};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TypePattern {
@@ -13,6 +13,5 @@ pub enum TypePattern {
     Bool,
     CChar,
     CVoid,
-    NamedCallback(Delegate),
     AsyncCallback(TypeId),
 }

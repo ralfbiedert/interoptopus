@@ -1,6 +1,6 @@
 //! Builds a map of C# TypeId to proper C# type names.
 
-use crate::lang::types::{Array, Primitive, TypeKind, TypePattern};
+use crate::lang::types::{Primitive, TypeKind, TypePattern};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -78,9 +78,13 @@ impl Pass {
                         let err_name = rust_to_pascal(resolve_name!(self, *err, pass_meta));
                         format!("Result{}{}", ok_name, err_name)
                     }
-                    TypePattern::NamedCallback(_) => sanitize_rust_name(&ty.name),
                 },
-                TypeKind::Delegate(_) => sanitize_delegate_name(&ty.name),
+                TypeKind::Delegate(_) => match &ty.kind {
+                    // Bare fn pointers have signature-based names like "extern C fn(u8) -> u8"
+                    interoptopus::lang::types::TypeKind::FnPointer(_) => sanitize_delegate_name(&ty.name),
+                    // Named callbacks already have clean Rust names
+                    _ => sanitize_rust_name(&ty.name),
+                },
                 _ => sanitize_rust_name(&ty.name),
             };
 

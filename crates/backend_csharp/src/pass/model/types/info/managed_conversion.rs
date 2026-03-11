@@ -8,7 +8,7 @@
 //! Compounds and enums are at least `To`. If any field/variant is `Into`, the
 //! compound/enum is also `Into`.
 
-use crate::lang::types::{ManagedConversion, TypeKind};
+use crate::lang::types::{DelegateKind, ManagedConversion, TypeKind};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -61,7 +61,6 @@ impl Pass {
                         TypePattern::ApiVersion => ManagedConversion::AsIs,
 
                         // Copy semantics (borrowing, original stays valid)
-                        TypePattern::NamedCallback(_) => ManagedConversion::To,
                         TypePattern::Slice(_) | TypePattern::SliceMut(_) => ManagedConversion::To,
 
                         // Move semantics (ownership transfer)

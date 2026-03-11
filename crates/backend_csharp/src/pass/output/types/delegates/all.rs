@@ -1,6 +1,6 @@
 //! Renders delegate type definitions through the `all.cs` template, grouped per output file.
 
-use crate::lang::types::{Primitive, TypeKind, TypePattern};
+use crate::lang::types::{DelegateKind, Primitive, TypeKind};
 use crate::lang::TypeId;
 use crate::output::{Output, OutputKind};
 use crate::pass::{model, output, OutputResult, PassInfo};
@@ -36,8 +36,7 @@ impl Pass {
 
             for (type_id, type_kind) in kinds.iter() {
                 let delegate = match type_kind {
-                    TypeKind::Delegate(d) => d,
-                    TypeKind::TypePattern(TypePattern::NamedCallback(d)) => d,
+                    TypeKind::Delegate(d) if d.kind == DelegateKind::Class => d,
                     _ => continue,
                 };
                 let signature = &delegate.signature;
