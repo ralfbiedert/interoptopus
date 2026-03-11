@@ -1,11 +1,8 @@
 //! Tracks which service functions (constructors and methods) have overloads.
 //!
 //! For each service ctor/method, this pass checks whether the underlying function
-//! has a simple overload or a body overload. It records the function ID so that
-//! output passes know a service method overload should be rendered.
-//!
-//! The actual overload details (ref types, delegate transforms) remain in the
-//! function-level overload passes (`fns::overload::simple` and `fns::overload::body`).
+//! has any overloads registered in `fns::overload::all`. It records the function ID
+//! so that output passes know a service method overload should be rendered.
 
 use crate::lang::FunctionId;
 use crate::pass::Outcome::Unchanged;
@@ -29,8 +26,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         service_map: &model::service::map::Pass,
-        overload_simple: &model::fns::overload::simple::Pass,
-        overload_body: &model::fns::overload::body::Pass,
+        overload_all: &model::fns::overload::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
@@ -42,7 +38,7 @@ impl Pass {
                     continue;
                 }
 
-                if overload_body.transforms(fn_id).is_some() || overload_simple.overloads_for(fn_id).is_some() {
+                if overload_all.overloads_for(fn_id).is_some() {
                     self.overloaded.insert(fn_id);
                     outcome.changed();
                 }

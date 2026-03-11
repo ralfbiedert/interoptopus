@@ -1,5 +1,8 @@
 //! Writes function import declarations for simple overloads.
-//! Simple overloads do not contain a body.
+//!
+//! Simple overloads do not contain a body — they are plain DllImport declarations.
+//! The overload IDs come from the simple model pass, with the actual Function
+//! objects looked up from `fns::all`.
 
 use crate::output::{Output, OutputKind};
 use crate::pass::{model, output, OutputResult, PassInfo};
@@ -24,6 +27,7 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
         overload_simple: &model::fns::overload::simple::Pass,
+        fn_all: &model::fns::all::Pass,
         type_names: &model::types::names::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
@@ -31,7 +35,8 @@ impl Pass {
         for output in output_master.outputs_of(OutputKind::Csharp) {
             let mut imports = Vec::new();
 
-            for (_id, function) in overload_simple.iter() {
+            for overload_id in overload_simple.iter_overloads() {
+                let Some(function) = fn_all.get(overload_id) else { continue };
                 let name = &function.name;
                 let rval = type_names
                     .name(function.signature.rval)

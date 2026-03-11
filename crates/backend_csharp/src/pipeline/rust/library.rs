@@ -34,6 +34,7 @@ pub struct RustLibraryConfig {
     pub model_type_map: model::types::map::Config,
     pub model_fn_all: model::fns::all::Config,
     pub model_fn_originals: model::fns::originals::Config,
+    pub model_fn_overload_all: model::fns::overload::all::Config,
     pub model_fn_overload_simple: model::fns::overload::simple::Config,
     pub model_fn_overload_body: model::fns::overload::body::Config,
     pub model_type_overload_delegate: model::types::overload::delegate::Config,
@@ -134,6 +135,7 @@ pub struct RustLibrary {
     model_type_map: model::types::map::Pass,
     model_fn_all: model::fns::all::Pass,
     model_fn_originals: model::fns::originals::Pass,
+    model_fn_overload_all: model::fns::overload::all::Pass,
     model_fn_overload_simple: model::fns::overload::simple::Pass,
     model_fn_overload_body: model::fns::overload::body::Pass,
     model_type_overload_delegate: model::types::overload::delegate::Pass,
@@ -197,6 +199,7 @@ impl RustLibrary {
             model_type_map: model::types::map::Pass::new(config.model_type_map),
             model_fn_all: model::fns::all::Pass::new(config.model_fn_all),
             model_fn_originals: model::fns::originals::Pass::new(config.model_fn_originals),
+            model_fn_overload_all: model::fns::overload::all::Pass::new(config.model_fn_overload_all),
             model_fn_overload_simple: model::fns::overload::simple::Pass::new(config.model_fn_overload_simple),
             model_fn_overload_body: model::fns::overload::body::Pass::new(config.model_fn_overload_body),
             model_type_overload_delegate: model::types::overload::delegate::Pass::new(config.model_type_overload_delegate),
@@ -291,11 +294,11 @@ impl RustLibrary {
             r.run(self.model_type_overload_delegate.process(&mut pass_meta, &mut self.model_type_kinds, &mut self.model_type_names, &mut self.model_type_map))?;
             r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
             r.run(self.model_fn_originals.process(&mut pass_meta, &self.model_id_maps, &mut self.model_fn_all, &self.inventory.functions))?;
-            r.run(self.model_fn_overload_simple.process(&mut pass_meta, &self.model_fn_originals, &mut self.model_fn_all, &self.model_type_kinds, &self.model_type_managed_conversion, &self.model_type_overload_pointer))?;
-            r.run(self.model_fn_overload_body.process(&mut pass_meta, &self.model_fn_originals, &self.model_type_kinds, &self.model_type_overload_pointer, &self.model_type_overload_delegate, &self.model_type_managed_conversion))?;
+            r.run(self.model_fn_overload_simple.process(&mut pass_meta, &self.model_fn_originals, &mut self.model_fn_all, &mut self.model_fn_overload_all, &self.model_type_kinds, &self.model_type_managed_conversion, &self.model_type_overload_pointer))?;
+            r.run(self.model_fn_overload_body.process(&mut pass_meta, &self.model_fn_originals, &mut self.model_fn_all, &mut self.model_fn_overload_all, &self.model_type_kinds, &self.model_type_overload_pointer, &self.model_type_overload_delegate, &self.model_type_managed_conversion))?;
             r.run(self.model_service_map.process(&mut pass_meta, &self.model_id_maps, &self.inventory.services))?;
             r.run(self.model_service_method_names.process(&mut pass_meta, &self.model_service_map, &self.model_fn_all, &self.model_type_names))?;
-            r.run(self.model_service_method_overload.process(&mut pass_meta, &self.model_service_map, &self.model_fn_overload_simple, &self.model_fn_overload_body))?;
+            r.run(self.model_service_method_overload.process(&mut pass_meta, &self.model_service_map, &self.model_fn_overload_all))?;
 
             let post_model = PostModelPass::default();
             for plugin in self.plugins.iter_mut() {
@@ -329,10 +332,10 @@ impl RustLibrary {
         self.output_passes.composites.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.composite_ty, &self.output_passes.composite_body)?;
         self.output_passes.delegates.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_names, &self.output_passes.unmanaged_conversion)?;
         self.output_passes.fns_rust.process(&mut pass_meta, &self.output_master, &self.model_fn_originals, &self.model_type_names)?;
-        self.output_passes.fns_overload_simple.process(&mut pass_meta, &self.output_master, &self.model_fn_overload_simple, &self.model_type_names)?;
+        self.output_passes.fns_overload_simple.process(&mut pass_meta, &self.output_master, &self.model_fn_overload_simple, &self.model_fn_all, &self.model_type_names)?;
         self.output_passes.fns_overload_body.process(&mut pass_meta, &self.output_master, &self.model_fn_overload_body, &self.model_fn_originals, &self.model_type_names, &self.model_type_kinds, &self.model_type_overload_pointer, &self.model_type_overload_delegate)?;
         self.output_passes.service_body_ctors.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.model_service_method_names)?;
-        self.output_passes.service_body_methods.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.model_type_kinds, &self.model_service_method_names, &self.model_fn_overload_simple, &self.model_fn_overload_body, &self.model_type_overload_pointer, &self.model_type_overload_delegate)?;
+        self.output_passes.service_body_methods.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.model_type_kinds, &self.model_service_method_names, &self.model_fn_overload_all)?;
         self.output_passes.services.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.output_passes.service_body_ctors, &self.output_passes.service_body_methods)?;
         self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         self.output_passes.util.process(&mut pass_meta, &self.output_master)?;
