@@ -6,6 +6,7 @@
 
 use crate::lang::FunctionId;
 use crate::pass::{model, output, OutputResult, PassInfo};
+use interoptopus_backends::casing::last_segment_to_pascal;
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -54,7 +55,7 @@ impl Pass {
                     args.push(m);
                 }
 
-                let method_name = super::body_methods::method_name_from_interop(&simple_fn.name);
+                let method_name = last_segment_to_pascal(&simple_fn.name);
 
                 let mut context = Context::new();
                 context.insert("rval", rval);

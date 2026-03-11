@@ -2,6 +2,7 @@
 
 use crate::lang::ServiceId;
 use crate::pass::{model, output, OutputResult, PassInfo};
+use interoptopus_backends::casing::last_segment_to_pascal;
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -46,7 +47,7 @@ impl Pass {
                     args.push(m);
                 }
 
-                let method_name = ctor_method_name(&ctor_fn.name);
+                let method_name = last_segment_to_pascal(&ctor_fn.name);
 
                 let mut context = Context::new();
                 context.insert("name", name);
@@ -66,17 +67,5 @@ impl Pass {
 
     pub fn get(&self, service_id: ServiceId) -> Option<&[String]> {
         self.body_ctors.get(&service_id).map(|v| v.as_slice())
-    }
-}
-
-/// Derives a C# method name from the interop function name.
-///
-/// E.g., `service_basic_new` → `New`.
-fn ctor_method_name(interop_name: &str) -> String {
-    let method = interop_name.rsplit('_').next().unwrap_or(interop_name);
-    let mut chars = method.chars();
-    match chars.next() {
-        Some(c) => c.to_uppercase().collect::<String>() + chars.as_str(),
-        None => interop_name.to_string(),
     }
 }
