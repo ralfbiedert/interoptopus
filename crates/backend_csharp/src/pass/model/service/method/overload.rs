@@ -1,36 +1,28 @@
-//! Extends service structures with overloaded function IDs for constructors and methods.
+//! Tracks which service functions (constructors and methods) have overloads.
 //!
-//! For each service ctor/method, this pass checks whether the function has a simple
-//! overload or a body overload. If it does, the overloaded FunctionId is stored so that
-//! output passes can pick the best variant when rendering service class methods.
+//! For each service ctor/method, this pass checks whether the underlying function
+//! has a simple overload or a body overload. It records the function ID so that
+//! output passes know a service method overload should be rendered.
 //!
-//! Priority: body overload (delegate) > simple overload (ref) > original (no entry).
+//! The actual overload details (ref types, delegate transforms) remain in the
+//! function-level overload passes (`fns::overload::simple` and `fns::overload::body`).
 
 use crate::lang::FunctionId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
-use std::collections::HashMap;
+use std::collections::HashSet;
 
 #[derive(Default)]
 pub struct Config {}
 
-/// Which overload variant applies to a service function.
-#[derive(Clone, Debug)]
-pub enum OverloadKind {
-    /// A simple overload exists (e.g., IntPtr replaced by ref).
-    Simple(FunctionId),
-    /// A body overload exists (e.g., delegate wrapping).
-    Body,
-}
-
 pub struct Pass {
     info: PassInfo,
-    overloads: HashMap<FunctionId, OverloadKind>,
+    overloaded: HashSet<FunctionId>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, overloads: Default::default() }
+        Self { info: PassInfo { name: file!() }, overloaded: Default::default() }
     }
 
     pub fn process(
@@ -46,19 +38,13 @@ impl Pass {
             let all_fns = service.ctors.iter().chain(service.methods.iter());
 
             for &fn_id in all_fns {
-                if self.overloads.contains_key(&fn_id) {
+                if self.overloaded.contains(&fn_id) {
                     continue;
                 }
 
-                // Body overload takes priority over simple overload
-                if overload_body.transforms(fn_id).is_some() {
-                    self.overloads.insert(fn_id, OverloadKind::Body);
+                if overload_body.transforms(fn_id).is_some() || overload_simple.overloads_for(fn_id).is_some() {
+                    self.overloaded.insert(fn_id);
                     outcome.changed();
-                } else if let Some(ids) = overload_simple.overloads_for(fn_id) {
-                    if let Some(&simple_id) = ids.first() {
-                        self.overloads.insert(fn_id, OverloadKind::Simple(simple_id));
-                        outcome.changed();
-                    }
                 }
             }
         }
@@ -66,7 +52,7 @@ impl Pass {
         Ok(outcome)
     }
 
-    pub fn get(&self, fn_id: FunctionId) -> Option<&OverloadKind> {
-        self.overloads.get(&fn_id)
+    pub fn has_overload(&self, fn_id: FunctionId) -> bool {
+        self.overloaded.contains(&fn_id)
     }
 }
