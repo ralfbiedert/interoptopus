@@ -34,6 +34,7 @@ impl Pass {
             let header = intermediary.header.header_for(file).unwrap();
             let fns_rust = intermediary.fns_rust.imports_for(file).unwrap();
             let fns_overload_simple = intermediary.fns_overload_simple.imports_for(file).unwrap();
+            let fns_overload_body = intermediary.fns_overload_body.imports_for(file).unwrap();
             let enums = intermediary.enums.enums_for(file).unwrap();
             let composites = intermediary.composites.composites_for(file).unwrap();
             let delegates = intermediary.delegates.delegates_for(file).unwrap();
@@ -46,6 +47,7 @@ impl Pass {
             context.insert("using", using);
             context.insert("fns_rust", &fns_rust);
             context.insert("fns_overload_simple", &fns_overload_simple);
+            context.insert("fns_overload_body", &fns_overload_body);
             context.insert("enums", &enums);
             context.insert("composites", &composites);
             context.insert("delegates", &delegates);
