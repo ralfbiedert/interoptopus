@@ -25,7 +25,7 @@ impl Pass {
         service_map: &model::service::map::Pass,
         fn_map: &model::fns::all::Pass,
         type_names: &model::types::names::Pass,
-        method_names: &model::service::method_names::Pass,
+        method_names: &model::service::method::names::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 

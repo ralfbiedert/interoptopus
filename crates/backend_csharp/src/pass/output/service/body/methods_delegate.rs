@@ -32,7 +32,7 @@ impl Pass {
         fn_map: &model::fns::all::Pass,
         type_names: &model::types::names::Pass,
         type_kinds: &model::types::kind::Pass,
-        method_names: &model::service::method_names::Pass,
+        method_names: &model::service::method::names::Pass,
         overload_body: &model::fns::overload::body::Pass,
         pointer_overloads: &model::types::overload::pointer::Pass,
         delegate_overloads: &model::types::overload::delegate::Pass,
