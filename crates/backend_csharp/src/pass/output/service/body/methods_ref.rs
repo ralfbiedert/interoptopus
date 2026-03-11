@@ -4,9 +4,10 @@
 //! renders the method using the overloaded signature. The method still just forwards
 //! to the interop function — no wrapping or disposal needed.
 
+use crate::lang::types::{Primitive, PointerKind, TypeKind};
 use crate::lang::FunctionId;
 use crate::pass::{model, output, OutputResult, PassInfo};
-use interoptopus_backends::template::Context;
+use interoptopus_backends::template::{Context, Value};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -29,6 +30,7 @@ impl Pass {
         service_map: &model::service::map::Pass,
         fn_map: &model::fns::all::Pass,
         type_names: &model::types::names::Pass,
+        type_kinds: &model::types::kind::Pass,
         method_names: &model::service::method::names::Pass,
         overload_simple: &model::fns::overload::simple::Pass,
     ) -> OutputResult {
@@ -44,14 +46,17 @@ impl Pass {
                 let Some(&simple_id) = overload_ids.first() else { continue };
                 let Some(simple_fn) = fn_map.get(simple_id) else { continue };
                 let Some(rval) = type_names.name(simple_fn.signature.rval) else { continue };
+                let is_void = matches!(type_kinds.get(simple_fn.signature.rval), Some(TypeKind::Primitive(Primitive::Void)));
 
                 // Skip the first argument (instance pointer)
-                let mut args: Vec<HashMap<&str, &str>> = Vec::new();
+                let mut args: Vec<HashMap<&str, Value>> = Vec::new();
                 for arg in simple_fn.signature.arguments.iter().skip(1) {
                     let Some(arg_ty) = type_names.name(arg.ty) else { continue };
+                    let is_ref = matches!(type_kinds.get(arg.ty), Some(TypeKind::Pointer(p)) if p.kind == PointerKind::ByRef);
                     let mut m = HashMap::new();
-                    m.insert("name", arg.name.as_str());
-                    m.insert("ty", arg_ty.as_str());
+                    m.insert("name", Value::String(arg.name.clone()));
+                    m.insert("ty", Value::String(arg_ty.clone()));
+                    m.insert("is_ref", Value::Bool(is_ref));
                     args.push(m);
                 }
 
@@ -59,6 +64,7 @@ impl Pass {
 
                 let mut context = Context::new();
                 context.insert("rval", rval);
+                context.insert("is_void", &is_void);
                 context.insert("method_name", &method_name);
                 context.insert("interop_name", &simple_fn.name);
                 context.insert("args", &args);

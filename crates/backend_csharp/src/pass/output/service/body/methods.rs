@@ -1,7 +1,9 @@
 //! Assembles the final rendered method list per service.
 //!
-//! For each service method, picks the best available render from the sub-passes
-//! in priority order: delegate overload > ref overload > plain.
+//! For each service method, collects all available renders from the sub-passes.
+//! A method may have multiple C# overloads (e.g., one with original types and
+//! one accepting bare delegates). The ref variant replaces the plain variant
+//! since it's strictly better, but the delegate variant is additive.
 
 use crate::lang::ServiceId;
 use crate::pass::{model, output, OutputResult, PassInfo};
@@ -32,17 +34,18 @@ impl Pass {
             let mut rendered_methods = Vec::new();
 
             for &method_fn_id in &service.methods {
-                let rendered = if let Some(s) = methods_delegate.get(method_fn_id) {
-                    s.to_string()
-                } else if let Some(s) = methods_ref.get(method_fn_id) {
-                    s.to_string()
+                // Ref replaces plain (strictly better signature), but both are the
+                // "base" method that uses the native types.
+                if let Some(s) = methods_ref.get(method_fn_id) {
+                    rendered_methods.push(s.to_string());
                 } else if let Some(s) = methods_plain.get(method_fn_id) {
-                    s.to_string()
-                } else {
-                    continue;
-                };
+                    rendered_methods.push(s.to_string());
+                }
 
-                rendered_methods.push(rendered);
+                // Delegate overload is an additional C# overload accepting bare delegates.
+                if let Some(s) = methods_delegate.get(method_fn_id) {
+                    rendered_methods.push(s.to_string());
+                }
             }
 
             self.body_methods.insert(*service_id, rendered_methods);

@@ -8,7 +8,7 @@ use crate::lang::functions::overload::ArgTransform;
 use crate::lang::types::{Primitive, TypeKind};
 use crate::lang::FunctionId;
 use crate::pass::{model, output, OutputResult, PassInfo};
-use interoptopus_backends::template::Context;
+use interoptopus_backends::template::{Context, Value};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -53,19 +53,19 @@ impl Pass {
                 let is_void = matches!(type_kinds.get(method_fn.signature.rval), Some(TypeKind::Primitive(Primitive::Void)));
 
                 // Skip the first argument (instance pointer) and its transform
-                let mut args: Vec<HashMap<String, String>> = Vec::new();
+                let mut args: Vec<HashMap<&str, Value>> = Vec::new();
                 for (arg, transform) in method_fn.signature.arguments.iter().zip(&transforms.args).skip(1) {
                     let mut m = HashMap::new();
-                    m.insert("name".to_string(), arg.name.clone());
+                    m.insert("name", Value::String(arg.name.clone()));
 
                     match transform {
                         ArgTransform::PassThrough => {
                             let ty_name = type_names
                                 .name(arg.ty)
                                 .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of method `{}`", arg.name, name)))?;
-                            m.insert("ty".to_string(), ty_name.clone());
-                            m.insert("is_ref".to_string(), "false".to_string());
-                            m.insert("is_wrap".to_string(), "false".to_string());
+                            m.insert("ty", Value::String(ty_name.clone()));
+                            m.insert("is_ref", Value::Bool(false));
+                            m.insert("is_wrap", Value::Bool(false));
                         }
                         ArgTransform::Ref => {
                             let family = pointer_overloads
@@ -74,9 +74,9 @@ impl Pass {
                             let ty_name = type_names
                                 .name(family.by_ref)
                                 .ok_or_else(|| crate::Error::MissingTypeName(format!("ref type for arg `{}` of method `{}`", arg.name, name)))?;
-                            m.insert("ty".to_string(), ty_name.clone());
-                            m.insert("is_ref".to_string(), "true".to_string());
-                            m.insert("is_wrap".to_string(), "false".to_string());
+                            m.insert("ty", Value::String(ty_name.clone()));
+                            m.insert("is_ref", Value::Bool(true));
+                            m.insert("is_wrap", Value::Bool(false));
                         }
                         ArgTransform::WrapDelegate => {
                             let family = delegate_overloads
@@ -88,10 +88,10 @@ impl Pass {
                             let class_name = type_names
                                 .name(family.class)
                                 .ok_or_else(|| crate::Error::MissingTypeName(format!("delegate class for arg `{}` of method `{}`", arg.name, name)))?;
-                            m.insert("ty".to_string(), sig_name.clone());
-                            m.insert("is_ref".to_string(), "false".to_string());
-                            m.insert("is_wrap".to_string(), "true".to_string());
-                            m.insert("wrapper_type".to_string(), class_name.clone());
+                            m.insert("ty", Value::String(sig_name.clone()));
+                            m.insert("is_ref", Value::Bool(false));
+                            m.insert("is_wrap", Value::Bool(true));
+                            m.insert("wrapper_type", Value::String(class_name.clone()));
                         }
                     }
 

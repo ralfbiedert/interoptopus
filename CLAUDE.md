@@ -145,6 +145,8 @@ Output passes run after model convergence. They render model data through Tera t
 
 Output passes are held in `IntermediateOutputPasses` (defined in `pipeline/rust/library.rs`) so they can be passed as a group to the final pass.
 
+Output passes providing bool values for templates must not do via strings (e.g., `is_foo = "true"`). Instead, tera has an enum Value::Bool for that. 
+
 **Managed Conversion**: The `model::types::info::managed_conversion` pass assigns each type a `ManagedConversion` category (`AsIs`, `To`, or `Into`) that determines how it marshals between managed and unmanaged representations. The `model::types::info::disposable` pass then uses this to determine which types need disposal. The output `conversion/unmanaged_conversion` pass provides suffix/name query methods (e.g., `.ToUnmanaged()`, `.ToManaged()`), and `conversion/unmanaged_names` precomputes the unmanaged type name for each type (plain name if `AsIs`, `Name.Unmanaged` otherwise).
 
 **Extension points**: Plugins implement `RustLibraryPlugin` with hooks at `init`, `post_model`, and `post_output`.
