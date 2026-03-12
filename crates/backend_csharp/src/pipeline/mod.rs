@@ -3,7 +3,7 @@ mod rust;
 
 use crate::Error;
 use crate::pass::{ModelResult, Outcome};
-pub use rust::{IntermediateOutputPasses, RustLibrary, RustLibraryBuilder, RustLibraryConfig};
+pub use rust::{IntermediateOutputPasses, ModelPasses, RustLibrary, RustLibraryBuilder, RustLibraryConfig};
 
 pub struct PassRunner {
     outcome: Outcome,

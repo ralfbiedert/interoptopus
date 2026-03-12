@@ -75,6 +75,38 @@ pub struct RustLibraryConfig {
     _hidden: PhantomData<()>,
 }
 
+pub struct ModelPasses {
+    pub id_maps: model::id_map::Pass,
+    pub type_kinds: model::types::kind::Pass,
+    pub type_map_primitives: model::types::kind::primitives::Pass,
+    pub type_map_array: model::types::kind::array::Pass,
+    pub type_map_delegate: model::types::kind::delegate::Pass,
+    pub type_map_pointer: model::types::kind::pointer::Pass,
+    pub type_map_service: model::types::kind::service::Pass,
+    pub type_map_patterns: model::types::kind::patterns::Pass,
+    pub type_fallback: model::types::fallback::Pass,
+    pub type_map_enum_variants: model::types::kind::enum_variants::Pass,
+    pub type_map_enum: model::types::kind::r#enum::Pass,
+    pub type_map_opaque: model::types::kind::opaque::Pass,
+    pub type_map_struct_fields: model::types::kind::struct_fields::Pass,
+    pub type_managed_conversion: model::types::info::managed_conversion::Pass,
+    pub type_disposable: model::types::info::disposable::Pass,
+    pub type_struct_class: model::types::info::struct_class::Pass,
+    pub type_map_struct: model::types::kind::r#struct::Pass,
+    pub type_names: model::types::names::Pass,
+    pub type_overload_pointer: model::types::overload::pointer::Pass,
+    pub type_map: model::types::map::Pass,
+    pub fn_all: model::fns::all::Pass,
+    pub fn_originals: model::fns::originals::Pass,
+    pub fn_overload_all: model::fns::overload::all::Pass,
+    pub fn_overload_simple: model::fns::overload::simple::Pass,
+    pub fn_overload_body: model::fns::overload::body::Pass,
+    pub type_overload_delegate: model::types::overload::delegate::Pass,
+    pub service_map: model::service::map::Pass,
+    pub service_method_names: model::service::method::names::Pass,
+    pub service_method_overload: model::service::method::overload::Pass,
+}
+
 pub struct IntermediateOutputPasses {
     pub unmanaged_conversion: output::conversion::unmanaged_conversion::Pass,
     pub unmanaged_names: output::conversion::unmanaged_names::Pass,
@@ -113,35 +145,7 @@ pub struct RustLibrary {
 
     // Model passes (transform and enrich data)
     meta_info: meta::info::Pass,
-    model_id_maps: model::id_map::Pass,
-    model_type_kinds: model::types::kind::Pass,
-    model_type_map_primitives: model::types::kind::primitives::Pass,
-    model_type_map_array: model::types::kind::array::Pass,
-    model_type_map_delegate: model::types::kind::delegate::Pass,
-    model_type_map_pointer: model::types::kind::pointer::Pass,
-    model_type_map_service: model::types::kind::service::Pass,
-    model_type_map_patterns: model::types::kind::patterns::Pass,
-    model_type_fallback: model::types::fallback::Pass,
-    model_type_map_enum_variants: model::types::kind::enum_variants::Pass,
-    model_type_map_enum: model::types::kind::r#enum::Pass,
-    model_type_map_opaque: model::types::kind::opaque::Pass,
-    model_type_map_struct_fields: model::types::kind::struct_fields::Pass,
-    model_type_managed_conversion: model::types::info::managed_conversion::Pass,
-    model_type_disposable: model::types::info::disposable::Pass,
-    model_type_struct_class: model::types::info::struct_class::Pass,
-    model_type_map_struct: model::types::kind::r#struct::Pass,
-    model_type_names: model::types::names::Pass,
-    model_type_overload_pointer: model::types::overload::pointer::Pass,
-    model_type_map: model::types::map::Pass,
-    model_fn_all: model::fns::all::Pass,
-    model_fn_originals: model::fns::originals::Pass,
-    model_fn_overload_all: model::fns::overload::all::Pass,
-    model_fn_overload_simple: model::fns::overload::simple::Pass,
-    model_fn_overload_body: model::fns::overload::body::Pass,
-    model_type_overload_delegate: model::types::overload::delegate::Pass,
-    model_service_map: model::service::map::Pass,
-    model_service_method_names: model::service::method::names::Pass,
-    model_service_method_overload: model::service::method::overload::Pass,
+    model_passes: ModelPasses,
 
     // First output pass determining files to be produced
     output_master: output::master::Pass,
@@ -177,35 +181,37 @@ impl RustLibrary {
         Self {
             inventory,
             meta_info: meta::info::Pass::new(config.meta_info),
-            model_id_maps: model::id_map::Pass::new(config.model_id_maps),
-            model_type_kinds: model::types::kind::Pass::new(config.model_type_kinds),
-            model_type_map_primitives: model::types::kind::primitives::Pass::new(config.model_type_map_primitives),
-            model_type_map_array: model::types::kind::array::Pass::new(config.model_type_map_array),
-            model_type_map_delegate: model::types::kind::delegate::Pass::new(config.model_type_map_delegate),
-            model_type_map_pointer: model::types::kind::pointer::Pass::new(config.model_type_map_pointer),
-            model_type_map_service: model::types::kind::service::Pass::new(config.model_type_map_service),
-            model_type_map_patterns: model::types::kind::patterns::Pass::new(config.model_type_map_patterns),
-            model_type_fallback: model::types::fallback::Pass::new(config.model_type_fallback),
-            model_type_map_enum_variants: model::types::kind::enum_variants::Pass::new(config.model_type_map_enum_variants),
-            model_type_map_enum: model::types::kind::r#enum::Pass::new(config.model_type_map_enum),
-            model_type_map_opaque: model::types::kind::opaque::Pass::new(config.model_type_map_opaque),
-            model_type_map_struct_fields: model::types::kind::struct_fields::Pass::new(config.model_type_map_struct_fields),
-            model_type_managed_conversion: model::types::info::managed_conversion::Pass::new(config.model_type_managed_conversion),
-            model_type_disposable: model::types::info::disposable::Pass::new(config.model_type_disposable),
-            model_type_struct_class: model::types::info::struct_class::Pass::new(config.model_type_struct_class),
-            model_type_map_struct: model::types::kind::r#struct::Pass::new(config.model_type_map_struct),
-            model_type_names: model::types::names::Pass::new(config.model_type_names),
-            model_type_overload_pointer: model::types::overload::pointer::Pass::new(config.model_type_overload_pointer),
-            model_type_map: model::types::map::Pass::new(config.model_type_map),
-            model_fn_all: model::fns::all::Pass::new(config.model_fn_all),
-            model_fn_originals: model::fns::originals::Pass::new(config.model_fn_originals),
-            model_fn_overload_all: model::fns::overload::all::Pass::new(config.model_fn_overload_all),
-            model_fn_overload_simple: model::fns::overload::simple::Pass::new(config.model_fn_overload_simple),
-            model_fn_overload_body: model::fns::overload::body::Pass::new(config.model_fn_overload_body),
-            model_type_overload_delegate: model::types::overload::delegate::Pass::new(config.model_type_overload_delegate),
-            model_service_map: model::service::map::Pass::new(config.model_service_map),
-            model_service_method_names: model::service::method::names::Pass::new(config.model_service_method_names),
-            model_service_method_overload: model::service::method::overload::Pass::new(config.model_service_method_overload),
+            model_passes: ModelPasses {
+                id_maps: model::id_map::Pass::new(config.model_id_maps),
+                type_kinds: model::types::kind::Pass::new(config.model_type_kinds),
+                type_map_primitives: model::types::kind::primitives::Pass::new(config.model_type_map_primitives),
+                type_map_array: model::types::kind::array::Pass::new(config.model_type_map_array),
+                type_map_delegate: model::types::kind::delegate::Pass::new(config.model_type_map_delegate),
+                type_map_pointer: model::types::kind::pointer::Pass::new(config.model_type_map_pointer),
+                type_map_service: model::types::kind::service::Pass::new(config.model_type_map_service),
+                type_map_patterns: model::types::kind::patterns::Pass::new(config.model_type_map_patterns),
+                type_fallback: model::types::fallback::Pass::new(config.model_type_fallback),
+                type_map_enum_variants: model::types::kind::enum_variants::Pass::new(config.model_type_map_enum_variants),
+                type_map_enum: model::types::kind::r#enum::Pass::new(config.model_type_map_enum),
+                type_map_opaque: model::types::kind::opaque::Pass::new(config.model_type_map_opaque),
+                type_map_struct_fields: model::types::kind::struct_fields::Pass::new(config.model_type_map_struct_fields),
+                type_managed_conversion: model::types::info::managed_conversion::Pass::new(config.model_type_managed_conversion),
+                type_disposable: model::types::info::disposable::Pass::new(config.model_type_disposable),
+                type_struct_class: model::types::info::struct_class::Pass::new(config.model_type_struct_class),
+                type_map_struct: model::types::kind::r#struct::Pass::new(config.model_type_map_struct),
+                type_names: model::types::names::Pass::new(config.model_type_names),
+                type_overload_pointer: model::types::overload::pointer::Pass::new(config.model_type_overload_pointer),
+                type_map: model::types::map::Pass::new(config.model_type_map),
+                fn_all: model::fns::all::Pass::new(config.model_fn_all),
+                fn_originals: model::fns::originals::Pass::new(config.model_fn_originals),
+                fn_overload_all: model::fns::overload::all::Pass::new(config.model_fn_overload_all),
+                fn_overload_simple: model::fns::overload::simple::Pass::new(config.model_fn_overload_simple),
+                fn_overload_body: model::fns::overload::body::Pass::new(config.model_fn_overload_body),
+                type_overload_delegate: model::types::overload::delegate::Pass::new(config.model_type_overload_delegate),
+                service_map: model::service::map::Pass::new(config.model_service_map),
+                service_method_names: model::service::method::names::Pass::new(config.model_service_method_names),
+                service_method_overload: model::service::method::overload::Pass::new(config.model_service_method_overload),
+            },
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
                 unmanaged_conversion: output::conversion::unmanaged_conversion::Pass::new(config.output_unmanaged_conversion),
@@ -267,38 +273,41 @@ impl RustLibrary {
     pub fn process(mut self) -> Result<Multibuf, Error> {
         self.plugin_init_pass();
         let mut pass_meta = PassMeta::default();
+    
+        let m = &mut self.model_passes;
+        let o = &mut self.output_passes;
 
         // Model passes
         loop_model_passes_until_done(|r| {
             pass_meta.clear();
             r.run(self.meta_info.process(&mut pass_meta))?;
-            r.run(self.model_id_maps.process(&mut pass_meta, &self.inventory.types, &self.inventory.functions, &self.inventory.services))?;
-            r.run(self.model_type_kinds.process(&mut pass_meta))?;
-            r.run(self.model_type_map_primitives.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_array.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_delegate.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_pointer.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_service.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_fallback.process(&mut pass_meta, &self.model_id_maps, &self.inventory.types))?;
-            r.run(self.model_type_map_patterns.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_fallback, &self.inventory.types))?;
-            r.run(self.model_type_map_enum_variants.process(&mut pass_meta, &self.model_id_maps, &self.inventory.types))?;
-            r.run(self.model_type_map_enum.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_enum_variants, &self.inventory.types))?;
-            r.run(self.model_type_map_opaque.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_map_struct_fields.process(&mut pass_meta, &self.model_id_maps, &self.inventory.types))?;
-            r.run(self.model_type_managed_conversion.process(&mut pass_meta, &self.model_type_kinds))?;
-            r.run(self.model_type_disposable.process(&mut pass_meta, &self.model_type_managed_conversion, &self.model_type_kinds))?;
-            r.run(self.model_type_struct_class.process(&mut pass_meta, &self.model_type_managed_conversion, &self.model_type_kinds))?;
-            r.run(self.model_type_map_struct.process(&mut pass_meta, &self.model_id_maps, &mut self.model_type_kinds, &self.model_type_map_struct_fields, &self.inventory.types))?;
-            r.run(self.model_type_names.process(&mut pass_meta, &self.model_id_maps, &self.model_type_kinds, &self.inventory.types))?;
-            r.run(self.model_type_overload_pointer.process(&mut pass_meta, &mut self.model_type_kinds, &mut self.model_type_names, &mut self.model_type_map))?;
-            r.run(self.model_type_overload_delegate.process(&mut pass_meta, &mut self.model_type_kinds, &mut self.model_type_names, &mut self.model_type_map))?;
-            r.run(self.model_type_map.process(&mut pass_meta, &self.model_type_kinds, &self.model_type_names))?;
-            r.run(self.model_fn_originals.process(&mut pass_meta, &self.model_id_maps, &mut self.model_fn_all, &self.inventory.functions))?;
-            r.run(self.model_fn_overload_simple.process(&mut pass_meta, &self.model_fn_originals, &mut self.model_fn_all, &mut self.model_fn_overload_all, &self.model_type_kinds, &self.model_type_managed_conversion, &self.model_type_overload_pointer))?;
-            r.run(self.model_fn_overload_body.process(&mut pass_meta, &self.model_fn_originals, &mut self.model_fn_all, &mut self.model_fn_overload_all, &self.model_type_kinds, &self.model_type_overload_pointer, &self.model_type_overload_delegate, &self.model_type_managed_conversion))?;
-            r.run(self.model_service_map.process(&mut pass_meta, &self.model_id_maps, &self.inventory.services))?;
-            r.run(self.model_service_method_names.process(&mut pass_meta, &self.model_service_map, &self.model_fn_all, &self.model_type_names))?;
-            r.run(self.model_service_method_overload.process(&mut pass_meta, &self.model_service_map, &self.model_fn_overload_all))?;
+            r.run(m.id_maps.process(&mut pass_meta, &self.inventory.types, &self.inventory.functions, &self.inventory.services))?;
+            r.run(m.type_kinds.process(&mut pass_meta))?;
+            r.run(m.type_map_primitives.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &self.inventory.types))?;
+            r.run(m.type_map_array.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &self.inventory.types))?;
+            r.run(m.type_map_delegate.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &self.inventory.types))?;
+            r.run(m.type_map_pointer.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &self.inventory.types))?;
+            r.run(m.type_map_service.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &self.inventory.types))?;
+            r.run(m.type_fallback.process(&mut pass_meta, &m.id_maps, &self.inventory.types))?;
+            r.run(m.type_map_patterns.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &m.type_fallback, &self.inventory.types))?;
+            r.run(m.type_map_enum_variants.process(&mut pass_meta, &m.id_maps, &self.inventory.types))?;
+            r.run(m.type_map_enum.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &m.type_map_enum_variants, &self.inventory.types))?;
+            r.run(m.type_map_opaque.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &self.inventory.types))?;
+            r.run(m.type_map_struct_fields.process(&mut pass_meta, &m.id_maps, &self.inventory.types))?;
+            r.run(m.type_managed_conversion.process(&mut pass_meta, &m.type_kinds))?;
+            r.run(m.type_disposable.process(&mut pass_meta, &m.type_managed_conversion, &m.type_kinds))?;
+            r.run(m.type_struct_class.process(&mut pass_meta, &m.type_managed_conversion, &m.type_kinds))?;
+            r.run(m.type_map_struct.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &m.type_map_struct_fields, &self.inventory.types))?;
+            r.run(m.type_names.process(&mut pass_meta, &m.id_maps, &m.type_kinds, &self.inventory.types))?;
+            r.run(m.type_overload_pointer.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_map))?;
+            r.run(m.type_overload_delegate.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_map))?;
+            r.run(m.type_map.process(&mut pass_meta, &m.type_kinds, &m.type_names))?;
+            r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &mut m.fn_all, &self.inventory.functions))?;
+            r.run(m.fn_overload_simple.process(&mut pass_meta, &m.fn_originals, &mut m.fn_all, &mut m.fn_overload_all, &m.type_kinds, &m.type_managed_conversion, &m.type_overload_pointer))?;
+            r.run(m.fn_overload_body.process(&mut pass_meta, &m.fn_originals, &mut m.fn_all, &mut m.fn_overload_all, &m.type_kinds, &m.type_overload_pointer, &m.type_overload_delegate, &m.type_managed_conversion))?;
+            r.run(m.service_map.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
+            r.run(m.service_method_names.process(&mut pass_meta, &m.service_map, &m.fn_all, &m.type_names))?;
+            r.run(m.service_method_overload.process(&mut pass_meta, &m.service_map, &m.fn_overload_all))?;
 
             let post_model = PostModelPass::default();
             for plugin in self.plugins.iter_mut() {
@@ -311,35 +320,35 @@ impl RustLibrary {
 
         // Output passes
         self.output_master.process(&mut pass_meta)?;
-        self.output_passes.unmanaged_conversion.process(&mut pass_meta, &self.model_type_managed_conversion, &self.model_type_kinds)?;
-        self.output_passes.unmanaged_names.process(&mut pass_meta, &self.model_type_names, &self.model_type_managed_conversion, &self.model_type_kinds)?;
-        self.output_passes.enum_ty.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class)?;
-        self.output_passes.enum_body_unmanaged_variant.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_names)?;
-        self.output_passes.enum_body_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_conversion)?;
-        self.output_passes.enum_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_conversion)?;
-        self.output_passes.enum_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_conversion)?;
-        self.output_passes.enum_body_ctors.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names)?;
-        self.output_passes.enum_body_exception_for_variant.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names)?;
-        self.output_passes.enum_body_tostring.process(&mut pass_meta, &self.output_master, &self.model_type_kinds)?;
-        self.output_passes.enum_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class, &self.model_type_disposable, &self.output_passes.enum_body_unmanaged_variant, &self.output_passes.enum_body_unmanaged, &self.output_passes.enum_body_to_unmanaged, &self.output_passes.enum_body_as_unmanaged, &self.output_passes.enum_body_ctors, &self.output_passes.enum_body_exception_for_variant, &self.output_passes.enum_body_tostring)?;
-        self.output_passes.enums.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.enum_ty, &self.output_passes.enum_body)?;
-        self.output_passes.conversion_fields.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names)?;
-        self.output_passes.composite_ty.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class, &self.output_passes.unmanaged_names)?;
-        self.output_passes.composite_body_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_conversion, &self.output_passes.conversion_fields)?;
-        self.output_passes.composite_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_conversion, &self.output_passes.conversion_fields)?;
-        self.output_passes.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_conversion, &self.output_passes.conversion_fields)?;
-        self.output_passes.composite_body.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.model_type_struct_class, &self.model_type_disposable, &self.output_passes.composite_body_unmanaged, &self.output_passes.composite_body_to_unmanaged, &self.output_passes.composite_body_as_unmanaged)?;
-        self.output_passes.composites.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.output_passes.composite_ty, &self.output_passes.composite_body)?;
-        self.output_passes.delegates.process(&mut pass_meta, &self.output_master, &self.model_type_kinds, &self.model_type_names, &self.output_passes.unmanaged_names, &self.output_passes.unmanaged_conversion)?;
-        self.output_passes.fns_rust.process(&mut pass_meta, &self.output_master, &self.model_fn_originals, &self.model_type_names)?;
-        self.output_passes.fns_overload_simple.process(&mut pass_meta, &self.output_master, &self.model_fn_overload_simple, &self.model_fn_all, &self.model_type_names)?;
-        self.output_passes.fns_overload_body.process(&mut pass_meta, &self.output_master, &self.model_fn_overload_body, &self.model_fn_originals, &self.model_type_names, &self.model_type_kinds, &self.model_type_overload_pointer, &self.model_type_overload_delegate)?;
-        self.output_passes.service_body_ctors.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.model_service_method_names)?;
-        self.output_passes.service_body_methods.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.model_type_kinds, &self.model_service_method_names, &self.model_fn_overload_all)?;
-        self.output_passes.services.process(&mut pass_meta, &self.output_master, &self.model_service_map, &self.model_fn_all, &self.model_type_names, &self.output_passes.service_body_ctors, &self.output_passes.service_body_methods)?;
-        self.output_passes.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
-        self.output_passes.util.process(&mut pass_meta, &self.output_master)?;
-        self.output_passes.using.process(&mut pass_meta, &self.output_master)?;
+        o.unmanaged_conversion.process(&mut pass_meta, &m.type_managed_conversion, &m.type_kinds)?;
+        o.unmanaged_names.process(&mut pass_meta, &m.type_names, &m.type_managed_conversion, &m.type_kinds)?;
+        o.enum_ty.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &m.type_struct_class)?;
+        o.enum_body_unmanaged_variant.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &o.unmanaged_names)?;
+        o.enum_body_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &o.unmanaged_conversion)?;
+        o.enum_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &o.unmanaged_conversion)?;
+        o.enum_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &o.unmanaged_conversion)?;
+        o.enum_body_ctors.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names)?;
+        o.enum_body_exception_for_variant.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names)?;
+        o.enum_body_tostring.process(&mut pass_meta, &self.output_master, &m.type_kinds)?;
+        o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_exception_for_variant, &o.enum_body_tostring)?;
+        o.enums.process(&mut pass_meta, &self.output_master, &m.type_kinds, &o.enum_ty, &o.enum_body)?;
+        o.conversion_fields.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names)?;
+        o.composite_ty.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &m.type_struct_class, &o.unmanaged_names)?;
+        o.composite_body_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &o.unmanaged_conversion, &o.conversion_fields)?;
+        o.composite_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &o.unmanaged_conversion, &o.conversion_fields)?;
+        o.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &o.unmanaged_conversion, &o.conversion_fields)?;
+        o.composite_body.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &m.type_struct_class, &m.type_disposable, &o.composite_body_unmanaged, &o.composite_body_to_unmanaged, &o.composite_body_as_unmanaged)?;
+        o.composites.process(&mut pass_meta, &self.output_master, &m.type_kinds, &o.composite_ty, &o.composite_body)?;
+        o.delegates.process(&mut pass_meta, &self.output_master, &m.type_kinds, &m.type_names, &o.unmanaged_names, &o.unmanaged_conversion)?;
+        o.fns_rust.process(&mut pass_meta, &self.output_master, &m.fn_originals, &m.type_names)?;
+        o.fns_overload_simple.process(&mut pass_meta, &self.output_master, &m.fn_overload_simple, &m.fn_all, &m.type_names)?;
+        o.fns_overload_body.process(&mut pass_meta, &self.output_master, &m.fn_overload_body, &m.fn_originals, &m.type_names, &m.type_kinds, &m.type_overload_pointer, &m.type_overload_delegate)?;
+        o.service_body_ctors.process(&mut pass_meta, &self.output_master, &m.service_map, &m.fn_all, &m.type_names, &m.service_method_names)?;
+        o.service_body_methods.process(&mut pass_meta, &self.output_master, &m.service_map, &m.fn_all, &m.type_names, &m.type_kinds, &m.service_method_names, &m.fn_overload_all)?;
+        o.services.process(&mut pass_meta, &self.output_master, &m.service_map, &m.fn_all, &m.type_names, &o.service_body_ctors, &o.service_body_methods)?;
+        o.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
+        o.util.process(&mut pass_meta, &self.output_master)?;
+        o.using.process(&mut pass_meta, &self.output_master)?;
         self.plugin_post_output_pass()?;
 
         // Final output pass(es)
