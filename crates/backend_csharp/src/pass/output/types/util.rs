@@ -27,10 +27,12 @@ impl Pass {
             let interop_exception = templates.render("types/util/interop_exception.cs", &context)?;
             let enum_exception = templates.render("types/util/enum_exception.cs", &context)?;
             let utf8string = templates.render("types/util/utf8string.cs", &context)?;
+            let async_callback_common = templates.render("types/util/async_callback_common.cs", &context)?;
 
             context.insert("interop_exception", &interop_exception.trim());
             context.insert("enum_exception", &enum_exception.trim());
             context.insert("utf8string", &utf8string.trim());
+            context.insert("async_callback_common", &async_callback_common.trim());
 
             let combined = templates.render("types/util/all.cs", &context)?;
 

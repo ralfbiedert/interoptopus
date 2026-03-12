@@ -1,4 +1,5 @@
 use interoptopus::inventory::{Inventory, RustInventory};
+use interoptopus::pattern::asynk::{Async, AsyncRuntime};
 use interoptopus::{callback, extra_type, ffi, service};
 
 /// A simple type in our FFI layer.
@@ -53,6 +54,32 @@ impl ServiceBasic {
     }
 }
 
+#[ffi(service)]
+pub struct ServiceBasic2 {}
+
+#[ffi]
+impl ServiceBasic2 {
+    pub fn new() -> ffi::Result<Self, Error> {
+        ffi::Ok(Self {})
+    }
+
+    pub async fn sum(_this: Async<Self>, x: i32, y: i32) -> ffi::Result<(), Error> {
+        ffi::Result::Ok(())
+    }
+}
+
+impl AsyncRuntime for ServiceBasic2 {
+    type T = ();
+
+    fn spawn<Fn, F>(&self, f: Fn)
+    where
+        Fn: FnOnce(Self::T) -> F,
+        F: Future<Output = ()> + Send + 'static,
+    {
+        todo!()
+    }
+}
+
 // We just trick a unit test into producing our bindings, here for C#
 #[test]
 #[rustfmt::skip]
@@ -71,6 +98,7 @@ fn generate_bindings() -> Result<(), Box<dyn std::error::Error>> {
         .register(extra_type!(SumDelegate2))
         .register(extra_type!(SumDelegateReturn))
         .register(service!(ServiceBasic))
+        .register(service!(ServiceBasic2))
         .validate();
 
     RustLibrary::builder(inventory)
