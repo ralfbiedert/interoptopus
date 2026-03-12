@@ -30,6 +30,26 @@ macro_rules! resolve_name {
     };
 }
 
+/// Like `resolve_name!`, but for building composed type names (Result, Slice, etc.).
+/// For pointer types, resolves through the target to produce a unique name
+/// (e.g., the target's name instead of `IntPtr`), preventing name collisions
+/// when different pointer types are used inside generic wrappers.
+macro_rules! resolve_compositional_name {
+    ($self:expr, $id:expr, $kinds:expr, $pass_meta:expr) => {{
+        if let Some(TypeKind::Pointer(p)) = $kinds.get($id) {
+            match $self.names.get(&p.target) {
+                Some(n) => n.as_str(),
+                None => {
+                    $pass_meta.lost_found.missing($self.info, crate::pass::MissingItem::CsType(p.target));
+                    continue;
+                }
+            }
+        } else {
+            resolve_name!($self, $id, $pass_meta)
+        }
+    }};
+}
+
 impl Pass {
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, names: Default::default() }
@@ -68,14 +88,14 @@ impl Pass {
                     TypePattern::CStrPointer => "CStrPtr".to_string(),
                     TypePattern::Utf8String => "Utf8String".to_string(),
                     TypePattern::ApiVersion => "ApiVersion".to_string(),
-                    TypePattern::Slice(t) => format!("Slice{}", rust_to_pascal(resolve_name!(self, *t, pass_meta))),
-                    TypePattern::SliceMut(t) => format!("SliceMut{}", rust_to_pascal(resolve_name!(self, *t, pass_meta))),
-                    TypePattern::Vec(t) => format!("Vec{}", rust_to_pascal(resolve_name!(self, *t, pass_meta))),
-                    TypePattern::Option(t, _) => format!("Option{}", rust_to_pascal(resolve_name!(self, *t, pass_meta))),
+                    TypePattern::Slice(t) => format!("Slice{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
+                    TypePattern::SliceMut(t) => format!("SliceMut{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
+                    TypePattern::Vec(t) => format!("Vec{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
+                    TypePattern::Option(t, _) => format!("Option{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
                     TypePattern::AsyncCallback(t) => "AsyncCallbackCommon".to_string(),
                     TypePattern::Result(ok, err, _) => {
-                        let ok_name = rust_to_pascal(resolve_name!(self, *ok, pass_meta));
-                        let err_name = rust_to_pascal(resolve_name!(self, *err, pass_meta));
+                        let ok_name = rust_to_pascal(resolve_compositional_name!(self, *ok, kinds, pass_meta));
+                        let err_name = rust_to_pascal(resolve_compositional_name!(self, *err, kinds, pass_meta));
                         format!("Result{}{}", ok_name, err_name)
                     }
                 },
@@ -94,6 +114,7 @@ impl Pass {
 
         Ok(outcome)
     }
+
 
     pub fn set(&mut self, ty: TypeId, name: String) {
         self.names.insert(ty, name);
