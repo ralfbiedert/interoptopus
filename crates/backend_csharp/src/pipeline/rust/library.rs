@@ -272,11 +272,12 @@ impl RustLibrary {
         Ok(())
     }
 
+
     #[rustfmt::skip]
     pub fn process(mut self) -> Result<Multibuf, Error> {
         self.plugin_init_pass();
         let mut pass_meta = PassMeta::default();
-    
+
         let m = &mut self.model_passes;
         let o = &mut self.output_passes;
 
@@ -312,14 +313,19 @@ impl RustLibrary {
             r.run(m.service_method_names.process(&mut pass_meta, &m.service_map, &m.fn_all, &m.type_all))?;
             r.run(m.service_method_overload.process(&mut pass_meta, &m.service_map, &m.fn_overload_all))?;
 
-            let post_model = PostModelPass::default();
             for plugin in self.plugins.iter_mut() {
-                r.run(plugin.post_model(&mut self.inventory, post_model))?;
+                let post_model = PostModelPass::from_model(m);
+                r.run(plugin.post_model_cycle(&mut self.inventory, post_model))?;
             }
             Ok(())
         })?;
 
         pass_meta.lost_found.print();
+
+        for plugin in self.plugins.iter_mut() {
+            let post_model = PostModelPass::from_model(m);
+            plugin.post_model_all(&self.inventory, post_model)?;
+        }
 
         // Output passes
         self.output_master.process(&mut pass_meta)?;

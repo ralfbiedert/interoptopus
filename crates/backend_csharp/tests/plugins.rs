@@ -20,9 +20,13 @@ impl RustLibraryPlugin for MyPlugin {
         self.init_called.store(true, Ordering::Relaxed);
     }
 
-    fn post_model(&mut self, _: &RustInventory, _: PostModelPass) -> ModelResult {
+    fn post_model_cycle(&mut self, _: &RustInventory, _: PostModelPass) -> ModelResult {
         self.post_model_called.store(true, Ordering::Relaxed);
         Ok(Unchanged)
+    }
+
+    fn post_model_all(&mut self, _: &RustInventory, _: PostModelPass) -> Result<(), interoptopus_csharp::Error> {
+        Ok(())
     }
 
     fn post_output(&mut self, _: &mut Multibuf, _: PostOutputPass) -> OutputResult {

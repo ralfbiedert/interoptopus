@@ -112,7 +112,7 @@ pass/
 │       │   ├── managed_conversion.rs  # AsIs/To/Into conversion category per type
 │       │   ├── disposable.rs          # Whether a type needs disposal
 │       │   └── struct_class.rs        # Whether a composite is a struct or class
-│       ├── map.rs        # Assembles final Type { name, kind } objects
+│       ├── all.rs        # Container for all C# types (id → Type), the primary query point
 │       └── names.rs      # Assigns C# type names to all mapped types
 └── output/
     ├── conversion/
