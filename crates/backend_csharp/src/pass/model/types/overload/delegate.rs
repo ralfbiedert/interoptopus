@@ -38,7 +38,7 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         kinds: &mut model::types::kind::Pass,
         names: &mut model::types::names::Pass,
-        map: &mut model::types::all::Pass,
+        types: &mut model::types::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
@@ -71,7 +71,7 @@ impl Pass {
             // Register in kinds, names, and map
             kinds.set(sig_id, TypeKind::Delegate(sig_delegate.clone()));
             names.set(sig_id, sig_name.clone());
-            map.set(sig_id, Type { name: sig_name, kind: TypeKind::Delegate(sig_delegate) });
+            types.set(sig_id, Type { name: sig_name, kind: TypeKind::Delegate(sig_delegate) });
 
             // Build family
             let family = Arc::new(Family { class: class_id, signature: sig_id });

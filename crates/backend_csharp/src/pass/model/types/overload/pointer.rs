@@ -41,7 +41,7 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         kinds: &mut model::types::kind::Pass,
         names: &mut model::types::names::Pass,
-        map: &mut model::types::all::Pass,
+        types: &mut model::types::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
@@ -60,7 +60,7 @@ impl Pass {
             }
 
             // Wait until the IntPtr type is fully resolved in the map pass
-            let Some(intptr_type) = map.get(intptr_id) else {
+            let Some(intptr_type) = types.get(intptr_id) else {
                 continue;
             };
 
@@ -85,8 +85,8 @@ impl Pass {
             names.set(by_out_id, format!("out {pointee_name}"));
 
             // Register in the map pass so they're fully resolved
-            map.set(by_ref_id, Type { name: format!("ref {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }) });
-            map.set(by_out_id, Type { name: format!("out {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }) });
+            types.set(by_ref_id, Type { name: format!("ref {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }) });
+            types.set(by_out_id, Type { name: format!("out {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }) });
 
             // Build family
             let family = Arc::new(Family { intptr: intptr_id, by_ref: by_ref_id, by_out: by_out_id });
