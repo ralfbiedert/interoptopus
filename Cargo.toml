@@ -19,7 +19,7 @@ authors = ["Ralf Biedert <rb@xr.io>"]
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/ralfbiedert/interoptopus"
-rust-version = "1.88"
+rust-version = "1.94"
 version = "0.16.0-alpha.1"
 
 [workspace.dependencies]
