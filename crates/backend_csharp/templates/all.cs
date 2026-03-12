@@ -18,6 +18,14 @@ namespace A {
         {% for fn in fns_overload_body %}
         {{ fn | indent(prefix = "        ") }}
         {% endfor %}
+
+        {% for fn in fns_overload_asynk %}
+        {{ fn | indent(prefix = "        ") }}
+        {% endfor %}
+
+        {% for field in async_trampoline_fields %}
+        {{ field | indent(prefix = "        ") }}
+        {% endfor %}
     }
 
     {% for enum in enums %}
@@ -34,6 +42,10 @@ namespace A {
 
     {% for service in services %}
     {{ service | indent }}
+    {% endfor %}
+
+    {% for trampoline in async_trampolines %}
+    {{ trampoline | indent }}
     {% endfor %}
 
     {{ util | indent }}

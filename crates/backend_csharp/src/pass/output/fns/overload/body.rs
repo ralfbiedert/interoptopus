@@ -2,10 +2,11 @@
 //!
 //! Body overloads have a method body that wraps delegate arguments into their
 //! class, calls the target function, and disposes the wrappers. This pass
-//! resolves all names and types from the originals and type overload passes,
-//! guided by the per-argument transforms from the body overload model pass.
+//! queries `overload::all` for `Body` kind overloads and resolves all names
+//! and types from the originals and type overload passes, guided by the
+//! per-argument transforms stored in the `OverloadKind::Body`.
 
-use crate::lang::functions::overload::ArgTransform;
+use crate::lang::functions::overload::{ArgTransform, OverloadKind};
 use crate::lang::types::kind::{Primitive, TypeKind};
 use crate::lang::types::OverloadFamily;
 use crate::output::{Output, OutputKind};
@@ -30,7 +31,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        overload_body: &model::fns::overload::body::Pass,
+        overload_all: &model::fns::overload::all::Pass,
         originals: &model::fns::originals::Pass,
         types: &model::types::all::Pass,
         overloads: &model::types::overload::all::Pass,
@@ -40,10 +41,15 @@ impl Pass {
         for output in output_master.outputs_of(OutputKind::Csharp) {
             let mut imports = Vec::new();
 
-            for (fn_id, transforms) in overload_body.iter() {
-                let Some(original_fn) = originals.get(fn_id) else { continue };
-                let rendered = render_body_overload(original_fn, transforms, types, overloads, templates)?;
-                imports.push(rendered);
+            for (&fn_id, original_fn) in originals.iter() {
+                let Some(overload_entries) = overload_all.overloads_for(fn_id) else { continue };
+
+                for (_, kind) in overload_entries {
+                    let OverloadKind::Body(transforms) = kind else { continue };
+
+                    let rendered = render_body_overload(original_fn, transforms, types, overloads, templates)?;
+                    imports.push(rendered);
+                }
             }
 
             imports.sort();

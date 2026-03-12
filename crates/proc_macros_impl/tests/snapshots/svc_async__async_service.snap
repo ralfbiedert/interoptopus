@@ -69,7 +69,7 @@ fn service_destroy(instance: *const Service) {
 #[::interoptopus::ffi]
 unsafe fn service_compute1(
     instance: *const Service,
-    callback: ::interoptopus::pattern::asynk::AsyncCallback<u8>,
+    callback: ::interoptopus::pattern::asynk::AsyncCallback<ffi::Result<u8, Error>>,
 ) -> <::interoptopus::ffi::Result<
     (),
     Error,
@@ -87,14 +87,7 @@ unsafe fn service_compute1(
                     _ctx,
                 );
                 let _result = Service::compute1(_async_this).await;
-                match _result {
-                    ::interoptopus::ffi::Ok(value) => {
-                        callback.call(&value);
-                    }
-                    ::interoptopus::ffi::Err(_err) => {}
-                    ::interoptopus::ffi::Result::Panic => {}
-                    ::interoptopus::ffi::Result::Null => {}
-                }
+                callback.call(&_result);
             });
         ::interoptopus::ffi::Ok(::std::ptr::null())
     }
@@ -102,7 +95,7 @@ unsafe fn service_compute1(
 #[::interoptopus::ffi]
 unsafe fn service_compute2(
     instance: *const Service,
-    callback: ::interoptopus::pattern::asynk::AsyncCallback<u8>,
+    callback: ::interoptopus::pattern::asynk::AsyncCallback<ffi::Result<u8, Error>>,
 ) -> <::interoptopus::ffi::Result<
     (),
     Error,
@@ -120,14 +113,7 @@ unsafe fn service_compute2(
                     _ctx,
                 );
                 let _result = Service::compute2(_async_this).await;
-                match _result {
-                    ::interoptopus::ffi::Ok(value) => {
-                        callback.call(&value);
-                    }
-                    ::interoptopus::ffi::Err(_err) => {}
-                    ::interoptopus::ffi::Result::Panic => {}
-                    ::interoptopus::ffi::Result::Null => {}
-                }
+                callback.call(&_result);
             });
         ::interoptopus::ffi::Ok(::std::ptr::null())
     }

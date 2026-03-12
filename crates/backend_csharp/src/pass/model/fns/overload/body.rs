@@ -7,7 +7,7 @@
 //! The output pass for body overloads renders the wrapping/disposal logic using
 //! the per-argument transforms stored here.
 
-use crate::lang::functions::overload::{ArgTransform, FnTransforms, RvalTransform};
+use crate::lang::functions::overload::{ArgTransform, FnTransforms, OverloadKind, RvalTransform};
 use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::types::kind::{DelegateKind, TypeKind};
 use crate::lang::types::{ManagedConversion, OverloadFamily};
@@ -91,10 +91,10 @@ impl Pass {
             let overload_id = derive_overload_id(original_id, &overload_signature);
             let overload_fn = Function { name: original_fn.name.clone(), signature: overload_signature };
 
+            let transforms = FnTransforms { rval: RvalTransform::PassThrough, args: arg_transforms };
             all.register(overload_id, overload_fn);
-            overload_all.register(original_id, overload_id);
-            self.transforms
-                .insert(original_id, Some(FnTransforms { rval: RvalTransform::PassThrough, args: arg_transforms }));
+            overload_all.register(original_id, overload_id, OverloadKind::Body(transforms.clone()));
+            self.transforms.insert(original_id, Some(transforms));
             outcome.changed();
         }
 

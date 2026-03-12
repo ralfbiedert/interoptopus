@@ -9,7 +9,8 @@
 //! which already have the correct overloaded types (ref, delegate signature, etc.).
 
 use crate::lang::functions::Argument;
-use crate::lang::types::kind::{PointerKind, Primitive, TypeKind};
+use crate::lang::functions::overload::{OverloadKind, RvalTransform};
+use crate::lang::types::kind::{PointerKind, Primitive, TypeKind, TypePattern};
 use crate::lang::ServiceId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::{Context, Value};
@@ -51,16 +52,29 @@ impl Pass {
                 };
                 let is_void = matches!(types.get(method_fn.signature.rval).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
 
-                // Base method
+                // Base method (the raw native forwarding method)
                 let base_args = build_args(&method_fn.signature.arguments[1..], types);
                 rendered_methods.push(render(templates, rval, is_void, method_name, &method_fn.name, &base_args)?);
 
                 // Overloads from the central registry
-                if let Some(overload_ids) = overload_all.overloads_for(method_fn_id) {
-                    for &overload_id in overload_ids {
-                        let Some(overload_fn) = fns.get(overload_id) else { continue };
-                        let overload_args = build_args(&overload_fn.signature.arguments[1..], types);
-                        rendered_methods.push(render(templates, rval, is_void, method_name, &overload_fn.name, &overload_args)?);
+                if let Some(overload_entries) = overload_all.overloads_for(method_fn_id) {
+                    for (overload_id, kind) in overload_entries {
+                        let Some(overload_fn) = fns.get(*overload_id) else { continue };
+
+                        if let OverloadKind::Async(transforms) = kind {
+                            // Render the async service method: Task<T>
+                            if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval {
+                                let task_rval = types.get(result_ty_id)
+                                    .map(|t| resolve_task_type_from_result(&t.kind, types))
+                                    .unwrap_or_else(|| "Task".to_string());
+                                // Skip the self arg (first) for service method args
+                                let async_args = build_args(&overload_fn.signature.arguments[1..], types);
+                                rendered_methods.push(render_async(templates, &task_rval, method_name, &overload_fn.name, &async_args)?);
+                            }
+                        } else {
+                            let overload_args = build_args(&overload_fn.signature.arguments[1..], types);
+                            rendered_methods.push(render(templates, rval, is_void, method_name, &overload_fn.name, &overload_args)?);
+                        }
                     }
                 }
             }
@@ -109,4 +123,34 @@ fn render(
     context.insert("interop_name", &interop_name);
     context.insert("args", args);
     Ok(templates.render("service/body_methods.cs", &context)?)
+}
+
+fn render_async(
+    templates: &interoptopus_backends::template::TemplateEngine,
+    task_rval: &str,
+    method_name: &str,
+    interop_name: &str,
+    args: &[HashMap<&str, Value>],
+) -> Result<String, crate::Error> {
+    let mut context = Context::new();
+    context.insert("task_rval", task_rval);
+    context.insert("method_name", method_name);
+    context.insert("interop_name", interop_name);
+    context.insert("args", args);
+    Ok(templates.render("service/body_methods_async.cs", &context)?)
+}
+
+fn resolve_task_type_from_result(result_kind: &TypeKind, types: &model::types::all::Pass) -> String {
+    match result_kind {
+        TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _)) => {
+            let ok_kind = types.get(*ok_ty).map(|t| &t.kind);
+            if matches!(ok_kind, Some(TypeKind::Primitive(Primitive::Void))) {
+                "Task".to_string()
+            } else {
+                let ok_name = types.get(*ok_ty).map(|t| t.name.clone()).unwrap_or_else(|| "void".to_string());
+                format!("Task<{}>", ok_name)
+            }
+        }
+        _ => "Task".to_string(),
+    }
 }

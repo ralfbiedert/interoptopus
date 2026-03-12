@@ -39,6 +39,7 @@ pub struct RustLibraryConfig {
     pub model_fn_overload_all: model::fns::overload::all::Config,
     pub model_fn_overload_simple: model::fns::overload::simple::Config,
     pub model_fn_overload_body: model::fns::overload::body::Config,
+    pub model_fn_overload_asynk: model::fns::overload::asynk::Config,
     pub model_service_map: model::service::all::Config,
     pub model_service_method_names: model::service::method::names::Config,
     pub model_service_method_overload: model::service::method::overload::Config,
@@ -66,6 +67,8 @@ pub struct RustLibraryConfig {
     pub output_fn_imports: output::fns::rust::Config,
     pub output_fn_overload_simple: output::fns::overload::simple::Config,
     pub output_fn_overload_body: output::fns::overload::body::Config,
+    pub output_fn_overload_asynk: output::fns::overload::asynk::Config,
+    pub output_asynk: output::types::asynk::Config,
     pub output_service_body_ctors: output::service::body::ctors::Config,
     pub output_service_body_methods: output::service::body::methods::Config,
     pub output_services: output::service::all::Config,
@@ -104,6 +107,7 @@ pub struct ModelPasses {
     pub fn_overload_all: model::fns::overload::all::Pass,
     pub fn_overload_simple: model::fns::overload::simple::Pass,
     pub fn_overload_body: model::fns::overload::body::Pass,
+    pub fn_overload_asynk: model::fns::overload::asynk::Pass,
     pub service_all: model::service::all::Pass,
     pub service_method_names: model::service::method::names::Pass,
     pub service_method_overload: model::service::method::overload::Pass,
@@ -133,6 +137,8 @@ pub struct IntermediateOutputPasses {
     pub fns_rust: output::fns::rust::Pass,
     pub fns_overload_simple: output::fns::overload::simple::Pass,
     pub fns_overload_body: output::fns::overload::body::Pass,
+    pub fns_overload_asynk: output::fns::overload::asynk::Pass,
+    pub asynk: output::types::asynk::Pass,
     pub service_body_ctors: output::service::body::ctors::Pass,
     pub service_body_methods: output::service::body::methods::Pass,
     pub services: output::service::all::Pass,
@@ -211,6 +217,7 @@ impl RustLibrary {
                 fn_overload_all: model::fns::overload::all::Pass::new(config.model_fn_overload_all),
                 fn_overload_simple: model::fns::overload::simple::Pass::new(config.model_fn_overload_simple),
                 fn_overload_body: model::fns::overload::body::Pass::new(config.model_fn_overload_body),
+                fn_overload_asynk: model::fns::overload::asynk::Pass::new(config.model_fn_overload_asynk),
                 service_all: model::service::all::Pass::new(config.model_service_map),
                 service_method_names: model::service::method::names::Pass::new(config.model_service_method_names),
                 service_method_overload: model::service::method::overload::Pass::new(config.model_service_method_overload),
@@ -240,6 +247,8 @@ impl RustLibrary {
                 fns_rust: output::fns::rust::Pass::new(config.output_fn_imports),
                 fns_overload_simple: output::fns::overload::simple::Pass::new(config.output_fn_overload_simple),
                 fns_overload_body: output::fns::overload::body::Pass::new(config.output_fn_overload_body),
+                fns_overload_asynk: output::fns::overload::asynk::Pass::new(config.output_fn_overload_asynk),
+                asynk: output::types::asynk::Pass::new(config.output_asynk),
                 service_body_ctors: output::service::body::ctors::Pass::new(config.output_service_body_ctors),
                 service_body_methods: output::service::body::methods::Pass::new(config.output_service_body_methods),
                 services: output::service::all::Pass::new(config.output_services),
@@ -309,6 +318,7 @@ impl RustLibrary {
             r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &mut m.fns_all, &self.inventory.functions))?;
             r.run(m.fn_overload_simple.process(&mut pass_meta, &m.fn_originals, &mut m.fns_all, &mut m.fn_overload_all, &m.type_all, &m.type_managed_conversion, &m.type_overload_all))?;
             r.run(m.fn_overload_body.process(&mut pass_meta, &m.fn_originals, &mut m.fns_all, &mut m.fn_overload_all, &m.type_all, &m.type_overload_all, &m.type_managed_conversion))?;
+            r.run(m.fn_overload_asynk.process(&mut pass_meta, &m.fn_originals, &mut m.fns_all, &mut m.fn_overload_all, &m.type_all, &m.type_overload_all, &m.type_managed_conversion))?;
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
             r.run(m.service_method_names.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
             r.run(m.service_method_overload.process(&mut pass_meta, &m.service_all, &m.fn_overload_all))?;
@@ -351,7 +361,9 @@ impl RustLibrary {
         o.delegates.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
         o.fns_rust.process(&mut pass_meta, &self.output_master, &m.fn_originals, &m.type_all)?;
         o.fns_overload_simple.process(&mut pass_meta, &self.output_master, &m.fn_overload_simple, &m.fns_all, &m.type_all)?;
-        o.fns_overload_body.process(&mut pass_meta, &self.output_master, &m.fn_overload_body, &m.fn_originals, &m.type_all, &m.type_overload_all)?;
+        o.fns_overload_body.process(&mut pass_meta, &self.output_master, &m.fn_overload_all, &m.fn_originals, &m.type_all, &m.type_overload_all)?;
+        o.fns_overload_asynk.process(&mut pass_meta, &self.output_master, &m.fn_overload_all, &m.fn_originals, &m.type_all, &m.type_overload_all)?;
+        o.asynk.process(&mut pass_meta, &self.output_master, &m.fn_overload_asynk, &m.type_all, &m.type_managed_conversion)?;
         o.service_body_ctors.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names)?;
         o.service_body_methods.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names, &m.fn_overload_all)?;
         o.services.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &o.service_body_ctors, &o.service_body_methods)?;

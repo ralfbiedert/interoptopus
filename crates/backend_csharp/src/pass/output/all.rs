@@ -35,10 +35,13 @@ impl Pass {
             let fns_rust = intermediary.fns_rust.imports_for(file).unwrap();
             let fns_overload_simple = intermediary.fns_overload_simple.imports_for(file).unwrap();
             let fns_overload_body = intermediary.fns_overload_body.imports_for(file).unwrap();
+            let fns_overload_asynk = intermediary.fns_overload_asynk.imports_for(file).unwrap();
+            let async_trampoline_fields = intermediary.asynk.trampoline_fields_for(file).unwrap();
             let enums = intermediary.enums.enums_for(file).unwrap();
             let composites = intermediary.composites.composites_for(file).unwrap();
             let delegates = intermediary.delegates.delegates_for(file).unwrap();
             let services = intermediary.services.services_for(file).unwrap();
+            let async_trampolines = intermediary.asynk.trampolines_for(file).unwrap();
             let util = intermediary.util.utils_for(file).unwrap();
             let using = intermediary.using.using_for(file).unwrap();
 
@@ -48,10 +51,13 @@ impl Pass {
             context.insert("fns_rust", &fns_rust);
             context.insert("fns_overload_simple", &fns_overload_simple);
             context.insert("fns_overload_body", &fns_overload_body);
+            context.insert("fns_overload_asynk", &fns_overload_asynk);
+            context.insert("async_trampoline_fields", &async_trampoline_fields);
             context.insert("enums", &enums);
             context.insert("composites", &composites);
             context.insert("delegates", &delegates);
             context.insert("services", &services);
+            context.insert("async_trampolines", &async_trampolines);
             context.insert("util", &util);
 
             let final_ = templates.render("all.cs", &context)?;

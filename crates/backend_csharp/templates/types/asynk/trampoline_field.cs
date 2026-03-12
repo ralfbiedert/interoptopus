@@ -1,0 +1,1 @@
+internal static {{ trampoline_name }} {{ trampoline_field }} = new();

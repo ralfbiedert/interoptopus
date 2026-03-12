@@ -1,10 +1,11 @@
-//! Central registry of all function overloads (simple and body).
+//! Central registry of all function overloads (simple, body, and async).
 //!
-//! Maps each original FunctionId to its overloaded FunctionIds. Both the simple
-//! and body overload passes register their results here. Downstream passes
-//! (output rendering, service methods) query this pass to discover all overloads
-//! for a given function.
+//! Maps each original FunctionId to its overloaded FunctionIds and their kind.
+//! All overload passes (simple, body, async) register their results here.
+//! Downstream passes (output rendering, service methods) query this pass to
+//! discover all overloads for a given function and filter by kind.
 
+use crate::lang::functions::overload::OverloadKind;
 use crate::lang::FunctionId;
 use crate::pass::PassInfo;
 use std::collections::HashMap;
@@ -14,21 +15,21 @@ pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    overloads: HashMap<FunctionId, Vec<FunctionId>>,
+    original_to_overload: HashMap<FunctionId, Vec<(FunctionId, OverloadKind)>>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, overloads: Default::default() }
+        Self { info: PassInfo { name: file!() }, original_to_overload: Default::default() }
     }
 
-    /// Register an overload for an original function.
-    pub fn register(&mut self, original_id: FunctionId, overload_id: FunctionId) {
-        self.overloads.entry(original_id).or_default().push(overload_id);
+    /// Register an overload for an original function with its kind.
+    pub fn register(&mut self, original_id: FunctionId, overload_id: FunctionId, kind: OverloadKind) {
+        self.original_to_overload.entry(original_id).or_default().push((overload_id, kind));
     }
 
-    /// Get all overload FunctionIds for an original function.
-    pub fn overloads_for(&self, original_id: FunctionId) -> Option<&[FunctionId]> {
-        self.overloads.get(&original_id).map(|v| v.as_slice())
+    /// Get all overload entries for an original function.
+    pub fn overloads_for(&self, original_id: FunctionId) -> Option<&[(FunctionId, OverloadKind)]> {
+        self.original_to_overload.get(&original_id).map(|v| v.as_slice())
     }
 }

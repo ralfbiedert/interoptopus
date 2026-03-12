@@ -7,6 +7,7 @@
 //! for each eligible `IntPtr` argument. Registers produced overloads into the
 //! central `overload::all` pass.
 
+use crate::lang::functions::overload::OverloadKind;
 use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::types::kind::{Pointer, PointerKind, TypeKind};
 use crate::lang::types::{ManagedConversion, OverloadFamily};
@@ -91,7 +92,7 @@ impl Pass {
             let overload_fn = Function { name: original_fn.name.clone(), signature: overload_signature };
 
             all.register(overload_id, overload_fn);
-            overload_all.register(original_id, overload_id);
+            overload_all.register(original_id, overload_id, OverloadKind::Simple);
             self.overloads.insert(overload_id);
             self.processed.insert(original_id);
             outcome.changed();

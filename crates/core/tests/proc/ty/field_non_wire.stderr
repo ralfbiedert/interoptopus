@@ -20,7 +20,3 @@ help: the trait `WireIO` is not implemented for `Bar`
              MaybeUninit<T>
            and $N others
    = help: see issue #48214
-help: add `#![feature(trivial_bounds)]` to the crate attributes to enable
-   |
- 1 + #![feature(trivial_bounds)]
-   |

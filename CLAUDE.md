@@ -10,14 +10,9 @@ Interoptopus is a polyglot bindings generator for Rust libraries. It allows you 
 
 ### Core Commands
 - `cargo build` - Build all workspace crates
-- `cargo test` - Run all tests (also generates bindings when `INTEROPTOPUS_UPDATE_BINDINGS=1`)
+- `cargo test` - Run all tests 
 - `just update-bindings` - Update generated bindings with env var set
 
-### Testing with Binding Updates
-```bash
-INTEROPTOPUS_UPDATE_BINDINGS=1 cargo test
-```
-This runs tests and regenerates bindings for all target languages.
 
 ### Working with Individual Crates
 - `cargo build -p interoptopus` - Build core crate

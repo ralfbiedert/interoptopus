@@ -383,20 +383,7 @@ impl ServiceModel {
                     _instance_invoke.spawn(move |_ctx| async move {
                         let _async_this = ::interoptopus::pattern::asynk::Async::new(_instance_inside, _ctx);
                         let _result = #service_type::#method_name(_async_this, #param_names).await;
-                        match _result {
-                            ::interoptopus::ffi::Ok(value) => {
-                                callback.call(&value);
-                            }
-                            ::interoptopus::ffi::Err(_err) => {
-                                // TODO: Handle async errors properly
-                            }
-                            ::interoptopus::ffi::Result::Panic => {
-                                // TODO: Handle async panics properly
-                            }
-                            ::interoptopus::ffi::Result::Null => {
-                                // TODO: Handle async null properly
-                            }
-                        }
+                        callback.call(&_result);
                     });
                     ::interoptopus::ffi::Ok(::std::ptr::null())
                 }
@@ -459,19 +446,8 @@ impl ServiceModel {
     fn extract_async_callback_type(&self, return_type: &ReturnType) -> TokenStream {
         match return_type {
             ReturnType::Type(_, ty) => {
-                // Try to extract T from ffi::Result<T, E>
-                if let Type::Path(path) = ty.as_ref() {
-                    if let Some(segment) = path.path.segments.last() {
-                        if segment.ident == "Result" {
-                            if let syn::PathArguments::AngleBracketed(args) = &segment.arguments {
-                                if let Some(syn::GenericArgument::Type(inner_type)) = args.args.first() {
-                                    return quote_spanned! { self.service_name.span() => #inner_type };
-                                }
-                            }
-                        }
-                    }
-                }
-                // Fallback to the whole type
+                // Use the full return type (e.g. ffi::Result<T, E>) as the callback type,
+                // so the C# trampoline can handle both Ok and Err variants.
                 quote_spanned! { self.service_name.span() => #ty }
             }
             ReturnType::Default => quote_spanned! { self.service_name.span() => () },
