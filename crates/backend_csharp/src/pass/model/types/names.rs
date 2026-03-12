@@ -92,7 +92,7 @@ impl Pass {
                     TypePattern::SliceMut(t) => format!("SliceMut{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
                     TypePattern::Vec(t) => format!("Vec{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
                     TypePattern::Option(t, _) => format!("Option{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
-                    TypePattern::AsyncCallback(t) => "AsyncCallbackCommon".to_string(),
+                    TypePattern::AsyncCallback(t) => "AsyncCallbackCommonNative".to_string(),
                     TypePattern::Result(ok, err, _) => {
                         let ok_name = rust_to_pascal(resolve_compositional_name!(self, *ok, kinds, pass_meta));
                         let err_name = rust_to_pascal(resolve_compositional_name!(self, *err, kinds, pass_meta));

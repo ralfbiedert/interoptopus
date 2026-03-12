@@ -1,6 +1,8 @@
 use interoptopus::inventory::{Inventory, RustInventory};
 use interoptopus::pattern::asynk::{Async, AsyncRuntime};
-use interoptopus::{callback, extra_type, ffi, service};
+use interoptopus::pattern::result::result_to_ffi;
+use interoptopus::rt::Tokio;
+use interoptopus::{callback, extra_type, ffi, service, AsyncRuntime};
 
 /// A simple type in our FFI layer.
 #[ffi]
@@ -55,28 +57,21 @@ impl ServiceBasic {
 }
 
 #[ffi(service)]
-pub struct ServiceBasic2 {}
+#[derive(AsyncRuntime)]
+pub struct ServiceBasic2 {
+    runtime: Tokio,
+}
 
 #[ffi]
 impl ServiceBasic2 {
     pub fn new() -> ffi::Result<Self, Error> {
-        ffi::Ok(Self {})
+        result_to_ffi(|| {
+            let runtime = Tokio::new();
+            Ok(Self { runtime })
+        })
     }
-
-    pub async fn sum(_this: Async<Self>, x: i32, y: i32) -> ffi::Result<(), Error> {
+    pub async fn sum(_this: Async<Self>, x: i32, y: i32, z: SumDelegateReturn) -> ffi::Result<(), Error> {
         ffi::Result::Ok(())
-    }
-}
-
-impl AsyncRuntime for ServiceBasic2 {
-    type T = ();
-
-    fn spawn<Fn, F>(&self, f: Fn)
-    where
-        Fn: FnOnce(Self::T) -> F,
-        F: Future<Output = ()> + Send + 'static,
-    {
-        todo!()
     }
 }
 
