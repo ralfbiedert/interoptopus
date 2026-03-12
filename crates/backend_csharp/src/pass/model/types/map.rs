@@ -1,17 +1,18 @@
 //! Creates the final Type instances from TypeKind and names.
 
 use crate::lang::types::Type;
-use crate::lang::{TypeId, Types};
+use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::try_resolve;
+use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    types: Types,
+    types: HashMap<TypeId, Type>,
 }
 
 impl Pass {

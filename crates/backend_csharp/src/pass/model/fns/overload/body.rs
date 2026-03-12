@@ -7,23 +7,17 @@
 //! The output pass for body overloads renders the wrapping/disposal logic using
 //! the per-argument transforms stored here.
 
-use crate::lang::functions::overload::{ArgTransform, RvalTransform};
+use crate::lang::functions::overload::{ArgTransform, FnTransforms, RvalTransform};
 use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::types::{DelegateKind, ManagedConversion, Pointer, PointerKind, TypeKind};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;
+use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
 
 #[derive(Default)]
 pub struct Config {}
-
-/// Per-function body overload transforms.
-#[derive(Clone, Debug)]
-pub struct FnTransforms {
-    pub rval: RvalTransform,
-    pub args: Vec<ArgTransform>,
-}
 
 pub struct Pass {
     info: PassInfo,
@@ -33,10 +27,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: file!() },
-            transforms: Default::default(),
-        }
+        Self { info: PassInfo { name: file!() }, transforms: Default::default() }
     }
 
     pub fn process(
@@ -104,16 +95,12 @@ impl Pass {
 
             all.register(overload_id, overload_fn);
             overload_all.register(original_id, overload_id);
-            self.transforms.insert(original_id, Some(FnTransforms { rval: RvalTransform::PassThrough, args: arg_transforms }));
+            self.transforms
+                .insert(original_id, Some(FnTransforms { rval: RvalTransform::PassThrough, args: arg_transforms }));
             outcome.changed();
         }
 
         Ok(outcome)
-    }
-
-    /// Returns the body overload transforms for a function, if it has one.
-    pub fn transforms(&self, id: FunctionId) -> Option<&FnTransforms> {
-        self.transforms.get(&id)?.as_ref()
     }
 
     /// Iterates over all functions that have body overloads.
@@ -124,19 +111,4 @@ impl Pass {
 
 fn is_delegate_class(ty: TypeId, type_kinds: &model::types::kind::Pass) -> bool {
     matches!(type_kinds.get(ty), Some(TypeKind::Delegate(d)) if d.kind == DelegateKind::Class)
-}
-
-fn is_eligible_intptr(ty: TypeId, type_kinds: &model::types::kind::Pass, managed_conversion: &model::types::info::managed_conversion::Pass) -> bool {
-    let Some(TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target })) = type_kinds.get(ty) else {
-        return false;
-    };
-    matches!(managed_conversion.managed_conversion(*target), Some(ManagedConversion::AsIs | ManagedConversion::To))
-}
-
-fn derive_overload_id(original_id: FunctionId, signature: &Signature) -> FunctionId {
-    let mut id = FunctionId::from_id(original_id.id().derive_id(signature.rval.id()));
-    for arg in &signature.arguments {
-        id = FunctionId::from_id(id.id().derive_id(arg.ty.id()));
-    }
-    id
 }

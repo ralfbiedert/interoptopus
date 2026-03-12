@@ -43,9 +43,7 @@ impl Pass {
 
             for (fn_id, transforms) in overload_body.iter() {
                 let Some(original_fn) = originals.get(fn_id) else { continue };
-                let rendered = render_body_overload(
-                    original_fn, transforms, type_names, type_kinds, pointer_overloads, delegate_overloads, templates,
-                )?;
+                let rendered = render_body_overload(original_fn, transforms, type_names, type_kinds, pointer_overloads, delegate_overloads, templates)?;
                 imports.push(rendered);
             }
 
@@ -64,7 +62,7 @@ impl Pass {
 
 fn render_body_overload(
     original_fn: &crate::lang::functions::Function,
-    transforms: &model::fns::overload::body::FnTransforms,
+    transforms: &crate::lang::functions::overload::FnTransforms,
     type_names: &model::types::names::Pass,
     type_kinds: &model::types::kind::Pass,
     pointer_overloads: &model::types::overload::pointer::Pass,

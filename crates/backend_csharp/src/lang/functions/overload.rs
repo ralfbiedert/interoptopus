@@ -15,3 +15,10 @@ pub enum ArgTransform {
     /// Argument is a bare C# delegate that wraps into a delegate class.
     WrapDelegate,
 }
+
+/// Per-function body overload transforms.
+#[derive(Clone, Debug)]
+pub struct FnTransforms {
+    pub rval: RvalTransform,
+    pub args: Vec<ArgTransform>,
+}

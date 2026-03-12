@@ -1,4 +1,8 @@
 //! Maps functions from Rust inventory to C# functions.
+//!
+//! This only contains original functions (the raw functions
+//! defined in the original Rust bindings in their basic form,
+//! not any overloads we produced afterwards)
 
 use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::FunctionId;
@@ -55,10 +59,7 @@ impl Pass {
                 continue;
             }
 
-            // Create the C# signature
             let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
-
-            // Create the C# function
             let cs_function = Function { name: rust_fn.name.clone(), signature: cs_signature };
 
             all.register(cs_id, cs_function.clone());

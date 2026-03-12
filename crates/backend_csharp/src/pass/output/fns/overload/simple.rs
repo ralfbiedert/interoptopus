@@ -35,7 +35,7 @@ impl Pass {
         for output in output_master.outputs_of(OutputKind::Csharp) {
             let mut imports = Vec::new();
 
-            for overload_id in overload_simple.iter_overloads() {
+            for overload_id in overload_simple.iter() {
                 let Some(function) = fn_all.get(overload_id) else { continue };
                 let name = &function.name;
                 let rval = type_names

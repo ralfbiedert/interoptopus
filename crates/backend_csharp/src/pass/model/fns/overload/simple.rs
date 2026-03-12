@@ -13,6 +13,7 @@ use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashSet;
+use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
 
 #[derive(Default)]
 pub struct Config {}
@@ -46,9 +47,11 @@ impl Pass {
             }
 
             // Check if any argument is an eligible IntPtr (pointee is AsIs or To, not a class)
-            let has_any_eligible = original_fn.signature.arguments.iter().any(|arg| {
-                is_eligible_intptr(arg.ty, type_kinds, managed_conversion)
-            });
+            let has_any_eligible = original_fn
+                .signature
+                .arguments
+                .iter()
+                .any(|arg| is_eligible_intptr(arg.ty, type_kinds, managed_conversion));
 
             if !has_any_eligible {
                 self.processed.insert(original_id);
@@ -93,30 +96,7 @@ impl Pass {
         Ok(outcome)
     }
 
-    pub fn is_overload(&self, id: FunctionId) -> bool {
-        self.overloads.contains(&id)
-    }
-
-    pub fn iter_overloads(&self) -> impl Iterator<Item = FunctionId> + '_ {
+    pub fn iter(&self) -> impl Iterator<Item = FunctionId> + '_ {
         self.overloads.iter().copied()
     }
-}
-
-fn is_eligible_intptr(
-    ty: TypeId,
-    type_kinds: &model::types::kind::Pass,
-    managed_conversion: &model::types::info::managed_conversion::Pass,
-) -> bool {
-    let Some(TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target })) = type_kinds.get(ty) else {
-        return false;
-    };
-    matches!(managed_conversion.managed_conversion(*target), Some(ManagedConversion::AsIs | ManagedConversion::To))
-}
-
-fn derive_overload_id(original_id: FunctionId, signature: &Signature) -> FunctionId {
-    let mut id = FunctionId::from_id(original_id.id().derive_id(signature.rval.id()));
-    for arg in &signature.arguments {
-        id = FunctionId::from_id(id.id().derive_id(arg.ty.id()));
-    }
-    id
 }
