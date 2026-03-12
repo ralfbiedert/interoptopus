@@ -4,7 +4,7 @@
 //! with `DelegateKind::Class`, representing the full delegate wrapper class in C#.
 
 use crate::lang::functions::{Argument, Signature};
-use crate::lang::types::{Delegate, DelegateKind, TypeKind};
+use crate::lang::types::kind::{Delegate, DelegateKind, TypeKind};
 use crate::pass::Outcome::{Changed, Unchanged};
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::{skip_mapped, try_resolve};

@@ -1,6 +1,6 @@
 //! Creates DataEnum types from computed enum variants.
 
-use crate::lang::types::{DataEnum, TypeKind};
+use crate::lang::types::kind::{DataEnum, TypeKind};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::try_resolve;

@@ -6,7 +6,8 @@
 //! guided by the per-argument transforms from the body overload model pass.
 
 use crate::lang::functions::overload::ArgTransform;
-use crate::lang::types::{OverloadFamily, Primitive, TypeKind};
+use crate::lang::types::kind::{Primitive, TypeKind};
+use crate::lang::types::OverloadFamily;
 use crate::output::{Output, OutputKind};
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::{Context, TemplateEngine};

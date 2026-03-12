@@ -1,7 +1,7 @@
 //! Pre-renders custom field conversion snippets for types whose fields need
 //! special marshalling (e.g. fixed-size arrays).
 
-use crate::lang::types::TypeKind;
+use crate::lang::types::kind::TypeKind;
 use crate::lang::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;

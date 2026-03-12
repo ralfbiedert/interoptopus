@@ -1,6 +1,6 @@
 //! Wraps enum type definitions through the `enum.cs` template, grouped per output file.
 
-use crate::lang::types::{TypeKind, TypePattern};
+use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::output::{Output, OutputKind};
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;

@@ -1,7 +1,7 @@
 //! Renders constructors, variant checks, and conversion methods for each enum
 //! using the `body_ctors.cs` template.
 
-use crate::lang::types::{TypeKind, TypePattern};
+use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::lang::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::{Context, Value};

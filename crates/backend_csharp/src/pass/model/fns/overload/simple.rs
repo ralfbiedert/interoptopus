@@ -8,7 +8,8 @@
 //! central `overload::all` pass.
 
 use crate::lang::functions::{Argument, Function, Signature};
-use crate::lang::types::{ManagedConversion, OverloadFamily, Pointer, PointerKind, TypeKind};
+use crate::lang::types::kind::{Pointer, PointerKind, TypeKind};
+use crate::lang::types::{ManagedConversion, OverloadFamily};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
 use crate::pass::Outcome::Unchanged;

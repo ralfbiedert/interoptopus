@@ -1,6 +1,6 @@
 //! Maps Rust type patterns to C# type patterns.
 
-use crate::lang::types::{TypeKind, TypePattern};
+use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};

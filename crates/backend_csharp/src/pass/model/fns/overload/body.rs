@@ -9,6 +9,7 @@
 
 use crate::lang::functions::overload::{ArgTransform, FnTransforms, RvalTransform};
 use crate::lang::functions::{Argument, Function, Signature};
+use crate::lang::types::kind::{DelegateKind, TypeKind};
 use crate::lang::types::{ManagedConversion, OverloadFamily};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};

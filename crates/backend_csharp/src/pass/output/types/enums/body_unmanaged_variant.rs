@@ -1,6 +1,6 @@
 //! Renders per-variant unmanaged struct definitions using the `enum_body_unmanaged.cs` template.
 
-use crate::lang::types::{TypeKind, TypePattern};
+use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::lang::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;

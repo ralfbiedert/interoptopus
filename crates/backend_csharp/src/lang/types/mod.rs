@@ -1,8 +1,6 @@
 pub mod csharp;
-mod kind;
+pub mod kind;
 mod overload;
-
-use crate::lang::TypeId;
 
 use crate::lang::types::kind::TypeKind;
 pub use overload::{DelegateFamily, OverloadFamily, PointerFamily};

@@ -1,6 +1,6 @@
 //! Renders delegate type definitions through the `all.cs` template, grouped per output file.
 
-use crate::lang::types::{DelegateKind, Primitive, TypeKind};
+use crate::lang::types::kind::{DelegateKind, Primitive, TypeKind};
 use crate::lang::TypeId;
 use crate::output::{Output, OutputKind};
 use crate::pass::{model, output, OutputResult, PassInfo};

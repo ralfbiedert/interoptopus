@@ -1,6 +1,6 @@
 //! ...
 
-use crate::lang::types::Variant;
+use crate::lang::types::kind::Variant;
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};

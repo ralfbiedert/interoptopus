@@ -1,6 +1,6 @@
 //! Maps Rust service types to C# service types.
 
-use crate::lang::types::TypeKind;
+use crate::lang::types::kind::TypeKind;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::{skip_mapped, try_resolve};

@@ -1,6 +1,6 @@
 //! Creates Composite types from computed struct fields and blittability.
 
-use crate::lang::types::{Composite, TypeKind};
+use crate::lang::types::kind::{Composite, TypeKind};
 use crate::pass::Outcome::{Changed, Unchanged};
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::{try_extract_kind, try_resolve};

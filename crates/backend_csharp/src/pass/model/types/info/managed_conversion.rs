@@ -8,7 +8,8 @@
 //! Compounds and enums are at least `To`. If any field/variant is `Into`, the
 //! compound/enum is also `Into`.
 
-use crate::lang::types::{DelegateKind, ManagedConversion, TypeKind};
+use crate::lang::types::kind::{DelegateKind, TypeKind};
+use crate::lang::types::ManagedConversion;
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -54,7 +55,7 @@ impl Pass {
                 },
 
                 TypeKind::TypePattern(pattern) => {
-                    use crate::lang::types::TypePattern;
+                    use crate::lang::types::kind::TypePattern;
                     match pattern {
                         // Direct mappings — no marshalling
                         TypePattern::Bool | TypePattern::CChar | TypePattern::CVoid => ManagedConversion::AsIs,

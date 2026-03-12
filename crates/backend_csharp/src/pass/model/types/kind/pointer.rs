@@ -1,6 +1,6 @@
 //! Maps Rust pointers (ReadPointer, ReadWritePointer) to C# pointers.
 
-use crate::lang::types::{IntPtrHint, Pointer, PointerKind, TypeKind};
+use crate::lang::types::kind::{IntPtrHint, Pointer, PointerKind, TypeKind};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};

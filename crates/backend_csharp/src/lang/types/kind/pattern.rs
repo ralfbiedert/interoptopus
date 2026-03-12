@@ -1,5 +1,5 @@
 use crate::lang::types::kind::DataEnum;
-use crate::lang::types::TypeId;
+use crate::lang::TypeId;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TypePattern {

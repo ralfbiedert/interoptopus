@@ -12,7 +12,7 @@ pub mod service;
 pub mod r#struct;
 pub mod struct_fields;
 
-use crate::lang::types::TypeKind;
+use crate::lang::types::kind::TypeKind;
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo};

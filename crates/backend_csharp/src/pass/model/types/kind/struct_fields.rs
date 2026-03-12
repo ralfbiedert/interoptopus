@@ -1,6 +1,7 @@
 //! ...
 
 use crate::lang::TypeId;
+use crate::lang::types::kind::Field;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::try_extract_kind;

@@ -10,7 +10,7 @@
 //! aren't mapped yet.
 
 use crate::lang::meta::Visibility;
-use crate::lang::types::{Composite, DataEnum, Field, IntPtrHint, Pointer, PointerKind, Primitive, TypeKind, Variant};
+use crate::lang::types::kind::{Composite, DataEnum, Field, IntPtrHint, Pointer, PointerKind, Primitive, TypeKind, Variant};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};

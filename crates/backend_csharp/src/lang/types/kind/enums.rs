@@ -1,4 +1,4 @@
-use crate::lang::types::TypeId;
+use crate::lang::TypeId;
 use interoptopus::lang::meta::Docs;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]

@@ -1,7 +1,7 @@
 //! ...
 
-use crate::lang::types;
-use crate::lang::types::TypeKind;
+use crate::lang::types::kind;
+use crate::lang::types::kind::TypeKind;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use crate::{skip_mapped, try_extract_kind, try_resolve};
@@ -38,21 +38,21 @@ impl Pass {
     }
 }
 
-fn map(p: Primitive) -> types::Primitive {
+fn map(p: Primitive) -> kind::Primitive {
     match p {
-        Primitive::Void => types::Primitive::Void,
-        Primitive::Bool => types::Primitive::Bool,
-        Primitive::U8 => types::Primitive::Byte,
-        Primitive::U16 => types::Primitive::UShort,
-        Primitive::U32 => types::Primitive::UInt,
-        Primitive::U64 => types::Primitive::ULong,
-        Primitive::Usize => types::Primitive::NUInt,
-        Primitive::I8 => types::Primitive::SByte,
-        Primitive::I16 => types::Primitive::Short,
-        Primitive::I32 => types::Primitive::Int,
-        Primitive::I64 => types::Primitive::Long,
-        Primitive::Isize => types::Primitive::NInt,
-        Primitive::F32 => types::Primitive::Float,
-        Primitive::F64 => types::Primitive::Double,
+        Primitive::Void => kind::Primitive::Void,
+        Primitive::Bool => kind::Primitive::Bool,
+        Primitive::U8 => kind::Primitive::Byte,
+        Primitive::U16 => kind::Primitive::UShort,
+        Primitive::U32 => kind::Primitive::UInt,
+        Primitive::U64 => kind::Primitive::ULong,
+        Primitive::Usize => kind::Primitive::NUInt,
+        Primitive::I8 => kind::Primitive::SByte,
+        Primitive::I16 => kind::Primitive::Short,
+        Primitive::I32 => kind::Primitive::Int,
+        Primitive::I64 => kind::Primitive::Long,
+        Primitive::Isize => kind::Primitive::NInt,
+        Primitive::F32 => kind::Primitive::Float,
+        Primitive::F64 => kind::Primitive::Double,
     }
 }

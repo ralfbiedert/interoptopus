@@ -9,7 +9,7 @@
 //! which already have the correct overloaded types (ref, delegate signature, etc.).
 
 use crate::lang::functions::Argument;
-use crate::lang::types::{PointerKind, Primitive, TypeKind};
+use crate::lang::types::kind::{PointerKind, Primitive, TypeKind};
 use crate::lang::ServiceId;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::{Context, Value};
