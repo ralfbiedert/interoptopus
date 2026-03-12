@@ -26,13 +26,13 @@ impl Pass {
     pub fn process(
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
-        service_map: &model::service::map::Pass,
-        fn_map: &model::fns::all::Pass,
+        services: &model::service::all::Pass,
+        fns: &model::fns::all::Pass,
         types: &model::types::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
-        for (_service_id, service) in service_map.iter() {
+        for (_service_id, service) in services.iter() {
             let Some(type_name) = types.get(service.ty).map(|t| &t.name) else { continue };
 
             let all_fns = service.ctors.iter().chain(service.methods.iter()).chain(std::iter::once(&service.destructor));
@@ -42,7 +42,7 @@ impl Pass {
                     continue;
                 }
 
-                let Some(func) = fn_map.get(fn_id) else { continue };
+                let Some(func) = fns.get(fn_id) else { continue };
 
                 let method_name = service_method_name(type_name, &func.name);
 

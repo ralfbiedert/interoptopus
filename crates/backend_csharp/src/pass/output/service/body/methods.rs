@@ -32,21 +32,23 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        service_map: &model::service::map::Pass,
-        fn_all: &model::fns::all::Pass,
+        services: &model::service::all::Pass,
+        fns: &model::fns::all::Pass,
         types: &model::types::all::Pass,
         method_names: &model::service::method::names::Pass,
         overload_all: &model::fns::overload::all::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        for (service_id, service) in service_map.iter() {
+        for (service_id, service) in services.iter() {
             let mut rendered_methods = Vec::new();
 
             for &method_fn_id in &service.methods {
-                let Some(method_fn) = fn_all.get(method_fn_id) else { continue };
+                let Some(method_fn) = fns.get(method_fn_id) else { continue };
                 let Some(method_name) = method_names.get(method_fn_id) else { continue };
-                let Some(rval) = types.get(method_fn.signature.rval).map(|t| &t.name) else { continue };
+                let Some(rval) = types.get(method_fn.signature.rval).map(|t| &t.name) else {
+                    continue;
+                };
                 let is_void = matches!(types.get(method_fn.signature.rval).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
 
                 // Base method
@@ -56,7 +58,7 @@ impl Pass {
                 // Overloads from the central registry
                 if let Some(overload_ids) = overload_all.overloads_for(method_fn_id) {
                     for &overload_id in overload_ids {
-                        let Some(overload_fn) = fn_all.get(overload_id) else { continue };
+                        let Some(overload_fn) = fns.get(overload_id) else { continue };
                         let overload_args = build_args(&overload_fn.signature.arguments[1..], types);
                         rendered_methods.push(render(templates, rval, is_void, method_name, &overload_fn.name, &overload_args)?);
                     }

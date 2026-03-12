@@ -14,7 +14,7 @@ pub struct PostModelPass<'a> {
 
 impl<'a> PostModelPass<'a> {
     pub(crate) fn from_model(m: &'a mut ModelPasses) -> Self {
-        Self { id_map: &mut m.id_maps, types: &mut m.type_all, fns: &mut m.fn_all }
+        Self { id_map: &mut m.id_maps, types: &mut m.type_all, fns: &mut m.fns_all }
     }
 }
 

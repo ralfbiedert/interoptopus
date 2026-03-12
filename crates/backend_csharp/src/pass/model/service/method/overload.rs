@@ -22,15 +22,10 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, overloaded: Default::default() }
     }
 
-    pub fn process(
-        &mut self,
-        _pass_meta: &mut crate::pass::PassMeta,
-        service_map: &model::service::map::Pass,
-        overload_all: &model::fns::overload::all::Pass,
-    ) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, services: &model::service::all::Pass, overloads: &model::fns::overload::all::Pass) -> ModelResult {
         let mut outcome = Unchanged;
 
-        for (_service_id, service) in service_map.iter() {
+        for (_service_id, service) in services.iter() {
             let all_fns = service.ctors.iter().chain(service.methods.iter());
 
             for &fn_id in all_fns {
@@ -38,7 +33,7 @@ impl Pass {
                     continue;
                 }
 
-                if overload_all.overloads_for(fn_id).is_some() {
+                if overloads.overloads_for(fn_id).is_some() {
                     self.overloaded.insert(fn_id);
                     outcome.changed();
                 }

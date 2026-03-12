@@ -22,8 +22,8 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        service_map: &model::service::map::Pass,
-        fn_map: &model::fns::all::Pass,
+        services: &model::service::all::Pass,
+        fns: &model::fns::all::Pass,
         types: &model::types::all::Pass,
         body_ctors: &output::service::body::ctors::Pass,
         body_methods: &output::service::body::methods::Pass,
@@ -33,9 +33,9 @@ impl Pass {
         for file in output_master.outputs_of(OutputKind::Csharp) {
             let mut rendered_services = Vec::new();
 
-            for (service_id, service) in service_map.iter() {
+            for (service_id, service) in services.iter() {
                 let Some(name) = types.get(service.ty).map(|t| &t.name) else { continue };
-                let Some(dtor_fn) = fn_map.get(service.destructor) else { continue };
+                let Some(dtor_fn) = fns.get(service.destructor) else { continue };
                 let ctors = body_ctors.get(*service_id).unwrap_or_default();
                 let methods = body_methods.get(*service_id).unwrap_or_default();
 
