@@ -24,7 +24,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, body_imports: HashMap::default(), async_imports: HashMap::default() }
     }
@@ -69,12 +69,12 @@ impl Pass {
         Ok(())
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn body_imports_for(&self, output: &Output) -> Option<&[String]> {
         self.body_imports.get(output).map(std::vec::Vec::as_slice)
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn async_imports_for(&self, output: &Output) -> Option<&[String]> {
         self.async_imports.get(output).map(std::vec::Vec::as_slice)
     }
@@ -131,10 +131,11 @@ fn render(
     context.insert("native_rval_is_result", &native_rval_is_result);
 
     if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval
-        && let Some(result_ty) = types.get(result_ty_id) {
-            let trampoline_field = format!("_trampoline{}", result_ty.name);
-            context.insert("trampoline_field", &trampoline_field);
-        }
+        && let Some(result_ty) = types.get(result_ty_id)
+    {
+        let trampoline_field = format!("_trampoline{}", result_ty.name);
+        context.insert("trampoline_field", &trampoline_field);
+    }
 
     templates.render("fns/overload/body.cs", &context).map_err(Into::into)
 }

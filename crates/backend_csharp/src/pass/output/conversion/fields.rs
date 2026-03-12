@@ -24,7 +24,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, custom_to_managed: HashMap::default(), custom_to_unmanaged: HashMap::default() }
     }
@@ -66,14 +66,14 @@ impl Pass {
     }
 
     /// Returns a pre-rendered custom `ToManaged` snippet for a field, if one exists.
-    #[must_use] 
+    #[must_use]
     pub fn custom_to_managed(&self, parent: TypeId, field_name: &str) -> Option<&str> {
         let key = FieldKey { parent, field_name: field_name.to_string() };
         self.custom_to_managed.get(&key).map(std::string::String::as_str)
     }
 
     /// Returns a pre-rendered custom `ToUnmanaged` snippet for a field, if one exists.
-    #[must_use] 
+    #[must_use]
     pub fn custom_to_unmanaged(&self, parent: TypeId, field_name: &str) -> Option<&str> {
         let key = FieldKey { parent, field_name: field_name.to_string() };
         self.custom_to_unmanaged.get(&key).map(std::string::String::as_str)

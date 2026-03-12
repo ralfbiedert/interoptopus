@@ -51,7 +51,7 @@ macro_rules! resolve_compositional_name {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, names: HashMap::default() }
     }
@@ -120,7 +120,7 @@ impl Pass {
         self.names.insert(ty, name);
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, ty: TypeId) -> Option<&String> {
         self.names.get(&ty)
     }

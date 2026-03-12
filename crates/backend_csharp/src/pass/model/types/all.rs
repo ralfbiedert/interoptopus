@@ -21,7 +21,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, types: HashMap::default() }
     }
@@ -53,7 +53,7 @@ impl Pass {
         self.types.insert(ty, t);
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, ty: TypeId) -> Option<&Type> {
         self.types.get(&ty)
     }

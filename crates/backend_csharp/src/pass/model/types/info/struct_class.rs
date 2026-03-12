@@ -17,7 +17,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, is_struct: HashMap::default() }
     }
@@ -46,12 +46,12 @@ impl Pass {
         Ok(outcome)
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn is_struct(&self, ty: TypeId) -> bool {
         self.is_struct.get(&ty).copied().unwrap_or(false)
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn is_class(&self, ty: TypeId) -> bool {
         !self.is_struct(ty)
     }

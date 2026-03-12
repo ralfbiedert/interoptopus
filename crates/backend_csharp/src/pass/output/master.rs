@@ -24,7 +24,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(config: Config) -> Self {
         Self { info: PassInfo { name: file!() }, config, outputs: vec![] }
     }
@@ -35,12 +35,12 @@ impl Pass {
         Ok(())
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn dispatch(&self) -> &Dispatch {
         &self.config.dispatch
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn templates(&self) -> &TemplateEngine {
         &self.config.templates
     }

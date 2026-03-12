@@ -11,7 +11,7 @@ impl Dispatch {
         Self { dispatch: Box::new(f) }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn single_file() -> Self {
         Self::custom(|x| "Interop.cs".to_string())
     }

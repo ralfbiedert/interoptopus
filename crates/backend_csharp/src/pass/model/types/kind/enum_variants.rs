@@ -17,7 +17,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, variants: HashMap::default() }
     }
@@ -70,7 +70,7 @@ impl Pass {
         Ok(outcome)
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, ty: TypeId) -> Option<&Vec<Variant>> {
         self.variants.get(&ty)
     }

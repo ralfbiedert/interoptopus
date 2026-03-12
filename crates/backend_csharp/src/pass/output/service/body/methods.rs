@@ -25,7 +25,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, body_methods: HashMap::default() }
     }
@@ -66,7 +66,8 @@ impl Pass {
                             // Render the async service method: Task<T>
                             if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval {
                                 let task_rval = types
-                                    .get(result_ty_id).map_or_else(|| "Task".to_string(), |t| resolve_task_type_from_result(&t.kind, types));
+                                    .get(result_ty_id)
+                                    .map_or_else(|| "Task".to_string(), |t| resolve_task_type_from_result(&t.kind, types));
                                 // Skip the self arg (first) for service method args
                                 let async_args = build_args(&overload_fn.signature.arguments[1..], types);
                                 rendered_methods.push(render_async(templates, &task_rval, method_name, &overload_fn.name, &async_args)?);
@@ -85,7 +86,7 @@ impl Pass {
         Ok(())
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, service_id: ServiceId) -> Option<&[String]> {
         self.body_methods.get(&service_id).map(std::vec::Vec::as_slice)
     }

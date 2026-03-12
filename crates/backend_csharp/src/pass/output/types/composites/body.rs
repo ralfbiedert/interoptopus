@@ -15,7 +15,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, composite_body: HashMap::default() }
     }
@@ -63,7 +63,7 @@ impl Pass {
         Ok(())
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
         self.composite_body.get(&type_id)
     }

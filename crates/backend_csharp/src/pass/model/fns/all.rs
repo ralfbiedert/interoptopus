@@ -13,7 +13,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { functions: HashMap::default() }
     }
@@ -22,7 +22,7 @@ impl Pass {
         self.functions.insert(id, function);
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, id: FunctionId) -> Option<&Function> {
         self.functions.get(&id)
     }

@@ -14,7 +14,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(config: Config) -> Self {
         Self { info: PassInfo { name: file!() }, dll_name: config.dll_name, api_hash: String::new() }
     }
@@ -24,22 +24,22 @@ impl Pass {
         Ok(Outcome::Unchanged)
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn dll_name(&self) -> &str {
         &self.dll_name
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn api_hash(&self) -> &str {
         &self.api_hash
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn interoptopus_crate(&self) -> &'static str {
         env!("CARGO_PKG_NAME")
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn interoptopus_version(&self) -> &'static str {
         env!("CARGO_PKG_VERSION")
     }

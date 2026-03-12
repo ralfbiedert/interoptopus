@@ -175,12 +175,12 @@ pub struct RustLibrary {
 }
 
 impl RustLibrary {
-    #[must_use] 
+    #[must_use]
     pub fn new(inventory: RustInventory) -> Self {
         Self::with_config(inventory, RustLibraryConfig::default())
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn builder(inventory: RustInventory) -> RustLibraryBuilder {
         RustLibraryBuilder::new(inventory)
     }

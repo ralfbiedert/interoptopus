@@ -24,7 +24,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, ty: HashMap::default(), fns: HashMap::default(), services: HashMap::default() }
     }
@@ -70,17 +70,17 @@ impl Pass {
         Ok(outcome)
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn ty(&self, rust_id: interoptopus::inventory::TypeId) -> Option<TypeId> {
         self.ty.get(&rust_id).copied()
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn fns(&self, rust_id: interoptopus::inventory::FunctionId) -> Option<FunctionId> {
         self.fns.get(&rust_id).copied()
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn service(&self, rust_id: interoptopus::inventory::ServiceId) -> Option<ServiceId> {
         self.services.get(&rust_id).copied()
     }

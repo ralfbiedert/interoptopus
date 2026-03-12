@@ -15,7 +15,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, composites: HashMap::default() }
     }
@@ -64,7 +64,7 @@ impl Pass {
         Ok(())
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn composites_for(&self, output: &Output) -> Option<&[String]> {
         self.composites.get(output).map(std::vec::Vec::as_slice)
     }

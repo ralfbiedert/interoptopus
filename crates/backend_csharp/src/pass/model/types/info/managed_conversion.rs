@@ -24,7 +24,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, managed_conversion: HashMap::default() }
     }
@@ -164,7 +164,7 @@ impl Pass {
         Ok(outcome)
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn managed_conversion(&self, ty: TypeId) -> Option<ManagedConversion> {
         self.managed_conversion.get(&ty).copied()
     }

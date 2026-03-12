@@ -18,7 +18,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, disposable: HashMap::default() }
     }
@@ -48,7 +48,7 @@ impl Pass {
         Ok(outcome)
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn is_disposable(&self, ty: TypeId) -> Option<bool> {
         self.disposable.get(&ty).copied()
     }

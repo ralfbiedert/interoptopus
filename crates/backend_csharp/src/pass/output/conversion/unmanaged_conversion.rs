@@ -14,7 +14,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, conversions: HashMap::default() }
     }
@@ -34,7 +34,7 @@ impl Pass {
         Ok(())
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn to_unmanaged_suffix(&self, ty: TypeId) -> &'static str {
         match self.conversions.get(&ty) {
             Some(ManagedConversion::AsIs) => "",
@@ -44,7 +44,7 @@ impl Pass {
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn to_managed_suffix(&self, ty: TypeId) -> &'static str {
         match self.conversions.get(&ty) {
             Some(ManagedConversion::AsIs) => "",
@@ -54,7 +54,7 @@ impl Pass {
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn to_unmanaged_name(&self, ty: TypeId) -> &'static str {
         match self.conversions.get(&ty) {
             Some(ManagedConversion::AsIs) => "",
@@ -64,7 +64,7 @@ impl Pass {
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn to_managed_name(&self, ty: TypeId) -> &'static str {
         match self.conversions.get(&ty) {
             Some(ManagedConversion::AsIs) => "",
@@ -74,7 +74,7 @@ impl Pass {
         }
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn as_unmanaged_suffix(&self, ty: TypeId) -> &'static str {
         match self.conversions.get(&ty) {
             Some(ManagedConversion::AsIs) => "",

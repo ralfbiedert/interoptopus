@@ -19,7 +19,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, trampoline_types: HashSet::default() }
     }
@@ -38,9 +38,10 @@ impl Pass {
             for (_, kind) in entries {
                 if let OverloadKind::Async(transforms) = kind
                     && let RvalTransform::AsyncTask(result_ty_id) = transforms.rval
-                        && self.trampoline_types.insert(result_ty_id) {
-                            outcome.changed();
-                        }
+                    && self.trampoline_types.insert(result_ty_id)
+                {
+                    outcome.changed();
+                }
             }
         }
 
@@ -48,7 +49,7 @@ impl Pass {
     }
 
     /// Returns the set of unique async Result type IDs that need trampoline classes.
-    #[must_use] 
+    #[must_use]
     pub fn trampoline_types(&self) -> &HashSet<TypeId> {
         &self.trampoline_types
     }

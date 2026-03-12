@@ -18,7 +18,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, fn_imports: HashMap::default() }
     }
@@ -75,7 +75,7 @@ impl Pass {
         Ok(())
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn imports_for(&self, output: &Output) -> Option<&[String]> {
         self.fn_imports.get(output).map(std::vec::Vec::as_slice)
     }

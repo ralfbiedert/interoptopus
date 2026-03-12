@@ -19,7 +19,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, original_to_overload: HashMap::default() }
     }
@@ -30,7 +30,7 @@ impl Pass {
     }
 
     /// Get all overload entries for an original function.
-    #[must_use] 
+    #[must_use]
     pub fn overloads_for(&self, original_id: FunctionId) -> Option<&[(FunctionId, OverloadKind)]> {
         self.original_to_overload.get(&original_id).map(std::vec::Vec::as_slice)
     }

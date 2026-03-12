@@ -18,7 +18,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { families: HashMap::default() }
     }
@@ -27,7 +27,7 @@ impl Pass {
         self.families.insert(id, family);
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, type_id: TypeId) -> Option<&OverloadFamily> {
         self.families.get(&type_id).map(std::convert::AsRef::as_ref)
     }

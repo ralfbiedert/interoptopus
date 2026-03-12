@@ -14,7 +14,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, names: HashMap::default() }
     }
@@ -40,7 +40,7 @@ impl Pass {
         Ok(())
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn name(&self, ty: TypeId) -> Option<&String> {
         self.names.get(&ty)
     }

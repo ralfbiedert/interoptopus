@@ -15,7 +15,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, body_as_unmanaged: HashMap::default() }
     }
@@ -66,7 +66,7 @@ impl Pass {
         Ok(())
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
         self.body_as_unmanaged.get(&type_id)
     }

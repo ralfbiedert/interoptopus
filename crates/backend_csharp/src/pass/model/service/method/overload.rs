@@ -18,7 +18,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, overloaded: HashSet::default() }
     }
@@ -44,7 +44,7 @@ impl Pass {
         Ok(outcome)
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn has_overload(&self, fn_id: FunctionId) -> bool {
         self.overloaded.contains(&fn_id)
     }

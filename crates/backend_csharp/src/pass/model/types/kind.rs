@@ -27,7 +27,7 @@ pub struct Pass {
 }
 
 impl Pass {
-    #[must_use] 
+    #[must_use]
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() }, kinds: HashMap::default() }
     }
@@ -44,12 +44,12 @@ impl Pass {
         self.kinds.iter()
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn contains(&self, id: &TypeId) -> bool {
         self.kinds.contains_key(id)
     }
 
-    #[must_use] 
+    #[must_use]
     pub fn get(&self, id: TypeId) -> Option<&TypeKind> {
         self.kinds.get(&id)
     }
