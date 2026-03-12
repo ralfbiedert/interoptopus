@@ -2,5 +2,5 @@
 mod common;
 
 mod model {
-    mod foo;
+    mod service_rval_result;
 }
