@@ -1,6 +1,6 @@
-use crate::pass::{model, ModelResult, Outcome, OutputResult};
-use crate::pipeline::ModelPasses;
 use crate::Error;
+use crate::pass::{ModelResult, Outcome, OutputResult, model};
+use crate::pipeline::ModelPasses;
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;

@@ -163,7 +163,7 @@
 pub use error::Error;
 
 #[cfg(feature = "derive")]
-pub use interoptopus_proc::{ffi, AsyncRuntime};
+pub use interoptopus_proc::{AsyncRuntime, ffi};
 
 mod error;
 pub mod ffi;

@@ -11,10 +11,9 @@ impl Dispatch {
         Self { dispatch: Box::new(f) }
     }
 
+    #[must_use] 
     pub fn single_file() -> Self {
-        Self::custom(|x| match x {
-            _ => "Interop.cs".to_string(),
-        })
+        Self::custom(|x| "Interop.cs".to_string())
     }
 
     pub fn classify(&mut self, item: Item) -> String {

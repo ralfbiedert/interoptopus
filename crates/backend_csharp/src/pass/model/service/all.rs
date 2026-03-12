@@ -1,9 +1,9 @@
 //! Maps services from Rust to C#.
 
-use crate::lang::service::Service;
 use crate::lang::ServiceId;
+use crate::lang::service::Service;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
 use interoptopus::inventory::Services;
 use std::collections::HashMap;
@@ -17,8 +17,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, services: Default::default() }
+        Self { info: PassInfo { name: file!() }, services: HashMap::default() }
     }
 
     pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &model::id_map::Pass, rs_services: &Services) -> ModelResult {

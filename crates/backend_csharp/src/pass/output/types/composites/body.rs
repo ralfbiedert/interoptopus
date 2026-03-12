@@ -1,8 +1,8 @@
 //! Renders composite body definitions using the `body.cs` template.
 
-use crate::lang::types::kind::TypeKind;
 use crate::lang::TypeId;
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::lang::types::kind::TypeKind;
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -15,8 +15,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, composite_body: Default::default() }
+        Self { info: PassInfo { name: file!() }, composite_body: HashMap::default() }
     }
 
     pub fn process(
@@ -43,9 +44,9 @@ impl Pass {
             let ty = *type_id;
             let struct_or_class = if struct_class.is_struct(ty) { "struct" } else { "class" };
             let is_disposable = disposable.is_disposable(*type_id).unwrap_or(false);
-            let unmanaged = composite_body_unmanaged.get(*type_id).map(|s| s.as_str()).unwrap_or("");
-            let to_unmanaged = composite_body_to_unmanaged.get(*type_id).map(|s| s.as_str()).unwrap_or("");
-            let as_unmanaged = composite_body_as_unmanaged.get(*type_id).map(|s| s.as_str()).unwrap_or("");
+            let unmanaged = composite_body_unmanaged.get(*type_id).map_or("", std::string::String::as_str);
+            let to_unmanaged = composite_body_to_unmanaged.get(*type_id).map_or("", std::string::String::as_str);
+            let as_unmanaged = composite_body_as_unmanaged.get(*type_id).map_or("", std::string::String::as_str);
 
             let mut context = Context::new();
             context.insert("name", name);
@@ -62,6 +63,7 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
         self.composite_body.get(&type_id)
     }

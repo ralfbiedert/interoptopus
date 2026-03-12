@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote_spanned;
-use syn::spanned::Spanned;
 use syn::Error;
+use syn::spanned::Spanned;
 
 use crate::types::model::{TypeData, TypeModel, VariantData};
 
@@ -22,6 +22,7 @@ impl TypeModel {
         let register_expr = self.generate_register();
 
         Ok(quote_spanned! { name.span() =>
+            #[allow(clippy::eq_op)]
             impl #impl_generics ::interoptopus::lang::types::TypeInfo for #name #ty_generics #where_clause {
                 const WIRE_SAFE: bool = #wire_safe;
                 const RAW_SAFE: bool = #raw_safe;
@@ -233,14 +234,9 @@ impl TypeModel {
                     let variant_docs = variant.docs.join("\n");
                     let kind = match &variant.data {
                         VariantData::Unit => {
-                            let value = if let Some(_discriminant) = &variant.discriminant {
-                                // For now, we'll use 0 as default - proper evaluation would need more work
-                                quote_spanned! { variant.name.span() => 0 }
-                            } else {
-                                quote_spanned! { variant.name.span() => 0 }
-                            };
+                            // For now, we use 0 as default - proper discriminant evaluation would need more work
                             quote_spanned! { variant.name.span() =>
-                                ::interoptopus::lang::types::VariantKind::Unit(#value)
+                                ::interoptopus::lang::types::VariantKind::Unit(0)
                             }
                         }
                         VariantData::Tuple(ty) => {

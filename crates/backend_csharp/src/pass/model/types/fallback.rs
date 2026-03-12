@@ -1,23 +1,23 @@
-//! Computes the C-level fallback TypeKind for each pattern type.
+//! Computes the C-level fallback `TypeKind` for each pattern type.
 //!
-//! For each Rust TypePattern, this stores the equivalent C-level TypeKind
+//! For each Rust `TypePattern`, this stores the equivalent C-level `TypeKind`
 //! (the "unrolled" representation). Struct-based patterns like Slice become
 //! Composite with ptr/len fields; enum-based patterns like Option/Result
-//! become DataEnum with their variants.
+//! become `DataEnum` with their variants.
 //!
-//! All inner type references are resolved through the id_map from Rust TypeIds
-//! to C# TypeIds, relying on the convergence loop to retry when dependencies
+//! All inner type references are resolved through the `id_map` from Rust `TypeIds`
+//! to C# `TypeIds`, relying on the convergence loop to retry when dependencies
 //! aren't mapped yet.
 
+use crate::lang::TypeId;
 use crate::lang::meta::Visibility;
 use crate::lang::types::kind::{Composite, DataEnum, Field, IntPtrHint, Pointer, PointerKind, Primitive, TypeKind, Variant};
-use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_extract_kind;
 use interoptopus::lang;
 use interoptopus::lang::meta::Docs;
-use interoptopus::lang::types::{type_id_ptr, type_id_ptr_mut, Repr, TypeInfo};
+use interoptopus::lang::types::{Repr, TypeInfo, type_id_ptr, type_id_ptr_mut};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -29,8 +29,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, fallbacks: Default::default() }
+        Self { info: PassInfo { name: file!() }, fallbacks: HashMap::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, id_map: &model::id_map::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
@@ -110,6 +111,7 @@ impl Pass {
         Ok(outcome)
     }
 
+    #[must_use] 
     pub fn get(&self, id: TypeId) -> Option<&TypeKind> {
         self.fallbacks.get(&id)
     }
@@ -130,6 +132,7 @@ fn variant(name: &str, tag: usize, ty: Option<TypeId>) -> Variant {
 /// Resolves a Rust type to an optional C# variant payload.
 /// Void types (`()`) become `Some(None)` (no payload), non-void types become
 /// `Some(Some(cs_id))`, and not-yet-mapped types return `None`.
+#[allow(clippy::option_option)]
 fn resolve_payload(rust_ty: interoptopus::inventory::TypeId, id_map: &model::id_map::Pass) -> Option<Option<TypeId>> {
     if rust_ty == <()>::id() { Some(None) } else { id_map.ty(rust_ty).map(Some) }
 }

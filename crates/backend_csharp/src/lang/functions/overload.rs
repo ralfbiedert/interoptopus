@@ -31,7 +31,7 @@ pub struct FnTransforms {
 /// Distinguishes the kind of each function overload registered in `overload::all`.
 #[derive(Clone, Debug)]
 pub enum OverloadKind {
-    /// Simple overload: IntPtr → ref. No function body needed.
+    /// Simple overload: `IntPtr` → ref. No function body needed.
     Simple,
     /// Body overload: delegate wrapping, ref args. Has a function body with
     /// try/finally for disposal.

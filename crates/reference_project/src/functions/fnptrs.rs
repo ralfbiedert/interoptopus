@@ -1,6 +1,6 @@
-use interoptopus::ffi;
 use crate::types::aliases::{FnPtrCharArray, FnPtru8u8};
 use crate::types::arrays::CharArray;
+use interoptopus::ffi;
 
 #[ffi]
 pub fn fnptr_1(callback: FnPtru8u8, x: u8) -> u8 {

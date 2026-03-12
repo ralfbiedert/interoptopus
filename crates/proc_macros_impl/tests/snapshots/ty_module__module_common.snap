@@ -6,6 +6,7 @@ expression: expand_ffi!(item)
 struct Foo {
     x: u8,
 }
+#[allow(clippy::eq_op)]
 impl ::interoptopus::lang::types::TypeInfo for Foo {
     const WIRE_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE;
     const RAW_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE;

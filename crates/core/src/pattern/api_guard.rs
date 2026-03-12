@@ -102,7 +102,7 @@ impl WireIO for ApiVersion {
     }
 
     fn read(r: &mut impl Read) -> Result<Self, SerializationError> {
-        Ok(ApiVersion { version: u64::read(r)? })
+        Ok(Self { version: u64::read(r)? })
     }
 
     fn live_size(&self) -> usize {

@@ -13,7 +13,7 @@ pub struct Config {
 
 impl Default for Config {
     fn default() -> Self {
-        Self { dispatch: Default::default(), templates: templates() }
+        Self { dispatch: Dispatch::default(), templates: templates() }
     }
 }
 
@@ -24,6 +24,7 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(config: Config) -> Self {
         Self { info: PassInfo { name: file!() }, config, outputs: vec![] }
     }
@@ -34,10 +35,12 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn dispatch(&self) -> &Dispatch {
         &self.config.dispatch
     }
 
+    #[must_use] 
     pub fn templates(&self) -> &TemplateEngine {
         &self.config.templates
     }

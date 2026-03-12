@@ -1,8 +1,8 @@
 //! Renders the `Unmanaged` struct for each composite using the `body_unmanaged.cs` template.
 
-use crate::lang::types::kind::TypeKind;
 use crate::lang::TypeId;
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::lang::types::kind::TypeKind;
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -15,8 +15,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, composite_body_unmanaged: Default::default() }
+        Self { info: PassInfo { name: file!() }, composite_body_unmanaged: HashMap::default() }
     }
 
     pub fn process(
@@ -30,11 +31,7 @@ impl Pass {
         let templates = output_master.templates();
 
         for (type_id, ty) in types.iter() {
-            let type_kind = &ty.kind;
-            let composite = match type_kind {
-                TypeKind::Composite(c) => c,
-                _ => continue,
-            };
+            let TypeKind::Composite(composite) = &ty.kind else { continue };
 
             let name = &ty.name;
 
@@ -67,6 +64,7 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
         self.composite_body_unmanaged.get(&type_id)
     }

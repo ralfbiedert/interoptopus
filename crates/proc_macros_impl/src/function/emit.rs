@@ -1,12 +1,12 @@
 use proc_macro2::TokenStream;
 use quote::quote_spanned;
 use syn::spanned::Spanned;
-use syn::{Error, ItemFn, ReturnType};
+use syn::{ItemFn, ReturnType};
 
 use crate::function::model::FunctionModel;
 
 impl FunctionModel {
-    pub fn emit_modified_function(&self, original_fn: &ItemFn) -> Result<TokenStream, Error> {
+    pub fn emit_modified_function(&self, original_fn: &ItemFn) -> TokenStream {
         let vis = &self.vis;
         let name = &self.name;
         let export_name = self.generate_export_name();
@@ -21,13 +21,13 @@ impl FunctionModel {
         };
         let where_clause = &generics.where_clause;
 
-        Ok(quote_spanned! { self.name.span() =>
+        quote_spanned! { self.name.span() =>
             #[unsafe(export_name = #export_name)]
             #vis #unsafety extern "C" fn #name #generics(#inputs) #output #where_clause #block
-        })
+        }
     }
 
-    pub fn emit_companion_struct(&self) -> Result<TokenStream, Error> {
+    pub fn emit_companion_struct(&self) -> TokenStream {
         let vis = &self.vis;
         let struct_name = &self.name;
         let generics = &self.signature.generics;
@@ -64,15 +64,15 @@ impl FunctionModel {
             }
         };
 
-        Ok(quote_spanned! { self.name.span() =>
+        quote_spanned! { self.name.span() =>
             #[allow(non_camel_case_types)]
             #vis struct #struct_name #generics #where_clause {
                 #phantom_data_field
             }
-        })
+        }
     }
 
-    pub fn emit_function_info_impl(&self) -> Result<TokenStream, Error> {
+    pub fn emit_function_info_impl(&self) -> TokenStream {
         let struct_name = &self.name;
         let export_name = self.generate_export_name();
         let generics = &self.signature.generics;
@@ -87,7 +87,7 @@ impl FunctionModel {
         let docs_tokens = self.emit_docs();
         let validation_guards = self.emit_validation_guards();
 
-        Ok(quote_spanned! { struct_name.span() =>
+        quote_spanned! { struct_name.span() =>
             #validation_guards
 
             impl #generics ::interoptopus::lang::function::FunctionInfo for #struct_name #generics #where_clause {
@@ -125,7 +125,7 @@ impl FunctionModel {
                     inventory.register_function(Self::id(), Self::function());
                 }
             }
-        })
+        }
     }
 
     fn emit_arguments(&self) -> Vec<TokenStream> {
@@ -212,7 +212,7 @@ impl FunctionModel {
     fn emit_validation_guards(&self) -> TokenStream {
         // Generate validation for each parameter with improved span attribution
         let parameter_validations = self.signature.inputs.iter().map(|param| {
-            let param_ty = self.elide_lifetimes(&param.ty);
+            let param_ty = Self::elide_lifetimes(&param.ty);
 
             // Since we've proven that syn::Error::new_spanned works perfectly for span attribution,
             // we need to implement our own check rather than relying on assert_raw_safe.
@@ -236,7 +236,7 @@ impl FunctionModel {
                 // Unit type is always RAW_SAFE, no validation needed
             },
             syn::ReturnType::Type(_, return_ty) => {
-                let elided_return_ty = self.elide_lifetimes(return_ty);
+                let elided_return_ty = Self::elide_lifetimes(return_ty);
 
                 // Use the return type token directly for proper span attribution
                 quote_spanned! {return_ty.span()=>
@@ -254,7 +254,7 @@ impl FunctionModel {
         }
     }
 
-    fn elide_lifetimes(&self, ty: &syn::Type) -> syn::Type {
+    fn elide_lifetimes(ty: &syn::Type) -> syn::Type {
         use syn::visit_mut::VisitMut;
 
         struct LifetimeElisor;

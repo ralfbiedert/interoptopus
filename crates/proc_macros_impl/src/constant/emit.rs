@@ -4,11 +4,11 @@ use quote::quote;
 use super::model::ConstantModel;
 
 impl ConstantModel {
-    pub fn emit_constant_info_impl(&self) -> syn::Result<TokenStream> {
+    pub fn emit_constant_info_impl(&self) -> TokenStream {
         let name_ident = syn::Ident::new(&self.name, proc_macro2::Span::call_site());
         let effective_name = self.effective_name();
         let ty = &self.ty;
-        let constant_value = self.constant_value_tokens()?;
+        let constant_value = self.constant_value_tokens();
         let docs_content = self.docs_content();
         let visibility = quote! { ::interoptopus::lang::meta::Visibility::Public };
         let emission = quote! { ::interoptopus::lang::meta::Emission::Common };
@@ -41,6 +41,6 @@ impl ConstantModel {
             }
         };
 
-        Ok(constant_info_impl)
+        constant_info_impl
     }
 }

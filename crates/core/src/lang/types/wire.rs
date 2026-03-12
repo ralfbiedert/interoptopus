@@ -19,7 +19,7 @@ macro_rules! bad_wire {
 
 /// Utilities for (de)serializing an instance of this type.
 ///
-/// These must be properly implemented if TypeInfo::WIRE_SAFE is true for that
+/// These must be properly implemented if `TypeInfo::WIRE_SAFE` is true for that
 /// type. Otherwise these should panic.
 pub trait WireIO {
     fn write(&self, out: &mut impl Write) -> Result<(), SerializationError>;

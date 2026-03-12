@@ -4,7 +4,7 @@ mod model;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse2, ItemConst};
+use syn::{ItemConst, parse2};
 
 use args::FfiConstantArgs;
 use model::ConstantModel;
@@ -14,14 +14,14 @@ pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     let input_const: ItemConst = parse2(input)?;
 
     // Create the model from the parsed input
-    let model = ConstantModel::from_item_const(input_const.clone(), args.clone())?;
+    let model = ConstantModel::from_item_const(input_const.clone(), args.clone());
 
     // Validate the model
-    args.validate()?;
-    model.validate()?;
+    FfiConstantArgs::validate();
+    ConstantModel::validate();
 
     // Generate the ConstantInfo implementation
-    let constant_info_impl = model.emit_constant_info_impl()?;
+    let constant_info_impl = model.emit_constant_info_impl();
 
     let result = quote! {
         #input_const

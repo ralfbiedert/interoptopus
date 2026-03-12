@@ -1,9 +1,9 @@
 //! Maps Rust arrays to C# arrays.
 
-use crate::lang::types::kind::{Array, TypeKind};
 use crate::lang::TypeId;
+use crate::lang::types::kind::{Array, TypeKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::{skip_mapped, try_extract_kind, try_resolve};
 
 #[derive(Default)]
@@ -14,6 +14,7 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() } }
     }

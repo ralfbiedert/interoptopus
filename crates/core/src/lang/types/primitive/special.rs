@@ -25,9 +25,7 @@ impl TypeInfo for () {
     }
 
     fn register(inventory: &mut impl Inventory) {
-        let type_id = Self::id();
-        let type_ = Self::ty();
-        _ = inventory.register_type(type_id, type_)
+        inventory.register_type(Self::id(), Self::ty());
     }
 }
 
@@ -46,11 +44,11 @@ impl WireIO for () {
 }
 
 impl TypeInfo for bool {
-    const WIRE_SAFE: bool = true;
-    const RAW_SAFE: bool = true;
-    const ASYNC_SAFE: bool = true;
-    const SERVICE_SAFE: bool = false;
-    const SERVICE_CTOR_SAFE: bool = false;
+    const WIRE_SAFE: Self = true;
+    const RAW_SAFE: Self = true;
+    const ASYNC_SAFE: Self = true;
+    const SERVICE_SAFE: Self = false;
+    const SERVICE_CTOR_SAFE: Self = false;
 
     fn id() -> TypeId {
         TypeId::new(0xCA37AD739D5997FE7F9E1B0B2CCBACE1)
@@ -65,15 +63,13 @@ impl TypeInfo for bool {
     }
 
     fn register(inventory: &mut impl Inventory) {
-        let type_id = Self::id();
-        let type_ = Self::ty();
-        _ = inventory.register_type(type_id, type_)
+        inventory.register_type(Self::id(), Self::ty());
     }
 }
 
 impl WireIO for bool {
     fn write(&self, w: &mut impl Write) -> Result<(), SerializationError> {
-        (*self as u8).write(w)
+        u8::from(*self).write(w)
     }
 
     fn read(r: &mut impl Read) -> Result<Self, SerializationError> {

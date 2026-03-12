@@ -1,6 +1,6 @@
 use crate::lang::functions::Signature;
-use crate::lang::types::kind::{Pointer, PointerKind, TypeKind};
 use crate::lang::types::ManagedConversion;
+use crate::lang::types::kind::{Pointer, PointerKind, TypeKind};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::model;
 

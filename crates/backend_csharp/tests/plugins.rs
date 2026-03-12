@@ -1,12 +1,12 @@
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
+use interoptopus_csharp::RustLibrary;
 use interoptopus_csharp::pass::Outcome::Unchanged;
 use interoptopus_csharp::pass::{ModelResult, OutputResult};
 use interoptopus_csharp::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
-use interoptopus_csharp::RustLibrary;
 use std::error::Error;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 #[derive(Default)]
 pub struct MyPlugin {

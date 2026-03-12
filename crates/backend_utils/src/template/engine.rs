@@ -1,5 +1,5 @@
-use crate::template::Assets;
 use crate::Error;
+use crate::template::Assets;
 use std::io::Read;
 use tera::{Context, Tera};
 
@@ -28,7 +28,7 @@ impl TemplateEngine {
     }
 
     pub fn render(&self, path: impl AsRef<str>, context: &Context) -> Result<String, Error> {
-        let rendered = self.tera.render(path.as_ref(), &context)?;
+        let rendered = self.tera.render(path.as_ref(), context)?;
         Ok(rendered)
     }
 }

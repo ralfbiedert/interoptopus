@@ -12,8 +12,8 @@ pub mod service;
 pub mod r#struct;
 pub mod struct_fields;
 
-use crate::lang::types::kind::TypeKind;
 use crate::lang::TypeId;
+use crate::lang::types::kind::TypeKind;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo};
 use std::collections::HashMap;
@@ -27,8 +27,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, kinds: Default::default() }
+        Self { info: PassInfo { name: file!() }, kinds: HashMap::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta) -> ModelResult {
@@ -43,10 +44,12 @@ impl Pass {
         self.kinds.iter()
     }
 
+    #[must_use] 
     pub fn contains(&self, id: &TypeId) -> bool {
         self.kinds.contains_key(id)
     }
 
+    #[must_use] 
     pub fn get(&self, id: TypeId) -> Option<&TypeKind> {
         self.kinds.get(&id)
     }

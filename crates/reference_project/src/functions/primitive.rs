@@ -5,7 +5,7 @@ pub fn primitive_void() {}
 
 #[ffi]
 #[allow(clippy::unused_unit)]
-pub fn primitive_void2() -> () {}
+pub fn primitive_void2() {}
 
 #[ffi]
 pub fn primitive_bool(x: bool) -> bool {

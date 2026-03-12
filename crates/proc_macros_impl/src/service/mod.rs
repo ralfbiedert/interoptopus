@@ -5,7 +5,7 @@ mod validation;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse2, ItemImpl};
+use syn::{ItemImpl, parse2};
 
 use crate::skip::is_ffi_skip_attribute;
 
@@ -23,8 +23,8 @@ pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     model.validate(&input_impl)?;
 
     // Generate FFI snippets
-    let ffi_functions = model.emit_ffi_functions()?;
-    let service_info_impl = model.emit_service_info_impl()?;
+    let ffi_functions = model.emit_ffi_functions();
+    let service_info_impl = model.emit_service_info_impl();
     let validation_blocks = model.emit_const_verification_blocks()?;
 
     // Remove skip attributes from the impl block before outputting

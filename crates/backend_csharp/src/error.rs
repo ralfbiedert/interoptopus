@@ -10,9 +10,9 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::TemplateError(e) => write!(f, "Template error: {}", e),
-            Error::PassLimit => write!(f, "Pass iteration limit reached."),
-            Error::MissingTypeName(ctx) => write!(f, "Missing type name: {}", ctx),
+            Self::TemplateError(e) => write!(f, "Template error: {e}"),
+            Self::PassLimit => write!(f, "Pass iteration limit reached."),
+            Self::MissingTypeName(ctx) => write!(f, "Missing type name: {ctx}"),
         }
     }
 }
@@ -21,6 +21,6 @@ impl std::error::Error for Error {}
 
 impl From<interoptopus_backends::Error> for Error {
     fn from(e: interoptopus_backends::Error) -> Self {
-        Error::TemplateError(e)
+        Self::TemplateError(e)
     }
 }

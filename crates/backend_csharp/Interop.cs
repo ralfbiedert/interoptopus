@@ -16,6 +16,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
@@ -562,7 +563,7 @@ namespace A {
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_basic_call")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultServiceAsyncBasicError service_async_basic_call(IntPtr instance, AsyncCallbackCommon callback);
+        public static partial ResultServiceAsyncBasicError service_async_basic_call(IntPtr instance, AsyncCallbackCommonNative callback);
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_basic_destroy")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -578,7 +579,7 @@ namespace A {
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_result_fail")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultServiceAsyncResultError service_async_result_fail(IntPtr instance, AsyncCallbackCommon callback);
+        public static partial ResultServiceAsyncResultError service_async_result_fail(IntPtr instance, AsyncCallbackCommonNative callback);
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_result_new")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -586,7 +587,7 @@ namespace A {
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_result_success")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultServiceAsyncResultError service_async_result_success(IntPtr instance, AsyncCallbackCommon callback);
+        public static partial ResultServiceAsyncResultError service_async_result_success(IntPtr instance, AsyncCallbackCommonNative callback);
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_destroy")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -598,7 +599,7 @@ namespace A {
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_sleep_return_after_ms")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultServiceAsyncSleepError service_async_sleep_return_after_ms(IntPtr instance, ulong x, ulong ms, AsyncCallbackCommon callback);
+        public static partial ResultServiceAsyncSleepError service_async_sleep_return_after_ms(IntPtr instance, ulong x, ulong ms, AsyncCallbackCommonNative callback);
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_structs_destroy")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -610,7 +611,7 @@ namespace A {
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_structs_process_struct")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultServiceAsyncStructsError service_async_structs_process_struct(IntPtr instance, NestedArray x, AsyncCallbackCommon callback);
+        public static partial ResultServiceAsyncStructsError service_async_structs_process_struct(IntPtr instance, NestedArray x, AsyncCallbackCommonNative callback);
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_destroy")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -618,15 +619,15 @@ namespace A {
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_nested_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultServiceAsyncVecStringError service_async_vec_string_handle_nested_string(IntPtr instance, Utf8String s, AsyncCallbackCommon callback);
+        public static partial ResultServiceAsyncVecStringError service_async_vec_string_handle_nested_string(IntPtr instance, Utf8String s, AsyncCallbackCommonNative callback);
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultServiceAsyncVecStringError service_async_vec_string_handle_string(IntPtr instance, Utf8String s, AsyncCallbackCommon callback);
+        public static partial ResultServiceAsyncVecStringError service_async_vec_string_handle_string(IntPtr instance, Utf8String s, AsyncCallbackCommonNative callback);
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_handle_vec_string")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static partial ResultServiceAsyncVecStringError service_async_vec_string_handle_vec_string(IntPtr instance, VecUtf8String s, AsyncCallbackCommon callback);
+        public static partial ResultServiceAsyncVecStringError service_async_vec_string_handle_vec_string(IntPtr instance, VecUtf8String s, AsyncCallbackCommonNative callback);
         
         [LibraryImport(NativeLib, EntryPoint = "service_async_vec_string_new")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -859,314 +860,259 @@ namespace A {
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe MyCallbackVoid pattern_callback_2(MyCallbackVoidDelegate callback)
         {
-    
             var callback_wrapped = new MyCallbackVoid(callback);
-    
             try
             {
                 return pattern_callback_2(callback_wrapped);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe ResultVoidError pattern_callback_7(SumDelegateReturnDelegate c1, SumDelegateReturn2Delegate c2, int x, int i, IntPtr o)
         {
-    
             var c1_wrapped = new SumDelegateReturn(c1);
-    
             var c2_wrapped = new SumDelegateReturn2(c2);
-    
             try
             {
                 return pattern_callback_7(c1_wrapped, c2_wrapped, x, i, o);
+
             }
             finally
             {
-        
                 c1_wrapped.Dispose();
-        
                 c2_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe ResultVoidError service_callbacks_callback_ffi_return(IntPtr instance, SumDelegateReturnDelegate callback)
         {
-    
             var callback_wrapped = new SumDelegateReturn(callback);
-    
             try
             {
                 return service_callbacks_callback_ffi_return(instance, callback_wrapped);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe ResultVoidError service_callbacks_callback_simple(IntPtr instance, MyCallbackDelegate callback)
         {
-    
             var callback_wrapped = new MyCallback(callback);
-    
             try
             {
                 return service_callbacks_callback_simple(instance, callback_wrapped);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe ResultVoidError service_callbacks_callback_with_slice(IntPtr instance, SumDelegateReturnDelegate callback, SliceInt input)
         {
-    
             var callback_wrapped = new SumDelegateReturn(callback);
-    
             try
             {
                 return service_callbacks_callback_with_slice(instance, callback_wrapped, input);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe Vec3f32 pattern_ffi_slice_delegate_huge(CallbackHugeVecSliceDelegate callback)
         {
-    
             var callback_wrapped = new CallbackHugeVecSlice(callback);
-    
             try
             {
                 return pattern_ffi_slice_delegate_huge(callback_wrapped);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe byte fnptr_1(FnU8U8Delegate callback, byte x)
         {
-    
             var callback_wrapped = new FnU8U8(callback);
-    
             try
             {
                 return fnptr_1(callback_wrapped, x);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe byte pattern_ffi_slice_delegate(CallbackFFISliceDelegate callback)
         {
-    
             var callback_wrapped = new CallbackFFISlice(callback);
-    
             try
             {
                 return pattern_ffi_slice_delegate(callback_wrapped);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe int pattern_callback_9(PointersDelegate x)
         {
-    
             var x_wrapped = new Pointers(x);
-    
             try
             {
                 return pattern_callback_9(x_wrapped);
+
             }
             finally
             {
-        
                 x_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe uint pattern_callback_1(MyCallbackDelegate callback, uint x)
         {
-    
             var callback_wrapped = new MyCallback(callback);
-    
             try
             {
                 return pattern_callback_1(callback_wrapped, x);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe uint pattern_callback_4(MyCallbackNamespacedDelegate callback, uint x)
         {
-    
             var callback_wrapped = new MyCallbackNamespaced(callback);
-    
             try
             {
                 return pattern_callback_4(callback_wrapped, x);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe void fnptr_2(FnCharArrayDelegate callback, CharArray x)
         {
-    
             var callback_wrapped = new FnCharArray(callback);
-    
             try
             {
                 fnptr_2(callback_wrapped, x);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe void pattern_callback_8(StringCallbackDelegate cb, NestedStringCallbackDelegate cb2, Utf8String s)
         {
-    
             var cb_wrapped = new StringCallback(cb);
-    
             var cb2_wrapped = new NestedStringCallback(cb2);
-    
             try
             {
                 pattern_callback_8(cb_wrapped, cb2_wrapped, s);
+
             }
             finally
             {
-        
                 cb_wrapped.Dispose();
-        
                 cb2_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe void pattern_ffi_slice_3(SliceMutByte slice, CallbackSliceMutDelegate callback)
         {
-    
             var callback_wrapped = new CallbackSliceMut(callback);
-    
             try
             {
                 pattern_ffi_slice_3(slice, callback_wrapped);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe void pattern_ffi_slice_6(IntPtr slice, CallbackU8Delegate callback)
         {
-    
             var callback_wrapped = new CallbackU8(callback);
-    
             try
             {
                 pattern_ffi_slice_6(slice, callback_wrapped);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe void pattern_ffi_slice_8(IntPtr slice, CallbackCharArray2Delegate callback)
         {
-    
             var callback_wrapped = new CallbackCharArray2(callback);
-    
             try
             {
                 pattern_ffi_slice_8(slice, callback_wrapped);
+
             }
             finally
             {
-        
                 callback_wrapped.Dispose();
-        
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe void service_strings_callback_string(IntPtr instance, Utf8String s, StringCallbackDelegate cb)
         {
-    
             var cb_wrapped = new StringCallback(cb);
-    
             try
             {
                 service_strings_callback_string(instance, s, cb_wrapped);
+
             }
             finally
             {
-        
                 cb_wrapped.Dispose();
-        
             }
         }
         
@@ -10344,7 +10290,7 @@ namespace A {
 
     
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultServiceAsyncBasicError Call(AsyncCallbackCommon callback)
+        public ResultServiceAsyncBasicError Call(AsyncCallbackCommonNative callback)
         {
             return Interop.service_async_basic_call(_context, callback);
         }
@@ -10378,13 +10324,13 @@ namespace A {
 
     
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultServiceAsyncResultError Success(AsyncCallbackCommon callback)
+        public ResultServiceAsyncResultError Success(AsyncCallbackCommonNative callback)
         {
             return Interop.service_async_result_success(_context, callback);
         }
     
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultServiceAsyncResultError Fail(AsyncCallbackCommon callback)
+        public ResultServiceAsyncResultError Fail(AsyncCallbackCommonNative callback)
         {
             return Interop.service_async_result_fail(_context, callback);
         }
@@ -10418,7 +10364,7 @@ namespace A {
 
     
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultServiceAsyncSleepError ReturnAfterMs(ulong x, ulong ms, AsyncCallbackCommon callback)
+        public ResultServiceAsyncSleepError ReturnAfterMs(ulong x, ulong ms, AsyncCallbackCommonNative callback)
         {
             return Interop.service_async_sleep_return_after_ms(_context, x, ms, callback);
         }
@@ -10452,7 +10398,7 @@ namespace A {
 
     
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultServiceAsyncStructsError ProcessStruct(NestedArray x, AsyncCallbackCommon callback)
+        public ResultServiceAsyncStructsError ProcessStruct(NestedArray x, AsyncCallbackCommonNative callback)
         {
             return Interop.service_async_structs_process_struct(_context, x, callback);
         }
@@ -10486,19 +10432,19 @@ namespace A {
 
     
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultServiceAsyncVecStringError HandleString(Utf8String s, AsyncCallbackCommon callback)
+        public ResultServiceAsyncVecStringError HandleString(Utf8String s, AsyncCallbackCommonNative callback)
         {
             return Interop.service_async_vec_string_handle_string(_context, s, callback);
         }
     
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultServiceAsyncVecStringError HandleVecString(VecUtf8String s, AsyncCallbackCommon callback)
+        public ResultServiceAsyncVecStringError HandleVecString(VecUtf8String s, AsyncCallbackCommonNative callback)
         {
             return Interop.service_async_vec_string_handle_vec_string(_context, s, callback);
         }
     
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public ResultServiceAsyncVecStringError HandleNestedString(Utf8String s, AsyncCallbackCommon callback)
+        public ResultServiceAsyncVecStringError HandleNestedString(Utf8String s, AsyncCallbackCommonNative callback)
         {
             return Interop.service_async_vec_string_handle_nested_string(_context, s, callback);
         }

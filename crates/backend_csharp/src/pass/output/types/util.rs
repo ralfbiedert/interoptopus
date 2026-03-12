@@ -1,7 +1,7 @@
 //! Renders utility types (exceptions, string extensions) per output file.
 
 use crate::output::{Output, OutputKind};
-use crate::pass::{output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -14,8 +14,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, utils: Default::default() }
+        Self { info: PassInfo { name: file!() }, utils: HashMap::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::master::Pass) -> OutputResult {
@@ -41,6 +42,7 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn utils_for(&self, output: &Output) -> Option<&str> {
         self.utils.get(output).map(|s| &**s)
     }

@@ -7,10 +7,10 @@
 
 use crate::lang::functions::overload::{ArgTransform, FnTransforms, OverloadKind, RvalTransform};
 use crate::lang::functions::{Argument, Function};
-use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
 use crate::lang::types::OverloadFamily;
+use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
 use crate::output::{Output, OutputKind};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::{Context, TemplateEngine, Value};
 use std::collections::HashMap;
 
@@ -24,8 +24,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, body_imports: Default::default(), async_imports: Default::default() }
+        Self { info: PassInfo { name: file!() }, body_imports: HashMap::default(), async_imports: HashMap::default() }
     }
 
     pub fn process(
@@ -68,12 +69,14 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn body_imports_for(&self, output: &Output) -> Option<&[String]> {
-        self.body_imports.get(output).map(|s| s.as_slice())
+        self.body_imports.get(output).map(std::vec::Vec::as_slice)
     }
 
+    #[must_use] 
     pub fn async_imports_for(&self, output: &Output) -> Option<&[String]> {
-        self.async_imports.get(output).map(|s| s.as_slice())
+        self.async_imports.get(output).map(std::vec::Vec::as_slice)
     }
 }
 
@@ -102,23 +105,20 @@ fn render(
 
     // Return type
     let rval = if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval {
-        let result_ty = types.get(result_ty_id)
-            .ok_or_else(|| crate::Error::MissingTypeName(format!("async result type for `{}`", name)))?;
+        let result_ty = types
+            .get(result_ty_id)
+            .ok_or_else(|| crate::Error::MissingTypeName(format!("async result type for `{name}`")))?;
         resolve_task_type(&result_ty.kind, types)
     } else {
-        types.get(original_fn.signature.rval).map(|t| t.name.clone())
-            .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of overload `{}`", name)))?
+        types
+            .get(original_fn.signature.rval)
+            .map(|t| t.name.clone())
+            .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of overload `{name}`")))?
     };
 
-    let is_void = !is_async && matches!(
-        types.get(original_fn.signature.rval).map(|t| &t.kind),
-        Some(TypeKind::Primitive(Primitive::Void))
-    );
+    let is_void = !is_async && matches!(types.get(original_fn.signature.rval).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
 
-    let native_rval_is_result = is_async && matches!(
-        types.get(original_fn.signature.rval).map(|t| &t.kind),
-        Some(TypeKind::TypePattern(TypePattern::Result(_, _, _)))
-    );
+    let native_rval_is_result = is_async && matches!(types.get(original_fn.signature.rval).map(|t| &t.kind), Some(TypeKind::TypePattern(TypePattern::Result(_, _, _))));
 
     let mut context = Context::new();
     context.insert("name", name);
@@ -130,12 +130,11 @@ fn render(
     context.insert("native_args", &native_args);
     context.insert("native_rval_is_result", &native_rval_is_result);
 
-    if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval {
-        if let Some(result_ty) = types.get(result_ty_id) {
+    if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval
+        && let Some(result_ty) = types.get(result_ty_id) {
             let trampoline_field = format!("_trampoline{}", result_ty.name);
             context.insert("trampoline_field", &trampoline_field);
         }
-    }
 
     templates.render("fns/overload/body.cs", &context).map_err(Into::into)
 }
@@ -156,31 +155,37 @@ fn resolve_args(
 
         match transform {
             ArgTransform::PassThrough => {
-                let ty_name = types.get(arg.ty).map(|t| &t.name)
+                let ty_name = types
+                    .get(arg.ty)
+                    .map(|t| &t.name)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of overload `{}`", arg.name, fn_name)))?;
                 m.insert("ty", Value::String(ty_name.clone()));
                 m.insert("is_ref", Value::String("false".into()));
                 m.insert("is_wrap", Value::String("false".into()));
             }
             ArgTransform::Ref => {
-                let family = match type_overloads.get(arg.ty) {
-                    Some(OverloadFamily::Pointer(f)) => f,
-                    _ => return Err(crate::Error::MissingTypeName(format!("pointer family for arg `{}` of overload `{}`", arg.name, fn_name))),
+                let Some(OverloadFamily::Pointer(family)) = type_overloads.get(arg.ty) else {
+                    return Err(crate::Error::MissingTypeName(format!("pointer family for arg `{}` of overload `{}`", arg.name, fn_name)));
                 };
-                let ty_name = types.get(family.by_ref).map(|t| &t.name)
+                let ty_name = types
+                    .get(family.by_ref)
+                    .map(|t| &t.name)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("ref type for arg `{}` of overload `{}`", arg.name, fn_name)))?;
                 m.insert("ty", Value::String(ty_name.clone()));
                 m.insert("is_ref", Value::String("true".into()));
                 m.insert("is_wrap", Value::String("false".into()));
             }
             ArgTransform::WrapDelegate => {
-                let family = match type_overloads.get(arg.ty) {
-                    Some(OverloadFamily::Delegate(f)) => f,
-                    _ => return Err(crate::Error::MissingTypeName(format!("delegate family for arg `{}` of overload `{}`", arg.name, fn_name))),
+                let Some(OverloadFamily::Delegate(family)) = type_overloads.get(arg.ty) else {
+                    return Err(crate::Error::MissingTypeName(format!("delegate family for arg `{}` of overload `{}`", arg.name, fn_name)));
                 };
-                let sig_name = types.get(family.signature).map(|t| &t.name)
+                let sig_name = types
+                    .get(family.signature)
+                    .map(|t| &t.name)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("delegate sig for arg `{}` of overload `{}`", arg.name, fn_name)))?;
-                let class_name = types.get(family.class).map(|t| &t.name)
+                let class_name = types
+                    .get(family.class)
+                    .map(|t| &t.name)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("delegate class for arg `{}` of overload `{}`", arg.name, fn_name)))?;
                 m.insert("ty", Value::String(sig_name.clone()));
                 m.insert("is_ref", Value::String("false".into()));
@@ -218,8 +223,8 @@ fn resolve_task_type(result_kind: &TypeKind, types: &model::types::all::Pass) ->
             if matches!(ok_kind, Some(TypeKind::Primitive(Primitive::Void))) {
                 "Task".to_string()
             } else {
-                let ok_name = types.get(*ok_ty).map(|t| t.name.clone()).unwrap_or_else(|| "void".to_string());
-                format!("Task<{}>", ok_name)
+                let ok_name = types.get(*ok_ty).map_or_else(|| "void".to_string(), |t| t.name.clone());
+                format!("Task<{ok_name}>")
             }
         }
         _ => "Task".to_string(),

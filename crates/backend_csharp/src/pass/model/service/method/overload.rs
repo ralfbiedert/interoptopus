@@ -6,7 +6,7 @@
 
 use crate::lang::FunctionId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashSet;
 
 #[derive(Default)]
@@ -18,8 +18,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, overloaded: Default::default() }
+        Self { info: PassInfo { name: file!() }, overloaded: HashSet::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, services: &model::service::all::Pass, overloads: &model::fns::overload::all::Pass) -> ModelResult {
@@ -43,6 +44,7 @@ impl Pass {
         Ok(outcome)
     }
 
+    #[must_use] 
     pub fn has_overload(&self, fn_id: FunctionId) -> bool {
         self.overloaded.contains(&fn_id)
     }

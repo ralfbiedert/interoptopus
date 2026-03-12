@@ -11,7 +11,7 @@ pub struct RustLibraryBuilder {
 
 impl RustLibraryBuilder {
     pub(crate) fn new(inventory: RustInventory) -> Self {
-        Self { inventory, ..Default::default() }
+        Self { inventory, ..Self::default() }
     }
 
     pub fn dispatch(mut self, dispatch: Dispatch) -> Self {

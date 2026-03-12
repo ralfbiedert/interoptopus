@@ -1,5 +1,5 @@
-//! Produces body and async overloads for functions with delegate, IntPtr, or
-//! AsyncCallback arguments.
+//! Produces body and async overloads for functions with delegate, `IntPtr`, or
+//! `AsyncCallback` arguments.
 //!
 //! For each original function this pass checks two conditions:
 //! - **Body**: Has delegate class args (but no async callback) → produces an overload
@@ -17,9 +17,9 @@ use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::types::kind::{DelegateKind, TypeKind, TypePattern};
 use crate::lang::types::{ManagedConversion, OverloadFamily};
 use crate::lang::{FunctionId, TypeId};
-use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
+use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashSet;
 
 #[derive(Default)]
@@ -31,8 +31,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, processed: Default::default() }
+        Self { info: PassInfo { name: file!() }, processed: HashSet::default() }
     }
 
     pub fn process(
@@ -119,10 +120,9 @@ impl Pass {
 
         Ok(outcome)
     }
-
 }
 
-/// If the last arg is `AsyncCallback<T>` where T is a Result, returns the TypeId of T.
+/// If the last arg is `AsyncCallback<T>` where T is a Result, returns the `TypeId` of T.
 fn detect_async_callback(args: &[Argument], types: &model::types::all::Pass) -> Option<TypeId> {
     let last = args.last()?;
     let ty = types.get(last.ty)?;

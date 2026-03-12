@@ -1,9 +1,9 @@
 //! Renders delegate type definitions through the `all.cs` template, grouped per output file.
 
-use crate::lang::types::kind::{DelegateKind, Primitive, TypeKind};
 use crate::lang::TypeId;
+use crate::lang::types::kind::{DelegateKind, Primitive, TypeKind};
 use crate::output::{Output, OutputKind};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -16,8 +16,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, delegates: Default::default() }
+        Self { info: PassInfo { name: file!() }, delegates: HashMap::default() }
     }
 
     pub fn process(
@@ -45,7 +46,7 @@ impl Pass {
 
                 // Determine return type info
                 let rval_kind = types.get(signature.rval).map(|t| &t.kind);
-                let rval_managed = types.get(signature.rval).map(|t| t.name.clone()).unwrap_or_else(|| "void".to_string());
+                let rval_managed = types.get(signature.rval).map_or_else(|| "void".to_string(), |t| t.name.clone());
                 let is_void = matches!(rval_kind, Some(TypeKind::Primitive(Primitive::Void)));
 
                 let rval_unmanaged = if is_void {
@@ -107,7 +108,8 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn delegates_for(&self, output: &Output) -> Option<&[String]> {
-        self.delegates.get(output).map(|s| s.as_slice())
+        self.delegates.get(output).map(std::vec::Vec::as_slice)
     }
 }

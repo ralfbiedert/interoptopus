@@ -1,4 +1,4 @@
-use syn::{parse::Parse, punctuated::Punctuated, Expr, Ident, Lit, Token};
+use syn::{Expr, Ident, Lit, Token, parse::Parse, punctuated::Punctuated};
 
 #[derive(Debug, Clone)]
 #[allow(dead_code)]
@@ -37,8 +37,8 @@ impl Parse for FfiConstantArgs {
 }
 
 impl FfiConstantArgs {
-    pub fn validate(&self) -> syn::Result<()> {
-        Ok(())
+    pub fn validate() {
+        // No validation needed currently
     }
 }
 

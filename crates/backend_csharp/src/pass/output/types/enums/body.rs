@@ -1,8 +1,8 @@
 //! Renders enum body definitions using the `enum_body.cs` template.
 
-use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::lang::TypeId;
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::lang::types::kind::{TypeKind, TypePattern};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -15,8 +15,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, enum_body: Default::default() }
+        Self { info: PassInfo { name: file!() }, enum_body: HashMap::default() }
     }
 
     pub fn process(
@@ -52,12 +53,12 @@ impl Pass {
             let is_disposable = disposable.is_disposable(*type_id).unwrap_or(false);
 
             let unmanaged_variants = enum_body_unmanaged_variant.get(*type_id).unwrap_or(&[]);
-            let unmanaged = enum_body_unmanaged.get(*type_id).map(|s| s.as_str()).unwrap_or("");
-            let to_unmanaged = enum_body_to_unmanaged.get(*type_id).map(|s| s.as_str()).unwrap_or("");
-            let as_unmanaged = enum_body_as_unmanaged.get(*type_id).map(|s| s.as_str()).unwrap_or("");
-            let ctors = enum_body_ctors.get(*type_id).map(|s| s.as_str()).unwrap_or("");
-            let exception_for_variant = enum_body_exception_for_variant.get(*type_id).map(|s| s.as_str()).unwrap_or("");
-            let to_string = enum_body_tostring.get(*type_id).map(|s| s.as_str()).unwrap_or("");
+            let unmanaged = enum_body_unmanaged.get(*type_id).map_or("", std::string::String::as_str);
+            let to_unmanaged = enum_body_to_unmanaged.get(*type_id).map_or("", std::string::String::as_str);
+            let as_unmanaged = enum_body_as_unmanaged.get(*type_id).map_or("", std::string::String::as_str);
+            let ctors = enum_body_ctors.get(*type_id).map_or("", std::string::String::as_str);
+            let exception_for_variant = enum_body_exception_for_variant.get(*type_id).map_or("", std::string::String::as_str);
+            let to_string = enum_body_tostring.get(*type_id).map_or("", std::string::String::as_str);
 
             let mut context = Context::new();
             context.insert("name", name);
@@ -78,6 +79,7 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
         self.enum_body.get(&type_id)
     }

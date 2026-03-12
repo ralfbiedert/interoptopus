@@ -1,8 +1,8 @@
-use interoptopus::inventory::{Inventory, RustInventory};
+use interoptopus::inventory::Inventory;
 use interoptopus::pattern::asynk::{Async, AsyncRuntime};
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::rt::Tokio;
-use interoptopus::{callback, extra_type, ffi, service, AsyncRuntime};
+use interoptopus::{AsyncRuntime, callback, ffi};
 
 /// A simple type in our FFI layer.
 #[ffi]
@@ -34,7 +34,7 @@ pub fn refref(input: &u32) -> &u32 {
 }
 
 #[ffi]
-pub fn delgt(x: SumDelegateReturn, input: &u32, input2: &mut u32) -> SumDelegateReturn {
+pub fn delgt(x: SumDelegateReturn, _input: &u32, _input2: &mut u32) -> SumDelegateReturn {
     x
 }
 
@@ -51,7 +51,7 @@ impl ServiceBasic {
         x + y
     }
 
-    pub fn delgt(&mut self, x: SumDelegateReturn, input: &u32, input2: &u32) -> SumDelegateReturn {
+    pub fn delgt(&mut self, x: SumDelegateReturn, _input: &u32, _input2: &u32) -> SumDelegateReturn {
         x
     }
 }
@@ -70,7 +70,7 @@ impl ServiceBasic2 {
             Ok(Self { runtime })
         })
     }
-    pub async fn sum(_this: Async<Self>, x: i32, y: i32, z: SumDelegateReturn) -> ffi::Result<(), Error> {
+    pub async fn sum(_this: Async<Self>, _x: i32, _y: i32, _z: SumDelegateReturn) -> ffi::Result<(), Error> {
         ffi::Result::Ok(())
     }
 }

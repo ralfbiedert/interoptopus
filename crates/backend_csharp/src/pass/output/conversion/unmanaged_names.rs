@@ -1,8 +1,8 @@
 //! Maps each type to its unmanaged name: plain name if `AsIs`, `Name.Unmanaged` otherwise.
 
-use crate::lang::types::ManagedConversion;
 use crate::lang::TypeId;
-use crate::pass::{model, OutputResult, PassInfo};
+use crate::lang::types::ManagedConversion;
+use crate::pass::{OutputResult, PassInfo, model};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -14,8 +14,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, names: Default::default() }
+        Self { info: PassInfo { name: file!() }, names: HashMap::default() }
     }
 
     pub fn process(
@@ -28,9 +29,9 @@ impl Pass {
             let managed_name = &ty.name;
 
             let unmanaged_name = match managed_conversion.managed_conversion(*type_id) {
-                Some(ManagedConversion::AsIs) => managed_name.to_string(),
-                Some(_) => format!("{}.Unmanaged", managed_name),
-                None => managed_name.to_string(),
+                Some(ManagedConversion::AsIs) => managed_name.clone(),
+                Some(_) => format!("{managed_name}.Unmanaged"),
+                None => managed_name.clone(),
             };
 
             self.names.insert(*type_id, unmanaged_name);
@@ -39,6 +40,7 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn name(&self, ty: TypeId) -> Option<&String> {
         self.names.get(&ty)
     }

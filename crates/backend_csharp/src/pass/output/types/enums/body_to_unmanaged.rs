@@ -1,8 +1,8 @@
 //! Renders the `ToUnmanaged`/`IntoUnmanaged` method for each enum using the `body_to_unmanaged.cs` template.
 
-use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::lang::TypeId;
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::lang::types::kind::{TypeKind, TypePattern};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -15,8 +15,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, body_to_unmanaged: Default::default() }
+        Self { info: PassInfo { name: file!() }, body_to_unmanaged: HashMap::default() }
     }
 
     pub fn process(
@@ -67,6 +68,7 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
         self.body_to_unmanaged.get(&type_id)
     }

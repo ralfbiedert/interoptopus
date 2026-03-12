@@ -3,7 +3,7 @@ use crate::types::arrays::NestedArray;
 use interoptopus::pattern::asynk::Async;
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::rt::Tokio;
-use interoptopus::{ffi, AsyncRuntime};
+use interoptopus::{AsyncRuntime, ffi};
 
 #[ffi(service)]
 #[derive(AsyncRuntime)]

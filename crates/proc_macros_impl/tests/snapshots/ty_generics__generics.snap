@@ -1,12 +1,12 @@
 ---
 source: crates/proc_macros_impl/tests/ty_generics.rs
-assertion_line: 15
 expression: expand_ffi!(item)
 ---
 #[repr(C)]
 struct Foo<T: TypeInfo> {
     t: T,
 }
+#[allow(clippy::eq_op)]
 impl<T: TypeInfo> ::interoptopus::lang::types::TypeInfo for Foo<T> {
     const WIRE_SAFE: bool = <T as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE;
     const RAW_SAFE: bool = <T as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE;

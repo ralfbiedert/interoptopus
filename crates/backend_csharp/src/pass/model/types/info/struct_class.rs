@@ -2,10 +2,10 @@
 //!
 //! Types with `ManagedConversion::AsIs` or `To` become structs; `Into` types become classes.
 
-use crate::lang::types::ManagedConversion;
 use crate::lang::TypeId;
+use crate::lang::types::ManagedConversion;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -17,8 +17,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, is_struct: Default::default() }
+        Self { info: PassInfo { name: file!() }, is_struct: HashMap::default() }
     }
 
     pub fn process(
@@ -45,10 +46,12 @@ impl Pass {
         Ok(outcome)
     }
 
+    #[must_use] 
     pub fn is_struct(&self, ty: TypeId) -> bool {
         self.is_struct.get(&ty).copied().unwrap_or(false)
     }
 
+    #[must_use] 
     pub fn is_class(&self, ty: TypeId) -> bool {
         !self.is_struct(ty)
     }

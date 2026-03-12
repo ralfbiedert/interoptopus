@@ -38,7 +38,7 @@ impl Assets {
     /// Load a file as raw bytes
     pub fn get_bytes(&self, path: impl AsRef<str>) -> Result<&[u8], Error> {
         let path = path.as_ref();
-        self.files.get(path).map(|v| v.as_slice()).ok_or_else(|| Error::AssetNotFound(path.to_string()))
+        self.files.get(path).map(std::vec::Vec::as_slice).ok_or_else(|| Error::AssetNotFound(path.to_string()))
     }
 
     /// Check if a file exists in the assets
@@ -48,7 +48,7 @@ impl Assets {
 
     /// List all asset paths
     pub fn list(&self) -> impl Iterator<Item = &str> {
-        self.files.keys().map(|s| s.as_str())
+        self.files.keys().map(String::as_str)
     }
 }
 

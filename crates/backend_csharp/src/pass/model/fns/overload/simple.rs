@@ -3,7 +3,7 @@
 //! These overloads are purely for C# signature convenience and don't require
 //! us to emit a function body — C# handles the marshalling natively.
 //!
-//! Uses the `overload::pointer` type pass to look up the `ByRef` sibling TypeId
+//! Uses the `overload::pointer` type pass to look up the `ByRef` sibling `TypeId`
 //! for each eligible `IntPtr` argument. Registers produced overloads into the
 //! central `overload::all` pass.
 
@@ -12,9 +12,9 @@ use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::types::kind::{Pointer, PointerKind, TypeKind};
 use crate::lang::types::{ManagedConversion, OverloadFamily};
 use crate::lang::{FunctionId, TypeId};
-use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
+use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashSet;
 
 #[derive(Default)]
@@ -27,8 +27,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, overloads: Default::default(), processed: Default::default() }
+        Self { info: PassInfo { name: file!() }, overloads: HashSet::default(), processed: HashSet::default() }
     }
 
     pub fn process(

@@ -2,15 +2,15 @@
 //!
 //! For every `Pointer::IntPtr(pointee, _)` that is fully resolved in the `all` pass,
 //! this pass creates two new types — `Pointer::ByRef(pointee)` and `Pointer::ByOut(pointee)` —
-//! with fresh TypeIds derived from the original. It registers them in the kind, name,
+//! with fresh `TypeIds` derived from the original. It registers them in the kind, name,
 //! and all passes, and registers the family in the overload all pass.
 
+use crate::lang::TypeId;
 use crate::lang::types::kind::{Pointer, PointerKind, TypeKind};
 use crate::lang::types::{OverloadFamily, PointerFamily, Type};
-use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
-use std::collections::HashMap;
+use crate::pass::{ModelResult, PassInfo, model};
+use std::collections::HashSet;
 use std::sync::Arc;
 
 #[derive(Default)]
@@ -18,13 +18,14 @@ pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    /// Tracks which IntPtr types we've already processed.
-    processed: HashMap<TypeId, ()>,
+    /// Tracks which `IntPtr` types we've already processed.
+    processed: HashSet<TypeId>,
 }
 
 impl Pass {
+    #[must_use]
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, processed: Default::default() }
+        Self { info: PassInfo { name: file!() }, processed: HashSet::default() }
     }
 
     pub fn process(
@@ -47,7 +48,7 @@ impl Pass {
             .collect();
 
         for (intptr_id, pointee_id) in intptr_types {
-            if self.processed.contains_key(&intptr_id) {
+            if self.processed.contains(&intptr_id) {
                 continue;
             }
 
@@ -86,7 +87,7 @@ impl Pass {
             overloads.register(by_ref_id, Arc::clone(&family));
             overloads.register(by_out_id, family);
 
-            self.processed.insert(intptr_id, ());
+            self.processed.insert(intptr_id);
             outcome.changed();
         }
 

@@ -14,9 +14,9 @@ macro_rules! try_extract_kind {
     };
 }
 
-/// Skip this loop iteration if `kinds` already has a TypeKind for this type's C# id.
+/// Skip this loop iteration if `kinds` already has a `TypeKind` for this type's C# id.
 ///
-/// Uses `id_map` to resolve the Rust TypeId to the C# TypeId.
+/// Uses `id_map` to resolve the Rust `TypeId` to the C# `TypeId`.
 ///
 /// ```ignore
 /// skip_mapped!(kinds, id_map, rust_id);

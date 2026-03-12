@@ -4,10 +4,10 @@
 //! defined in the original Rust bindings in their basic form,
 //! not any overloads we produced afterwards)
 
-use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::FunctionId;
+use crate::lang::functions::{Argument, Function, Signature};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
 use interoptopus::inventory::Functions;
 use std::collections::HashMap;
@@ -21,8 +21,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, functions: Default::default() }
+        Self { info: PassInfo { name: file!() }, functions: HashMap::default() }
     }
 
     pub fn process(
@@ -76,6 +77,7 @@ impl Pass {
         Ok(outcome)
     }
 
+    #[must_use] 
     pub fn get(&self, id: FunctionId) -> Option<&Function> {
         self.functions.get(&id)
     }

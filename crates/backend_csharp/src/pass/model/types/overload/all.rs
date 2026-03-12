@@ -1,12 +1,12 @@
 //! Container for all type overload families (pointers, delegates).
 //!
-//! Each overloaded type belongs to a family — e.g. an IntPtr type has ByRef/ByOut
+//! Each overloaded type belongs to a family — e.g. an `IntPtr` type has ByRef/ByOut
 //! siblings, a delegate class has a bare signature sibling. Individual overload
 //! passes (pointer, delegate) register their families here; downstream passes
 //! query this pass instead of the individual ones.
 
-use crate::lang::types::OverloadFamily;
 use crate::lang::TypeId;
+use crate::lang::types::OverloadFamily;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -18,15 +18,17 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { families: Default::default() }
+        Self { families: HashMap::default() }
     }
 
     pub fn register(&mut self, id: TypeId, family: Arc<OverloadFamily>) {
         self.families.insert(id, family);
     }
 
+    #[must_use] 
     pub fn get(&self, type_id: TypeId) -> Option<&OverloadFamily> {
-        self.families.get(&type_id).map(|a| a.as_ref())
+        self.families.get(&type_id).map(std::convert::AsRef::as_ref)
     }
 }

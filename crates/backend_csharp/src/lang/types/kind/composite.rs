@@ -1,5 +1,5 @@
-use crate::lang::meta::Visibility;
 use crate::lang::TypeId;
+use crate::lang::meta::Visibility;
 use interoptopus::lang::meta::Docs;
 use interoptopus::lang::types::Repr;
 

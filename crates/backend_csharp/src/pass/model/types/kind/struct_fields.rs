@@ -3,7 +3,7 @@
 use crate::lang::TypeId;
 use crate::lang::types::kind::Field;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_extract_kind;
 use interoptopus::lang;
 use std::collections::HashMap;
@@ -17,8 +17,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, fields: Default::default() }
+        Self { info: PassInfo { name: file!() }, fields: HashMap::default() }
     }
 
     pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &model::id_map::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
@@ -68,6 +69,7 @@ impl Pass {
         Ok(outcome)
     }
 
+    #[must_use] 
     pub fn get(&self, ty: TypeId) -> Option<&Vec<Field>> {
         self.fields.get(&ty)
     }

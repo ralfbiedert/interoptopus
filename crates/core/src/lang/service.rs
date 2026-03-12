@@ -17,6 +17,7 @@ pub struct Service {
 }
 
 impl Service {
+    #[must_use]
     pub fn new(ty: TypeId, ctors: Vec<FunctionId>, destructor: FunctionId, methods: Vec<FunctionId>) -> Self {
         Self { ty, ctors, destructor, methods }
     }

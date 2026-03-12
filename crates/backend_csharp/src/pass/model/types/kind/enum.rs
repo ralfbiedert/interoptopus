@@ -1,8 +1,8 @@
-//! Creates DataEnum types from computed enum variants.
+//! Creates `DataEnum` types from computed enum variants.
 
 use crate::lang::types::kind::{DataEnum, TypeKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
 use interoptopus::lang;
 
@@ -14,6 +14,7 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() } }
     }

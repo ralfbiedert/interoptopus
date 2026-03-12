@@ -1,5 +1,6 @@
 ---
 source: crates/proc_macros_impl/tests/ty_fields.rs
+assertion_line: 17
 expression: expand_ffi!(item)
 ---
 #[repr(C)]
@@ -8,6 +9,7 @@ struct Foo {
     y: String,
     z: f32,
 }
+#[allow(clippy::eq_op)]
 impl ::interoptopus::lang::types::TypeInfo for Foo {
     const WIRE_SAFE: bool = <u8 as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE
         && <String as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE

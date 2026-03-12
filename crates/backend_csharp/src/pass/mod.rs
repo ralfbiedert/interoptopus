@@ -1,5 +1,5 @@
-use crate::lang::TypeId;
 use crate::Error;
+use crate::lang::TypeId;
 use std::cmp::PartialEq;
 
 pub mod macros;
@@ -7,7 +7,7 @@ pub mod meta;
 pub mod model;
 pub mod output;
 
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Outcome {
     Unchanged,
     Changed,
@@ -15,7 +15,7 @@ pub enum Outcome {
 
 impl Outcome {
     pub fn changed(&mut self) {
-        *self = Outcome::Changed;
+        *self = Self::Changed;
     }
 }
 

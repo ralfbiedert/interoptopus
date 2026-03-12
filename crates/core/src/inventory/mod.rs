@@ -10,7 +10,7 @@ use crate::lang::types::Type;
 use std::collections::HashMap;
 
 pub use foreign::ForeignInventory;
-pub use id::{hash_str, ConstantId, FunctionId, Id, ServiceId, TypeId};
+pub use id::{ConstantId, FunctionId, Id, ServiceId, TypeId, hash_str};
 pub use rust::RustInventory;
 
 pub type Types = HashMap<TypeId, Type>;

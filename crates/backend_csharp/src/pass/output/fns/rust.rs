@@ -1,7 +1,7 @@
 //! Writes function import declarations.
 
 use crate::output::{Output, OutputKind};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -14,8 +14,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, fn_imports: Default::default() }
+        Self { info: PassInfo { name: file!() }, fn_imports: HashMap::default() }
     }
 
     pub fn process(
@@ -32,12 +33,16 @@ impl Pass {
 
             for (_id, function) in fn_maps.iter() {
                 let name = &function.name;
-                let rval = types.get(function.signature.rval).map(|t| &t.name)
-                    .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of function `{}`", name)))?;
+                let rval = types
+                    .get(function.signature.rval)
+                    .map(|t| &t.name)
+                    .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of function `{name}`")))?;
 
                 let mut args: Vec<HashMap<&str, &str>> = Vec::new();
                 for arg in &function.signature.arguments {
-                    let arg_ty = types.get(arg.ty).map(|t| &t.name)
+                    let arg_ty = types
+                        .get(arg.ty)
+                        .map(|t| &t.name)
                         .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of function `{}`", arg.name, name)))?;
                     let mut m = HashMap::new();
                     m.insert("name", arg.name.as_str());
@@ -64,7 +69,8 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn imports_for(&self, output: &Output) -> Option<&[String]> {
-        self.fn_imports.get(output).map(|s| s.as_slice())
+        self.fn_imports.get(output).map(std::vec::Vec::as_slice)
     }
 }

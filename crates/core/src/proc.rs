@@ -2,6 +2,7 @@
 ///
 /// For example, `"my_crate::module::Struct<alloc::string::String>"` becomes `"Struct<String>"`.
 /// Handles nested generics and multiple type parameters.
+#[must_use]
 pub fn strip_module_paths(full: &str) -> String {
     // Find the first top-level '<' (not nested)
     let mut depth = 0usize;

@@ -1,12 +1,12 @@
 //! Computes C# method names for service functions (constructors, methods, destructor).
 //!
 //! Given a service type name like `ServiceBasic` and a function name like
-//! `service_basic_do_something`, this pass strips the snake_case service prefix
-//! and PascalCases the remainder to produce `DoSomething`.
+//! `service_basic_do_something`, this pass strips the `snake_case` service prefix
+//! and `PascalCases` the remainder to produce `DoSomething`.
 
 use crate::lang::FunctionId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use interoptopus_backends::casing::service_method_name;
 use std::collections::HashMap;
 
@@ -19,8 +19,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, names: Default::default() }
+        Self { info: PassInfo { name: file!() }, names: HashMap::default() }
     }
 
     pub fn process(
@@ -54,7 +55,8 @@ impl Pass {
         Ok(outcome)
     }
 
+    #[must_use] 
     pub fn get(&self, fn_id: FunctionId) -> Option<&str> {
-        self.names.get(&fn_id).map(|s| s.as_str())
+        self.names.get(&fn_id).map(std::string::String::as_str)
     }
 }

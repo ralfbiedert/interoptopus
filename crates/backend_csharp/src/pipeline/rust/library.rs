@@ -1,10 +1,10 @@
+use crate::Error;
 use crate::pass::meta;
 use crate::pass::model;
 use crate::pass::output;
 use crate::pass::{OutputResult, PassMeta};
-use crate::pipeline::{loop_model_passes_until_done, RustLibraryBuilder};
+use crate::pipeline::{RustLibraryBuilder, loop_model_passes_until_done};
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
-use crate::Error;
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
@@ -175,10 +175,12 @@ pub struct RustLibrary {
 }
 
 impl RustLibrary {
+    #[must_use] 
     pub fn new(inventory: RustInventory) -> Self {
         Self::with_config(inventory, RustLibraryConfig::default())
     }
 
+    #[must_use] 
     pub fn builder(inventory: RustInventory) -> RustLibraryBuilder {
         RustLibraryBuilder::new(inventory)
     }
@@ -259,20 +261,21 @@ impl RustLibrary {
         }
     }
 
+    #[must_use]
     pub fn register_plugin(mut self, plugin: impl RustLibraryPlugin + 'static) -> Self {
         self.plugins.push(Box::new(plugin));
         self
     }
 
     fn plugin_init_pass(&mut self) {
-        for plugin in self.plugins.iter_mut() {
+        for plugin in &mut self.plugins {
             plugin.init(&mut self.inventory);
         }
     }
 
     fn plugin_post_output_pass(&mut self) -> OutputResult {
         let post_output = PostOutputPass::default();
-        for plugin in self.plugins.iter_mut() {
+        for plugin in &mut self.plugins {
             plugin.post_output(&mut self.output, post_output)?;
         }
         Ok(())
@@ -320,16 +323,16 @@ impl RustLibrary {
             r.run(m.service_method_names.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
             r.run(m.service_method_overload.process(&mut pass_meta, &m.service_all, &m.fn_overload_all))?;
 
-            for plugin in self.plugins.iter_mut() {
+            for plugin in &mut self.plugins {
                 let post_model = PostModelPass::from_model(m);
-                r.run(plugin.post_model_cycle(&mut self.inventory, post_model))?;
+                r.run(plugin.post_model_cycle(&self.inventory, post_model))?;
             }
             Ok(())
         })?;
 
         pass_meta.lost_found.print();
 
-        for plugin in self.plugins.iter_mut() {
+        for plugin in &mut self.plugins {
             let post_model = PostModelPass::from_model(m);
             plugin.post_model_all(&self.inventory, post_model)?;
         }

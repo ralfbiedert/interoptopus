@@ -48,7 +48,7 @@ where
     T: WireIO + Copy,
 {
     fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
-        for x in self.iter() {
+        for x in self {
             x.write(out)?;
         }
         Ok(())
@@ -65,6 +65,6 @@ where
     }
 
     fn live_size(&self) -> usize {
-        self.iter().map(|x| x.live_size()).sum()
+        self.iter().map(WireIO::live_size).sum()
     }
 }

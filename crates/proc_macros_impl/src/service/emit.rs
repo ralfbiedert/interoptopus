@@ -1,11 +1,11 @@
 use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote_spanned, ToTokens};
+use quote::{ToTokens, format_ident, quote_spanned};
 use syn::spanned::Spanned;
 use syn::{Error, Generics, Lifetime, ReturnType, Type};
 
 impl ServiceModel {
-    pub fn emit_ffi_functions(&self) -> Result<TokenStream, Error> {
+    pub fn emit_ffi_functions(&self) -> TokenStream {
         let mut functions = Vec::new();
 
         // Generate constructor functions
@@ -21,9 +21,9 @@ impl ServiceModel {
             functions.push(self.emit_method_function(method));
         }
 
-        Ok(quote_spanned! { self.service_name.span() =>
+        quote_spanned! { self.service_name.span() =>
             #(#functions)*
-        })
+        }
     }
 
     /// Get the base service name without any generic parameters (for const contexts)
@@ -32,22 +32,20 @@ impl ServiceModel {
     }
 
     /// Replace anonymous lifetimes ('_) with explicit lifetime parameters
-    fn replace_anonymous_lifetimes(&self, ty: &Type, method_generics: &Generics) -> Type {
+    fn replace_anonymous_lifetimes(ty: &Type, method_generics: &Generics) -> Type {
         use syn::{GenericArgument, PathArguments, Type};
 
         match ty {
             Type::Reference(type_ref) => {
                 let mut new_ref = type_ref.clone();
-                if let Some(ref lifetime) = type_ref.lifetime {
-                    // Check if it's an anonymous lifetime
-                    if lifetime.ident == "_" {
-                        // Create or find a suitable lifetime parameter
-                        let replacement_lifetime = self.get_replacement_lifetime(method_generics);
-                        new_ref.lifetime = Some(replacement_lifetime);
-                    }
+                if let Some(ref lifetime) = type_ref.lifetime
+                    && lifetime.ident == "_"
+                {
+                    let replacement_lifetime = Self::get_replacement_lifetime(method_generics);
+                    new_ref.lifetime = Some(replacement_lifetime);
                 }
                 // Recursively process the referenced type
-                new_ref.elem = Box::new(self.replace_anonymous_lifetimes(&type_ref.elem, method_generics));
+                new_ref.elem = Box::new(Self::replace_anonymous_lifetimes(&type_ref.elem, method_generics));
                 Type::Reference(new_ref)
             }
             Type::Path(type_path) => {
@@ -60,12 +58,12 @@ impl ServiceModel {
                         for arg in &mut args.args {
                             match arg {
                                 GenericArgument::Type(inner_type) => {
-                                    *inner_type = self.replace_anonymous_lifetimes(inner_type, method_generics);
+                                    *inner_type = Self::replace_anonymous_lifetimes(inner_type, method_generics);
                                 }
                                 GenericArgument::Lifetime(lifetime) => {
                                     // Replace anonymous lifetime with explicit one
                                     if lifetime.ident == "_" {
-                                        *lifetime = self.get_replacement_lifetime(method_generics);
+                                        *lifetime = Self::get_replacement_lifetime(method_generics);
                                     }
                                 }
                                 _ => {}
@@ -81,7 +79,7 @@ impl ServiceModel {
     }
 
     /// Get a suitable lifetime to replace anonymous lifetimes
-    fn get_replacement_lifetime(&self, method_generics: &Generics) -> Lifetime {
+    fn get_replacement_lifetime(method_generics: &Generics) -> Lifetime {
         use syn::parse_quote;
 
         // First, try to find an existing lifetime parameter
@@ -100,17 +98,17 @@ impl ServiceModel {
     }
 
     /// Check if a type contains anonymous lifetimes that need explicit parameters
-    fn type_contains_anonymous_lifetimes(&self, ty: &Type) -> bool {
+    fn type_contains_anonymous_lifetimes(ty: &Type) -> bool {
         use syn::{GenericArgument, PathArguments, Type};
 
         match ty {
             Type::Reference(type_ref) => {
-                if let Some(ref lifetime) = type_ref.lifetime {
-                    if lifetime.ident == "_" {
-                        return true;
-                    }
+                if let Some(ref lifetime) = type_ref.lifetime
+                    && lifetime.ident == "_"
+                {
+                    return true;
                 }
-                self.type_contains_anonymous_lifetimes(&type_ref.elem)
+                Self::type_contains_anonymous_lifetimes(&type_ref.elem)
             }
             Type::Path(type_path) => {
                 for segment in &type_path.path.segments {
@@ -118,7 +116,7 @@ impl ServiceModel {
                         for arg in &args.args {
                             match arg {
                                 GenericArgument::Type(inner_type) => {
-                                    if self.type_contains_anonymous_lifetimes(inner_type) {
+                                    if Self::type_contains_anonymous_lifetimes(inner_type) {
                                         return true;
                                     }
                                 }
@@ -139,13 +137,13 @@ impl ServiceModel {
     }
 
     /// Add a lifetime parameter to generics if needed for anonymous lifetimes
-    fn ensure_lifetime_parameter(&self, method_generics: &Generics, return_type: &syn::ReturnType) -> Generics {
-        use syn::{parse_quote, GenericParam, ReturnType};
+    fn ensure_lifetime_parameter(method_generics: &Generics, return_type: &syn::ReturnType) -> Generics {
+        use syn::{GenericParam, ReturnType, parse_quote};
 
         // Check if the return type contains anonymous lifetimes
         let needs_lifetime = match return_type {
-            ReturnType::Type(_, ty) => self.type_contains_anonymous_lifetimes(ty),
-            _ => false,
+            ReturnType::Type(_, ty) => Self::type_contains_anonymous_lifetimes(ty),
+            ReturnType::Default => false,
         };
 
         if needs_lifetime && method_generics.params.iter().all(|param| !matches!(param, GenericParam::Lifetime(_))) {
@@ -215,7 +213,7 @@ impl ServiceModel {
         };
 
         // Extract error type from the constructor's return type
-        let error_type = self.extract_error_type_from_constructor(ctor);
+        let error_type = Self::extract_error_type_from_constructor(ctor);
 
         // Use Box for non-async services, Arc for async services
         let into_raw_call = if self.is_async {
@@ -277,7 +275,6 @@ impl ServiceModel {
         let function_name = format_ident!("{}_{}", service_name_snake, method_name);
 
         let docs = self.emit_docs(&method.docs);
-        let _service_type = &self.service_type;
 
         match method.receiver_kind {
             ReceiverKind::Shared => self.emit_shared_method(method, &function_name, &docs),
@@ -301,7 +298,7 @@ impl ServiceModel {
         let param_names = self.emit_param_names(&method.inputs);
 
         // Ensure we have proper lifetime parameters and process types
-        let enhanced_generics = self.ensure_lifetime_parameter(&method.generics, &method.output);
+        let enhanced_generics = Self::ensure_lifetime_parameter(&method.generics, &method.output);
         let return_type = self.emit_return_type_processed(&method.output, &enhanced_generics);
         let where_clause = &enhanced_generics.where_clause;
 
@@ -324,7 +321,7 @@ impl ServiceModel {
         let param_names = self.emit_param_names(&method.inputs);
 
         // Ensure we have proper lifetime parameters and process types
-        let enhanced_generics = self.ensure_lifetime_parameter(&method.generics, &method.output);
+        let enhanced_generics = Self::ensure_lifetime_parameter(&method.generics, &method.output);
         let return_type = self.emit_return_type_processed(&method.output, &enhanced_generics);
         let where_clause = &enhanced_generics.where_clause;
 
@@ -347,7 +344,7 @@ impl ServiceModel {
         let param_names = self.emit_param_names(&method.inputs);
 
         // Ensure we have proper lifetime parameters
-        let enhanced_generics = self.ensure_lifetime_parameter(&method.generics, &method.output);
+        let enhanced_generics = Self::ensure_lifetime_parameter(&method.generics, &method.output);
         let where_clause = &enhanced_generics.where_clause;
 
         // Extract the inner type from ffi::Result<T, E>
@@ -424,7 +421,7 @@ impl ServiceModel {
             ReturnType::Default => quote_spanned! { self.service_name.span() => },
             ReturnType::Type(arrow, ty) => {
                 let service_ty = &self.replace_self_with_service_type(ty);
-                let processed_ty = self.replace_anonymous_lifetimes(service_ty, method_generics);
+                let processed_ty = Self::replace_anonymous_lifetimes(service_ty, method_generics);
                 quote_spanned! { self.service_name.span() => #arrow #processed_ty }
             }
         }
@@ -454,22 +451,18 @@ impl ServiceModel {
         }
     }
 
-    fn extract_error_type_from_constructor(&self, ctor: &ServiceMethod) -> TokenStream {
+    fn extract_error_type_from_constructor(ctor: &ServiceMethod) -> TokenStream {
         match &ctor.output {
             ReturnType::Type(_, ty) => {
                 // Try to extract E from ffi::Result<T, E>
-                if let Type::Path(path) = ty.as_ref() {
-                    if let Some(segment) = path.path.segments.last() {
-                        if segment.ident == "Result" {
-                            if let syn::PathArguments::AngleBracketed(args) = &segment.arguments {
-                                if let Some(syn::GenericArgument::Type(_)) = args.args.first() {
-                                    if let Some(syn::GenericArgument::Type(error_type)) = args.args.iter().nth(1) {
-                                        return quote_spanned! { ctor.name.span() => #error_type };
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if let Type::Path(path) = ty.as_ref()
+                    && let Some(segment) = path.path.segments.last()
+                    && segment.ident == "Result"
+                    && let syn::PathArguments::AngleBracketed(args) = &segment.arguments
+                    && let Some(syn::GenericArgument::Type(_)) = args.args.first()
+                    && let Some(syn::GenericArgument::Type(error_type)) = args.args.iter().nth(1)
+                {
+                    return quote_spanned! { ctor.name.span() => #error_type };
                 }
                 // Fallback - if we can't extract it, just use the Error type that should be in scope
                 quote_spanned! { ctor.name.span() => Error }
@@ -478,8 +471,7 @@ impl ServiceModel {
         }
     }
 
-    pub fn emit_service_info_impl(&self) -> Result<TokenStream, Error> {
-        let _service_name = &self.service_name;
+    pub fn emit_service_info_impl(&self) -> TokenStream {
         let service_type = &self.service_type;
         let service_name_snake = self.service_name_snake_case();
         let generics = &self.generics;
@@ -492,7 +484,7 @@ impl ServiceModel {
 
         let destructor_name = format_ident!("{}_destroy", service_name_snake);
 
-        Ok(quote_spanned! { self.service_name.span() =>
+        quote_spanned! { self.service_name.span() =>
             impl #generics ::interoptopus::lang::service::ServiceInfo for #service_type {
                 fn id() -> ::interoptopus::inventory::ServiceId {
                     ::interoptopus::inventory::ServiceId::from_id(::interoptopus::id!(#service_type))
@@ -532,7 +524,7 @@ impl ServiceModel {
                     inventory.register_service(Self::id(), Self::service());
                 }
             }
-        })
+        }
     }
 
     pub fn emit_const_verification_blocks(&self) -> Result<TokenStream, Error> {
@@ -562,7 +554,7 @@ impl ServiceModel {
                     })
                 }
                 ReturnType::Default => {
-                    return Err(Error::new_spanned(ctor.name.to_token_stream(), "This method looks like a constructor, but it does not return ffi::Result<Self, _>"));
+                    Err(Error::new_spanned(ctor.name.to_token_stream(), "This method looks like a constructor, but it does not return ffi::Result<Self, _>"))
                 }
             })
             .collect::<Result<Vec<_>, Error>>()?;

@@ -1,7 +1,7 @@
 //! Renders constructor methods for each service using the `service/body_ctors.cs` template.
 
 use crate::lang::ServiceId;
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -14,8 +14,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, body_ctors: Default::default() }
+        Self { info: PassInfo { name: file!() }, body_ctors: HashMap::default() }
     }
 
     pub fn process(
@@ -65,7 +66,8 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn get(&self, service_id: ServiceId) -> Option<&[String]> {
-        self.body_ctors.get(&service_id).map(|v| v.as_slice())
+        self.body_ctors.get(&service_id).map(std::vec::Vec::as_slice)
     }
 }

@@ -71,7 +71,7 @@ impl FunctionModel {
                         pat_ident.ident.clone()
                     } else {
                         // Generate a synthetic name for non-identifier patterns (like `_`)
-                        syn::Ident::new(&format!("_{}", index), typed_arg.pat.span())
+                        syn::Ident::new(&format!("_{index}"), typed_arg.pat.span())
                     };
                     inputs.push(FunctionParameter { name: param_name, ty: (*typed_arg.ty).clone() });
                 }
@@ -123,22 +123,18 @@ impl FunctionModel {
 
                     // Hash the parameter types to differentiate between different instantiations
                     for param in &self.signature.inputs {
-                        // Convert the type to a string for hashing
-                        let type_str = param.ty.to_token_stream().to_string();
-                        type_str.hash(&mut hasher);
+                        param.ty.to_token_stream().to_string().hash(&mut hasher);
                     }
 
                     // Hash the return type
-                    let return_type_str = match &self.signature.output {
-                        syn::ReturnType::Default => "()".to_string(),
-                        syn::ReturnType::Type(_, ty) => ty.to_token_stream().to_string(),
-                    };
-                    return_type_str.hash(&mut hasher);
+                    match &self.signature.output {
+                        syn::ReturnType::Default => "()".hash(&mut hasher),
+                        syn::ReturnType::Type(_, ty) => ty.to_token_stream().to_string().hash(&mut hasher),
+                    }
 
                     // Hash generic parameters if any
                     for param in &self.signature.generics.params {
-                        let param_str = param.to_token_stream().to_string();
-                        param_str.hash(&mut hasher);
+                        param.to_token_stream().to_string().hash(&mut hasher);
                     }
 
                     hasher.finish()

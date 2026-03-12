@@ -1,8 +1,8 @@
 //! Renders composite type definitions using the `definition.cs` template.
 
-use crate::lang::types::kind::TypeKind;
 use crate::lang::TypeId;
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::lang::types::kind::TypeKind;
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -15,8 +15,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, composite_ty: Default::default() }
+        Self { info: PassInfo { name: file!() }, composite_ty: HashMap::default() }
     }
 
     pub fn process(
@@ -30,11 +31,7 @@ impl Pass {
         let templates = output_master.templates();
 
         for (type_id, ty) in types.iter() {
-            let type_kind = &ty.kind;
-            let composite = match type_kind {
-                TypeKind::Composite(c) => c,
-                _ => continue,
-            };
+            let TypeKind::Composite(composite) = &ty.kind else { continue };
 
             let name = &ty.name;
             let ty = *type_id;
@@ -46,7 +43,7 @@ impl Pass {
                 .filter_map(|f| {
                     let unmanaged_name = unmanaged_names.name(f.ty)?;
                     let mut m = HashMap::new();
-                    m.insert("name", f.name.to_string());
+                    m.insert("name", f.name.clone());
                     m.insert("unmanaged_name", unmanaged_name.clone());
                     Some(m)
                 })
@@ -64,6 +61,7 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
         self.composite_ty.get(&type_id)
     }

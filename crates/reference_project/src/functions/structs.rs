@@ -1,7 +1,7 @@
-use interoptopus::ffi;
 use crate::patterns::result::Error;
 use crate::types::basic::{Tupled, Vec3f32};
 use crate::types::bool::BoolField;
+use interoptopus::ffi;
 use interoptopus::pattern::result::Result;
 
 #[ffi]

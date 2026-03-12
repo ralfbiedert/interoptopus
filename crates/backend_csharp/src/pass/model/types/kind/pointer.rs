@@ -1,9 +1,9 @@
-//! Maps Rust pointers (ReadPointer, ReadWritePointer) to C# pointers.
+//! Maps Rust pointers (`ReadPointer`, `ReadWritePointer`) to C# pointers.
 
-use crate::lang::types::kind::{IntPtrHint, Pointer, PointerKind, TypeKind};
 use crate::lang::TypeId;
+use crate::lang::types::kind::{IntPtrHint, Pointer, PointerKind, TypeKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::{skip_mapped, try_resolve};
 use interoptopus::lang;
 
@@ -15,6 +15,7 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() } }
     }

@@ -2,7 +2,7 @@
 
 use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::output::{Output, OutputKind};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -15,8 +15,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, enums: Default::default() }
+        Self { info: PassInfo { name: file!() }, enums: HashMap::default() }
     }
 
     pub fn process(
@@ -65,7 +66,8 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn enums_for(&self, output: &Output) -> Option<&[String]> {
-        self.enums.get(output).map(|s| s.as_slice())
+        self.enums.get(output).map(std::vec::Vec::as_slice)
     }
 }

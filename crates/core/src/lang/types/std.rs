@@ -1,8 +1,8 @@
 use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, Visibility};
-use crate::lang::types::wire::WireIO;
 use crate::lang::types::SerializationError;
+use crate::lang::types::wire::WireIO;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
 use std::collections::HashMap;
 use std::io::{Read, Write};
@@ -71,6 +71,7 @@ impl_ptr!(Option<&'_ T>, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01
 ///
 /// This uses the same derive constant as [`impl_ptr!`] for `*const T`, `&T`,
 /// and `Option<&T>`, so the result matches `<*const T>::id()` for concrete types.
+#[must_use]
 pub fn type_id_ptr(x: TypeId) -> TypeId {
     x.derive(0x20973BD3D67EF4E0323195B99A01FD5E)
 }
@@ -79,6 +80,7 @@ pub fn type_id_ptr(x: TypeId) -> TypeId {
 ///
 /// This uses the same derive constant as [`impl_ptr!`] for `*mut T`, `&mut T`,
 /// and `NonNull<T>`, so the result matches `<*mut T>::id()` for concrete types.
+#[must_use]
 pub fn type_id_ptr_mut(x: TypeId) -> TypeId {
     x.derive(0x7EE1DB481C7FEAD63EB329E9812A2F68)
 }
@@ -157,7 +159,7 @@ impl WireIO for String {
     }
 
     fn live_size(&self) -> usize {
-        4 + self.as_bytes().len()
+        4 + self.len()
     }
 }
 

@@ -16,7 +16,7 @@ mod types;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse2, Item};
+use syn::{Item, parse2};
 
 #[must_use]
 pub fn ffi(attr: TokenStream, item: TokenStream) -> TokenStream {

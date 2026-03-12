@@ -1,9 +1,9 @@
-//! Builds a map of C# TypeId to proper C# type names.
+//! Builds a map of C# `TypeId` to proper C# type names.
 
-use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
 use crate::lang::TypeId;
+use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
 use interoptopus_backends::casing::{rust_to_pascal, sanitize_delegate_name, sanitize_rust_name};
 use std::collections::HashMap;
@@ -51,8 +51,9 @@ macro_rules! resolve_compositional_name {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, names: Default::default() }
+        Self { info: PassInfo { name: file!() }, names: HashMap::default() }
     }
 
     pub fn process(
@@ -75,7 +76,7 @@ impl Pass {
             let cs_kind = try_resolve!(kinds.get(cs_id), pass_meta, self.info, crate::pass::MissingItem::CsType(cs_id));
 
             let cs_name = match cs_kind {
-                TypeKind::Primitive(p) => primitive_name(p).to_string(),
+                TypeKind::Primitive(p) => primitive_name(*p).to_string(),
                 TypeKind::Pointer(_) => "IntPtr".to_string(),
                 TypeKind::Array(a) => {
                     let element = resolve_name!(self, a.ty, pass_meta);
@@ -96,7 +97,7 @@ impl Pass {
                     TypePattern::Result(ok, err, _) => {
                         let ok_name = rust_to_pascal(resolve_compositional_name!(self, *ok, kinds, pass_meta));
                         let err_name = rust_to_pascal(resolve_compositional_name!(self, *err, kinds, pass_meta));
-                        format!("Result{}{}", ok_name, err_name)
+                        format!("Result{ok_name}{err_name}")
                     }
                 },
                 TypeKind::Delegate(_) => match &ty.kind {
@@ -115,17 +116,17 @@ impl Pass {
         Ok(outcome)
     }
 
-
     pub fn set(&mut self, ty: TypeId, name: String) {
         self.names.insert(ty, name);
     }
 
+    #[must_use] 
     pub fn get(&self, ty: TypeId) -> Option<&String> {
         self.names.get(&ty)
     }
 }
 
-fn primitive_name(p: &Primitive) -> &'static str {
+fn primitive_name(p: Primitive) -> &'static str {
     match p {
         Primitive::Void => "void",
         Primitive::Bool => "bool",

@@ -1,6 +1,6 @@
-use interoptopus::ffi;
 use crate::types::generic::{Generic, Generic2, Generic3, Generic4, Weird1, Weird2};
 use crate::types::meta::Phantom;
+use interoptopus::ffi;
 
 #[ffi]
 pub fn generic_1a(x: Generic<u32>, _y: Phantom<u8>) -> u32 {

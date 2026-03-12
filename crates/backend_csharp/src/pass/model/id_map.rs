@@ -1,8 +1,8 @@
-//! Introduces C# TypeIDs and converts a Rust `TypeId` into a C# one.
+//! Introduces C# `TypeIDs` and converts a Rust `TypeId` into a C# one.
 //!
-//! Populates all type and function id mappings upfront. The C# TypeId is
+//! Populates all type and function id mappings upfront. The C# `TypeId` is
 //! always `TypeId::from_id(rust_id.id())`, except for two special pattern
-//! types (CStrPointer, Utf8String) which have predefined C# TypeIds.
+//! types (`CStrPointer`, `Utf8String`) which have predefined C# `TypeIds`.
 
 use crate::lang::types::csharp;
 use crate::lang::{FunctionId, ServiceId, TypeId};
@@ -24,8 +24,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, ty: Default::default(), fns: Default::default(), services: Default::default() }
+        Self { info: PassInfo { name: file!() }, ty: HashMap::default(), fns: HashMap::default(), services: HashMap::default() }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, rs_types: &Types, rs_functions: &Functions, rs_services: &Services) -> ModelResult {
@@ -46,7 +47,7 @@ impl Pass {
             outcome.changed();
         }
 
-        for (rust_id, _) in rs_functions {
+        for rust_id in rs_functions.keys() {
             if self.fns.contains_key(rust_id) {
                 continue;
             }
@@ -56,7 +57,7 @@ impl Pass {
             outcome.changed();
         }
 
-        for (rust_id, _) in rs_services {
+        for rust_id in rs_services.keys() {
             if self.services.contains_key(rust_id) {
                 continue;
             }
@@ -69,14 +70,17 @@ impl Pass {
         Ok(outcome)
     }
 
+    #[must_use] 
     pub fn ty(&self, rust_id: interoptopus::inventory::TypeId) -> Option<TypeId> {
         self.ty.get(&rust_id).copied()
     }
 
+    #[must_use] 
     pub fn fns(&self, rust_id: interoptopus::inventory::FunctionId) -> Option<FunctionId> {
         self.fns.get(&rust_id).copied()
     }
 
+    #[must_use] 
     pub fn service(&self, rust_id: interoptopus::inventory::ServiceId) -> Option<ServiceId> {
         self.services.get(&rust_id).copied()
     }

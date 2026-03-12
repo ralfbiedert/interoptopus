@@ -8,14 +8,16 @@ pub struct Multibuf {
 }
 
 impl Multibuf {
-    pub fn new() -> Multibuf {
-        Default::default()
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
     }
 
     pub fn add_buffer(&mut self, name: impl AsRef<str>, value: String) {
         self.buffers.insert(name.as_ref().to_string(), value);
     }
 
+    #[must_use]
     pub fn buffer(&self, name: &str) -> Option<&String> {
         self.buffers.get(name)
     }
@@ -29,7 +31,7 @@ impl Multibuf {
         let content = self
             .buffers
             .get(name)
-            .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, format!("buffer '{}' not found", name)))?;
+            .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, format!("buffer '{name}' not found")))?;
         fs::write(dir.as_ref().join(name), content)?;
         Ok(())
     }

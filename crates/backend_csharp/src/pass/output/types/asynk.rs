@@ -4,10 +4,10 @@
 //! - A trampoline class (`AsyncTrampoline*`) that manages in-flight tasks
 //! - A static field declaration for the `Interop` class
 
-use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
 use crate::lang::types::ManagedConversion;
+use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
 use crate::output::{Output, OutputKind};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -21,12 +21,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: file!() },
-            trampolines: Default::default(),
-            trampoline_fields: Default::default(),
-        }
+        Self { info: PassInfo { name: file!() }, trampolines: HashMap::default(), trampoline_fields: HashMap::default() }
     }
 
     pub fn process(
@@ -48,8 +45,8 @@ impl Pass {
                 let result_ty_name = &result_ty.name;
 
                 // The trampoline class name and field name
-                let trampoline_name = format!("AsyncTrampoline{}", result_ty_name);
-                let trampoline_field = format!("_trampoline{}", result_ty_name);
+                let trampoline_name = format!("AsyncTrampoline{result_ty_name}");
+                let trampoline_field = format!("_trampoline{result_ty_name}");
 
                 // Determine the Task<T> inner type from the Result's Ok variant
                 let (task_inner_ty, is_task_void) = match &result_ty.kind {
@@ -58,7 +55,7 @@ impl Pass {
                         if matches!(ok_kind, Some(TypeKind::Primitive(Primitive::Void))) {
                             ("void".to_string(), true)
                         } else {
-                            let ok_name = types.get(*ok_ty).map(|t| t.name.clone()).unwrap_or_else(|| "void".to_string());
+                            let ok_name = types.get(*ok_ty).map_or_else(|| "void".to_string(), |t| t.name.clone());
                             (ok_name, false)
                         }
                     }
@@ -66,13 +63,10 @@ impl Pass {
                 };
 
                 // Check if the result type has an unmanaged representation
-                let has_unmanaged = matches!(
-                    managed_conversion.managed_conversion(result_ty_id),
-                    Some(ManagedConversion::To | ManagedConversion::Into)
-                );
+                let has_unmanaged = matches!(managed_conversion.managed_conversion(result_ty_id), Some(ManagedConversion::To | ManagedConversion::Into));
 
                 let unmanaged_result_ty = if has_unmanaged {
-                    format!("{}.Unmanaged", result_ty_name)
+                    format!("{result_ty_name}.Unmanaged")
                 } else {
                     result_ty_name.clone()
                 };
@@ -106,11 +100,13 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn trampolines_for(&self, output: &Output) -> Option<&[String]> {
-        self.trampolines.get(output).map(|s| s.as_slice())
+        self.trampolines.get(output).map(std::vec::Vec::as_slice)
     }
 
+    #[must_use] 
     pub fn trampoline_fields_for(&self, output: &Output) -> Option<&[String]> {
-        self.trampoline_fields.get(output).map(|s| s.as_slice())
+        self.trampoline_fields.get(output).map(std::vec::Vec::as_slice)
     }
 }

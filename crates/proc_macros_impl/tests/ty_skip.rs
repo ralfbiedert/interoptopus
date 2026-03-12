@@ -1,5 +1,5 @@
 use quote::quote;
-use syn::{parse_quote, ItemStruct};
+use syn::{ItemStruct, parse_quote};
 
 mod util;
 

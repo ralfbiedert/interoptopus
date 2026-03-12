@@ -1,7 +1,7 @@
 //! Last output step where a buffer is fully materialized.
 
 use crate::output::OutputKind;
-use crate::pass::{meta, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, meta, output};
 use crate::pipeline::IntermediateOutputPasses;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;
@@ -14,6 +14,7 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() } }
     }

@@ -8,11 +8,11 @@
 //! Argument types are taken directly from the Function objects in `fns::all`,
 //! which already have the correct overloaded types (ref, delegate signature, etc.).
 
+use crate::lang::ServiceId;
 use crate::lang::functions::Argument;
 use crate::lang::functions::overload::{OverloadKind, RvalTransform};
 use crate::lang::types::kind::{PointerKind, Primitive, TypeKind, TypePattern};
-use crate::lang::ServiceId;
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::{Context, Value};
 use std::collections::HashMap;
 
@@ -25,8 +25,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, body_methods: Default::default() }
+        Self { info: PassInfo { name: file!() }, body_methods: HashMap::default() }
     }
 
     pub fn process(
@@ -64,9 +65,8 @@ impl Pass {
                         if let OverloadKind::Async(transforms) = kind {
                             // Render the async service method: Task<T>
                             if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval {
-                                let task_rval = types.get(result_ty_id)
-                                    .map(|t| resolve_task_type_from_result(&t.kind, types))
-                                    .unwrap_or_else(|| "Task".to_string());
+                                let task_rval = types
+                                    .get(result_ty_id).map_or_else(|| "Task".to_string(), |t| resolve_task_type_from_result(&t.kind, types));
                                 // Skip the self arg (first) for service method args
                                 let async_args = build_args(&overload_fn.signature.arguments[1..], types);
                                 rendered_methods.push(render_async(templates, &task_rval, method_name, &overload_fn.name, &async_args)?);
@@ -85,8 +85,9 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn get(&self, service_id: ServiceId) -> Option<&[String]> {
-        self.body_methods.get(&service_id).map(|v| v.as_slice())
+        self.body_methods.get(&service_id).map(std::vec::Vec::as_slice)
     }
 }
 
@@ -147,8 +148,8 @@ fn resolve_task_type_from_result(result_kind: &TypeKind, types: &model::types::a
             if matches!(ok_kind, Some(TypeKind::Primitive(Primitive::Void))) {
                 "Task".to_string()
             } else {
-                let ok_name = types.get(*ok_ty).map(|t| t.name.clone()).unwrap_or_else(|| "void".to_string());
-                format!("Task<{}>", ok_name)
+                let ok_name = types.get(*ok_ty).map_or_else(|| "void".to_string(), |t| t.name.clone());
+                format!("Task<{ok_name}>")
             }
         }
         _ => "Task".to_string(),

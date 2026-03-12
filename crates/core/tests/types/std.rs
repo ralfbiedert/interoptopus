@@ -1,4 +1,4 @@
-use interoptopus::lang::types::{type_id_ptr, type_id_ptr_mut, TypeInfo};
+use interoptopus::lang::types::{TypeInfo, type_id_ptr, type_id_ptr_mut};
 
 #[test]
 fn type_id_ptr_matches_concrete_const_pointer() {

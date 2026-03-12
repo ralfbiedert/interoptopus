@@ -1,7 +1,7 @@
 //! Renders service classes through the `service/all.cs` template, grouped per output file.
 
 use crate::output::{Output, OutputKind};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -14,8 +14,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, services: Default::default() }
+        Self { info: PassInfo { name: file!() }, services: HashMap::default() }
     }
 
     pub fn process(
@@ -57,7 +58,8 @@ impl Pass {
         Ok(())
     }
 
+    #[must_use] 
     pub fn services_for(&self, output: &Output) -> Option<&[String]> {
-        self.services.get(output).map(|s| s.as_slice())
+        self.services.get(output).map(std::vec::Vec::as_slice)
     }
 }

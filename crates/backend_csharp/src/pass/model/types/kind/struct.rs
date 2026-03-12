@@ -2,7 +2,7 @@
 
 use crate::lang::types::kind::{Composite, TypeKind};
 use crate::pass::Outcome::{Changed, Unchanged};
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::{try_extract_kind, try_resolve};
 
 #[derive(Default)]
@@ -13,6 +13,7 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
         Self { info: PassInfo { name: file!() } }
     }

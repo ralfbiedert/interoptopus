@@ -1,5 +1,5 @@
-use interoptopus::ffi;
 use crate::types::namespaces::common;
+use interoptopus::ffi;
 use interoptopus::pattern::option::Option;
 use interoptopus::pattern::slice::{Slice, SliceMut};
 

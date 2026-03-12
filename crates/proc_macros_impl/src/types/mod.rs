@@ -6,7 +6,7 @@ mod wireio;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse2, DeriveInput};
+use syn::{DeriveInput, parse2};
 
 use crate::skip::is_ffi_skip_attribute;
 

@@ -8,11 +8,11 @@
 //! Compounds and enums are at least `To`. If any field/variant is `Into`, the
 //! compound/enum is also `Into`.
 
-use crate::lang::types::kind::{DelegateKind, TypeKind};
-use crate::lang::types::ManagedConversion;
 use crate::lang::TypeId;
+use crate::lang::types::ManagedConversion;
+use crate::lang::types::kind::{DelegateKind, TypeKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -24,10 +24,12 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, managed_conversion: Default::default() }
+        Self { info: PassInfo { name: file!() }, managed_conversion: HashMap::default() }
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, types: &model::types::all::Pass) -> ModelResult {
         let mut outcome = Unchanged;
 
@@ -49,7 +51,7 @@ impl Pass {
 
                 // Arrays follow their element type, but are at least To
                 TypeKind::Array(arr) => match self.managed_conversion.get(&arr.ty) {
-                    Some(ManagedConversion::AsIs) | Some(ManagedConversion::To) => ManagedConversion::To,
+                    Some(ManagedConversion::AsIs | ManagedConversion::To) => ManagedConversion::To,
                     Some(ManagedConversion::Into) => ManagedConversion::Into,
                     None => continue,
                 },
@@ -81,7 +83,7 @@ impl Pass {
                                             has_into = true;
                                             break;
                                         }
-                                        Some(_) => continue,
+                                        Some(_) => {}
                                         None => {
                                             pending = true;
                                             break;
@@ -110,7 +112,7 @@ impl Pass {
                                     has_into = true;
                                     break;
                                 }
-                                Some(_) => continue,
+                                Some(_) => {}
                                 None => {
                                     pending = true;
                                     break;
@@ -136,7 +138,7 @@ impl Pass {
                                 has_into = true;
                                 break;
                             }
-                            Some(_) => continue,
+                            Some(_) => {}
                             None => {
                                 pending = true;
                                 break;
@@ -162,6 +164,7 @@ impl Pass {
         Ok(outcome)
     }
 
+    #[must_use] 
     pub fn managed_conversion(&self, ty: TypeId) -> Option<ManagedConversion> {
         self.managed_conversion.get(&ty).copied()
     }

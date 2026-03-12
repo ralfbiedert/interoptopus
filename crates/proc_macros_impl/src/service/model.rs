@@ -72,11 +72,7 @@ impl ServiceModel {
         // Process each method in the impl block
         for item in &input.items {
             if let ImplItem::Fn(method) = item {
-                // Check if method should be skipped
-                let skip = has_ffi_skip_attribute(&method.attrs);
-
-                // Skip processing this method if it has the skip attribute
-                if skip {
+                if has_ffi_skip_attribute(&method.attrs) {
                     continue;
                 }
 
@@ -108,15 +104,14 @@ impl ServiceModel {
                             let param_type = (*typed_arg.ty).clone();
 
                             // Check for special Async<Self> parameter (first parameter in async functions)
-                            if i == 0 && is_async {
-                                if let Type::Path(path) = &param_type {
-                                    if let Some(segment) = path.path.segments.last() {
-                                        if segment.ident == "Async" {
-                                            receiver_kind = ReceiverKind::AsyncThis;
-                                            continue; // Don't add to inputs, regardless of pattern
-                                        }
-                                    }
-                                }
+                            if i == 0
+                                && is_async
+                                && let Type::Path(path) = &param_type
+                                && let Some(segment) = path.path.segments.last()
+                                && segment.ident == "Async"
+                            {
+                                receiver_kind = ReceiverKind::AsyncThis;
+                                continue; // Don't add to inputs, regardless of pattern
                             }
 
                             let param_name = if let Pat::Ident(pat_ident) = typed_arg.pat.as_ref() {
@@ -149,18 +144,12 @@ impl ServiceModel {
                 if is_async {
                     match receiver_kind {
                         ReceiverKind::None => {
-                            return Err(syn::Error::new_spanned(
-                                method.sig.inputs.first(),
-                                "Async methods must use Async<Self> as their first parameter"
-                            ));
+                            return Err(syn::Error::new_spanned(method.sig.inputs.first(), "Async methods must use Async<Self> as their first parameter"));
                         }
                         ReceiverKind::Shared | ReceiverKind::Mutable => {
                             // Find the receiver to point the error at it
-                            let receiver_span = method.sig.inputs.first().map(|arg| arg.span()).unwrap_or_else(|| method.sig.span());
-                            return Err(syn::Error::new(
-                                receiver_span,
-                                "Async methods cannot use &self or &mut self. Use Async<Self> as the first parameter instead."
-                            ));
+                            let receiver_span = method.sig.inputs.first().map_or_else(|| method.sig.span(), Spanned::span);
+                            return Err(syn::Error::new(receiver_span, "Async methods cannot use &self or &mut self. Use Async<Self> as the first parameter instead."));
                         }
                         ReceiverKind::AsyncThis => {
                             // Valid async method
@@ -183,7 +172,7 @@ impl ServiceModel {
             }
         }
 
-        let model = ServiceModel { service_name, service_type, generics, args, constructors, methods, is_async: has_async };
+        let model = Self { service_name, service_type, generics, args, constructors, methods, is_async: has_async };
 
         Ok(model)
     }
@@ -202,10 +191,10 @@ impl ServiceModel {
             while let Some(ch) = chars.next() {
                 if ch.is_uppercase() && !result.is_empty() {
                     // Check if next char is lowercase (to handle acronyms correctly)
-                    if let Some(&next_ch) = chars.peek() {
-                        if next_ch.is_lowercase() {
-                            result.push('_');
-                        }
+                    if let Some(&next_ch) = chars.peek()
+                        && next_ch.is_lowercase()
+                    {
+                        result.push('_');
                     }
                 }
                 result.push(ch.to_lowercase().next().unwrap_or(ch));

@@ -2,7 +2,7 @@
 
 extern crate test;
 
-use std::io::{Cursor, Write};
+use std::io::Write;
 use test::Bencher;
 
 trait Pointer {
@@ -31,12 +31,6 @@ impl Pointer for Bar {
         std::ptr::copy_nonoverlapping(self.v.as_ptr(), dst.cast(), self.v.len());
         dst = dst.add(self.v.len());
         std::ptr::write_unaligned(dst.cast(), self.f);
-    }
-}
-
-impl Writer for Bar {
-    fn write(&self, dst: impl Write) {
-        dst.
     }
 }
 

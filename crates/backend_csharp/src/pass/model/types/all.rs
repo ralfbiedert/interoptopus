@@ -1,13 +1,13 @@
 //! Container for all C# types (id → Type), analogous to `fns::all` for functions.
 //!
-//! Assembles final `Type` instances from TypeKind (via the `kind` pass) and
+//! Assembles final `Type` instances from `TypeKind` (via the `kind` pass) and
 //! names (via the `names` pass). Other passes should prefer querying this pass
 //! over accessing `kind` or `names` directly.
 
-use crate::lang::types::Type;
 use crate::lang::TypeId;
+use crate::lang::types::Type;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
 use std::collections::HashMap;
 
@@ -21,8 +21,9 @@ pub struct Pass {
 }
 
 impl Pass {
+    #[must_use] 
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, types: Default::default() }
+        Self { info: PassInfo { name: file!() }, types: HashMap::default() }
     }
 
     pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, kinds: &model::types::kind::Pass, names: &model::types::names::Pass) -> ModelResult {
@@ -52,6 +53,7 @@ impl Pass {
         self.types.insert(ty, t);
     }
 
+    #[must_use] 
     pub fn get(&self, ty: TypeId) -> Option<&Type> {
         self.types.get(&ty)
     }
