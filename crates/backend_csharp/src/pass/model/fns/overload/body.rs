@@ -18,7 +18,7 @@ use crate::lang::{FunctionId, TypeId};
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 #[derive(Default)]
 pub struct Config {}
@@ -26,13 +26,11 @@ pub struct Config {}
 pub struct Pass {
     info: PassInfo,
     processed: HashSet<FunctionId>,
-    /// Set of unique async Result type IDs that need trampoline classes.
-    trampoline_types: HashSet<TypeId>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, processed: Default::default(), trampoline_types: Default::default() }
+        Self { info: PassInfo { name: file!() }, processed: Default::default() }
     }
 
     pub fn process(
@@ -108,7 +106,6 @@ impl Pass {
                 let transforms = FnTransforms { rval: RvalTransform::AsyncTask(result_ty_id), args: arg_transforms };
                 fns_all.register(id, func);
                 overload_all.register(original_id, id, OverloadKind::Async(transforms));
-                self.trampoline_types.insert(result_ty_id);
                 outcome.changed();
             }
 
@@ -118,10 +115,6 @@ impl Pass {
         Ok(outcome)
     }
 
-    /// Returns the set of unique async Result type IDs that need trampoline classes.
-    pub fn trampoline_types(&self) -> &HashSet<TypeId> {
-        &self.trampoline_types
-    }
 }
 
 /// If the last arg is `AsyncCallback<T>` where T is a Result, returns the TypeId of T.

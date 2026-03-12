@@ -33,7 +33,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        overload_body: &model::fns::overload::body::Pass,
+        async_types: &model::types::info::async_types::Pass,
         types: &model::types::all::Pass,
         managed_conversion: &model::types::info::managed_conversion::Pass,
     ) -> OutputResult {
@@ -43,7 +43,7 @@ impl Pass {
             let mut rendered_trampolines = Vec::new();
             let mut rendered_fields = Vec::new();
 
-            for &result_ty_id in overload_body.trampoline_types() {
+            for &result_ty_id in async_types.trampoline_types() {
                 let Some(result_ty) = types.get(result_ty_id) else { continue };
                 let result_ty_name = &result_ty.name;
 
