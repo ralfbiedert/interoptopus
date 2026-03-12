@@ -1,5 +1,4 @@
-use interoptopus::inventory::Inventory;
-use interoptopus::pattern::asynk::{Async, AsyncRuntime};
+use interoptopus::pattern::asynk::Async;
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::rt::Tokio;
 use interoptopus::{AsyncRuntime, callback, ffi};
@@ -75,32 +74,34 @@ impl ServiceBasic2 {
     }
 }
 
-// We just trick a unit test into producing our bindings, here for C#
-#[test]
-#[rustfmt::skip]
-fn generate_bindings() -> Result<(), Box<dyn std::error::Error>> {
-    use interoptopus::function;
-    use interoptopus::inventory::Inventory;
+#[cfg(test)]
+mod tests {
+    use interoptopus::inventory::RustInventory;
+    use interoptopus::{extra_type, function, service};
     use interoptopus_csharp::RustLibrary;
 
-    // In a real project this should be a freestanding `my_inventory()` function inside
-    // your FFI or build crate.
-    let inventory = RustInventory::new()
-        .register(function!(my_function))
-        .register(function!(refref))
-        .register(function!(delgt))
-        .register(extra_type!(Error))
-        .register(extra_type!(SumDelegate2))
-        .register(extra_type!(SumDelegateReturn))
-        .register(service!(ServiceBasic))
-        .register(service!(ServiceBasic2))
-        .validate();
+    // We just trick a unit test into producing our bindings, here for C#
+    #[test]
+    fn generate_bindings() -> Result<(), Box<dyn std::error::Error>> {
+        // In a real project this should be a freestanding `my_inventory()` function inside
+        // your FFI or build crate.
+        let inventory = RustInventory::new()
+            .register(function!(super::my_function))
+            .register(function!(super::refref))
+            .register(function!(super::delgt))
+            .register(extra_type!(super::Error))
+            .register(extra_type!(super::SumDelegate2))
+            .register(extra_type!(super::SumDelegateReturn))
+            .register(service!(super::ServiceBasic))
+            .register(service!(super::ServiceBasic2))
+            .validate();
 
-    RustLibrary::builder(inventory)
-        .dll_name("hello_world")
-        .build()
-        .process()?
-        .write_buffers_to("bindings/")?;
+        RustLibrary::builder(inventory)
+            .dll_name("hello_world")
+            .build()
+            .process()?
+            .write_buffers_to("bindings/")?;
 
-    Ok(())
+        Ok(())
+    }
 }

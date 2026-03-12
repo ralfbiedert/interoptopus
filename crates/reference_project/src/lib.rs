@@ -1,3 +1,6 @@
+#![allow(clippy::missing_safety_doc)]
+#![allow(clippy::just_underscores_and_digits)]
+
 //! A reference project for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
 //!
 //! This project tries to use every Interoptopus feature at least once.

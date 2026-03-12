@@ -42,7 +42,7 @@ pub struct FieldModel {
 pub struct VariantModel {
     pub name: Ident,
     pub data: VariantData,
-    pub discriminant: Option<syn::Expr>,
+    pub _discriminant: Option<syn::Expr>,
     pub docs: Vec<String>,
 }
 
@@ -93,7 +93,7 @@ impl TypeModel {
                             Fields::Named(_) => return Err(syn::Error::new_spanned(variant, "Struct variants are not supported")),
                         };
 
-                        Ok(VariantModel { name: variant.ident, data, discriminant: variant.discriminant.map(|(_, expr)| expr), docs: extract_docs(&variant.attrs) })
+                        Ok(VariantModel { name: variant.ident, data, _discriminant: variant.discriminant.map(|(_, expr)| expr), docs: extract_docs(&variant.attrs) })
                     })
                     .collect::<syn::Result<Vec<_>>>()?;
 
