@@ -2,13 +2,15 @@
 //! AsyncCallback arguments.
 //!
 //! For each original function this pass checks two conditions:
-//! - **Body**: Has delegate class args → produces an overload with delegate→signature,
-//!   intptr→ref transforms, registered as `OverloadKind::Body`.
+//! - **Body**: Has delegate class args (but no async callback) → produces an overload
+//!   with delegate→signature, intptr→ref transforms, registered as `OverloadKind::Body`.
 //! - **Async**: Last arg is `AsyncCallback<T>` → produces an overload that drops the
 //!   callback, applies the same arg transforms to remaining args, and registers as
 //!   `OverloadKind::Async` with `RvalTransform::AsyncTask`.
 //!
-//! A function can produce both overloads (e.g. delegate args + async callback).
+//! When both conditions are true, only the Async overload is emitted. Emitting both
+//! would create two C# methods with identical parameter signatures differing only in
+//! return type, which C# does not allow.
 
 use crate::lang::functions::overload::{ArgTransform, FnTransforms, OverloadKind, RvalTransform};
 use crate::lang::functions::{Argument, Function, Signature};
@@ -87,8 +89,11 @@ impl Pass {
             // Compute arg transforms for the transformable args
             let (overload_args, arg_transforms) = build_arg_transforms(transformable_args, types, type_overloads, managed_conversion);
 
-            // Produce Body overload if there are delegate args
-            if has_delegate {
+            // Produce Body overload if there are delegate args but NO async callback.
+            // When async is present, the Async overload already applies the same arg
+            // transforms; emitting both would create two methods differing only in
+            // return type, which C# rejects.
+            if has_delegate && async_result_ty.is_none() {
                 let sig = Signature { arguments: overload_args.clone(), rval: original_fn.signature.rval };
                 let id = derive_overload_id(original_id, &sig);
                 let func = Function { name: original_fn.name.clone(), signature: sig };

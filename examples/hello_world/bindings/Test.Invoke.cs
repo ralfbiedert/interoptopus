@@ -14,7 +14,7 @@ public class TestInvoke
         svc.Dispose();
 
         var svc2 = ServiceBasic2.New();
-        await svc2.Sum(1, 2);
+        await svc2.Sum(1, 2, null);
 
         Assert.Equal(3, res);
     }
