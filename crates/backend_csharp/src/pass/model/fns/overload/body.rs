@@ -1,110 +1,179 @@
-//! Produces body overloads that replace delegate class and IntPtr arguments.
+//! Produces body and async overloads for functions with delegate, IntPtr, or
+//! AsyncCallback arguments.
 //!
-//! When a function has delegate class arguments, this pass creates an overloaded
-//! Function where delegates become their signature type, IntPtrs become ref types,
-//! and registers it in both `fn_all` and `overload::all`.
+//! For each original function this pass checks two conditions:
+//! - **Body**: Has delegate class args → produces an overload with delegate→signature,
+//!   intptr→ref transforms, registered as `OverloadKind::Body`.
+//! - **Async**: Last arg is `AsyncCallback<T>` → produces an overload that drops the
+//!   callback, applies the same arg transforms to remaining args, and registers as
+//!   `OverloadKind::Async` with `RvalTransform::AsyncTask`.
 //!
-//! The output pass for body overloads renders the wrapping/disposal logic using
-//! the per-argument transforms stored here.
+//! A function can produce both overloads (e.g. delegate args + async callback).
 
 use crate::lang::functions::overload::{ArgTransform, FnTransforms, OverloadKind, RvalTransform};
 use crate::lang::functions::{Argument, Function, Signature};
-use crate::lang::types::kind::{DelegateKind, TypeKind};
+use crate::lang::types::kind::{DelegateKind, TypeKind, TypePattern};
 use crate::lang::types::{ManagedConversion, OverloadFamily};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Default)]
 pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    /// Maps original function ID to its body overload transforms. `None` means no body overload.
-    transforms: HashMap<FunctionId, Option<FnTransforms>>,
+    processed: HashSet<FunctionId>,
+    /// Set of unique async Result type IDs that need trampoline classes.
+    trampoline_types: HashSet<TypeId>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, transforms: Default::default() }
+        Self { info: PassInfo { name: file!() }, processed: Default::default(), trampoline_types: Default::default() }
     }
 
     pub fn process(
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         originals: &model::fns::originals::Pass,
-        all: &mut model::fns::all::Pass,
+        fns_all: &mut model::fns::all::Pass,
         overload_all: &mut model::fns::overload::all::Pass,
         types: &model::types::all::Pass,
-        overloads: &model::types::overload::all::Pass,
+        type_overloads: &model::types::overload::all::Pass,
         managed_conversion: &model::types::info::managed_conversion::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (&original_id, original_fn) in originals.iter() {
-            if self.transforms.contains_key(&original_id) {
+            if self.processed.contains(&original_id) {
                 continue;
             }
 
-            let has_any_delegate = original_fn.signature.arguments.iter().any(|arg| is_delegate_class(arg.ty, types));
+            let args = &original_fn.signature.arguments;
 
-            if !has_any_delegate {
-                self.transforms.insert(original_id, None);
+            // Detect async: last arg is AsyncCallback<Result<T,E>>
+            let async_result_ty = detect_async_callback(args, types);
+
+            // Determine which args to check for body transforms (exclude callback if async)
+            let transformable_args = match async_result_ty {
+                Some(_) => &args[..args.len() - 1],
+                None => &args[..],
+            };
+
+            let has_delegate = transformable_args.iter().any(|a| is_delegate_class(a.ty, types));
+            let has_intptr = transformable_args.iter().any(|a| is_eligible_intptr(a.ty, types, managed_conversion));
+
+            // Nothing to do for this function
+            if async_result_ty.is_none() && !has_delegate {
+                self.processed.insert(original_id);
                 continue;
             }
 
-            // Check that all required sibling types are available
-            let all_ready = original_fn.signature.arguments.iter().all(|arg| {
-                if is_delegate_class(arg.ty, types) {
-                    matches!(overloads.get(arg.ty), Some(OverloadFamily::Delegate(_)))
-                } else if is_eligible_intptr(arg.ty, types, managed_conversion) {
-                    matches!(overloads.get(arg.ty), Some(OverloadFamily::Pointer(_)))
-                } else {
-                    true
-                }
-            });
-
-            if !all_ready {
+            // Wait for type overload families to be available
+            if !all_families_ready(transformable_args, types, type_overloads, managed_conversion) {
                 continue;
             }
 
-            // Build per-argument transforms and the overloaded signature
-            let mut arg_transforms = Vec::new();
-            let mut overload_args = Vec::new();
-
-            for arg in &original_fn.signature.arguments {
-                if let Some(OverloadFamily::Delegate(family)) = is_delegate_class(arg.ty, types).then(|| overloads.get(arg.ty)).flatten() {
-                    overload_args.push(Argument { name: arg.name.clone(), ty: family.signature });
-                    arg_transforms.push(ArgTransform::WrapDelegate);
-                } else if let Some(OverloadFamily::Pointer(family)) = is_eligible_intptr(arg.ty, types, managed_conversion).then(|| overloads.get(arg.ty)).flatten() {
-                    overload_args.push(Argument { name: arg.name.clone(), ty: family.by_ref });
-                    arg_transforms.push(ArgTransform::Ref);
-                } else {
-                    overload_args.push(Argument { name: arg.name.clone(), ty: arg.ty });
-                    arg_transforms.push(ArgTransform::PassThrough);
+            // Also verify async result type is a Result if present
+            if let Some(result_ty_id) = async_result_ty {
+                let Some(result_ty) = types.get(result_ty_id) else { continue };
+                if !matches!(&result_ty.kind, TypeKind::TypePattern(TypePattern::Result(_, _, _))) {
+                    self.processed.insert(original_id);
+                    continue;
                 }
             }
 
-            let overload_signature = Signature { arguments: overload_args, rval: original_fn.signature.rval };
-            let overload_id = derive_overload_id(original_id, &overload_signature);
-            let overload_fn = Function { name: original_fn.name.clone(), signature: overload_signature };
+            // Compute arg transforms for the transformable args
+            let (overload_args, arg_transforms) = build_arg_transforms(transformable_args, types, type_overloads, managed_conversion);
 
-            let transforms = FnTransforms { rval: RvalTransform::PassThrough, args: arg_transforms };
-            all.register(overload_id, overload_fn);
-            overload_all.register(original_id, overload_id, OverloadKind::Body(transforms.clone()));
-            self.transforms.insert(original_id, Some(transforms));
-            outcome.changed();
+            // Produce Body overload if there are delegate args
+            if has_delegate {
+                let sig = Signature { arguments: overload_args.clone(), rval: original_fn.signature.rval };
+                let id = derive_overload_id(original_id, &sig);
+                let func = Function { name: original_fn.name.clone(), signature: sig };
+                let transforms = FnTransforms { rval: RvalTransform::PassThrough, args: arg_transforms.clone() };
+                fns_all.register(id, func);
+                overload_all.register(original_id, id, OverloadKind::Body(transforms));
+                outcome.changed();
+            }
+
+            // Produce Async overload if last arg is AsyncCallback
+            if let Some(result_ty_id) = async_result_ty {
+                let sig = Signature { arguments: overload_args, rval: result_ty_id };
+                let id = derive_overload_id(original_id, &sig);
+                let func = Function { name: original_fn.name.clone(), signature: sig };
+                let transforms = FnTransforms { rval: RvalTransform::AsyncTask(result_ty_id), args: arg_transforms };
+                fns_all.register(id, func);
+                overload_all.register(original_id, id, OverloadKind::Async(transforms));
+                self.trampoline_types.insert(result_ty_id);
+                outcome.changed();
+            }
+
+            self.processed.insert(original_id);
         }
 
         Ok(outcome)
     }
 
-    /// Iterates over all functions that have body overloads.
-    pub fn iter(&self) -> impl Iterator<Item = (FunctionId, &FnTransforms)> {
-        self.transforms.iter().filter_map(|(&id, t)| t.as_ref().map(|t| (id, t)))
+    /// Returns the set of unique async Result type IDs that need trampoline classes.
+    pub fn trampoline_types(&self) -> &HashSet<TypeId> {
+        &self.trampoline_types
     }
+}
+
+/// If the last arg is `AsyncCallback<T>` where T is a Result, returns the TypeId of T.
+fn detect_async_callback(args: &[Argument], types: &model::types::all::Pass) -> Option<TypeId> {
+    let last = args.last()?;
+    let ty = types.get(last.ty)?;
+    match &ty.kind {
+        TypeKind::TypePattern(TypePattern::AsyncCallback(t)) => Some(*t),
+        _ => None,
+    }
+}
+
+fn all_families_ready(
+    args: &[Argument],
+    types: &model::types::all::Pass,
+    type_overloads: &model::types::overload::all::Pass,
+    managed_conversion: &model::types::info::managed_conversion::Pass,
+) -> bool {
+    args.iter().all(|arg| {
+        if is_delegate_class(arg.ty, types) {
+            matches!(type_overloads.get(arg.ty), Some(OverloadFamily::Delegate(_)))
+        } else if is_eligible_intptr(arg.ty, types, managed_conversion) {
+            matches!(type_overloads.get(arg.ty), Some(OverloadFamily::Pointer(_)))
+        } else {
+            true
+        }
+    })
+}
+
+fn build_arg_transforms(
+    args: &[Argument],
+    types: &model::types::all::Pass,
+    type_overloads: &model::types::overload::all::Pass,
+    managed_conversion: &model::types::info::managed_conversion::Pass,
+) -> (Vec<Argument>, Vec<ArgTransform>) {
+    let mut overload_args = Vec::new();
+    let mut transforms = Vec::new();
+
+    for arg in args {
+        if let Some(OverloadFamily::Delegate(family)) = is_delegate_class(arg.ty, types).then(|| type_overloads.get(arg.ty)).flatten() {
+            overload_args.push(Argument { name: arg.name.clone(), ty: family.signature });
+            transforms.push(ArgTransform::WrapDelegate);
+        } else if let Some(OverloadFamily::Pointer(family)) = is_eligible_intptr(arg.ty, types, managed_conversion).then(|| type_overloads.get(arg.ty)).flatten() {
+            overload_args.push(Argument { name: arg.name.clone(), ty: family.by_ref });
+            transforms.push(ArgTransform::Ref);
+        } else {
+            overload_args.push(Argument { name: arg.name.clone(), ty: arg.ty });
+            transforms.push(ArgTransform::PassThrough);
+        }
+    }
+
+    (overload_args, transforms)
 }
 
 fn is_delegate_class(ty: TypeId, types: &model::types::all::Pass) -> bool {

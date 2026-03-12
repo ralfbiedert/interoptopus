@@ -34,8 +34,8 @@ impl Pass {
             let header = intermediary.header.header_for(file).unwrap();
             let fns_rust = intermediary.fns_rust.imports_for(file).unwrap();
             let fns_overload_simple = intermediary.fns_overload_simple.imports_for(file).unwrap();
-            let fns_overload_body = intermediary.fns_overload_body.imports_for(file).unwrap();
-            let fns_overload_asynk = intermediary.fns_overload_asynk.imports_for(file).unwrap();
+            let fns_overload_body = intermediary.fns_overload_body.body_imports_for(file).unwrap();
+            let fns_overload_asynk = intermediary.fns_overload_body.async_imports_for(file).unwrap();
             let async_trampoline_fields = intermediary.asynk.trampoline_fields_for(file).unwrap();
             let enums = intermediary.enums.enums_for(file).unwrap();
             let composites = intermediary.composites.composites_for(file).unwrap();

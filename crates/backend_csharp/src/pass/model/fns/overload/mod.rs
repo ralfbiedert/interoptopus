@@ -5,7 +5,6 @@ use crate::lang::{FunctionId, TypeId};
 use crate::pass::model;
 
 pub mod all;
-pub mod asynk;
 pub mod body;
 pub mod simple;
 
