@@ -35,7 +35,7 @@ impl Pass {
         originals: &model::fns::originals::Pass,
         all: &mut model::fns::all::Pass,
         overload_all: &mut model::fns::overload::all::Pass,
-        type_kinds: &model::types::kind::Pass,
+        types: &model::types::all::Pass,
         managed_conversion: &model::types::info::managed_conversion::Pass,
         pointer_overloads: &model::types::overload::pointer::Pass,
     ) -> ModelResult {
@@ -51,7 +51,7 @@ impl Pass {
                 .signature
                 .arguments
                 .iter()
-                .any(|arg| is_eligible_intptr(arg.ty, type_kinds, managed_conversion));
+                .any(|arg| is_eligible_intptr(arg.ty, types, managed_conversion));
 
             if !has_any_eligible {
                 self.processed.insert(original_id);
@@ -60,7 +60,7 @@ impl Pass {
 
             // Has eligible IntPtr args, but families aren't available yet — skip and retry
             let all_families_available = original_fn.signature.arguments.iter().all(|arg| {
-                if is_eligible_intptr(arg.ty, type_kinds, managed_conversion) {
+                if is_eligible_intptr(arg.ty, types, managed_conversion) {
                     pointer_overloads.get(arg.ty).is_some()
                 } else {
                     true
@@ -74,7 +74,7 @@ impl Pass {
             // Build the overload signature replacing eligible IntPtr args with their ByRef siblings
             let mut overload_args = Vec::new();
             for arg in &original_fn.signature.arguments {
-                let new_ty = if is_eligible_intptr(arg.ty, type_kinds, managed_conversion) {
+                let new_ty = if is_eligible_intptr(arg.ty, types, managed_conversion) {
                     pointer_overloads.get(arg.ty).map(|f| f.by_ref).unwrap_or(arg.ty)
                 } else {
                     arg.ty

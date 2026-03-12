@@ -27,10 +27,11 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, managed_conversion: Default::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, kinds: &model::types::kind::Pass) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, types: &model::types::all::Pass) -> ModelResult {
         let mut outcome = Unchanged;
 
-        for (cs_id, type_kind) in kinds.iter() {
+        for (cs_id, ty) in types.iter() {
+            let type_kind = &ty.kind;
             if self.managed_conversion.contains_key(cs_id) {
                 continue;
             }

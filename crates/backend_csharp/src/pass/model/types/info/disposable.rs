@@ -22,10 +22,10 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, disposable: Default::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, managed_conversion: &model::types::info::managed_conversion::Pass, kinds: &model::types::kind::Pass) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, managed_conversion: &model::types::info::managed_conversion::Pass, types: &model::types::all::Pass) -> ModelResult {
         let mut outcome = Unchanged;
 
-        for (type_id, _) in kinds.iter() {
+        for (type_id, _) in types.iter() {
             if self.disposable.contains_key(type_id) {
                 continue;
             }

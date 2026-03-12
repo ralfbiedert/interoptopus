@@ -28,12 +28,12 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         service_map: &model::service::map::Pass,
         fn_map: &model::fns::all::Pass,
-        type_names: &model::types::names::Pass,
+        types: &model::types::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (_service_id, service) in service_map.iter() {
-            let Some(type_name) = type_names.get(service.ty) else { continue };
+            let Some(type_name) = types.name(service.ty) else { continue };
 
             let all_fns = service.ctors.iter().chain(service.methods.iter()).chain(std::iter::once(&service.destructor));
 

@@ -23,8 +23,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        kinds: &model::types::kind::Pass,
-        names: &model::types::names::Pass,
+        types: &model::types::all::Pass,
         struct_class: &model::types::info::struct_class::Pass,
         disposable: &model::types::info::disposable::Pass,
         composite_body_unmanaged: &output::types::composites::body_unmanaged::Pass,
@@ -33,13 +32,14 @@ impl Pass {
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        for (type_id, type_kind) in kinds.iter() {
+        for (type_id, ty) in types.iter() {
+            let type_kind = &ty.kind;
             match type_kind {
                 TypeKind::Composite(_) => {}
                 _ => continue,
             }
 
-            let name = names.get(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
+            let name = types.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
             let ty = *type_id;
             let struct_or_class = if struct_class.is_struct(ty) { "struct" } else { "class" };
             let is_disposable = disposable.is_disposable(*type_id).unwrap_or(false);

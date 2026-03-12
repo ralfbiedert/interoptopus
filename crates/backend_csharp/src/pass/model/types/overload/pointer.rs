@@ -41,7 +41,7 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         kinds: &mut model::types::kind::Pass,
         names: &mut model::types::names::Pass,
-        map: &mut model::types::map::Pass,
+        map: &mut model::types::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 

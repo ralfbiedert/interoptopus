@@ -28,7 +28,7 @@ impl Pass {
         output_master: &output::master::Pass,
         overload_simple: &model::fns::overload::simple::Pass,
         fn_all: &model::fns::all::Pass,
-        type_names: &model::types::names::Pass,
+        types: &model::types::all::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -38,14 +38,12 @@ impl Pass {
             for overload_id in overload_simple.iter() {
                 let Some(function) = fn_all.get(overload_id) else { continue };
                 let name = &function.name;
-                let rval = type_names
-                    .get(function.signature.rval)
+                let rval = types.name(function.signature.rval)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of overload `{}`", name)))?;
 
                 let mut args: Vec<HashMap<&str, &str>> = Vec::new();
                 for arg in &function.signature.arguments {
-                    let arg_ty = type_names
-                        .get(arg.ty)
+                    let arg_ty = types.name(arg.ty)
                         .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of overload `{}`", arg.name, name)))?;
                     let mut m = HashMap::new();
                     m.insert("name", arg.name.as_str());

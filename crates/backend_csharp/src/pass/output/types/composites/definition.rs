@@ -23,20 +23,20 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        kinds: &model::types::kind::Pass,
-        names: &model::types::names::Pass,
+        types: &model::types::all::Pass,
         struct_class: &model::types::info::struct_class::Pass,
         unmanaged_names: &output::conversion::unmanaged_names::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        for (type_id, type_kind) in kinds.iter() {
+        for (type_id, ty) in types.iter() {
+            let type_kind = &ty.kind;
             let composite = match type_kind {
                 TypeKind::Composite(c) => c,
                 _ => continue,
             };
 
-            let name = names.get(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
+            let name = types.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
             let ty = *type_id;
             let struct_or_class = if struct_class.is_struct(ty) { "struct" } else { "class" };
 

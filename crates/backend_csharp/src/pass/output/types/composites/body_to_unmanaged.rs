@@ -23,20 +23,20 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        kinds: &model::types::kind::Pass,
-        names: &model::types::names::Pass,
+        types: &model::types::all::Pass,
         managed: &output::conversion::unmanaged_conversion::Pass,
         field_conversions: &output::conversion::fields::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        for (type_id, type_kind) in kinds.iter() {
+        for (type_id, ty) in types.iter() {
+            let type_kind = &ty.kind;
             let composite = match type_kind {
                 TypeKind::Composite(c) => c,
                 _ => continue,
             };
 
-            let name = names.get(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
+            let name = types.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
             let to_unmanaged = managed.to_unmanaged_name(*type_id);
 
             let fields: Vec<HashMap<&str, String>> = composite

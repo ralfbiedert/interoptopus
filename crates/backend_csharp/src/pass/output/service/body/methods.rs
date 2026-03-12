@@ -34,8 +34,7 @@ impl Pass {
         output_master: &output::master::Pass,
         service_map: &model::service::map::Pass,
         fn_all: &model::fns::all::Pass,
-        type_names: &model::types::names::Pass,
-        type_kinds: &model::types::kind::Pass,
+        types: &model::types::all::Pass,
         method_names: &model::service::method::names::Pass,
         overload_all: &model::fns::overload::all::Pass,
     ) -> OutputResult {
@@ -47,18 +46,18 @@ impl Pass {
             for &method_fn_id in &service.methods {
                 let Some(method_fn) = fn_all.get(method_fn_id) else { continue };
                 let Some(method_name) = method_names.get(method_fn_id) else { continue };
-                let Some(rval) = type_names.get(method_fn.signature.rval) else { continue };
-                let is_void = matches!(type_kinds.get(method_fn.signature.rval), Some(TypeKind::Primitive(Primitive::Void)));
+                let Some(rval) = types.name(method_fn.signature.rval) else { continue };
+                let is_void = matches!(types.kind(method_fn.signature.rval), Some(TypeKind::Primitive(Primitive::Void)));
 
                 // Base method
-                let base_args = build_args(&method_fn.signature.arguments[1..], type_names, type_kinds);
+                let base_args = build_args(&method_fn.signature.arguments[1..], types);
                 rendered_methods.push(render(templates, rval, is_void, method_name, &method_fn.name, &base_args)?);
 
                 // Overloads from the central registry
                 if let Some(overload_ids) = overload_all.overloads_for(method_fn_id) {
                     for &overload_id in overload_ids {
                         let Some(overload_fn) = fn_all.get(overload_id) else { continue };
-                        let overload_args = build_args(&overload_fn.signature.arguments[1..], type_names, type_kinds);
+                        let overload_args = build_args(&overload_fn.signature.arguments[1..], types);
                         rendered_methods.push(render(templates, rval, is_void, method_name, &overload_fn.name, &overload_args)?);
                     }
                 }
@@ -75,11 +74,11 @@ impl Pass {
     }
 }
 
-fn build_args(args: &[Argument], type_names: &model::types::names::Pass, type_kinds: &model::types::kind::Pass) -> Vec<HashMap<&'static str, Value>> {
+fn build_args(args: &[Argument], types: &model::types::all::Pass) -> Vec<HashMap<&'static str, Value>> {
     args.iter()
         .filter_map(|arg| {
-            let ty_name = type_names.get(arg.ty)?;
-            let is_ref = matches!(type_kinds.get(arg.ty), Some(TypeKind::Pointer(p)) if p.kind == PointerKind::ByRef);
+            let ty_name = types.name(arg.ty)?;
+            let is_ref = matches!(types.kind(arg.ty), Some(TypeKind::Pointer(p)) if p.kind == PointerKind::ByRef);
             Some(make_arg(&arg.name, ty_name, is_ref))
         })
         .collect()

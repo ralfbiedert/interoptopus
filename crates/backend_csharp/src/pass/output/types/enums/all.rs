@@ -23,7 +23,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        kinds: &model::types::kind::Pass,
+        types: &model::types::all::Pass,
         enum_ty: &output::types::enums::definition::Pass,
         enum_body: &output::types::enums::body::Pass,
     ) -> OutputResult {
@@ -32,7 +32,8 @@ impl Pass {
         for file in output_master.outputs_of(OutputKind::Csharp) {
             let mut rendered_enums = Vec::new();
 
-            for (type_id, type_kind) in kinds.iter() {
+            for (type_id, ty) in types.iter() {
+                let type_kind = &ty.kind;
                 match type_kind {
                     TypeKind::DataEnum(_) => {}
                     TypeKind::TypePattern(TypePattern::Result(_, _, e)) => {}

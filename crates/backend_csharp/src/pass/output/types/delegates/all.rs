@@ -24,8 +24,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        kinds: &model::types::kind::Pass,
-        names: &model::types::names::Pass,
+        types: &model::types::all::Pass,
         unmanaged_names: &output::conversion::unmanaged_names::Pass,
         unmanaged_conversion: &output::conversion::unmanaged_conversion::Pass,
     ) -> OutputResult {
@@ -34,20 +33,21 @@ impl Pass {
         for file in output_master.outputs_of(OutputKind::Csharp) {
             let mut rendered_delegates = Vec::new();
 
-            for (type_id, type_kind) in kinds.iter() {
+            for (type_id, ty) in types.iter() {
+                let type_kind = &ty.kind;
                 let delegate = match type_kind {
                     TypeKind::Delegate(d) if d.kind == DelegateKind::Class => d,
                     _ => continue,
                 };
                 let signature = &delegate.signature;
 
-                let Some(name) = names.get(*type_id) else {
+                let Some(name) = types.name(*type_id) else {
                     continue;
                 };
 
                 // Determine return type info
-                let rval_kind = kinds.get(signature.rval);
-                let rval_managed = names.get(signature.rval).cloned().unwrap_or_else(|| "void".to_string());
+                let rval_kind = types.kind(signature.rval);
+                let rval_managed = types.name(signature.rval).cloned().unwrap_or_else(|| "void".to_string());
                 let is_void = matches!(rval_kind, Some(TypeKind::Primitive(Primitive::Void)));
 
                 let rval_unmanaged = if is_void {
@@ -71,7 +71,7 @@ impl Pass {
                 // Build argument list (excluding callback_data which is always appended in the template)
                 let mut args: Vec<HashMap<String, String>> = Vec::new();
                 for arg in &signature.arguments {
-                    let Some(arg_managed) = names.get(arg.ty) else {
+                    let Some(arg_managed) = types.name(arg.ty) else {
                         continue;
                     };
 

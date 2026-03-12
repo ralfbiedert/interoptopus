@@ -24,13 +24,13 @@ impl Pass {
         output_master: &output::master::Pass,
         service_map: &model::service::map::Pass,
         fn_map: &model::fns::all::Pass,
-        type_names: &model::types::names::Pass,
+        types: &model::types::all::Pass,
         method_names: &model::service::method::names::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
         for (service_id, service) in service_map.iter() {
-            let Some(name) = type_names.get(service.ty) else { continue };
+            let Some(name) = types.name(service.ty) else { continue };
 
             let mut rendered_ctors = Vec::new();
 
@@ -40,7 +40,7 @@ impl Pass {
                 let mut args: Vec<HashMap<&str, &str>> = Vec::new();
 
                 for arg in &ctor_fn.signature.arguments {
-                    let Some(arg_ty) = type_names.get(arg.ty) else { continue };
+                    let Some(arg_ty) = types.name(arg.ty) else { continue };
                     let mut m = HashMap::new();
                     m.insert("name", arg.name.as_str());
                     m.insert("ty", arg_ty.as_str());

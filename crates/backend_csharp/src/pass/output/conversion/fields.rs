@@ -32,25 +32,24 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        kinds: &model::types::kind::Pass,
-        names: &model::types::names::Pass,
+        types: &model::types::all::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        for (type_id, type_kind) in kinds.iter() {
-            let composite = match type_kind {
+        for (type_id, ty) in types.iter() {
+            let composite = match &ty.kind {
                 TypeKind::Composite(c) => c,
                 _ => continue,
             };
 
             for f in &composite.fields {
-                let Some(field_kind) = kinds.get(f.ty) else {
+                let Some(field_kind) = types.kind(f.ty) else {
                     continue;
                 };
 
                 match field_kind {
                     TypeKind::Array(a) => {
-                        let Some(element_type) = names.get(a.ty) else {
+                        let Some(element_type) = types.name(a.ty) else {
                             continue;
                         };
 

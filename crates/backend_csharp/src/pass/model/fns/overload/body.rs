@@ -36,7 +36,7 @@ impl Pass {
         originals: &model::fns::originals::Pass,
         all: &mut model::fns::all::Pass,
         overload_all: &mut model::fns::overload::all::Pass,
-        type_kinds: &model::types::kind::Pass,
+        types: &model::types::all::Pass,
         pointer_overloads: &model::types::overload::pointer::Pass,
         delegate_overloads: &model::types::overload::delegate::Pass,
         managed_conversion: &model::types::info::managed_conversion::Pass,
@@ -48,7 +48,7 @@ impl Pass {
                 continue;
             }
 
-            let has_any_delegate = original_fn.signature.arguments.iter().any(|arg| is_delegate_class(arg.ty, type_kinds));
+            let has_any_delegate = original_fn.signature.arguments.iter().any(|arg| is_delegate_class(arg.ty, types));
 
             if !has_any_delegate {
                 self.transforms.insert(original_id, None);
@@ -57,9 +57,9 @@ impl Pass {
 
             // Check that all required sibling types are available
             let all_ready = original_fn.signature.arguments.iter().all(|arg| {
-                if is_delegate_class(arg.ty, type_kinds) {
+                if is_delegate_class(arg.ty, types) {
                     delegate_overloads.get(arg.ty).is_some()
-                } else if is_eligible_intptr(arg.ty, type_kinds, managed_conversion) {
+                } else if is_eligible_intptr(arg.ty, types, managed_conversion) {
                     pointer_overloads.get(arg.ty).is_some()
                 } else {
                     true
@@ -75,11 +75,11 @@ impl Pass {
             let mut overload_args = Vec::new();
 
             for arg in &original_fn.signature.arguments {
-                if is_delegate_class(arg.ty, type_kinds) {
+                if is_delegate_class(arg.ty, types) {
                     let family = delegate_overloads.get(arg.ty).unwrap();
                     overload_args.push(Argument { name: arg.name.clone(), ty: family.signature });
                     arg_transforms.push(ArgTransform::WrapDelegate);
-                } else if is_eligible_intptr(arg.ty, type_kinds, managed_conversion) {
+                } else if is_eligible_intptr(arg.ty, types, managed_conversion) {
                     let family = pointer_overloads.get(arg.ty).unwrap();
                     overload_args.push(Argument { name: arg.name.clone(), ty: family.by_ref });
                     arg_transforms.push(ArgTransform::Ref);
@@ -109,6 +109,6 @@ impl Pass {
     }
 }
 
-fn is_delegate_class(ty: TypeId, type_kinds: &model::types::kind::Pass) -> bool {
-    matches!(type_kinds.get(ty), Some(TypeKind::Delegate(d)) if d.kind == DelegateKind::Class)
+fn is_delegate_class(ty: TypeId, types: &model::types::all::Pass) -> bool {
+    matches!(types.kind(ty), Some(TypeKind::Delegate(d)) if d.kind == DelegateKind::Class)
 }

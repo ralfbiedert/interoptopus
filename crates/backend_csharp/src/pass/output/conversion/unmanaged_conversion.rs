@@ -22,9 +22,9 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         managed_conversion: &model::types::info::managed_conversion::Pass,
-        kinds: &model::types::kind::Pass,
+        types: &model::types::all::Pass,
     ) -> OutputResult {
-        for (type_id, _) in kinds.iter() {
+        for (type_id, _) in types.iter() {
             if let Some(mc) = managed_conversion.managed_conversion(*type_id) {
                 self.conversions.insert(*type_id, mc);
             }

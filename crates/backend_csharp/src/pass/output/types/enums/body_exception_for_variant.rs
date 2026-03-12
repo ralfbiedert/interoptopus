@@ -24,12 +24,12 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        kinds: &model::types::kind::Pass,
-        names: &model::types::names::Pass,
+        types: &model::types::all::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        for (type_id, type_kind) in kinds.iter() {
+        for (type_id, ty) in types.iter() {
+            let type_kind = &ty.kind;
             let data_enum = match type_kind {
                 TypeKind::DataEnum(e) => e,
                 TypeKind::TypePattern(TypePattern::Result(_, _, e)) => e,
@@ -42,7 +42,7 @@ impl Pass {
                 .iter()
                 .map(|v| {
                     let has_payload = v.ty.is_some();
-                    let type_name = v.ty.and_then(|ty| names.get(ty)).cloned().unwrap_or_default();
+                    let type_name = v.ty.and_then(|ty| types.name(ty)).cloned().unwrap_or_default();
 
                     let mut m = HashMap::new();
                     m.insert("name", Value::String(v.name.clone()));

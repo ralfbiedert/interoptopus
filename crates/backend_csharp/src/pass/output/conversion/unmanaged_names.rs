@@ -21,14 +21,11 @@ impl Pass {
     pub fn process(
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
-        names: &model::types::names::Pass,
+        types: &model::types::all::Pass,
         managed_conversion: &model::types::info::managed_conversion::Pass,
-        kinds: &model::types::kind::Pass,
     ) -> OutputResult {
-        for (type_id, _) in kinds.iter() {
-            let Some(managed_name) = names.get(*type_id) else {
-                continue;
-            };
+        for (type_id, ty) in types.iter() {
+            let managed_name = &ty.name;
 
             let unmanaged_name = match managed_conversion.managed_conversion(*type_id) {
                 Some(ManagedConversion::AsIs) => managed_name.to_string(),

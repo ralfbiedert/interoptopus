@@ -31,8 +31,7 @@ impl Pass {
         output_master: &output::master::Pass,
         overload_body: &model::fns::overload::body::Pass,
         originals: &model::fns::originals::Pass,
-        type_names: &model::types::names::Pass,
-        type_kinds: &model::types::kind::Pass,
+        types: &model::types::all::Pass,
         pointer_overloads: &model::types::overload::pointer::Pass,
         delegate_overloads: &model::types::overload::delegate::Pass,
     ) -> OutputResult {
@@ -43,7 +42,7 @@ impl Pass {
 
             for (fn_id, transforms) in overload_body.iter() {
                 let Some(original_fn) = originals.get(fn_id) else { continue };
-                let rendered = render_body_overload(original_fn, transforms, type_names, type_kinds, pointer_overloads, delegate_overloads, templates)?;
+                let rendered = render_body_overload(original_fn, transforms, types, pointer_overloads, delegate_overloads, templates)?;
                 imports.push(rendered);
             }
 
@@ -63,19 +62,17 @@ impl Pass {
 fn render_body_overload(
     original_fn: &crate::lang::functions::Function,
     transforms: &crate::lang::functions::overload::FnTransforms,
-    type_names: &model::types::names::Pass,
-    type_kinds: &model::types::kind::Pass,
+    types: &model::types::all::Pass,
     pointer_overloads: &model::types::overload::pointer::Pass,
     delegate_overloads: &model::types::overload::delegate::Pass,
     templates: &TemplateEngine,
 ) -> Result<String, crate::Error> {
     let name = &original_fn.name;
 
-    let rval = type_names
-        .get(original_fn.signature.rval)
+    let rval = types.name(original_fn.signature.rval)
         .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of body overload `{}`", name)))?;
 
-    let is_void = matches!(type_kinds.get(original_fn.signature.rval), Some(TypeKind::Primitive(Primitive::Void)));
+    let is_void = matches!(types.kind(original_fn.signature.rval), Some(TypeKind::Primitive(Primitive::Void)));
 
     let mut args: Vec<HashMap<String, String>> = Vec::new();
     for (arg, transform) in original_fn.signature.arguments.iter().zip(&transforms.args) {
@@ -84,8 +81,7 @@ fn render_body_overload(
 
         match transform {
             ArgTransform::PassThrough => {
-                let ty_name = type_names
-                    .get(arg.ty)
+                let ty_name = types.name(arg.ty)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of body overload `{}`", arg.name, name)))?;
                 m.insert("ty".to_string(), ty_name.clone());
                 m.insert("is_ref".to_string(), "false".to_string());
@@ -95,8 +91,7 @@ fn render_body_overload(
                 let family = pointer_overloads
                     .get(arg.ty)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("pointer family for arg `{}` of body overload `{}`", arg.name, name)))?;
-                let ty_name = type_names
-                    .get(family.by_ref)
+                let ty_name = types.name(family.by_ref)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("ref type for arg `{}` of body overload `{}`", arg.name, name)))?;
                 m.insert("ty".to_string(), ty_name.clone());
                 m.insert("is_ref".to_string(), "true".to_string());
@@ -106,11 +101,9 @@ fn render_body_overload(
                 let family = delegate_overloads
                     .get(arg.ty)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("delegate family for arg `{}` of body overload `{}`", arg.name, name)))?;
-                let sig_name = type_names
-                    .get(family.signature)
+                let sig_name = types.name(family.signature)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("delegate sig for arg `{}` of body overload `{}`", arg.name, name)))?;
-                let class_name = type_names
-                    .get(family.class)
+                let class_name = types.name(family.class)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("delegate class for arg `{}` of body overload `{}`", arg.name, name)))?;
                 m.insert("ty".to_string(), sig_name.clone());
                 m.insert("is_ref".to_string(), "false".to_string());
