@@ -20,18 +20,18 @@ edition = "2024"
 license = "MIT"
 repository = "https://github.com/ralfbiedert/interoptopus"
 rust-version = "1.88"
-version = "0.15.0-alpha.18"
+version = "0.16.0-alpha.1"
 
 [workspace.dependencies]
 # Internal
-interoptopus = { path = "crates/core", version = "=0.15.0-alpha.18" }
-interoptopus_proc = { path = "crates/proc_macros", version = "=0.15.0-alpha.18" }
-interoptopus_proc_impl = { path = "crates/proc_macros_impl", version = "=0.15.0-alpha.18" }
-interoptopus_c = { path = "crates/backend_c", version = "=0.15.0-alpha.18" }
-interoptopus_cpython = { path = "crates/backend_cpython", version = "=0.15.0-alpha.18" }
-interoptopus_csharp = { path = "crates/backend_csharp", version = "=0.15.0-alpha.18" }
-interoptopus_csharp_old = { path = "crates/backend_csharp_old", version = "=0.15.0-alpha.18" }
-interoptopus_backends = { path = "crates/backend_utils", version = "=0.15.0-alpha.18" }
+interoptopus = { path = "crates/core", version = "=0.16.0-alpha.1" }
+interoptopus_proc = { path = "crates/proc_macros", version = "=0.16.0-alpha.1" }
+interoptopus_proc_impl = { path = "crates/proc_macros_impl", version = "=0.16.0-alpha.1" }
+interoptopus_c = { path = "crates/backend_c", version = "=0.16.0-alpha.1" }
+interoptopus_cpython = { path = "crates/backend_cpython", version = "=0.16.0-alpha.1" }
+interoptopus_csharp = { path = "crates/backend_csharp", version = "=0.16.0-alpha.1" }
+interoptopus_csharp_old = { path = "crates/backend_csharp_old", version = "=0.16.0-alpha.1" }
+interoptopus_backends = { path = "crates/backend_utils", version = "=0.16.0-alpha.1" }
 # Not published (no version dependency):
 reference_project = { path = "crates/reference_project" }
 
