@@ -37,7 +37,7 @@ impl Pass {
                 _ => continue,
             };
 
-            let name = types.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
+            let name = &ty.name;
 
             let ty = *type_id;
             let struct_or_class = if struct_class.is_struct(ty) { "struct" } else { "class" };
@@ -47,7 +47,7 @@ impl Pass {
                 .iter()
                 .filter_map(|v| {
                     let ty = v.ty?;
-                    let ty_name = types.name(ty)?;
+                    let ty_name = types.get(ty).map(|t| &t.name)?;
                     let mut m = HashMap::new();
                     m.insert("name", v.name.to_string());
                     m.insert("type", ty_name.clone());

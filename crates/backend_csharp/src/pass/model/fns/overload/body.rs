@@ -110,5 +110,5 @@ impl Pass {
 }
 
 fn is_delegate_class(ty: TypeId, types: &model::types::all::Pass) -> bool {
-    matches!(types.kind(ty), Some(TypeKind::Delegate(d)) if d.kind == DelegateKind::Class)
+    matches!(types.get(ty).map(|t| &t.kind), Some(TypeKind::Delegate(d)) if d.kind == DelegateKind::Class)
 }

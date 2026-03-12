@@ -43,13 +43,13 @@ impl Pass {
             };
 
             for f in &composite.fields {
-                let Some(field_kind) = types.kind(f.ty) else {
+                let Some(field_kind) = types.get(f.ty).map(|t| &t.kind) else {
                     continue;
                 };
 
                 match field_kind {
                     TypeKind::Array(a) => {
-                        let Some(element_type) = types.name(a.ty) else {
+                        let Some(element_type) = types.get(a.ty).map(|t| &t.name) else {
                             continue;
                         };
 

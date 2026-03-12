@@ -4,7 +4,7 @@
 //! names (via the `names` pass). Other passes should prefer querying this pass
 //! over accessing `kind` or `names` directly.
 
-use crate::lang::types::{Type, TypeKind};
+use crate::lang::types::Type;
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
@@ -55,19 +55,7 @@ impl Pass {
         self.types.get(&ty)
     }
 
-    pub fn name(&self, ty: TypeId) -> Option<&String> {
-        self.types.get(&ty).map(|t| &t.name)
-    }
-
-    pub fn kind(&self, ty: TypeId) -> Option<&TypeKind> {
-        self.types.get(&ty).map(|t| &t.kind)
-    }
-
-    pub fn contains(&self, id: &TypeId) -> bool {
-        self.types.contains_key(id)
-    }
-
-    pub fn iter(&self) -> impl Iterator<Item = (&TypeId, &Type)> {
+pub fn iter(&self) -> impl Iterator<Item = (&TypeId, &Type)> {
         self.types.iter()
     }
 }

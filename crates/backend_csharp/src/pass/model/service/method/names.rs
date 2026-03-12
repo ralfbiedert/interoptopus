@@ -33,7 +33,7 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (_service_id, service) in service_map.iter() {
-            let Some(type_name) = types.name(service.ty) else { continue };
+            let Some(type_name) = types.get(service.ty).map(|t| &t.name) else { continue };
 
             let all_fns = service.ctors.iter().chain(service.methods.iter()).chain(std::iter::once(&service.destructor));
 

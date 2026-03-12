@@ -36,7 +36,7 @@ impl Pass {
                 _ => continue,
             };
 
-            let name = types.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
+            let name = &ty.name;
             let ty = *type_id;
             let struct_or_class = if struct_class.is_struct(ty) { "struct" } else { "class" };
 

@@ -8,7 +8,7 @@ pub mod body;
 pub mod simple;
 
 fn is_eligible_intptr(ty: TypeId, types: &model::types::all::Pass, managed_conversion: &model::types::info::managed_conversion::Pass) -> bool {
-    let Some(TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target })) = types.kind(ty) else {
+    let Some(TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target })) = types.get(ty).map(|t| &t.kind) else {
         return false;
     };
     matches!(managed_conversion.managed_conversion(*target), Some(ManagedConversion::AsIs | ManagedConversion::To))

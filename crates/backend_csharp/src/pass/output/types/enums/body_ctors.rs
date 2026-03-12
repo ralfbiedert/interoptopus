@@ -37,14 +37,14 @@ impl Pass {
                 _ => continue,
             };
 
-            let name = types.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
+            let name = &ty.name;
 
             let variants: Vec<HashMap<&str, Value>> = data_enum
                 .variants
                 .iter()
                 .map(|v| {
                     let has_payload = v.ty.is_some();
-                    let type_name = v.ty.and_then(|ty| types.name(ty)).cloned().unwrap_or_default();
+                    let type_name = v.ty.and_then(|ty| types.get(ty).map(|t| &t.name)).cloned().unwrap_or_default();
 
                     let mut m = HashMap::new();
                     m.insert("name", Value::String(v.name.clone()));

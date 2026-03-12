@@ -34,7 +34,7 @@ impl Pass {
             let mut rendered_services = Vec::new();
 
             for (service_id, service) in service_map.iter() {
-                let Some(name) = types.name(service.ty) else { continue };
+                let Some(name) = types.get(service.ty).map(|t| &t.name) else { continue };
                 let Some(dtor_fn) = fn_map.get(service.destructor) else { continue };
                 let ctors = body_ctors.get(*service_id).unwrap_or_default();
                 let methods = body_methods.get(*service_id).unwrap_or_default();

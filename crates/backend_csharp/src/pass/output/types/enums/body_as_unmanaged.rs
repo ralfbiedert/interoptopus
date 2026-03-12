@@ -37,7 +37,7 @@ impl Pass {
                 _ => continue,
             };
 
-            let name = types.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
+            let name = &ty.name;
 
             let variants: Vec<HashMap<&str, String>> = data_enum
                 .variants

@@ -36,7 +36,7 @@ impl Pass {
                 _ => continue,
             };
 
-            let name = types.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
+            let name = &ty.name;
             let to_unmanaged = managed.to_unmanaged_name(*type_id);
 
             let fields: Vec<HashMap<&str, String>> = composite
