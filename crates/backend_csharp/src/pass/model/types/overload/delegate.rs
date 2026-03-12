@@ -5,11 +5,10 @@
 //! `DelegateKind::Signature`. This sibling is used by the body overload pass to build
 //! overload signatures that accept C# delegates directly instead of the wrapper class.
 
-use crate::lang::types::{Delegate, DelegateKind, Type, TypeKind};
+use crate::lang::types::{Delegate, DelegateFamily, DelegateKind, OverloadFamily, Type, TypeKind};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
-use crate::pass::model::types::overload::all::{DelegateFamily, OverloadFamily};
 use std::collections::HashSet;
 use std::sync::Arc;
 

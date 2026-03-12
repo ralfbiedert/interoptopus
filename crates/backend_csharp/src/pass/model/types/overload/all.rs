@@ -5,31 +5,10 @@
 //! passes (pointer, delegate) register their families here; downstream passes
 //! query this pass instead of the individual ones.
 
+use crate::lang::types::OverloadFamily;
 use crate::lang::TypeId;
 use std::collections::HashMap;
 use std::sync::Arc;
-
-/// The IntPtr/ByRef/ByOut family for a single pointer type.
-#[derive(Debug, Clone)]
-pub struct PointerFamily {
-    pub intptr: TypeId,
-    pub by_ref: TypeId,
-    pub by_out: TypeId,
-}
-
-/// Links a delegate class type to its bare delegate signature sibling.
-#[derive(Debug, Clone)]
-pub struct DelegateFamily {
-    pub class: TypeId,
-    pub signature: TypeId,
-}
-
-/// Discriminated union over all overload family kinds.
-#[derive(Debug, Clone)]
-pub enum OverloadFamily {
-    Pointer(PointerFamily),
-    Delegate(DelegateFamily),
-}
 
 #[derive(Default)]
 pub struct Config {}

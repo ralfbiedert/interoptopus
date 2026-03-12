@@ -1,6 +1,5 @@
 //! ...
 
-use crate::lang::types::Field;
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};

@@ -5,11 +5,10 @@
 //! with fresh TypeIds derived from the original. It registers them in the kind, name,
 //! and all passes, and registers the family in the overload all pass.
 
-use crate::lang::types::{Pointer, PointerKind, Type, TypeKind};
+use crate::lang::types::{OverloadFamily, Pointer, PointerFamily, PointerKind, Type, TypeKind};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
-use crate::pass::model::types::overload::all::{OverloadFamily, PointerFamily};
 use std::collections::HashMap;
 use std::sync::Arc;
 

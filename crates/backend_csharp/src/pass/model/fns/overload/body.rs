@@ -9,10 +9,9 @@
 
 use crate::lang::functions::overload::{ArgTransform, FnTransforms, RvalTransform};
 use crate::lang::functions::{Argument, Function, Signature};
-use crate::lang::types::{DelegateKind, ManagedConversion, Pointer, PointerKind, TypeKind};
+use crate::lang::types::{ManagedConversion, OverloadFamily};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
-use crate::pass::model::types::overload::all::OverloadFamily;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;
