@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          lfs: true
       - name: Python - Install 3.8
         uses: actions/setup-python@v2
         with:
