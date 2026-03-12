@@ -78,6 +78,25 @@ pub fn pascal_to_snake(name: &str) -> String {
     result
 }
 
+/// Derives a method name from a service function name by stripping the snake_case
+/// service prefix and PascalCasing the remainder.
+///
+/// Given a PascalCase type name (e.g. `ServiceBasic`) and a snake_case function name
+/// (e.g. `service_basic_do_something`), strips the prefix to produce `DoSomething`.
+/// If the function name doesn't start with the prefix, the full name is PascalCased.
+///
+/// # Examples
+/// - `("ServiceBasic", "service_basic_do_something")` → `"DoSomething"`
+/// - `("ServiceBasic", "unrelated_name")` → `"UnrelatedName"`
+pub fn service_method_name(type_name: &str, fn_name: &str) -> String {
+    let prefix = pascal_to_snake(type_name);
+    let method_part = fn_name
+        .strip_prefix(&prefix)
+        .and_then(|s| s.strip_prefix('_'))
+        .unwrap_or(fn_name);
+    rust_to_pascal(method_part)
+}
+
 /// Sanitizes a Rust delegate/fn-pointer name into a valid target-language identifier.
 ///
 /// Strips the `extern "C" ` prefix, removes void return types (`-> ()`),
@@ -132,6 +151,13 @@ mod tests {
         assert_eq!(rust_to_pascal("vec3_f32"), "Vec3F32");
         assert_eq!(rust_to_pascal("already"), "Already");
         assert_eq!(rust_to_pascal("a_b_c"), "ABC");
+    }
+
+    #[test]
+    fn test_service_method_name() {
+        assert_eq!(service_method_name("ServiceBasic", "service_basic_do_something"), "DoSomething");
+        assert_eq!(service_method_name("ServiceBasic", "unrelated_name"), "UnrelatedName");
+        assert_eq!(service_method_name("MyService", "my_service_new"), "New");
     }
 
     #[test]

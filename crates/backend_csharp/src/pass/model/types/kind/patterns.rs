@@ -22,7 +22,7 @@ impl Pass {
     pub fn process(
         &mut self,
         pass_meta: &mut crate::pass::PassMeta,
-        id_map: &model::id::Pass,
+        id_map: &model::id_map::Pass,
         kinds: &mut model::types::kind::Pass,
         fallbacks: &model::types::fallback::Pass,
         rs_types: &interoptopus::inventory::Types,
@@ -67,7 +67,7 @@ impl Pass {
                 lang::types::TypePattern::NamedCallback(_) => continue,
             };
 
-            kinds.set_kind(cs_id, TypeKind::TypePattern(cs_pattern));
+            kinds.set(cs_id, TypeKind::TypePattern(cs_pattern));
             outcome.changed();
         }
 

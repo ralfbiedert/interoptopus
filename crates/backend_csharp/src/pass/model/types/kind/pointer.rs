@@ -22,7 +22,7 @@ impl Pass {
     pub fn process(
         &mut self,
         pass_meta: &mut crate::pass::PassMeta,
-        id_map: &model::id::Pass,
+        id_map: &model::id_map::Pass,
         kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
@@ -50,7 +50,7 @@ impl Pass {
             let cs_pointee_id = try_resolve!(id_map.ty(*rust_pointee_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_pointee_id));
 
             // Register the pointer type
-            kinds.set_kind(cs_id, TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(hint), target: cs_pointee_id }));
+            kinds.set(cs_id, TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(hint), target: cs_pointee_id }));
             outcome.changed();
         }
 

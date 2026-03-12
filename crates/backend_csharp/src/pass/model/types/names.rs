@@ -38,7 +38,7 @@ impl Pass {
     pub fn process(
         &mut self,
         pass_meta: &mut crate::pass::PassMeta,
-        id_map: &model::id::Pass,
+        id_map: &model::id_map::Pass,
         kinds: &model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
@@ -95,11 +95,11 @@ impl Pass {
         Ok(outcome)
     }
 
-    pub fn set_name(&mut self, ty: TypeId, name: String) {
+    pub fn set(&mut self, ty: TypeId, name: String) {
         self.names.insert(ty, name);
     }
 
-    pub fn name(&self, ty: TypeId) -> Option<&String> {
+    pub fn get(&self, ty: TypeId) -> Option<&String> {
         self.names.get(&ty)
     }
 }

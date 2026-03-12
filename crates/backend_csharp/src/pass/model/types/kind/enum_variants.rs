@@ -21,7 +21,7 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, variants: Default::default() }
     }
 
-    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &model::id::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &model::id_map::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
@@ -69,7 +69,7 @@ impl Pass {
         Ok(outcome)
     }
 
-    pub fn get_variants(&self, ty: TypeId) -> Option<&Vec<Variant>> {
+    pub fn get(&self, ty: TypeId) -> Option<&Vec<Variant>> {
         self.variants.get(&ty)
     }
 }

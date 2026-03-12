@@ -33,7 +33,7 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, fallbacks: Default::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, id_map: &model::id::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, id_map: &model::id_map::Pass, rs_types: &interoptopus::inventory::Types) -> ModelResult {
         let mut outcome = Unchanged;
 
         // Static Rust TypeIds for commonly needed types and pointers.
@@ -130,6 +130,6 @@ fn variant(name: &str, tag: usize, ty: Option<TypeId>) -> Variant {
 /// Resolves a Rust type to an optional C# variant payload.
 /// Void types (`()`) become `Some(None)` (no payload), non-void types become
 /// `Some(Some(cs_id))`, and not-yet-mapped types return `None`.
-fn resolve_payload(rust_ty: interoptopus::inventory::TypeId, id_map: &model::id::Pass) -> Option<Option<TypeId>> {
+fn resolve_payload(rust_ty: interoptopus::inventory::TypeId, id_map: &model::id_map::Pass) -> Option<Option<TypeId>> {
     if rust_ty == <()>::id() { Some(None) } else { id_map.ty(rust_ty).map(Some) }
 }

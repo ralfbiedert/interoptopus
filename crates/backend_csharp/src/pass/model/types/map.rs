@@ -31,7 +31,7 @@ impl Pass {
             }
 
             // Get the name for this type
-            let name = try_resolve!(names.name(*type_id), pass_meta, self.info, crate::pass::MissingItem::CsType(*type_id));
+            let name = try_resolve!(names.get(*type_id), pass_meta, self.info, crate::pass::MissingItem::CsType(*type_id));
 
             // Create the Type
             let ty = Type { name: name.clone(), kind: kind.clone() };
@@ -43,11 +43,11 @@ impl Pass {
         Ok(outcome)
     }
 
-    pub fn register(&mut self, ty: TypeId, t: Type) {
+    pub fn set(&mut self, ty: TypeId, t: Type) {
         self.types.insert(ty, t);
     }
 
-    pub fn ty(&self, ty: TypeId) -> Option<&Type> {
+    pub fn get(&self, ty: TypeId) -> Option<&Type> {
         self.types.get(&ty)
     }
 }

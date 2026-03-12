@@ -11,10 +11,10 @@ use crate::lang::functions::overload::{ArgTransform, FnTransforms, RvalTransform
 use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::types::{DelegateKind, ManagedConversion, Pointer, PointerKind, TypeKind};
 use crate::lang::{FunctionId, TypeId};
+use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;
-use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
 
 #[derive(Default)]
 pub struct Config {}
@@ -58,9 +58,9 @@ impl Pass {
             // Check that all required sibling types are available
             let all_ready = original_fn.signature.arguments.iter().all(|arg| {
                 if is_delegate_class(arg.ty, type_kinds) {
-                    delegate_overloads.family(arg.ty).is_some()
+                    delegate_overloads.get(arg.ty).is_some()
                 } else if is_eligible_intptr(arg.ty, type_kinds, managed_conversion) {
-                    pointer_overloads.family(arg.ty).is_some()
+                    pointer_overloads.get(arg.ty).is_some()
                 } else {
                     true
                 }
@@ -76,11 +76,11 @@ impl Pass {
 
             for arg in &original_fn.signature.arguments {
                 if is_delegate_class(arg.ty, type_kinds) {
-                    let family = delegate_overloads.family(arg.ty).unwrap();
+                    let family = delegate_overloads.get(arg.ty).unwrap();
                     overload_args.push(Argument { name: arg.name.clone(), ty: family.signature });
                     arg_transforms.push(ArgTransform::WrapDelegate);
                 } else if is_eligible_intptr(arg.ty, type_kinds, managed_conversion) {
-                    let family = pointer_overloads.family(arg.ty).unwrap();
+                    let family = pointer_overloads.get(arg.ty).unwrap();
                     overload_args.push(Argument { name: arg.name.clone(), ty: family.by_ref });
                     arg_transforms.push(ArgTransform::Ref);
                 } else {

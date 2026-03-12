@@ -20,7 +20,7 @@ impl Pass {
     pub fn process(
         &mut self,
         pass_meta: &mut crate::pass::PassMeta,
-        id_map: &model::id::Pass,
+        id_map: &model::id_map::Pass,
         kinds: &mut model::types::kind::Pass,
         fields: &model::types::kind::struct_fields::Pass,
         rs_types: &interoptopus::inventory::Types,
@@ -43,11 +43,11 @@ impl Pass {
                 continue;
             }
 
-            let fields = try_resolve!(fields.get_fields(cs_id), pass_meta, self.info, crate::pass::MissingItem::CsType(cs_id));
+            let fields = try_resolve!(fields.get(cs_id), pass_meta, self.info, crate::pass::MissingItem::CsType(cs_id));
 
             let composite = Composite { fields: fields.clone(), repr: rust_struct.repr };
 
-            kinds.set_kind(cs_id, TypeKind::Composite(composite));
+            kinds.set(cs_id, TypeKind::Composite(composite));
             outcome.changed();
         }
 

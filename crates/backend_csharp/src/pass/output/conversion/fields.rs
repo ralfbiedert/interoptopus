@@ -25,11 +25,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: file!() },
-            custom_to_managed: Default::default(),
-            custom_to_unmanaged: Default::default(),
-        }
+        Self { info: PassInfo { name: file!() }, custom_to_managed: Default::default(), custom_to_unmanaged: Default::default() }
     }
 
     pub fn process(
@@ -54,7 +50,7 @@ impl Pass {
 
                 match field_kind {
                     TypeKind::Array(a) => {
-                        let Some(element_type) = names.name(a.ty) else {
+                        let Some(element_type) = names.get(a.ty) else {
                             continue;
                         };
 

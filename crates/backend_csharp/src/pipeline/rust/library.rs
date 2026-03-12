@@ -12,7 +12,7 @@ use std::marker::PhantomData;
 #[derive(Default)]
 pub struct RustLibraryConfig {
     pub meta_info: meta::info::Config,
-    pub model_id_maps: model::id::Config,
+    pub model_id_maps: model::id_map::Config,
     pub model_type_kinds: model::types::kind::Config,
     pub model_type_map_primitives: model::types::kind::primitives::Config,
     pub model_type_map_array: model::types::kind::array::Config,
@@ -113,7 +113,7 @@ pub struct RustLibrary {
 
     // Model passes (transform and enrich data)
     meta_info: meta::info::Pass,
-    model_id_maps: model::id::Pass,
+    model_id_maps: model::id_map::Pass,
     model_type_kinds: model::types::kind::Pass,
     model_type_map_primitives: model::types::kind::primitives::Pass,
     model_type_map_array: model::types::kind::array::Pass,
@@ -177,7 +177,7 @@ impl RustLibrary {
         Self {
             inventory,
             meta_info: meta::info::Pass::new(config.meta_info),
-            model_id_maps: model::id::Pass::new(config.model_id_maps),
+            model_id_maps: model::id_map::Pass::new(config.model_id_maps),
             model_type_kinds: model::types::kind::Pass::new(config.model_type_kinds),
             model_type_map_primitives: model::types::kind::primitives::Pass::new(config.model_type_map_primitives),
             model_type_map_array: model::types::kind::array::Pass::new(config.model_type_map_array),

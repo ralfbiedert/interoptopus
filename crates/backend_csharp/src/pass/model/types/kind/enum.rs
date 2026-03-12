@@ -21,7 +21,7 @@ impl Pass {
     pub fn process(
         &mut self,
         pass_meta: &mut crate::pass::PassMeta,
-        id_map: &model::id::Pass,
+        id_map: &model::id_map::Pass,
         kinds: &mut model::types::kind::Pass,
         variants_pass: &model::types::kind::enum_variants::Pass,
         rs_types: &interoptopus::inventory::Types,
@@ -35,7 +35,7 @@ impl Pass {
             }
 
             let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
-            let variants = try_resolve!(variants_pass.get_variants(cs_id), pass_meta, self.info, crate::pass::MissingItem::CsType(cs_id));
+            let variants = try_resolve!(variants_pass.get(cs_id), pass_meta, self.info, crate::pass::MissingItem::CsType(cs_id));
 
             // Check if we've already processed this type
             if kinds.contains(&cs_id) {
@@ -45,7 +45,7 @@ impl Pass {
             // Create the data enum
             let data_enum = DataEnum { variants: variants.clone() };
 
-            kinds.set_kind(cs_id, TypeKind::DataEnum(data_enum));
+            kinds.set(cs_id, TypeKind::DataEnum(data_enum));
             outcome.changed();
         }
 

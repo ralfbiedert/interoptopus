@@ -20,7 +20,7 @@ impl Pass {
     pub fn process(
         &mut self,
         pass_meta: &mut crate::pass::PassMeta,
-        id_map: &model::id::Pass,
+        id_map: &model::id_map::Pass,
         kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
@@ -36,7 +36,7 @@ impl Pass {
 
             let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
 
-            kinds.set_kind(cs_id, TypeKind::Service);
+            kinds.set(cs_id, TypeKind::Service);
             outcome.changed();
         }
 

@@ -26,7 +26,7 @@ impl Pass {
         kinds: &model::types::kind::Pass,
     ) -> OutputResult {
         for (type_id, _) in kinds.iter() {
-            let Some(managed_name) = names.name(*type_id) else {
+            let Some(managed_name) = names.get(*type_id) else {
                 continue;
             };
 

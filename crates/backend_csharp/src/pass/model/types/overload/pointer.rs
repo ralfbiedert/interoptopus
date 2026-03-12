@@ -33,11 +33,7 @@ pub struct Pass {
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self {
-            info: PassInfo { name: file!() },
-            families: Default::default(),
-            processed: Default::default(),
-        }
+        Self { info: PassInfo { name: file!() }, families: Default::default(), processed: Default::default() }
     }
 
     pub fn process(
@@ -64,12 +60,12 @@ impl Pass {
             }
 
             // Wait until the IntPtr type is fully resolved in the map pass
-            let Some(intptr_type) = map.ty(intptr_id) else {
+            let Some(intptr_type) = map.get(intptr_id) else {
                 continue;
             };
 
             // Also need the pointee to be named
-            let Some(pointee_name) = names.name(pointee_id) else {
+            let Some(pointee_name) = names.get(pointee_id) else {
                 continue;
             };
 
@@ -81,16 +77,16 @@ impl Pass {
             let by_out_id = TypeId::from_id(intptr_id.id().derive(0x_6279_6F75_745F_7369)); // "byout_si"
 
             // Register kinds
-            kinds.set_kind(by_ref_id, TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }));
-            kinds.set_kind(by_out_id, TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }));
+            kinds.set(by_ref_id, TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }));
+            kinds.set(by_out_id, TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }));
 
             // Register names
-            names.set_name(by_ref_id, format!("ref {pointee_name}"));
-            names.set_name(by_out_id, format!("out {pointee_name}"));
+            names.set(by_ref_id, format!("ref {pointee_name}"));
+            names.set(by_out_id, format!("out {pointee_name}"));
 
             // Register in the map pass so they're fully resolved
-            map.register(by_ref_id, Type { name: format!("ref {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }) });
-            map.register(by_out_id, Type { name: format!("out {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }) });
+            map.set(by_ref_id, Type { name: format!("ref {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }) });
+            map.set(by_out_id, Type { name: format!("out {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }) });
 
             // Build family
             let family = Arc::new(Family { intptr: intptr_id, by_ref: by_ref_id, by_out: by_out_id });
@@ -107,7 +103,7 @@ impl Pass {
     }
 
     /// Look up the pointer family for any member TypeId (intptr, by_ref, or by_out).
-    pub fn family(&self, type_id: TypeId) -> Option<&Arc<Family>> {
+    pub fn get(&self, type_id: TypeId) -> Option<&Arc<Family>> {
         self.families.get(&type_id)
     }
 }

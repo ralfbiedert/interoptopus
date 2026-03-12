@@ -7,7 +7,7 @@
 use crate::lang::FunctionId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
-use interoptopus_backends::casing::{pascal_to_snake, rust_to_pascal};
+use interoptopus_backends::casing::service_method_name;
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -33,8 +33,7 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (_service_id, service) in service_map.iter() {
-            let Some(type_name) = type_names.name(service.ty) else { continue };
-            let prefix = pascal_to_snake(type_name);
+            let Some(type_name) = type_names.get(service.ty) else { continue };
 
             let all_fns = service.ctors.iter().chain(service.methods.iter()).chain(std::iter::once(&service.destructor));
 
@@ -45,13 +44,7 @@ impl Pass {
 
                 let Some(func) = fn_map.get(fn_id) else { continue };
 
-                let method_part = func
-                    .name
-                    .strip_prefix(&prefix)
-                    .and_then(|s| s.strip_prefix('_'))
-                    .unwrap_or(&func.name);
-
-                let method_name = rust_to_pascal(method_part);
+                let method_name = service_method_name(type_name, &func.name);
 
                 self.names.insert(fn_id, method_name);
                 outcome.changed();

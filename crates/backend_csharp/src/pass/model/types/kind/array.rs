@@ -21,7 +21,7 @@ impl Pass {
     pub fn process(
         &mut self,
         pass_meta: &mut crate::pass::PassMeta,
-        id_map: &model::id::Pass,
+        id_map: &model::id_map::Pass,
         kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
@@ -37,7 +37,7 @@ impl Pass {
             // Create the C# array with mapped element type
             let cs_array = Array { ty: cs_element_type, len: rust_array.len };
 
-            kinds.set_kind(cs_id, TypeKind::Array(cs_array));
+            kinds.set(cs_id, TypeKind::Array(cs_array));
             outcome.changed();
         }
 

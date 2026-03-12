@@ -35,7 +35,7 @@ impl Pass {
         Ok(Unchanged)
     }
 
-    pub fn set_kind(&mut self, id: TypeId, kind: TypeKind) {
+    pub fn set(&mut self, id: TypeId, kind: TypeKind) {
         self.kinds.insert(id, kind);
     }
 

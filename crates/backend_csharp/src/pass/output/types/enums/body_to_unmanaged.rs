@@ -37,7 +37,7 @@ impl Pass {
                 _ => continue,
             };
 
-            let name = names.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
+            let name = names.get(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
             let to_unmanaged = managed.to_unmanaged_name(*type_id);
 
             let variants: Vec<HashMap<&str, String>> = data_enum

@@ -25,7 +25,7 @@ impl Pass {
     pub fn process(
         &mut self,
         pass_meta: &mut crate::pass::PassMeta,
-        id_map: &model::id::Pass,
+        id_map: &model::id_map::Pass,
         kinds: &mut model::types::kind::Pass,
         rs_types: &interoptopus::inventory::Types,
     ) -> ModelResult {
@@ -69,7 +69,7 @@ impl Pass {
 
             let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
 
-            kinds.set_kind(cs_id, TypeKind::Delegate(Delegate { kind: DelegateKind::Class, signature: cs_signature }));
+            kinds.set(cs_id, TypeKind::Delegate(Delegate { kind: DelegateKind::Class, signature: cs_signature }));
             outcome.changed();
         }
 

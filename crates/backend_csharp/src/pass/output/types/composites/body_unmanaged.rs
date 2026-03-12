@@ -36,13 +36,13 @@ impl Pass {
                 _ => continue,
             };
 
-            let name = names.name(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
+            let name = names.get(*type_id).ok_or_else(|| crate::Error::MissingTypeName(format!("{type_id:?}")))?;
 
             let fields: Vec<HashMap<&str, String>> = composite
                 .fields
                 .iter()
                 .map(|f| {
-                    let ty_name = names.name(f.ty).cloned().unwrap_or_default();
+                    let ty_name = names.get(f.ty).cloned().unwrap_or_default();
                     let to_managed = managed.to_managed_suffix(f.ty).to_string();
 
                     let mut m = HashMap::new();

@@ -41,13 +41,13 @@ impl Pass {
                 };
                 let signature = &delegate.signature;
 
-                let Some(name) = names.name(*type_id) else {
+                let Some(name) = names.get(*type_id) else {
                     continue;
                 };
 
                 // Determine return type info
                 let rval_kind = kinds.get(signature.rval);
-                let rval_managed = names.name(signature.rval).cloned().unwrap_or_else(|| "void".to_string());
+                let rval_managed = names.get(signature.rval).cloned().unwrap_or_else(|| "void".to_string());
                 let is_void = matches!(rval_kind, Some(TypeKind::Primitive(Primitive::Void)));
 
                 let rval_unmanaged = if is_void {
@@ -71,7 +71,7 @@ impl Pass {
                 // Build argument list (excluding callback_data which is always appended in the template)
                 let mut args: Vec<HashMap<String, String>> = Vec::new();
                 for arg in &signature.arguments {
-                    let Some(arg_managed) = names.name(arg.ty) else {
+                    let Some(arg_managed) = names.get(arg.ty) else {
                         continue;
                     };
 

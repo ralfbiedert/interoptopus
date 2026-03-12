@@ -25,7 +25,13 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, functions: Default::default() }
     }
 
-    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &model::id::Pass, all: &mut model::fns::all::Pass, rs_functions: &Functions) -> ModelResult {
+    pub fn process(
+        &mut self,
+        pass_meta: &mut crate::pass::PassMeta,
+        id_map: &model::id_map::Pass,
+        all: &mut model::fns::all::Pass,
+        rs_functions: &Functions,
+    ) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (rust_id, rust_fn) in rs_functions {

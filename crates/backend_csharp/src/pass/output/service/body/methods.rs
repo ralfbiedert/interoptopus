@@ -47,7 +47,7 @@ impl Pass {
             for &method_fn_id in &service.methods {
                 let Some(method_fn) = fn_all.get(method_fn_id) else { continue };
                 let Some(method_name) = method_names.get(method_fn_id) else { continue };
-                let Some(rval) = type_names.name(method_fn.signature.rval) else { continue };
+                let Some(rval) = type_names.get(method_fn.signature.rval) else { continue };
                 let is_void = matches!(type_kinds.get(method_fn.signature.rval), Some(TypeKind::Primitive(Primitive::Void)));
 
                 // Base method
@@ -78,7 +78,7 @@ impl Pass {
 fn build_args(args: &[Argument], type_names: &model::types::names::Pass, type_kinds: &model::types::kind::Pass) -> Vec<HashMap<&'static str, Value>> {
     args.iter()
         .filter_map(|arg| {
-            let ty_name = type_names.name(arg.ty)?;
+            let ty_name = type_names.get(arg.ty)?;
             let is_ref = matches!(type_kinds.get(arg.ty), Some(TypeKind::Pointer(p)) if p.kind == PointerKind::ByRef);
             Some(make_arg(&arg.name, ty_name, is_ref))
         })

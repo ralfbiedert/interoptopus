@@ -57,7 +57,7 @@ impl Pass {
             }
 
             // Wait until the class type is named
-            let Some(class_name) = names.name(class_id) else {
+            let Some(class_name) = names.get(class_id) else {
                 continue;
             };
 
@@ -69,9 +69,9 @@ impl Pass {
             let sig_delegate = Delegate { kind: DelegateKind::Signature, signature: delegate.signature.clone() };
 
             // Register in kinds, names, and map
-            kinds.set_kind(sig_id, TypeKind::Delegate(sig_delegate.clone()));
-            names.set_name(sig_id, sig_name.clone());
-            map.register(sig_id, Type { name: sig_name, kind: TypeKind::Delegate(sig_delegate) });
+            kinds.set(sig_id, TypeKind::Delegate(sig_delegate.clone()));
+            names.set(sig_id, sig_name.clone());
+            map.set(sig_id, Type { name: sig_name, kind: TypeKind::Delegate(sig_delegate) });
 
             // Build family
             let family = Arc::new(Family { class: class_id, signature: sig_id });
@@ -85,7 +85,7 @@ impl Pass {
     }
 
     /// Look up the delegate family for either member TypeId.
-    pub fn family(&self, type_id: TypeId) -> Option<&Arc<Family>> {
+    pub fn get(&self, type_id: TypeId) -> Option<&Arc<Family>> {
         self.families.get(&type_id)
     }
 }
