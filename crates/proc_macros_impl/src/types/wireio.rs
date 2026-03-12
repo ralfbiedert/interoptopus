@@ -32,6 +32,7 @@ impl TypeModel {
         let wireio_where_clause = self.build_wireio_where_clause(where_clause);
 
         quote_spanned! { name.span() =>
+            #[allow(clippy::used_underscore_binding, clippy::type_repetition_in_bounds)]
             impl #impl_generics ::interoptopus::lang::types::WireIO for #name #ty_generics #wireio_where_clause {
                 fn write(&self, #write_param: &mut impl ::std::io::Write) -> ::std::result::Result<(), ::interoptopus::lang::types::SerializationError> {
                     #write_impl

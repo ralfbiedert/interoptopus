@@ -10,15 +10,12 @@ version.workspace = true
 [dependencies]
 interoptopus.workspace = true
 interoptopus_backends.workspace = true
-fundle.workspace = true
-include_dir.workspace = true
 
 [build-dependencies]
 interoptopus_backends.workspace = true
 
 [dev-dependencies]
 interoptopus = { workspace = true, features = ["serde"] }
-insta.workspace = true
 serde_json.workspace = true
 
 [lints]

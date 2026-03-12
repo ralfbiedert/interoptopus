@@ -9,6 +9,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 #[derive(Default)]
+#[allow(clippy::struct_field_names)]
 pub struct MyPlugin {
     init_called: Arc<AtomicBool>,
     post_model_called: Arc<AtomicBool>,

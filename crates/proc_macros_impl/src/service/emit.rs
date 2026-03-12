@@ -258,6 +258,7 @@ impl ServiceModel {
         };
 
         quote_spanned! { self.service_name.span() =>
+            #[allow(clippy::ptr_cast_constness)]
             #[::interoptopus::ffi]
             fn #function_name #generics(instance: *const #service_type) {
                 if !instance.is_null() {
@@ -365,6 +366,7 @@ impl ServiceModel {
 
         quote_spanned! { method.name.span() =>
             #docs
+            #[allow(clippy::used_underscore_items)]
             #[::interoptopus::ffi]
             unsafe fn #function_name #enhanced_generics(
                 #async_params
@@ -592,6 +594,7 @@ impl ServiceModel {
         };
 
         Ok(quote_spanned! { x=>
+            #[allow(clippy::used_underscore_items)]
             const _: () = {
                 #base_service_verification
                 #async_verification

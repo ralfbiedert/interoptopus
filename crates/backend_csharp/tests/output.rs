@@ -8,7 +8,7 @@ fn output() -> Result<(), Box<dyn Error>> {
     let multibuf = RustLibrary::new(inventory).process()?;
 
     for output in multibuf.iter() {
-        println!("{:?}", output);
+        println!("{output:?}");
     }
 
     Ok(())

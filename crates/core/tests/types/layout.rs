@@ -1,3 +1,5 @@
+#![allow(clippy::ptr_as_ptr, clippy::borrow_as_ptr, clippy::cast_ptr_alignment, clippy::ref_as_ptr)]
+
 use interoptopus::ffi;
 use interoptopus::pattern::api_guard::ApiVersion;
 use std::mem;

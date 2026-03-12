@@ -1,6 +1,7 @@
 use interoptopus_backends::template::{TemplateEngine, pack_assets};
 use tera::Context;
 
+#[must_use]
 pub fn engine_from_templates() -> TemplateEngine {
     let mut buf = Vec::new();
     pack_assets(&mut buf, "tests/templates").unwrap();

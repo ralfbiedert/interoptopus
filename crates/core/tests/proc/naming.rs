@@ -3,6 +3,7 @@
 use interoptopus::lang::types::TypeInfo;
 use interoptopus_proc::ffi;
 
+#[allow(clippy::type_repetition_in_bounds)]
 #[ffi]
 struct Struct<T: TypeInfo> {
     t: T,

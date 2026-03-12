@@ -6,7 +6,11 @@ expression: expand_ffi!(item)
 struct Foo<T: TypeInfo> {
     t: T,
 }
-#[allow(clippy::eq_op)]
+#[allow(
+    clippy::eq_op,
+    clippy::type_repetition_in_bounds,
+    clippy::used_underscore_binding
+)]
 impl<T: TypeInfo> ::interoptopus::lang::types::TypeInfo for Foo<T> {
     const WIRE_SAFE: bool = <T as ::interoptopus::lang::types::TypeInfo>::WIRE_SAFE;
     const RAW_SAFE: bool = <T as ::interoptopus::lang::types::TypeInfo>::RAW_SAFE;
@@ -47,6 +51,7 @@ impl<T: TypeInfo> ::interoptopus::lang::types::TypeInfo for Foo<T> {
         inventory.register_type(Self::id(), Self::ty());
     }
 }
+#[allow(clippy::used_underscore_binding, clippy::type_repetition_in_bounds)]
 impl<T: TypeInfo> ::interoptopus::lang::types::WireIO for Foo<T>
 where
     T: ::interoptopus::lang::types::WireIO,

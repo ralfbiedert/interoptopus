@@ -2,6 +2,7 @@
 source: crates/proc_macros_impl/tests/svc_skip.rs
 expression: expand_ffi!(item)
 ---
+#[allow(clippy::used_underscore_items)]
 const _: () = {
     const fn _assert_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
     _assert_type_info::<Service>();
@@ -10,6 +11,7 @@ const _: () = {
 impl Service {
     fn new() -> ffi::Result<Self, Error> {}
 }
+#[allow(clippy::ptr_cast_constness)]
 #[::interoptopus::ffi]
 fn service_destroy(instance: *const Service) {
     if !instance.is_null() {

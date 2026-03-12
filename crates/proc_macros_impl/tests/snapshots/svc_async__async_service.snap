@@ -2,6 +2,7 @@
 source: crates/proc_macros_impl/tests/svc_async.rs
 expression: expand_ffi!(item)
 ---
+#[allow(clippy::used_underscore_items)]
 const _: () = {
     const fn _assert_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
     _assert_type_info::<Service>();
@@ -58,6 +59,7 @@ unsafe fn service_new() -> <::interoptopus::ffi::Result<
         ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
     }
 }
+#[allow(clippy::ptr_cast_constness)]
 #[::interoptopus::ffi]
 fn service_destroy(instance: *const Service) {
     if !instance.is_null() {
@@ -66,6 +68,7 @@ fn service_destroy(instance: *const Service) {
         }
     }
 }
+#[allow(clippy::used_underscore_items)]
 #[::interoptopus::ffi]
 unsafe fn service_compute1(
     instance: *const Service,
@@ -92,6 +95,7 @@ unsafe fn service_compute1(
         ::interoptopus::ffi::Ok(::std::ptr::null())
     }
 }
+#[allow(clippy::used_underscore_items)]
 #[::interoptopus::ffi]
 unsafe fn service_compute2(
     instance: *const Service,

@@ -21,7 +21,18 @@ impl FunctionModel {
         };
         let where_clause = &generics.where_clause;
 
+        // Preserve non-doc, non-ffi attributes (e.g. #[allow(...)])
+        let preserved_attrs: Vec<_> = original_fn
+            .attrs
+            .iter()
+            .filter(|attr| {
+                let path = attr.path();
+                !path.is_ident("doc") && !path.is_ident("ffi") && !path.is_ident("no_mangle") && !path.is_ident("unsafe")
+            })
+            .collect();
+
         quote_spanned! { self.name.span() =>
+            #(#preserved_attrs)*
             #[unsafe(export_name = #export_name)]
             #vis #unsafety extern "C" fn #name #generics(#inputs) #output #where_clause #block
         }

@@ -2,6 +2,7 @@ use interoptopus::extra_type;
 use interoptopus::inventory::{ForeignInventory, RustInventory};
 use interoptopus_proc::ffi;
 
+#[allow(clippy::used_underscore_binding)]
 #[ffi]
 struct Foo {
     _x: u8,
