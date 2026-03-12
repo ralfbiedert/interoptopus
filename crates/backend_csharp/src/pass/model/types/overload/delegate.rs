@@ -9,28 +9,21 @@ use crate::lang::types::{Delegate, DelegateKind, Type, TypeKind};
 use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
-use std::collections::HashMap;
+use crate::pass::model::types::overload::all::{DelegateFamily, OverloadFamily};
+use std::collections::HashSet;
 use std::sync::Arc;
-
-/// Links a delegate class type to its bare delegate signature sibling.
-#[derive(Debug, Clone)]
-pub struct Family {
-    pub class: TypeId,
-    pub signature: TypeId,
-}
 
 #[derive(Default)]
 pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    /// Maps either member TypeId to its family.
-    families: HashMap<TypeId, Arc<Family>>,
+    processed: HashSet<TypeId>,
 }
 
 impl Pass {
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, families: Default::default() }
+        Self { info: PassInfo { name: file!() }, processed: Default::default() }
     }
 
     pub fn process(
@@ -39,6 +32,7 @@ impl Pass {
         kinds: &mut model::types::kind::Pass,
         names: &mut model::types::names::Pass,
         types: &mut model::types::all::Pass,
+        overloads: &mut model::types::overload::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
@@ -52,7 +46,7 @@ impl Pass {
             .collect();
 
         for (class_id, delegate) in class_delegates {
-            if self.families.contains_key(&class_id) {
+            if self.processed.contains(&class_id) {
                 continue;
             }
 
@@ -68,24 +62,21 @@ impl Pass {
 
             let sig_delegate = Delegate { kind: DelegateKind::Signature, signature: delegate.signature.clone() };
 
-            // Register in kinds, names, and map
+            // Register in kinds, names, and types
             kinds.set(sig_id, TypeKind::Delegate(sig_delegate.clone()));
             names.set(sig_id, sig_name.clone());
             types.set(sig_id, Type { name: sig_name, kind: TypeKind::Delegate(sig_delegate) });
 
-            // Build family
-            let family = Arc::new(Family { class: class_id, signature: sig_id });
+            // Register family in the overload all pass
+            let family = Arc::new(OverloadFamily::Delegate(DelegateFamily { class: class_id, signature: sig_id }));
 
-            self.families.insert(class_id, Arc::clone(&family));
-            self.families.insert(sig_id, family);
+            overloads.register(class_id, Arc::clone(&family));
+            overloads.register(sig_id, family);
+
+            self.processed.insert(class_id);
             outcome.changed();
         }
 
         Ok(outcome)
-    }
-
-    /// Look up the delegate family for either member TypeId.
-    pub fn get(&self, type_id: TypeId) -> Option<&Arc<Family>> {
-        self.families.get(&type_id)
     }
 }

@@ -12,6 +12,7 @@ use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::types::{DelegateKind, ManagedConversion, Pointer, PointerKind, TypeKind};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
+use crate::pass::model::types::overload::all::OverloadFamily;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;
@@ -37,8 +38,7 @@ impl Pass {
         all: &mut model::fns::all::Pass,
         overload_all: &mut model::fns::overload::all::Pass,
         types: &model::types::all::Pass,
-        pointer_overloads: &model::types::overload::pointer::Pass,
-        delegate_overloads: &model::types::overload::delegate::Pass,
+        overloads: &model::types::overload::all::Pass,
         managed_conversion: &model::types::info::managed_conversion::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
@@ -58,9 +58,9 @@ impl Pass {
             // Check that all required sibling types are available
             let all_ready = original_fn.signature.arguments.iter().all(|arg| {
                 if is_delegate_class(arg.ty, types) {
-                    delegate_overloads.get(arg.ty).is_some()
+                    matches!(overloads.get(arg.ty), Some(OverloadFamily::Delegate(_)))
                 } else if is_eligible_intptr(arg.ty, types, managed_conversion) {
-                    pointer_overloads.get(arg.ty).is_some()
+                    matches!(overloads.get(arg.ty), Some(OverloadFamily::Pointer(_)))
                 } else {
                     true
                 }
@@ -75,12 +75,10 @@ impl Pass {
             let mut overload_args = Vec::new();
 
             for arg in &original_fn.signature.arguments {
-                if is_delegate_class(arg.ty, types) {
-                    let family = delegate_overloads.get(arg.ty).unwrap();
+                if let Some(OverloadFamily::Delegate(family)) = is_delegate_class(arg.ty, types).then(|| overloads.get(arg.ty)).flatten() {
                     overload_args.push(Argument { name: arg.name.clone(), ty: family.signature });
                     arg_transforms.push(ArgTransform::WrapDelegate);
-                } else if is_eligible_intptr(arg.ty, types, managed_conversion) {
-                    let family = pointer_overloads.get(arg.ty).unwrap();
+                } else if let Some(OverloadFamily::Pointer(family)) = is_eligible_intptr(arg.ty, types, managed_conversion).then(|| overloads.get(arg.ty)).flatten() {
                     overload_args.push(Argument { name: arg.name.clone(), ty: family.by_ref });
                     arg_transforms.push(ArgTransform::Ref);
                 } else {

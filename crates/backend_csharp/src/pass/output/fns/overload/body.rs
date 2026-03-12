@@ -8,6 +8,7 @@
 use crate::lang::functions::overload::ArgTransform;
 use crate::lang::types::{Primitive, TypeKind};
 use crate::output::{Output, OutputKind};
+use crate::pass::model::types::overload::all::OverloadFamily;
 use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::{Context, TemplateEngine};
 use std::collections::HashMap;
@@ -32,8 +33,7 @@ impl Pass {
         overload_body: &model::fns::overload::body::Pass,
         originals: &model::fns::originals::Pass,
         types: &model::types::all::Pass,
-        pointer_overloads: &model::types::overload::pointer::Pass,
-        delegate_overloads: &model::types::overload::delegate::Pass,
+        overloads: &model::types::overload::all::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -42,7 +42,7 @@ impl Pass {
 
             for (fn_id, transforms) in overload_body.iter() {
                 let Some(original_fn) = originals.get(fn_id) else { continue };
-                let rendered = render_body_overload(original_fn, transforms, types, pointer_overloads, delegate_overloads, templates)?;
+                let rendered = render_body_overload(original_fn, transforms, types, overloads, templates)?;
                 imports.push(rendered);
             }
 
@@ -63,8 +63,7 @@ fn render_body_overload(
     original_fn: &crate::lang::functions::Function,
     transforms: &crate::lang::functions::overload::FnTransforms,
     types: &model::types::all::Pass,
-    pointer_overloads: &model::types::overload::pointer::Pass,
-    delegate_overloads: &model::types::overload::delegate::Pass,
+    overloads: &model::types::overload::all::Pass,
     templates: &TemplateEngine,
 ) -> Result<String, crate::Error> {
     let name = &original_fn.name;
@@ -88,9 +87,10 @@ fn render_body_overload(
                 m.insert("is_wrap".to_string(), "false".to_string());
             }
             ArgTransform::Ref => {
-                let family = pointer_overloads
-                    .get(arg.ty)
-                    .ok_or_else(|| crate::Error::MissingTypeName(format!("pointer family for arg `{}` of body overload `{}`", arg.name, name)))?;
+                let family = match overloads.get(arg.ty) {
+                    Some(OverloadFamily::Pointer(f)) => f,
+                    _ => return Err(crate::Error::MissingTypeName(format!("pointer family for arg `{}` of body overload `{}`", arg.name, name))),
+                };
                 let ty_name = types.get(family.by_ref).map(|t| &t.name)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("ref type for arg `{}` of body overload `{}`", arg.name, name)))?;
                 m.insert("ty".to_string(), ty_name.clone());
@@ -98,9 +98,10 @@ fn render_body_overload(
                 m.insert("is_wrap".to_string(), "false".to_string());
             }
             ArgTransform::WrapDelegate => {
-                let family = delegate_overloads
-                    .get(arg.ty)
-                    .ok_or_else(|| crate::Error::MissingTypeName(format!("delegate family for arg `{}` of body overload `{}`", arg.name, name)))?;
+                let family = match overloads.get(arg.ty) {
+                    Some(OverloadFamily::Delegate(f)) => f,
+                    _ => return Err(crate::Error::MissingTypeName(format!("delegate family for arg `{}` of body overload `{}`", arg.name, name))),
+                };
                 let sig_name = types.get(family.signature).map(|t| &t.name)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("delegate sig for arg `{}` of body overload `{}`", arg.name, name)))?;
                 let class_name = types.get(family.class).map(|t| &t.name)

@@ -11,6 +11,7 @@ use crate::lang::functions::{Argument, Function, Signature};
 use crate::lang::types::{ManagedConversion, Pointer, PointerKind, TypeKind};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
+use crate::pass::model::types::overload::all::OverloadFamily;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashSet;
@@ -37,7 +38,7 @@ impl Pass {
         overload_all: &mut model::fns::overload::all::Pass,
         types: &model::types::all::Pass,
         managed_conversion: &model::types::info::managed_conversion::Pass,
-        pointer_overloads: &model::types::overload::pointer::Pass,
+        overloads: &model::types::overload::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
@@ -61,7 +62,7 @@ impl Pass {
             // Has eligible IntPtr args, but families aren't available yet — skip and retry
             let all_families_available = original_fn.signature.arguments.iter().all(|arg| {
                 if is_eligible_intptr(arg.ty, types, managed_conversion) {
-                    pointer_overloads.get(arg.ty).is_some()
+                    matches!(overloads.get(arg.ty), Some(OverloadFamily::Pointer(_)))
                 } else {
                     true
                 }
@@ -75,7 +76,10 @@ impl Pass {
             let mut overload_args = Vec::new();
             for arg in &original_fn.signature.arguments {
                 let new_ty = if is_eligible_intptr(arg.ty, types, managed_conversion) {
-                    pointer_overloads.get(arg.ty).map(|f| f.by_ref).unwrap_or(arg.ty)
+                    match overloads.get(arg.ty) {
+                        Some(OverloadFamily::Pointer(f)) => f.by_ref,
+                        _ => arg.ty,
+                    }
                 } else {
                     arg.ty
                 };
