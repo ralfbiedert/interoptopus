@@ -27,8 +27,6 @@ tokio = { workspace = true, features = ["rt-multi-thread", "io-std"], optional =
 [dev-dependencies]
 rustc-hash.workspace = true
 trybuild.workspace = true
-syn.workspace = true
-quote.workspace = true
 
 [package.metadata.docs.rs]
 all-features = true
