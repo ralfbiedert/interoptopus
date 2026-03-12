@@ -1,10 +1,11 @@
-use crate::pass::{model, ModelResult, OutputResult};
+use crate::pass::{model, ModelResult, Outcome, OutputResult};
 use crate::pipeline::ModelPasses;
 use crate::Error;
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
 
+#[derive(Debug)]
 pub struct PostModelPass<'a> {
     pub id_map: &'a mut model::id_map::Pass,
     pub types: &'a mut model::types::all::Pass,
@@ -24,8 +25,17 @@ pub struct PostOutputPass<'a> {
 }
 
 pub trait RustLibraryPlugin {
-    fn init(&mut self, inventory: &mut RustInventory);
-    fn post_model_cycle(&mut self, inventory: &RustInventory, models: PostModelPass) -> ModelResult;
-    fn post_model_all(&mut self, inventory: &RustInventory, models: PostModelPass) -> Result<(), Error>;
-    fn post_output(&mut self, multibuf: &mut Multibuf, outputs: PostOutputPass) -> OutputResult;
+    fn init(&mut self, inventory: &mut RustInventory) {}
+
+    fn post_model_cycle(&mut self, inventory: &RustInventory, models: PostModelPass) -> ModelResult {
+        Ok(Outcome::Unchanged)
+    }
+
+    fn post_model_all(&mut self, inventory: &RustInventory, models: PostModelPass) -> Result<(), Error> {
+        Ok(())
+    }
+
+    fn post_output(&mut self, multibuf: &mut Multibuf, outputs: PostOutputPass) -> OutputResult {
+        Ok(())
+    }
 }

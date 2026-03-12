@@ -7,6 +7,7 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub struct Config {}
 
+#[derive(Debug)]
 pub struct Pass {
     functions: HashMap<FunctionId, Function>,
 }

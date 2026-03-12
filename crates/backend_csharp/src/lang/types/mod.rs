@@ -15,6 +15,7 @@ pub enum ManagedConversion {
     Into,
 }
 
+#[derive(Debug)]
 pub struct Type {
     // TODO: Handle this separately and not as part of model?
     // pub namespace: NamespaceId,

@@ -14,6 +14,7 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub struct Config {}
 
+#[derive(Debug)]
 pub struct Pass {
     info: PassInfo,
     types: HashMap<TypeId, Type>,
@@ -55,7 +56,7 @@ impl Pass {
         self.types.get(&ty)
     }
 
-pub fn iter(&self) -> impl Iterator<Item = (&TypeId, &Type)> {
+    pub fn iter(&self) -> impl Iterator<Item = (&TypeId, &Type)> {
         self.types.iter()
     }
 }

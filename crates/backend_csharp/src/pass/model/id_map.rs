@@ -15,6 +15,7 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub struct Config {}
 
+#[derive(Debug)]
 pub struct Pass {
     info: PassInfo,
     ty: HashMap<interoptopus::inventory::TypeId, TypeId>,
