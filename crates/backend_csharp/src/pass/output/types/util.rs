@@ -1,5 +1,10 @@
 //! Renders utility types (exceptions, string extensions) per output file.
+//!
+//! Each utility type has a registered TypeId (see `lang::types::csharp`) and
+//! participates in dispatch routing. Only utility types routed to a given
+//! output file are rendered into that file.
 
+use crate::lang::types::csharp;
 use crate::output::{FileType, Output};
 use crate::pass::{output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
@@ -22,22 +27,23 @@ impl Pass {
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::master::Pass) -> OutputResult {
         let templates = output_master.templates();
 
-        for output in output_master.outputs_of(FileType::Csharp) {
-            let mut context = Context::new();
+        for file in output_master.outputs_of(FileType::Csharp) {
+            let mut parts = Vec::new();
 
-            let interop_exception = templates.render("types/util/interop_exception.cs", &context)?;
-            let enum_exception = templates.render("types/util/enum_exception.cs", &context)?;
-            let utf8string = templates.render("types/util/utf8string.cs", &context)?;
-            let async_callback_common = templates.render("types/util/async_callback_common.cs", &context)?;
+            if output_master.type_belongs_to(csharp::UTIL_INTEROP_EXCEPTION, file) {
+                parts.push(templates.render("types/util/interop_exception.cs", &Context::new())?.trim().to_string());
+            }
+            if output_master.type_belongs_to(csharp::UTIL_ENUM_EXCEPTION, file) {
+                parts.push(templates.render("types/util/enum_exception.cs", &Context::new())?.trim().to_string());
+            }
+            if output_master.type_belongs_to(csharp::UTIL_UTF8STRING, file) {
+                parts.push(templates.render("types/util/utf8string.cs", &Context::new())?.trim().to_string());
+            }
+            if output_master.type_belongs_to(csharp::UTIL_ASYNC_CALLBACK_COMMON, file) {
+                parts.push(templates.render("types/util/async_callback_common.cs", &Context::new())?.trim().to_string());
+            }
 
-            context.insert("interop_exception", &interop_exception.trim());
-            context.insert("enum_exception", &enum_exception.trim());
-            context.insert("utf8string", &utf8string.trim());
-            context.insert("async_callback_common", &async_callback_common.trim());
-
-            let combined = templates.render("types/util/all.cs", &context)?;
-
-            self.utils.insert(output.clone(), combined);
+            self.utils.insert(file.clone(), parts.join("\n\n"));
         }
         Ok(())
     }

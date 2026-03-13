@@ -155,6 +155,9 @@ impl Pass {
 
                 // Helpers are always move
                 TypeKind::AsyncHelper(_) | TypeKind::WireHelper(_) => ManagedConversion::Into,
+
+                // Util types are backend-generated; no managed conversion needed
+                TypeKind::Util => ManagedConversion::AsIs,
             };
 
             self.managed_conversion.insert(*cs_id, conversion);
