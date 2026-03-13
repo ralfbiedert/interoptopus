@@ -4,6 +4,7 @@ use std::path::Path;
 use std::process::Command;
 
 /// If `dotnet` is installed, run the command as `dotnet command` from `path`, ignore and succeed otherwise.
+#[allow(unused)]
 pub fn run_dotnet_if_installed(path: impl AsRef<Path>, command: &str) -> Result<String, Error> {
     let child = match Command::new("dotnet").arg(command).current_dir(path).spawn() {
         Ok(x) => x,
