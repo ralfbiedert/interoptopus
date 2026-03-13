@@ -46,6 +46,7 @@ impl Pass {
             let util = intermediary.util.utils_for(file).unwrap();
             let using = intermediary.using.using_for(file).unwrap();
 
+            context.insert("namespace", file.target.namespace());
             context.insert("dll_name", meta_info.dll_name());
             context.insert("header", header);
             context.insert("using", using);
@@ -62,7 +63,7 @@ impl Pass {
             context.insert("util", &util);
 
             let final_ = templates.render("all.cs", &context)?;
-            output.add_buffer(&file.name, final_);
+            output.add_buffer(&file.target.file_name(), final_);
         }
 
         Ok(())

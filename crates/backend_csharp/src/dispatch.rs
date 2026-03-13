@@ -2,26 +2,26 @@ use crate::lang::functions::Function;
 use crate::lang::meta::FileEmission;
 use crate::lang::types::Type;
 use crate::lang::{FunctionId, TypeId};
-use crate::output::FileName;
+use crate::output::Target;
 
 /// A dispatch function that maps an item to a file name.
-type DispatchFn = Box<dyn FnMut(Item, Meta) -> FileName>;
+type DispatchFn = Box<dyn FnMut(Item, Meta) -> Target>;
 
 pub struct Dispatch {
     dispatch: DispatchFn,
 }
 
 impl Dispatch {
-    pub fn custom(f: impl FnMut(Item, Meta) -> FileName + 'static) -> Self {
+    pub fn custom(f: impl FnMut(Item, Meta) -> Target + 'static) -> Self {
         Self { dispatch: Box::new(f) }
     }
 
     #[must_use]
     pub fn single_file() -> Self {
-        Self::custom(|_, _| FileName::new("Interop.cs"))
+        Self::custom(|_, _| Target::new("Interop.cs", "My.Company"))
     }
 
-    pub fn classify(&mut self, item: Item) -> FileName {
+    pub fn classify(&mut self, item: Item) -> Target {
         (self.dispatch)(item, Meta {})
     }
 }

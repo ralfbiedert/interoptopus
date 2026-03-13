@@ -1,16 +1,21 @@
 /// A file name, e.g., `Interop.Foo.Bar.cs`.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct FileName(String);
-
-impl FileName {
-    pub fn new(name: impl AsRef<str>) -> Self {
-        Self(name.as_ref().to_string())
-    }
+pub struct Target {
+    file_name: String,
+    namespace: String,
 }
 
-impl AsRef<str> for FileName {
-    fn as_ref(&self) -> &str {
-        &self.0
+impl Target {
+    pub fn new(file_name: impl AsRef<str>, namespace: impl AsRef<str>) -> Self {
+        Self { file_name: file_name.as_ref().to_string(), namespace: namespace.as_ref().to_string() }
+    }
+
+    pub fn file_name(&self) -> &str {
+        &self.file_name
+    }
+
+    pub fn namespace(&self) -> &str {
+        &self.namespace
     }
 }
 
@@ -26,6 +31,6 @@ pub enum FileType {
 
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Output {
-    pub name: FileName,
+    pub target: Target,
     pub kind: FileType,
 }

@@ -2,7 +2,7 @@
 
 {{ using }}
 
-namespace My.Company {
+namespace {{ namespace }} {
     public static partial class Interop {
 
         public const string NativeLib = "{{ dll_name }}";

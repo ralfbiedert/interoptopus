@@ -8,8 +8,8 @@
 use crate::dispatch::{Dispatch, Item, ItemKind};
 use crate::lang::meta::Emission;
 use crate::lang::{FunctionId, TypeId};
-use crate::output::{FileName, FileType, Output};
-use crate::pass::{OutputResult, PassInfo, model};
+use crate::output::{FileType, Output, Target};
+use crate::pass::{model, OutputResult, PassInfo};
 use crate::template::templates;
 use interoptopus_backends::template::TemplateEngine;
 use std::collections::{HashMap, HashSet};
@@ -30,9 +30,9 @@ pub struct Pass {
     config: Config,
     outputs: Vec<Output>,
     /// Which output file each type should be rendered into.
-    type_routing: HashMap<TypeId, FileName>,
+    type_routing: HashMap<TypeId, Target>,
     /// Which output file each function should be rendered into.
-    fn_routing: HashMap<FunctionId, FileName>,
+    fn_routing: HashMap<FunctionId, Target>,
 }
 
 impl Pass {
@@ -41,13 +41,8 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, config, outputs: vec![], type_routing: HashMap::new(), fn_routing: HashMap::new() }
     }
 
-    pub fn process(
-        &mut self,
-        _pass_meta: &mut crate::pass::PassMeta,
-        types: &model::types::all::Pass,
-        fn_originals: &model::fns::originals::Pass,
-    ) -> OutputResult {
-        let mut seen_files: HashSet<FileName> = HashSet::new();
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, types: &model::types::all::Pass, fn_originals: &model::fns::originals::Pass) -> OutputResult {
+        let mut seen_files: HashSet<Target> = HashSet::new();
 
         // Classify all emittable types
         for (&type_id, ty) in types.iter() {
@@ -73,14 +68,14 @@ impl Pass {
 
         // If nothing was classified (e.g., empty inventory), still produce a default file
         if seen_files.is_empty() {
-            seen_files.insert(FileName::new("Interop.cs"));
+            seen_files.insert(Target::new("Interop.cs", "My.Company"));
         }
 
         // Build sorted output list
-        let mut file_names: Vec<FileName> = seen_files.into_iter().collect();
+        let mut file_names: Vec<Target> = seen_files.into_iter().collect();
         file_names.sort();
 
-        self.outputs = file_names.into_iter().map(|name| Output { name, kind: FileType::Csharp }).collect();
+        self.outputs = file_names.into_iter().map(|name| Output { target: name, kind: FileType::Csharp }).collect();
 
         Ok(())
     }
@@ -106,12 +101,12 @@ impl Pass {
     /// Returns true if the given type should be rendered into the given output file.
     #[must_use]
     pub fn type_belongs_to(&self, type_id: TypeId, output: &Output) -> bool {
-        self.type_routing.get(&type_id).is_some_and(|f| *f == output.name)
+        self.type_routing.get(&type_id).is_some_and(|f| *f == output.target)
     }
 
     /// Returns true if the given function should be rendered into the given output file.
     #[must_use]
     pub fn fn_belongs_to(&self, fn_id: FunctionId, output: &Output) -> bool {
-        self.fn_routing.get(&fn_id).is_some_and(|f| *f == output.name)
+        self.fn_routing.get(&fn_id).is_some_and(|f| *f == output.target)
     }
 }

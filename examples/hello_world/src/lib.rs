@@ -80,7 +80,7 @@ mod tests {
     use interoptopus::{extra_type, function, service};
     use interoptopus_csharp::dispatch::Dispatch;
     use interoptopus_csharp::lang::meta::FileEmission;
-    use interoptopus_csharp::output::FileName;
+    use interoptopus_csharp::output::Target;
     use interoptopus_csharp::RustLibrary;
 
     // We just trick a unit test into producing our bindings, here for C#
@@ -102,9 +102,9 @@ mod tests {
         RustLibrary::builder(inventory)
             .dll_name("hello_world")
             .dispatch(Dispatch::custom(|x, _| match x.emission {
-                FileEmission::Common => FileName::new("Interop.Common.cs"),
-                FileEmission::Default => FileName::new("Interop.cs"),
-                FileEmission::CustomModule(_) => FileName::new("Interop.cs"),
+                FileEmission::Common => Target::new("Interop.Common.cs", "My.Company.Common"),
+                FileEmission::Default => Target::new("Interop.cs", "My.Company"),
+                FileEmission::CustomModule(_) => Target::new("Interop.cs", "My.Company"),
             }))
             .build()
             .process()?
