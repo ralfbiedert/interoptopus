@@ -31,7 +31,11 @@ impl Pass {
         for output in output_master.outputs_of(FileType::Csharp) {
             let mut imports = Vec::new();
 
-            for (_id, function) in fn_maps.iter() {
+            for (&id, function) in fn_maps.iter() {
+                if !output_master.fn_belongs_to(id, output) {
+                    continue;
+                }
+
                 let name = &function.name;
                 let rval = types
                     .get(function.signature.rval)

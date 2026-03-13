@@ -41,6 +41,10 @@ impl Pass {
             let mut rendered_fields = Vec::new();
 
             for &result_ty_id in async_types.trampoline_types() {
+                if !output_master.type_belongs_to(result_ty_id, file) {
+                    continue;
+                }
+
                 let Some(result_ty) = types.get(result_ty_id) else { continue };
                 let result_ty_name = &result_ty.name;
 

@@ -314,7 +314,7 @@ impl RustLibrary {
             r.run(m.type_names.process(&mut pass_meta, &m.id_maps, &m.type_kinds, &self.inventory.types))?;
             r.run(m.type_overload_pointer.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_all, &mut m.type_overload_all))?;
             r.run(m.type_overload_delegate.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_all, &mut m.type_overload_all))?;
-            r.run(m.type_all.process(&mut pass_meta, &m.type_kinds, &m.type_names))?;
+            r.run(m.type_all.process(&mut pass_meta, &m.type_kinds, &m.type_names, &m.id_maps, &self.inventory.types))?;
             r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &mut m.fns_all, &self.inventory.functions))?;
             r.run(m.fn_overload_simple.process(&mut pass_meta, &m.fn_originals, &mut m.fns_all, &mut m.fn_overload_all, &m.type_all, &m.type_managed_conversion, &m.type_overload_all))?;
             r.run(m.fn_overload_body.process(&mut pass_meta, &m.fn_originals, &mut m.fns_all, &mut m.fn_overload_all, &m.type_all, &m.type_overload_all, &m.type_managed_conversion))?;
@@ -338,7 +338,7 @@ impl RustLibrary {
         }
 
         // Output passes
-        self.output_master.process(&mut pass_meta)?;
+        self.output_master.process(&mut pass_meta, &m.type_all, &m.fn_originals)?;
         o.unmanaged_conversion.process(&mut pass_meta, &m.type_managed_conversion, &m.type_all)?;
         o.unmanaged_names.process(&mut pass_meta, &m.type_all, &m.type_managed_conversion)?;
         o.enum_ty.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class)?;
@@ -360,7 +360,7 @@ impl RustLibrary {
         o.composites.process(&mut pass_meta, &self.output_master, &m.type_all, &o.composite_ty, &o.composite_body)?;
         o.delegates.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
         o.fns_rust.process(&mut pass_meta, &self.output_master, &m.fn_originals, &m.type_all)?;
-        o.fns_overload_simple.process(&mut pass_meta, &self.output_master, &m.fn_overload_simple, &m.fns_all, &m.type_all)?;
+        o.fns_overload_simple.process(&mut pass_meta, &self.output_master, &m.fn_originals, &m.fn_overload_all, &m.fns_all, &m.type_all)?;
         o.fns_overload_body.process(&mut pass_meta, &self.output_master, &m.fn_overload_all, &m.fn_originals, &m.type_all, &m.type_overload_all)?;
         o.asynk.process(&mut pass_meta, &self.output_master, &m.type_async_types, &m.type_all, &m.type_managed_conversion)?;
         o.service_body_ctors.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names)?;

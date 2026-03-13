@@ -6,6 +6,7 @@
 
 use crate::lang::FunctionId;
 use crate::lang::functions::{Argument, Function, Signature};
+use crate::lang::meta::Emission;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
@@ -67,7 +68,7 @@ impl Pass {
             }
 
             let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
-            let cs_function = Function { name: rust_fn.name.clone(), signature: cs_signature };
+            let cs_function = Function { emission: Emission::from_rust(&rust_fn.emission), name: rust_fn.name.clone(), signature: cs_signature };
 
             all.register(cs_id, cs_function.clone());
             self.functions.insert(cs_id, cs_function);

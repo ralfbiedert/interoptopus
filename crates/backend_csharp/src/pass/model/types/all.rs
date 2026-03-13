@@ -5,10 +5,12 @@
 //! over accessing `kind` or `names` directly.
 
 use crate::lang::TypeId;
+use crate::lang::meta::Emission;
 use crate::lang::types::Type;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
+use interoptopus::inventory::Types;
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -26,7 +28,14 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, types: HashMap::default() }
     }
 
-    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, kinds: &model::types::kind::Pass, names: &model::types::names::Pass) -> ModelResult {
+    pub fn process(
+        &mut self,
+        pass_meta: &mut crate::pass::PassMeta,
+        kinds: &model::types::kind::Pass,
+        names: &model::types::names::Pass,
+        id_maps: &model::id_map::Pass,
+        rs_types: &Types,
+    ) -> ModelResult {
         let mut outcome = Unchanged;
 
         // Iterate through all kinds and create Types
@@ -39,8 +48,11 @@ impl Pass {
             // Get the name for this type
             let name = try_resolve!(names.get(*type_id), pass_meta, self.info, crate::pass::MissingItem::CsType(*type_id));
 
+            // Look up emission from the Rust inventory type
+            let emission = lookup_emission(*type_id, id_maps, rs_types);
+
             // Create the Type
-            let ty = Type { name: name.clone(), kind: kind.clone() };
+            let ty = Type { emission, name: name.clone(), kind: kind.clone() };
 
             self.types.insert(*type_id, ty);
             outcome.changed();
@@ -61,4 +73,17 @@ impl Pass {
     pub fn iter(&self) -> impl Iterator<Item = (&TypeId, &Type)> {
         self.types.iter()
     }
+}
+
+/// Looks up the Rust emission for a C# type by searching the id_map for a matching Rust type.
+fn lookup_emission(cs_type_id: TypeId, id_maps: &model::id_map::Pass, rs_types: &Types) -> Emission {
+    // Try to find the corresponding Rust type by checking all Rust types
+    for (rust_id, rust_ty) in rs_types {
+        if id_maps.ty(*rust_id) == Some(cs_type_id) {
+            return Emission::from_rust(&rust_ty.emission);
+        }
+    }
+    // Synthesized types (e.g., overload siblings) won't be in the inventory;
+    // default to Builtin so they don't get emitted on their own.
+    Emission::Builtin
 }

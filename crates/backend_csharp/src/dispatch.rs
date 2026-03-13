@@ -1,8 +1,8 @@
+use crate::lang::functions::Function;
 use crate::lang::meta::FileEmission;
 use crate::lang::types::Type;
 use crate::lang::{FunctionId, TypeId};
 use crate::output::FileName;
-use interoptopus::lang::function::Function;
 
 /// A dispatch function that maps an item to a file name.
 type DispatchFn = Box<dyn FnMut(Item, Meta) -> FileName>;

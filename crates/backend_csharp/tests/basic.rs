@@ -24,14 +24,3 @@ fn real_inventory() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-
-#[test]
-fn real_inventory_temp() -> Result<(), Box<dyn std::error::Error>> {
-    let reference_project = include_str!("inventory/reference_project.json");
-    let inventory: RustInventory = serde_json::from_str::<RustInventory>(reference_project)?;
-    let library = RustLibrary::builder(inventory).dll_name("foo").build();
-    let multibuf = library.process()?;
-    multibuf.write_buffer("Interop.cs")?;
-
-    Ok(())
-}

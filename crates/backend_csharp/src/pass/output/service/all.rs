@@ -35,6 +35,10 @@ impl Pass {
             let mut rendered_services = Vec::new();
 
             for (service_id, service) in services.iter() {
+                if !output_master.type_belongs_to(service.ty, file) {
+                    continue;
+                }
+
                 let Some(name) = types.get(service.ty).map(|t| &t.name) else { continue };
                 let Some(dtor_fn) = fns.get(service.destructor) else { continue };
                 let ctors = body_ctors.get(*service_id).unwrap_or_default();

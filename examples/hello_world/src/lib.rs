@@ -1,7 +1,7 @@
 use interoptopus::pattern::asynk::Async;
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::rt::Tokio;
-use interoptopus::{AsyncRuntime, callback, ffi};
+use interoptopus::{callback, ffi, AsyncRuntime};
 
 /// A simple type in our FFI layer.
 #[ffi]
@@ -78,6 +78,9 @@ impl ServiceBasic2 {
 mod tests {
     use interoptopus::inventory::RustInventory;
     use interoptopus::{extra_type, function, service};
+    use interoptopus_csharp::dispatch::Dispatch;
+    use interoptopus_csharp::lang::meta::FileEmission;
+    use interoptopus_csharp::output::FileName;
     use interoptopus_csharp::RustLibrary;
 
     // We just trick a unit test into producing our bindings, here for C#
@@ -98,6 +101,10 @@ mod tests {
 
         RustLibrary::builder(inventory)
             .dll_name("hello_world")
+            .dispatch(Dispatch::custom(|x, _| match x.emission {
+                FileEmission::Common => FileName::new("Interop.Common.cs"),
+                FileEmission::Module(_) => FileName::new("Interop.cs"),
+            }))
             .build()
             .process()?
             .write_buffers_to("bindings/")?;

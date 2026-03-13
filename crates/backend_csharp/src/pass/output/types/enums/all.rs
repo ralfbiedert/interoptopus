@@ -34,6 +34,10 @@ impl Pass {
             let mut rendered_enums = Vec::new();
 
             for (type_id, ty) in types.iter() {
+                if !output_master.type_belongs_to(*type_id, file) {
+                    continue;
+                }
+
                 let type_kind = &ty.kind;
                 match type_kind {
                     TypeKind::DataEnum(_) => {}

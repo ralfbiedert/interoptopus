@@ -97,7 +97,7 @@ impl Pass {
             if has_delegate && async_result_ty.is_none() {
                 let sig = Signature { arguments: overload_args.clone(), rval: original_fn.signature.rval };
                 let id = derive_overload_id(original_id, &sig);
-                let func = Function { name: original_fn.name.clone(), signature: sig };
+                let func = Function { emission: original_fn.emission.clone(), name: original_fn.name.clone(), signature: sig };
                 let transforms = FnTransforms { rval: RvalTransform::PassThrough, args: arg_transforms.clone() };
                 fns_all.register(id, func);
                 overload_all.register(original_id, id, OverloadKind::Body(transforms));
@@ -108,7 +108,7 @@ impl Pass {
             if let Some(result_ty_id) = async_result_ty {
                 let sig = Signature { arguments: overload_args, rval: result_ty_id };
                 let id = derive_overload_id(original_id, &sig);
-                let func = Function { name: original_fn.name.clone(), signature: sig };
+                let func = Function { emission: original_fn.emission.clone(), name: original_fn.name.clone(), signature: sig };
                 let transforms = FnTransforms { rval: RvalTransform::AsyncTask(result_ty_id), args: arg_transforms };
                 fns_all.register(id, func);
                 overload_all.register(original_id, id, OverloadKind::Async(transforms));

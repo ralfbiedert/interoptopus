@@ -16,7 +16,7 @@ pub enum ManagedConversion {
     Into,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Type {
     pub emission: Emission,
     pub name: String,

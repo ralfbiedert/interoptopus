@@ -6,6 +6,7 @@
 //! overload signatures that accept C# delegates directly instead of the wrapper class.
 
 use crate::lang::TypeId;
+use crate::lang::meta::Emission;
 use crate::lang::types::kind::{Delegate, DelegateKind, TypeKind};
 use crate::lang::types::{DelegateFamily, OverloadFamily, Type};
 use crate::pass::Outcome::Unchanged;
@@ -66,7 +67,7 @@ impl Pass {
             // Register in kinds, names, and types
             kinds.set(sig_id, TypeKind::Delegate(sig_delegate.clone()));
             names.set(sig_id, sig_name.clone());
-            types.set(sig_id, Type { name: sig_name, kind: TypeKind::Delegate(sig_delegate) });
+            types.set(sig_id, Type { emission: Emission::Builtin, name: sig_name, kind: TypeKind::Delegate(sig_delegate) });
 
             // Register family in the overload all pass
             let family = Arc::new(OverloadFamily::Delegate(DelegateFamily { class: class_id, signature: sig_id }));

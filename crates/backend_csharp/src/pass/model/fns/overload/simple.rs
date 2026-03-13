@@ -90,7 +90,7 @@ impl Pass {
 
             let overload_signature = Signature { arguments: overload_args, rval: original_fn.signature.rval };
             let overload_id = derive_overload_id(original_id, &overload_signature);
-            let overload_fn = Function { name: original_fn.name.clone(), signature: overload_signature };
+            let overload_fn = Function { emission: original_fn.emission.clone(), name: original_fn.name.clone(), signature: overload_signature };
 
             all.register(overload_id, overload_fn);
             overload_all.register(original_id, overload_id, OverloadKind::Simple);

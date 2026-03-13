@@ -8,6 +8,12 @@ impl FileName {
     }
 }
 
+impl AsRef<str> for FileName {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
 /// A custom file type, e.g., `csproj`.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct CustomFileType(String);

@@ -45,6 +45,10 @@ impl Pass {
             let mut asynk = Vec::new();
 
             for (&fn_id, original_fn) in originals.iter() {
+                if !output_master.fn_belongs_to(fn_id, file) {
+                    continue;
+                }
+
                 let Some(entries) = overload_all.overloads_for(fn_id) else { continue };
 
                 for (_, kind) in entries {
