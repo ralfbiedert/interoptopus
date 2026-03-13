@@ -1,3 +1,5 @@
+mod cli;
+
 /// Builds a `RustLibrary`, registers inventory items and a plugin, then processes.
 ///
 /// ```ignore

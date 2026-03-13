@@ -7,10 +7,10 @@
 
 use crate::lang::functions::overload::{ArgTransform, FnTransforms, OverloadKind, RvalTransform};
 use crate::lang::functions::{Argument, Function};
-use crate::lang::types::OverloadFamily;
 use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
-use crate::output::{Output, OutputKind};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::lang::types::OverloadFamily;
+use crate::output::{FileType, Output};
+use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::{Context, TemplateEngine, Value};
 use std::collections::HashMap;
 
@@ -40,7 +40,7 @@ impl Pass {
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        for file in output_master.outputs_of(OutputKind::Csharp) {
+        for file in output_master.outputs_of(FileType::Csharp) {
             let mut body = Vec::new();
             let mut asynk = Vec::new();
 

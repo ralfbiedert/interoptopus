@@ -2,6 +2,7 @@ pub mod csharp;
 pub mod kind;
 mod overload;
 
+use crate::lang::meta::Emission;
 use crate::lang::types::kind::TypeKind;
 pub use overload::{DelegateFamily, OverloadFamily, PointerFamily};
 
@@ -17,8 +18,7 @@ pub enum ManagedConversion {
 
 #[derive(Debug)]
 pub struct Type {
-    // TODO: Handle this separately and not as part of model?
-    // pub namespace: NamespaceId,
+    pub emission: Emission,
     pub name: String,
     pub kind: TypeKind,
 }

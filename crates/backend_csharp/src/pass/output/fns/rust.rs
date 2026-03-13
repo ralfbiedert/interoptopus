@@ -1,7 +1,7 @@
 //! Writes function import declarations.
 
-use crate::output::{Output, OutputKind};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::output::{FileType, Output};
+use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -28,7 +28,7 @@ impl Pass {
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        for output in output_master.outputs_of(OutputKind::Csharp) {
+        for output in output_master.outputs_of(FileType::Csharp) {
             let mut imports = Vec::new();
 
             for (_id, function) in fn_maps.iter() {

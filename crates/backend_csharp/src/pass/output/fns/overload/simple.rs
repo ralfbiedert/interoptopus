@@ -4,8 +4,8 @@
 //! The overload IDs come from the simple model pass, with the actual Function
 //! objects looked up from `fns::all`.
 
-use crate::output::{Output, OutputKind};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::output::{FileType, Output};
+use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -33,7 +33,7 @@ impl Pass {
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        for output in output_master.outputs_of(OutputKind::Csharp) {
+        for output in output_master.outputs_of(FileType::Csharp) {
             let mut imports = Vec::new();
 
             for overload_id in overload_simple.iter() {

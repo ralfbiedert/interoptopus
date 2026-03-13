@@ -1,7 +1,7 @@
 //! Last output step where a buffer is fully materialized.
 
-use crate::output::OutputKind;
-use crate::pass::{OutputResult, PassInfo, meta, output};
+use crate::output::FileType;
+use crate::pass::{meta, output, OutputResult, PassInfo};
 use crate::pipeline::IntermediateOutputPasses;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;
@@ -29,7 +29,7 @@ impl Pass {
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        for file in output_master.outputs_of(OutputKind::Csharp) {
+        for file in output_master.outputs_of(FileType::Csharp) {
             let mut context = Context::new();
 
             let header = intermediary.header.header_for(file).unwrap();

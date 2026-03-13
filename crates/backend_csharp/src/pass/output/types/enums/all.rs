@@ -1,8 +1,8 @@
 //! Wraps enum type definitions through the `enum.cs` template, grouped per output file.
 
 use crate::lang::types::kind::{TypeKind, TypePattern};
-use crate::output::{Output, OutputKind};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::output::{FileType, Output};
+use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -30,7 +30,7 @@ impl Pass {
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        for file in output_master.outputs_of(OutputKind::Csharp) {
+        for file in output_master.outputs_of(FileType::Csharp) {
             let mut rendered_enums = Vec::new();
 
             for (type_id, ty) in types.iter() {

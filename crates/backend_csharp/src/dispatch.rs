@@ -1,23 +1,28 @@
+use crate::lang::meta::FileEmission;
+use crate::lang::types::Type;
 use crate::lang::{FunctionId, TypeId};
+use crate::output::FileName;
+use interoptopus::lang::function::Function;
 
-type DispatchFn = Box<dyn FnMut(Item) -> String>;
+/// A dispatch function that maps an item to a file name.
+type DispatchFn = Box<dyn FnMut(Item, Meta) -> FileName>;
 
 pub struct Dispatch {
     dispatch: DispatchFn,
 }
 
 impl Dispatch {
-    pub fn custom(f: impl FnMut(Item) -> String + 'static) -> Self {
+    pub fn custom(f: impl FnMut(Item, Meta) -> FileName + 'static) -> Self {
         Self { dispatch: Box::new(f) }
     }
 
     #[must_use]
     pub fn single_file() -> Self {
-        Self::custom(|x| "Interop.cs".to_string())
+        Self::custom(|_, _| FileName::new("Interop.cs"))
     }
 
-    pub fn classify(&mut self, item: Item) -> String {
-        (self.dispatch)(item)
+    pub fn classify(&mut self, item: Item) -> FileName {
+        (self.dispatch)(item, Meta {})
     }
 }
 
@@ -27,7 +32,14 @@ impl Default for Dispatch {
     }
 }
 
-pub enum Item {
-    Type(TypeId),
-    Function(FunctionId),
+pub enum ItemKind {
+    Type(TypeId, Type),
+    Function(FunctionId, Function),
+}
+
+pub struct Meta {}
+
+pub struct Item {
+    pub kind: ItemKind,
+    pub emission: FileEmission,
 }

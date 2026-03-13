@@ -1,7 +1,7 @@
 //! Renders using directives per output file.
 
-use crate::output::{Output, OutputKind};
-use crate::pass::{OutputResult, PassInfo, output};
+use crate::output::{FileType, Output};
+use crate::pass::{output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -22,7 +22,7 @@ impl Pass {
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::master::Pass) -> OutputResult {
         let templates = output_master.templates();
 
-        for output in output_master.outputs_of(OutputKind::Csharp) {
+        for output in output_master.outputs_of(FileType::Csharp) {
             let mut context = Context::new();
 
             // TODO: Compute correct cross-file imports.

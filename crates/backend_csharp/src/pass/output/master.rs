@@ -1,7 +1,7 @@
 //! Top-level output configuration.
 
 use crate::dispatch::Dispatch;
-use crate::output::{Output, OutputKind};
+use crate::output::{FileName, FileType, Output};
 use crate::pass::{OutputResult, PassInfo};
 use crate::template::templates;
 use interoptopus_backends::template::TemplateEngine;
@@ -31,7 +31,7 @@ impl Pass {
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta) -> OutputResult {
         // TODO: for each possible file, create an entry
-        self.outputs.push(Output { name: "Interop.cs".to_string(), kind: OutputKind::Csharp });
+        self.outputs.push(Output { name: FileName::new("Interop.cs"), kind: FileType::Csharp });
         Ok(())
     }
 
@@ -49,7 +49,7 @@ impl Pass {
         self.outputs.iter()
     }
 
-    pub fn outputs_of(&self, kind: OutputKind) -> impl Iterator<Item = &Output> {
+    pub fn outputs_of(&self, kind: FileType) -> impl Iterator<Item = &Output> {
         self.outputs.iter().filter(move |x| x.kind == kind)
     }
 }

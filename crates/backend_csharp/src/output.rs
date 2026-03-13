@@ -1,11 +1,25 @@
+/// A file name, e.g., `Interop.Foo.Bar.cs`.
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct FileName(String);
+
+impl FileName {
+    pub fn new(name: impl AsRef<str>) -> Self {
+        Self(name.as_ref().to_string())
+    }
+}
+
+/// A custom file type, e.g., `csproj`.
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+pub struct CustomFileType(String);
+
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub enum OutputKind {
+pub enum FileType {
     Csharp,
-    Custom(String),
+    Custom(CustomFileType),
 }
 
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Output {
-    pub name: String,
-    pub kind: OutputKind,
+    pub name: FileName,
+    pub kind: FileType,
 }
