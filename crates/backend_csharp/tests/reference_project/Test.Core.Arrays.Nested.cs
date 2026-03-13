@@ -1,7 +1,7 @@
 using System.Linq;
 using My.Company;
-using My.Company.Common;
 using Xunit;
+using Interop = My.Company.Interop;
 
 public class TestArrayNested
 {

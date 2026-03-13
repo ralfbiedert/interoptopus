@@ -1,4 +1,4 @@
-using A;
+using My.Company;
 using Xunit;
 
 public class TestInvoke
