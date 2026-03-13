@@ -40,4 +40,5 @@ dist
 .DS_Store
 
 # Project-specific
-crates/backend_csharp/tests/reference_project/Interop.cs
+Interop.cs
+Interop.Common.cs
