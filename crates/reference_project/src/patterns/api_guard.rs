@@ -5,5 +5,5 @@ use interoptopus::pattern::api_guard::ApiVersion;
 // in your bindings that checks if the bindings match the DLL.
 #[ffi]
 pub fn pattern_api_guard() -> ApiVersion {
-    crate::ffi_inventory().into()
+    crate::inventory().into()
 }

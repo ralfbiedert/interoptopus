@@ -5,6 +5,8 @@ pub enum Error {
     PassLimit,
     TemplateError(interoptopus_backends::Error),
     MissingTypeName(String),
+    /// If `dotnet` was found, but an actual command failed.
+    DotNetCliCommandFailed(String),
 }
 
 impl Display for Error {
@@ -13,6 +15,7 @@ impl Display for Error {
             Self::TemplateError(e) => write!(f, "Template error: {e}"),
             Self::PassLimit => write!(f, "Pass iteration limit reached."),
             Self::MissingTypeName(ctx) => write!(f, "Missing type name: {ctx}"),
+            Self::DotNetCliCommandFailed(ctx) => write!(f, "dotnet command failed: {ctx}"),
         }
     }
 }

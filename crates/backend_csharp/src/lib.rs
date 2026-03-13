@@ -10,6 +10,7 @@ pub mod pass;
 pub mod plugin;
 pub mod template;
 
+mod dotnet;
 mod error;
 mod macros;
 mod pipeline;

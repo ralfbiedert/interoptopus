@@ -51,7 +51,7 @@ pub mod services {
 pub mod types;
 // pub mod wire;
 
-pub fn ffi_inventory() -> RustInventory {
+pub fn inventory() -> RustInventory {
     RustInventory::new()
         // Functions
         .register(builtins_string!())

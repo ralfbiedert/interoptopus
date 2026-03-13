@@ -21,3 +21,4 @@ __pycache__
 .claude
 .zed
 .wakatime-project
+crates/backend_csharp/tests/reference_project/Interop.cs
