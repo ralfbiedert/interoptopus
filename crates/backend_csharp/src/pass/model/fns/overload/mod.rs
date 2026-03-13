@@ -1,6 +1,5 @@
 use crate::lang::functions::Signature;
 use crate::lang::types::kind::{Pointer, PointerKind, Primitive, TypeKind, TypePattern};
-use crate::lang::types::ManagedConversion;
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::model;
 
@@ -8,7 +7,7 @@ pub mod all;
 pub mod body;
 pub mod simple;
 
-/// Check whether an argument type is an IntPtr whose pointee is eligible for `ref` overloads.
+/// Check whether an argument type is an `IntPtr` whose pointee is eligible for `ref` overloads.
 ///
 /// Returns `Some(true)` if eligible, `Some(false)` if definitely not eligible,
 /// and `None` if the managed conversion for the pointee isn't known yet (caller should defer).
@@ -16,16 +15,15 @@ fn is_eligible_intptr(ty: TypeId, types: &model::types::all::Pass, managed_conve
     let Some(TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target })) = types.get(ty).map(|t| &t.kind) else {
         return Some(false);
     };
+
     // Exclude void targets — `ref void` is not valid C#.
-    if let Some(t) = types.get(*target) {
-        if matches!(t.kind, TypeKind::Primitive(Primitive::Void) | TypeKind::TypePattern(TypePattern::CVoid)) {
-            return Some(false);
-        }
+    if let Some(t) = types.get(*target)
+        && matches!(t.kind, TypeKind::Primitive(Primitive::Void) | TypeKind::TypePattern(TypePattern::CVoid))
+    {
+        return Some(false);
     }
-    match managed_conversion.managed_conversion(*target) {
-        Some(ManagedConversion::AsIs | ManagedConversion::To | ManagedConversion::Into) => Some(true),
-        None => None,
-    }
+
+    Some(true)
 }
 
 fn derive_overload_id(original_id: FunctionId, signature: &Signature) -> FunctionId {

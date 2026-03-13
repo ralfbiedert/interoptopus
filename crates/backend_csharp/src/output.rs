@@ -10,10 +10,12 @@ impl Target {
         Self { file_name: file_name.as_ref().to_string(), namespace: namespace.as_ref().to_string() }
     }
 
+    #[must_use] 
     pub fn file_name(&self) -> &str {
         &self.file_name
     }
 
+    #[must_use] 
     pub fn namespace(&self) -> &str {
         &self.namespace
     }

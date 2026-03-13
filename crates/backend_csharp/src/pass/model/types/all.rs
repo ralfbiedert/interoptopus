@@ -75,7 +75,7 @@ impl Pass {
     }
 }
 
-/// Looks up the Rust emission for a C# type by searching the id_map for a matching Rust type.
+/// Looks up the Rust emission for a C# type by searching the `id_map` for a matching Rust type.
 fn lookup_emission(cs_type_id: TypeId, id_maps: &model::id_map::Pass, rs_types: &Types) -> Emission {
     // Try to find the corresponding Rust type by checking all Rust types
     for (rust_id, rust_ty) in rs_types {

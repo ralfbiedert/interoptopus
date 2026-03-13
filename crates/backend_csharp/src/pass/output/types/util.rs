@@ -1,6 +1,6 @@
 //! Renders utility types (exceptions, string extensions) per output file.
 //!
-//! Each utility type has a registered TypeId (see `lang::types::csharp`) and
+//! Each utility type has a registered `TypeId` (see `lang::types::csharp`) and
 //! participates in dispatch routing. Only utility types routed to a given
 //! output file are rendered into that file.
 

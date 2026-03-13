@@ -1,8 +1,8 @@
-//! Renders slice types (Slice<T> and SliceMut<T>) per output file.
+//! Renders slice types (Slice<T> and `SliceMut`<T>) per output file.
 //!
 //! For each slice type, determines whether to use the "fast" (blittable) or
 //! "marshalling" template based on the element type's `ManagedConversion`.
-//! Elements with `AsIs` or `To` conversion are blittable and use GCHandle pinning;
+//! Elements with `AsIs` or `To` conversion are blittable and use `GCHandle` pinning;
 //! elements with `Into` conversion require per-element marshalling.
 
 use crate::lang::TypeId;

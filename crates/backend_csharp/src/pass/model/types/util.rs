@@ -1,4 +1,4 @@
-//! Registers backend-specific utility types (InteropException, Utf8String, etc.)
+//! Registers backend-specific utility types (`InteropException`, `Utf8String`, etc.)
 //! so they participate in dispatch routing like any other type.
 
 use crate::lang::meta::{Emission, FileEmission};

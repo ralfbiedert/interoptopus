@@ -31,6 +31,6 @@ pub enum TypeKind {
     AsyncHelper(TypeId),
     WireHelper(TypeId), // TODO?
     TypePattern(TypePattern),
-    /// A backend-specific utility type (e.g., InteropException, Utf8String helper class).
+    /// A backend-specific utility type (e.g., `InteropException`, `Utf8String` helper class).
     Util,
 }
