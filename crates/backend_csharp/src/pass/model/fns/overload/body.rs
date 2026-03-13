@@ -65,7 +65,7 @@ impl Pass {
             };
 
             let has_delegate = transformable_args.iter().any(|a| is_delegate_class(a.ty, types));
-            let has_intptr = transformable_args.iter().any(|a| is_eligible_intptr(a.ty, types, managed_conversion));
+            let has_intptr = transformable_args.iter().any(|a| is_eligible_intptr(a.ty, types, managed_conversion) == Some(true));
 
             // Nothing to do for this function
             if async_result_ty.is_none() && !has_delegate {
@@ -141,7 +141,7 @@ fn all_families_ready(
     args.iter().all(|arg| {
         if is_delegate_class(arg.ty, types) {
             matches!(type_overloads.get(arg.ty), Some(OverloadFamily::Delegate(_)))
-        } else if is_eligible_intptr(arg.ty, types, managed_conversion) {
+        } else if is_eligible_intptr(arg.ty, types, managed_conversion) == Some(true) {
             matches!(type_overloads.get(arg.ty), Some(OverloadFamily::Pointer(_)))
         } else {
             true
@@ -162,7 +162,7 @@ fn build_arg_transforms(
         if let Some(OverloadFamily::Delegate(family)) = is_delegate_class(arg.ty, types).then(|| type_overloads.get(arg.ty)).flatten() {
             overload_args.push(Argument { name: arg.name.clone(), ty: family.signature });
             transforms.push(ArgTransform::WrapDelegate);
-        } else if let Some(OverloadFamily::Pointer(family)) = is_eligible_intptr(arg.ty, types, managed_conversion).then(|| type_overloads.get(arg.ty)).flatten() {
+        } else if let Some(OverloadFamily::Pointer(family)) = (is_eligible_intptr(arg.ty, types, managed_conversion) == Some(true)).then(|| type_overloads.get(arg.ty)).flatten() {
             overload_args.push(Argument { name: arg.name.clone(), ty: family.by_ref });
             transforms.push(ArgTransform::Ref);
         } else {
