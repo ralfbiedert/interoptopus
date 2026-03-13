@@ -41,6 +41,7 @@ impl Pass {
             let enums = intermediary.enums.enums_for(file).unwrap();
             let composites = intermediary.composites.composites_for(file).unwrap();
             let delegates = intermediary.delegates.delegates_for(file).unwrap();
+            let slices = intermediary.slices.slices_for(file).unwrap();
             let services = intermediary.services.services_for(file).unwrap();
             let async_trampolines = intermediary.asynk.trampolines_for(file).unwrap();
             let util = intermediary.util.utils_for(file).unwrap();
@@ -58,6 +59,7 @@ impl Pass {
             context.insert("enums", &enums);
             context.insert("composites", &composites);
             context.insert("delegates", &delegates);
+            context.insert("slices", &slices);
             context.insert("services", &services);
             context.insert("async_trampolines", &async_trampolines);
             context.insert("util", &util);

@@ -39,6 +39,10 @@ namespace {{ namespace }} {
 
     {{ delegate | indent }}
 {%- endfor %}
+{%- for slice in slices %}
+
+    {{ slice | indent }}
+{%- endfor %}
 {%- for service in services %}
 
     {{ service | indent }}

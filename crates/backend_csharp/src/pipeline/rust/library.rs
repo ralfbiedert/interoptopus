@@ -65,6 +65,7 @@ pub struct RustLibraryConfig {
     pub output_composite_body_as_unmanaged: output::types::composites::body_as_unmanaged::Config,
     pub output_composite: output::types::composites::all::Config,
     pub output_delegates: output::types::delegates::all::Config,
+    pub output_slices: output::types::slices::Config,
     pub output_fn_imports: output::fns::rust::Config,
     pub output_fn_overload_simple: output::fns::overload::simple::Config,
     pub output_fn_overload_body: output::fns::overload::body::Config,
@@ -135,6 +136,7 @@ pub struct IntermediateOutputPasses {
     pub composite_body: output::types::composites::body::Pass,
     pub composites: output::types::composites::all::Pass,
     pub delegates: output::types::delegates::all::Pass,
+    pub slices: output::types::slices::Pass,
     pub fns_rust: output::fns::rust::Pass,
     pub fns_overload_simple: output::fns::overload::simple::Pass,
     pub fns_overload_body: output::fns::overload::body::Pass,
@@ -247,6 +249,7 @@ impl RustLibrary {
                 composite_body: output::types::composites::body::Pass::new(config.output_composite_body),
                 composites: output::types::composites::all::Pass::new(config.output_composite),
                 delegates: output::types::delegates::all::Pass::new(config.output_delegates),
+                slices: output::types::slices::Pass::new(config.output_slices),
                 fns_rust: output::fns::rust::Pass::new(config.output_fn_imports),
                 fns_overload_simple: output::fns::overload::simple::Pass::new(config.output_fn_overload_simple),
                 fns_overload_body: output::fns::overload::body::Pass::new(config.output_fn_overload_body),
@@ -363,6 +366,7 @@ impl RustLibrary {
         o.composite_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.composite_body_unmanaged, &o.composite_body_to_unmanaged, &o.composite_body_as_unmanaged)?;
         o.composites.process(&mut pass_meta, &self.output_master, &m.type_all, &o.composite_ty, &o.composite_body)?;
         o.delegates.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
+        o.slices.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_managed_conversion, &o.unmanaged_names)?;
         o.fns_rust.process(&mut pass_meta, &self.output_master, &m.fn_originals, &m.type_all)?;
         o.fns_overload_simple.process(&mut pass_meta, &self.output_master, &m.fn_originals, &m.fn_overload_all, &m.fns_all, &m.type_all)?;
         o.fns_overload_body.process(&mut pass_meta, &self.output_master, &m.fn_overload_all, &m.fn_originals, &m.type_all, &m.type_overload_all)?;
