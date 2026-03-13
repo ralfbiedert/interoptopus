@@ -123,7 +123,7 @@ public partial class {{ name }} : IEnumerable<{{ element_type }}>, IDisposable
     }
 }
 
-    public static class {{ name }}Extensions
-    {
-        public static {{ name }} {{ method }}(this {{ element_type }}[] s) { return {{ name }}.From(s); }
-    }
+public static class {{ name }}Extensions
+{
+    public static {{ name }} {{ method }}(this {{ element_type }}[] s) { return {{ name }}.From(s); }
+}
