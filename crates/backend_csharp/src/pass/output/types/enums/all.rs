@@ -2,7 +2,7 @@
 
 use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::output::{FileType, Output};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 

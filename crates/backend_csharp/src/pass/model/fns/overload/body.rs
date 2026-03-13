@@ -14,8 +14,8 @@
 
 use crate::lang::functions::overload::{ArgTransform, FnTransforms, OverloadKind, RvalTransform};
 use crate::lang::functions::{Argument, Function, Signature};
+use crate::lang::types::OverloadFamily;
 use crate::lang::types::kind::{DelegateKind, TypeKind, TypePattern};
-use crate::lang::types::{ManagedConversion, OverloadFamily};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
@@ -44,7 +44,6 @@ impl Pass {
         overload_all: &mut model::fns::overload::all::Pass,
         types: &model::types::all::Pass,
         type_overloads: &model::types::overload::all::Pass,
-        managed_conversion: &model::types::info::managed_conversion::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
@@ -65,7 +64,7 @@ impl Pass {
             };
 
             let has_delegate = transformable_args.iter().any(|a| is_delegate_class(a.ty, types));
-            let has_intptr = transformable_args.iter().any(|a| is_eligible_intptr(a.ty, types, managed_conversion) == Some(true));
+            let has_intptr = transformable_args.iter().any(|a| is_eligible_intptr(a.ty, types));
 
             // Nothing to do for this function
             if async_result_ty.is_none() && !has_delegate {
@@ -74,7 +73,7 @@ impl Pass {
             }
 
             // Wait for type overload families to be available
-            if !all_families_ready(transformable_args, types, type_overloads, managed_conversion) {
+            if !all_families_ready(transformable_args, types, type_overloads) {
                 continue;
             }
 
@@ -88,7 +87,7 @@ impl Pass {
             }
 
             // Compute arg transforms for the transformable args
-            let (overload_args, arg_transforms) = build_arg_transforms(transformable_args, types, type_overloads, managed_conversion);
+            let (overload_args, arg_transforms) = build_arg_transforms(transformable_args, types, type_overloads);
 
             // Produce Body overload if there are delegate args but NO async callback.
             // When async is present, the Async overload already applies the same arg
@@ -132,16 +131,11 @@ fn detect_async_callback(args: &[Argument], types: &model::types::all::Pass) -> 
     }
 }
 
-fn all_families_ready(
-    args: &[Argument],
-    types: &model::types::all::Pass,
-    type_overloads: &model::types::overload::all::Pass,
-    managed_conversion: &model::types::info::managed_conversion::Pass,
-) -> bool {
+fn all_families_ready(args: &[Argument], types: &model::types::all::Pass, type_overloads: &model::types::overload::all::Pass) -> bool {
     args.iter().all(|arg| {
         if is_delegate_class(arg.ty, types) {
             matches!(type_overloads.get(arg.ty), Some(OverloadFamily::Delegate(_)))
-        } else if is_eligible_intptr(arg.ty, types, managed_conversion) == Some(true) {
+        } else if is_eligible_intptr(arg.ty, types) {
             matches!(type_overloads.get(arg.ty), Some(OverloadFamily::Pointer(_)))
         } else {
             true
@@ -149,12 +143,7 @@ fn all_families_ready(
     })
 }
 
-fn build_arg_transforms(
-    args: &[Argument],
-    types: &model::types::all::Pass,
-    type_overloads: &model::types::overload::all::Pass,
-    managed_conversion: &model::types::info::managed_conversion::Pass,
-) -> (Vec<Argument>, Vec<ArgTransform>) {
+fn build_arg_transforms(args: &[Argument], types: &model::types::all::Pass, type_overloads: &model::types::overload::all::Pass) -> (Vec<Argument>, Vec<ArgTransform>) {
     let mut overload_args = Vec::new();
     let mut transforms = Vec::new();
 
@@ -162,7 +151,7 @@ fn build_arg_transforms(
         if let Some(OverloadFamily::Delegate(family)) = is_delegate_class(arg.ty, types).then(|| type_overloads.get(arg.ty)).flatten() {
             overload_args.push(Argument { name: arg.name.clone(), ty: family.signature });
             transforms.push(ArgTransform::WrapDelegate);
-        } else if let Some(OverloadFamily::Pointer(family)) = (is_eligible_intptr(arg.ty, types, managed_conversion) == Some(true)).then(|| type_overloads.get(arg.ty)).flatten() {
+        } else if let Some(OverloadFamily::Pointer(family)) = is_eligible_intptr(arg.ty, types).then(|| type_overloads.get(arg.ty)).flatten() {
             overload_args.push(Argument { name: arg.name.clone(), ty: family.by_ref });
             transforms.push(ArgTransform::Ref);
         } else {

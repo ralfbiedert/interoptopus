@@ -1,9 +1,9 @@
 //! Renders delegate type definitions through the `all.cs` template, grouped per output file.
 
-use crate::lang::types::kind::{DelegateKind, Primitive, TypeKind};
 use crate::lang::TypeId;
+use crate::lang::types::kind::{DelegateKind, Primitive, TypeKind};
 use crate::output::{FileType, Output};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 

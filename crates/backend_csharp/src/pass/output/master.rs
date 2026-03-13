@@ -9,7 +9,7 @@ use crate::dispatch::{Dispatch, Item, ItemKind};
 use crate::lang::meta::Emission;
 use crate::lang::{FunctionId, TypeId};
 use crate::output::{FileType, Output, Target};
-use crate::pass::{model, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model};
 use crate::template::templates;
 use interoptopus_backends::template::TemplateEngine;
 use std::collections::{HashMap, HashSet};

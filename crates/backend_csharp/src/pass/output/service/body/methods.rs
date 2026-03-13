@@ -54,7 +54,10 @@ impl Pass {
                 let rval_kind = types.get(method_fn.signature.rval).map(|t| &t.kind);
                 let result_info = resolve_result_rval(rval_kind, types);
 
-                let rval = result_info.rval_name.as_deref().or_else(|| types.get(method_fn.signature.rval).map(|t| t.name.as_str()));
+                let rval = result_info
+                    .rval_name
+                    .as_deref()
+                    .or_else(|| types.get(method_fn.signature.rval).map(|t| t.name.as_str()));
                 let Some(rval) = rval else { continue };
                 let is_void = result_info.is_void || matches!(rval_kind, Some(TypeKind::Primitive(Primitive::Void)));
 
@@ -183,7 +186,9 @@ fn overload_args_eq(a: &[HashMap<&str, Value>], b: &[HashMap<&str, Value>]) -> b
     if a.len() != b.len() {
         return false;
     }
-    a.iter().zip(b.iter()).all(|(x, y)| x.get("name") == y.get("name") && x.get("ty") == y.get("ty") && x.get("is_ref") == y.get("is_ref"))
+    a.iter()
+        .zip(b.iter())
+        .all(|(x, y)| x.get("name") == y.get("name") && x.get("ty") == y.get("ty") && x.get("is_ref") == y.get("is_ref"))
 }
 
 fn resolve_task_type_from_result(result_kind: &TypeKind, types: &model::types::all::Pass) -> String {

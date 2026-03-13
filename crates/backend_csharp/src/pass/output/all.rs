@@ -1,7 +1,7 @@
 //! Last output step where a buffer is fully materialized.
 
 use crate::output::FileType;
-use crate::pass::{meta, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, meta, output};
 use crate::pipeline::IntermediateOutputPasses;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;

@@ -1,7 +1,7 @@
 pub mod overload;
 
-use crate::lang::meta::Emission;
 use crate::lang::TypeId;
+use crate::lang::meta::Emission;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Argument {

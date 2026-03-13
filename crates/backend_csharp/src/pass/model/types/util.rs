@@ -43,11 +43,7 @@ impl Pass {
         for (id, name) in utils {
             kinds.set(id, TypeKind::Util);
             names.set(id, name.to_string());
-            types.set(id, Type {
-                emission: Emission::FileEmission(FileEmission::Common),
-                name: name.to_string(),
-                kind: TypeKind::Util,
-            });
+            types.set(id, Type { emission: Emission::FileEmission(FileEmission::Common), name: name.to_string(), kind: TypeKind::Util });
         }
 
         self.done = true;

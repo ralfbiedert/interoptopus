@@ -40,7 +40,10 @@ impl Pass {
                 .fields
                 .iter()
                 .map(|f| {
-                    let ty_name = unmanaged_names.name(f.ty).cloned().unwrap_or_else(|| types.get(f.ty).map(|t| t.name.clone()).unwrap_or_default());
+                    let ty_name = unmanaged_names
+                        .name(f.ty)
+                        .cloned()
+                        .unwrap_or_else(|| types.get(f.ty).map(|t| t.name.clone()).unwrap_or_default());
                     let to_managed = managed.to_managed_suffix(f.ty).to_string();
 
                     let mut m = HashMap::new();

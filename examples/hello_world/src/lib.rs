@@ -1,7 +1,7 @@
 use interoptopus::pattern::asynk::Async;
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::rt::Tokio;
-use interoptopus::{callback, ffi, AsyncRuntime};
+use interoptopus::{AsyncRuntime, callback, ffi};
 
 /// A simple type in our FFI layer.
 #[ffi]
@@ -78,10 +78,10 @@ impl ServiceBasic2 {
 mod tests {
     use interoptopus::inventory::RustInventory;
     use interoptopus::{extra_type, function, service};
+    use interoptopus_csharp::RustLibrary;
     use interoptopus_csharp::dispatch::Dispatch;
     use interoptopus_csharp::lang::meta::FileEmission;
     use interoptopus_csharp::output::Target;
-    use interoptopus_csharp::RustLibrary;
 
     // We just trick a unit test into producing our bindings, here for C#
     #[test]

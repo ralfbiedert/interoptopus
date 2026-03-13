@@ -4,10 +4,10 @@
 //! - A trampoline class (`AsyncTrampoline*`) that manages in-flight tasks
 //! - A static field declaration for the `Interop` class
 
-use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
 use crate::lang::types::ManagedConversion;
+use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
 use crate::output::{FileType, Output};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 

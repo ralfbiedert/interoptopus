@@ -78,8 +78,22 @@ impl Pass {
             names.set(by_out_id, format!("out {pointee_name}"));
 
             // Register in the all pass so they're fully resolved
-            types.set(by_ref_id, Type { emission: Emission::Builtin, name: format!("ref {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }) });
-            types.set(by_out_id, Type { emission: Emission::Builtin, name: format!("out {pointee_name}"), kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }) });
+            types.set(
+                by_ref_id,
+                Type {
+                    emission: Emission::Builtin,
+                    name: format!("ref {pointee_name}"),
+                    kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }),
+                },
+            );
+            types.set(
+                by_out_id,
+                Type {
+                    emission: Emission::Builtin,
+                    name: format!("out {pointee_name}"),
+                    kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }),
+                },
+            );
 
             // Register family in the overload all pass
             let family = Arc::new(OverloadFamily::Pointer(PointerFamily { intptr: intptr_id, by_ref: by_ref_id, by_out: by_out_id }));

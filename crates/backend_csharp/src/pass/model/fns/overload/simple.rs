@@ -9,8 +9,8 @@
 
 use crate::lang::functions::overload::OverloadKind;
 use crate::lang::functions::{Argument, Function, Signature};
+use crate::lang::types::OverloadFamily;
 use crate::lang::types::kind::{Pointer, PointerKind, TypeKind};
-use crate::lang::types::{ManagedConversion, OverloadFamily};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
@@ -39,7 +39,6 @@ impl Pass {
         all: &mut model::fns::all::Pass,
         overload_all: &mut model::fns::overload::all::Pass,
         types: &model::types::all::Pass,
-        managed_conversion: &model::types::info::managed_conversion::Pass,
         overloads: &model::types::overload::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
@@ -52,20 +51,7 @@ impl Pass {
             // Check if any argument is an eligible IntPtr (pointee is AsIs or To, not a class).
             // If any argument's eligibility is unknown (managed_conversion not yet available),
             // we must defer and retry on the next iteration rather than permanently rejecting.
-            let mut has_any_eligible = false;
-            let mut has_any_pending = false;
-            for arg in &original_fn.signature.arguments {
-                match is_eligible_intptr(arg.ty, types, managed_conversion) {
-                    Some(true) => has_any_eligible = true,
-                    Some(false) => {}
-                    None => has_any_pending = true,
-                }
-            }
-
-            // If some args are still pending, skip and retry next iteration
-            if has_any_pending && !has_any_eligible {
-                continue;
-            }
+            let has_any_eligible = original_fn.signature.arguments.iter().any(|arg| is_eligible_intptr(arg.ty, types));
 
             if !has_any_eligible {
                 self.processed.insert(original_id);
@@ -74,7 +60,7 @@ impl Pass {
 
             // Has eligible IntPtr args, but families aren't available yet — skip and retry
             let all_families_available = original_fn.signature.arguments.iter().all(|arg| {
-                if is_eligible_intptr(arg.ty, types, managed_conversion) == Some(true) {
+                if is_eligible_intptr(arg.ty, types) {
                     matches!(overloads.get(arg.ty), Some(OverloadFamily::Pointer(_)))
                 } else {
                     true
@@ -88,7 +74,7 @@ impl Pass {
             // Build the overload signature replacing eligible IntPtr args with their ByRef siblings
             let mut overload_args = Vec::new();
             for arg in &original_fn.signature.arguments {
-                let new_ty = if is_eligible_intptr(arg.ty, types, managed_conversion) == Some(true) {
+                let new_ty = if is_eligible_intptr(arg.ty, types) {
                     match overloads.get(arg.ty) {
                         Some(OverloadFamily::Pointer(f)) => f.by_ref,
                         _ => arg.ty,

@@ -6,7 +6,7 @@
 
 use crate::lang::types::csharp;
 use crate::output::{FileType, Output};
-use crate::pass::{output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 

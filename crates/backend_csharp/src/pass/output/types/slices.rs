@@ -9,7 +9,7 @@ use crate::lang::TypeId;
 use crate::lang::types::ManagedConversion;
 use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::output::{FileType, Output};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -54,10 +54,7 @@ impl Pass {
                 let Some(element_ty) = types.get(element_ty_id) else { continue };
                 let element_name = &element_ty.name;
 
-                let is_blittable = matches!(
-                    managed_conversion.managed_conversion(element_ty_id),
-                    Some(ManagedConversion::AsIs | ManagedConversion::To)
-                );
+                let is_blittable = matches!(managed_conversion.managed_conversion(element_ty_id), Some(ManagedConversion::AsIs | ManagedConversion::To));
 
                 let method = if is_mut { "SliceMut" } else { "Slice" };
 

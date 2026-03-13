@@ -1,7 +1,7 @@
 //! Renders using directives per output file.
 
 use crate::output::{FileType, Output};
-use crate::pass::{output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -28,11 +28,7 @@ impl Pass {
             let mut context = Context::new();
 
             let this_ns = output.target.namespace();
-            let extra_imports: Vec<String> = all_outputs
-                .iter()
-                .map(|o| o.target.namespace().to_string())
-                .filter(|ns| ns != this_ns)
-                .collect();
+            let extra_imports: Vec<String> = all_outputs.iter().map(|o| o.target.namespace().to_string()).filter(|ns| ns != this_ns).collect();
 
             context.insert("extra_imports", &extra_imports);
 

@@ -39,7 +39,7 @@ pub enum Emission {
 
 impl Emission {
     /// Converts from the Rust core `Emission` to the C# backend's `Emission`.
-    #[must_use] 
+    #[must_use]
     pub fn from_rust(rust: &interoptopus::lang::meta::Emission) -> Self {
         match rust {
             interoptopus::lang::meta::Emission::Builtin => Self::Builtin,
@@ -51,7 +51,7 @@ impl Emission {
     }
 
     /// Returns the `FileEmission` if this item should be written to a file.
-    #[must_use] 
+    #[must_use]
     pub fn file_emission(&self) -> Option<&FileEmission> {
         match self {
             Self::FileEmission(fe) => Some(fe),
