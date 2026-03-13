@@ -26,7 +26,6 @@ impl Pass {
         output_master: &output::master::Pass,
         types: &model::types::all::Pass,
         struct_class: &model::types::info::struct_class::Pass,
-        unmanaged_names: &output::conversion::unmanaged_names::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -41,10 +40,10 @@ impl Pass {
                 .fields
                 .iter()
                 .filter_map(|f| {
-                    let unmanaged_name = unmanaged_names.name(f.ty)?;
+                    let managed_name = types.get(f.ty).map(|t| t.name.clone())?;
                     let mut m = HashMap::new();
                     m.insert("name", f.name.clone());
-                    m.insert("unmanaged_name", unmanaged_name.clone());
+                    m.insert("managed_name", managed_name);
                     Some(m)
                 })
                 .collect();

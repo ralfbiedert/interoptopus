@@ -79,6 +79,11 @@ impl Pass {
                             }
                         } else {
                             let overload_args = build_args(&overload_fn.signature.arguments[1..], types);
+                            // Skip overloads that only differ in the service context (first arg),
+                            // since service methods strip the context arg and would produce duplicates.
+                            if overload_args_eq(&overload_args, &base_args) {
+                                continue;
+                            }
                             rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, method_name, &overload_fn.name, &overload_args)?);
                         }
                     }
@@ -172,6 +177,13 @@ fn resolve_result_rval(rval_kind: Option<&TypeKind>, types: &model::types::all::
         }
         _ => ResultRval { as_ok: false, rval_name: None, is_void: false },
     }
+}
+
+fn overload_args_eq(a: &[HashMap<&str, Value>], b: &[HashMap<&str, Value>]) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    a.iter().zip(b.iter()).all(|(x, y)| x.get("name") == y.get("name") && x.get("ty") == y.get("ty") && x.get("is_ref") == y.get("is_ref"))
 }
 
 fn resolve_task_type_from_result(result_kind: &TypeKind, types: &model::types::all::Pass) -> String {

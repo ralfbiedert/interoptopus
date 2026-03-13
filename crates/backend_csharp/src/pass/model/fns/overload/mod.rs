@@ -1,6 +1,6 @@
 use crate::lang::functions::Signature;
+use crate::lang::types::kind::{Pointer, PointerKind, Primitive, TypeKind, TypePattern};
 use crate::lang::types::ManagedConversion;
-use crate::lang::types::kind::{Pointer, PointerKind, TypeKind};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::model;
 
@@ -16,9 +16,14 @@ fn is_eligible_intptr(ty: TypeId, types: &model::types::all::Pass, managed_conve
     let Some(TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target })) = types.get(ty).map(|t| &t.kind) else {
         return Some(false);
     };
+    // Exclude void targets — `ref void` is not valid C#.
+    if let Some(t) = types.get(*target) {
+        if matches!(t.kind, TypeKind::Primitive(Primitive::Void) | TypeKind::TypePattern(TypePattern::CVoid)) {
+            return Some(false);
+        }
+    }
     match managed_conversion.managed_conversion(*target) {
-        Some(ManagedConversion::AsIs | ManagedConversion::To) => Some(true),
-        Some(_) => Some(false),
+        Some(ManagedConversion::AsIs | ManagedConversion::To | ManagedConversion::Into) => Some(true),
         None => None,
     }
 }

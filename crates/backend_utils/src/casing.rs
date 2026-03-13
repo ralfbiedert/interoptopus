@@ -38,7 +38,7 @@ pub fn sanitize_rust_name(name: &str) -> String {
 
     for c in name.chars() {
         match c {
-            '<' | '>' | ',' | ';' | '[' | ']' | ' ' => {
+            '<' | '>' | ',' | ';' | '[' | ']' | ' ' | '\'' => {
                 capitalize_next = true;
             }
             '_' => {
@@ -167,6 +167,9 @@ mod tests {
         assert_eq!(sanitize_rust_name("Weird2<u8, 5>"), "Weird2U85");
         assert_eq!(sanitize_rust_name("[u8; 5]"), "U85");
         assert_eq!(sanitize_rust_name("MyStruct"), "MyStruct");
+        assert_eq!(sanitize_rust_name("Generic<'_, u32>"), "GenericU32");
+        assert_eq!(sanitize_rust_name("Weird2<'_, u8, 5>"), "Weird2U85");
+        assert_eq!(sanitize_rust_name("Phantom<'_, u8>"), "PhantomU8");
     }
 
     #[test]
