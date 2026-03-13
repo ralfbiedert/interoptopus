@@ -1,24 +1,43 @@
+# Build artifacts
 target
 *.rs.bk
-Cargo.lock
-node_modules
-html
-dist
-.cache
-.idea
-*.log
+cmake-build-debug
+
+# C
 *.lib
 *.a
 *.o
+
+# C#
 obj
 bin
 *.user
-cmake-build-debug
+
+# Python
+__pycache__
+
+# Dependencies
+Cargo.lock
+node_modules
+
+# Generated files
 *.actual
 *.generated
-__pycache__
-.DS_Store
+html
+dist
+
+# Logs
+*.log
+
+# IDE and editor
+.cache
 .claude
+.idea
 .zed
 .wakatime-project
+
+# OS
+.DS_Store
+
+# Project-specific
 crates/backend_csharp/tests/reference_project/Interop.cs
