@@ -18,8 +18,10 @@ pub enum FileEmission {
     /// This is a 'common' type (like Slice<u8>) that needs to be emitted in some interop file,
     /// is not a builtin, but not specific to any customer project.
     Common,
+    /// Variants for which the user never specified anything.
+    Default,
     /// The type should be placed in the given module / file.
-    Module(Module),
+    CustomModule(Module),
 }
 
 /// Where an item definition should be placed in generated files.
@@ -40,8 +42,9 @@ impl Emission {
     pub fn from_rust(rust: &interoptopus::lang::meta::Emission) -> Self {
         match rust {
             interoptopus::lang::meta::Emission::Builtin => Self::Builtin,
+            interoptopus::lang::meta::Emission::Default => Self::FileEmission(FileEmission::Default),
             interoptopus::lang::meta::Emission::Common => Self::FileEmission(FileEmission::Common),
-            interoptopus::lang::meta::Emission::Module(s) => Self::FileEmission(FileEmission::Module(Module::new(s.clone()))),
+            interoptopus::lang::meta::Emission::Module(s) => Self::FileEmission(FileEmission::CustomModule(Module::new(s.clone()))),
             interoptopus::lang::meta::Emission::External => Self::External,
         }
     }

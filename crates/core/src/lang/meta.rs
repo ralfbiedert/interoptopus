@@ -14,6 +14,8 @@ pub enum Emission {
     /// This is a built-in type (e.g., `f32` <-> `float`) and does not need to be defined (emitted
     /// in generated interop code). Also used for "std" like builtins, `String` <-> `string`.
     Builtin,
+    /// Variants for which the user never specified anything.
+    Default,
     /// This is a 'common' type (like Slice<u8>) that needs to be emitted in some interop file,
     /// is not a builtin, but not specific to any customer project.
     Common,
@@ -57,7 +59,10 @@ impl Docs {
 pub fn common_or_module_emission(x: &[Emission]) -> Emission {
     if x.iter().all(|x| matches!(x, Emission::Builtin | Emission::Common)) {
         Emission::Common
-    } else {
+    } else if x.iter().any(|x| matches!(x, Emission::Module(_))) {
         Emission::Module(String::new())
+    } else {
+        // At least one Default inner type → Default
+        Emission::Default
     }
 }

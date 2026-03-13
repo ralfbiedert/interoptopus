@@ -29,7 +29,7 @@
 //! ```
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Emission, Visibility};
+use crate::lang::meta::{Visibility, common_or_module_emission};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::any::Any;
 use std::fmt::Debug;
@@ -129,7 +129,7 @@ impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
         let t = T::ty();
         let e = E::ty();
         Type {
-            emission: Emission::Common,
+            emission: common_or_module_emission(&[t.emission, e.emission]),
             docs: crate::lang::meta::Docs::empty(),
             visibility: Visibility::Public,
             name: format!("Result<{}, {}>", t.name, e.name),

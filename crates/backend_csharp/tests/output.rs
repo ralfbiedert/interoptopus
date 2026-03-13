@@ -11,7 +11,8 @@ fn output() -> Result<(), Box<dyn Error>> {
     let multibuf = RustLibrary::builder(inventory)
         .dispatch(Dispatch::custom(|x, _| match x.emission {
             FileEmission::Common => FileName::new("Interop.Common.cs"),
-            FileEmission::Module(_) => FileName::new("Interop.cs"),
+            FileEmission::Default => FileName::new("Interop.cs"),
+            FileEmission::CustomModule(_) => FileName::new("Interop.cs"),
         }))
         .build()
         .process()?;

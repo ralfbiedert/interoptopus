@@ -55,7 +55,7 @@ impl ::interoptopus::lang::types::TypeInfo for Foo {
             name: "Foo".to_string(),
             visibility: ::interoptopus::lang::meta::Visibility::Public,
             docs: ::interoptopus::lang::meta::Docs::from_line(""),
-            emission: ::interoptopus::lang::meta::Emission::External,
+            emission: ::interoptopus::lang::meta::Emission::Default,
             kind: Self::kind(),
         }
     }

@@ -1,7 +1,7 @@
 //! Like a regular [`Vec`](std::vec::Vec), but FFI safe.<sup>🚧</sup>
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::io::{Read, Write};
 use std::mem::forget;
@@ -90,7 +90,7 @@ impl<T: TypeInfo> TypeInfo for Vec<T> {
             name: format!("Vec<{}>", t.name),
             visibility: Visibility::Public,
             docs: Docs::default(),
-            emission: if matches!(t.emission, Emission::Module(_)) { t.emission } else { Emission::Common },
+            emission: common_or_module_emission(&[t.emission]),
             kind: Self::kind(),
         }
     }

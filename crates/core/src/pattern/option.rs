@@ -15,7 +15,7 @@
 //!
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Emission, Visibility};
+use crate::lang::meta::Visibility;
 use crate::lang::types::{SerializationError, TypeInfo};
 use crate::lang::types::{TypeKind, WireIO};
 use std::io::{Read, Write};
@@ -127,7 +127,7 @@ impl<T: TypeInfo> TypeInfo for Option<T> {
     fn ty() -> crate::lang::types::Type {
         let t = T::ty();
         crate::lang::types::Type {
-            emission: Emission::Common,
+            emission: crate::lang::meta::common_or_module_emission(&[t.emission]),
             docs: crate::lang::meta::Docs::empty(),
             visibility: Visibility::Public,
             name: format!("Option<{}>", t.name),

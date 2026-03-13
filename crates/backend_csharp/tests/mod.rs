@@ -13,7 +13,8 @@ mod reference_project {
             .dll_name("foo")
             .dispatch(Dispatch::custom(|x, _| match x.emission {
                 FileEmission::Common => FileName::new("Interop.Common.cs"),
-                FileEmission::Module(_) => FileName::new("Interop.cs"),
+                FileEmission::Default => FileName::new("Interop.cs"),
+                FileEmission::CustomModule(_) => FileName::new("Interop.cs"),
             }))
             .build()
             .process()?

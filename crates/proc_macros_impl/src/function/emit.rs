@@ -200,7 +200,7 @@ impl FunctionModel {
                 quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::Common }
             }
             None => {
-                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::External }
+                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::Default }
             }
         }
     }

@@ -21,7 +21,7 @@ impl ::interoptopus::lang::function::FunctionInfo for foo {
             name: "foo".to_string(),
             visibility: ::interoptopus::lang::meta::Visibility::Private,
             docs: ::interoptopus::lang::meta::Docs::from_lines(vec![]),
-            emission: ::interoptopus::lang::meta::Emission::External,
+            emission: ::interoptopus::lang::meta::Emission::Default,
             signature: Self::signature(),
         }
     }

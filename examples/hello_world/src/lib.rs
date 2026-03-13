@@ -103,7 +103,8 @@ mod tests {
             .dll_name("hello_world")
             .dispatch(Dispatch::custom(|x, _| match x.emission {
                 FileEmission::Common => FileName::new("Interop.Common.cs"),
-                FileEmission::Module(_) => FileName::new("Interop.cs"),
+                FileEmission::Default => FileName::new("Interop.cs"),
+                FileEmission::CustomModule(_) => FileName::new("Interop.cs"),
             }))
             .build()
             .process()?
