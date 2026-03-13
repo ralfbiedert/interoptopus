@@ -23,11 +23,12 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.CompilerServices;
+using My.Company;
 
 #pragma warning restore 0105
 
 
-namespace My.Company {
+namespace My.Company.Common {
     public static partial class Interop {
 
         public const string NativeLib = "foo";
