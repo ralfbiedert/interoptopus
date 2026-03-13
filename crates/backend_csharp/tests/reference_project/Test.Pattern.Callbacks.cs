@@ -88,7 +88,7 @@ public class TestPatternDelegates
         var called_exception = false;
 
 
-        ResultError C1(int x, int y)
+        ResultVoidError C1(int x, int y)
         {
             // This should see `6` here, and it does, because the function has set that value.
             Assert.Equal(rval, 6);

@@ -9,7 +9,7 @@ public class TestBehavior
     public void behavior_panics_via_result()
     {
         var v = Interop.behavior_panics_via_result();
-        Assert.Equal(ResultError.Panic, v);
+        Assert.Equal(ResultVoidError.Panic, v);
     }
 
     [Fact]
