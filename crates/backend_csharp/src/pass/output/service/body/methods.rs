@@ -48,14 +48,19 @@ impl Pass {
             for &method_fn_id in &service.methods {
                 let Some(method_fn) = fns.get(method_fn_id) else { continue };
                 let Some(method_name) = method_names.get(method_fn_id) else { continue };
-                let Some(rval) = types.get(method_fn.signature.rval).map(|t| &t.name) else {
-                    continue;
-                };
-                let is_void = matches!(types.get(method_fn.signature.rval).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
+
+                // Detect if the return type is a Result pattern; if so, unwrap to the Ok type
+                // and mark that the call should use .AsOk() conversion.
+                let rval_kind = types.get(method_fn.signature.rval).map(|t| &t.kind);
+                let result_info = resolve_result_rval(rval_kind, types);
+
+                let rval = result_info.rval_name.as_deref().or_else(|| types.get(method_fn.signature.rval).map(|t| t.name.as_str()));
+                let Some(rval) = rval else { continue };
+                let is_void = result_info.is_void || matches!(rval_kind, Some(TypeKind::Primitive(Primitive::Void)));
 
                 // Base method (the raw native forwarding method)
                 let base_args = build_args(&method_fn.signature.arguments[1..], types);
-                rendered_methods.push(render(templates, rval, is_void, method_name, &method_fn.name, &base_args)?);
+                rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, method_name, &method_fn.name, &base_args)?);
 
                 // Overloads from the central registry
                 if let Some(overload_entries) = overload_all.overloads_for(method_fn_id) {
@@ -74,7 +79,7 @@ impl Pass {
                             }
                         } else {
                             let overload_args = build_args(&overload_fn.signature.arguments[1..], types);
-                            rendered_methods.push(render(templates, rval, is_void, method_name, &overload_fn.name, &overload_args)?);
+                            rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, method_name, &overload_fn.name, &overload_args)?);
                         }
                     }
                 }
@@ -114,6 +119,7 @@ fn render(
     templates: &interoptopus_backends::template::TemplateEngine,
     rval: &str,
     is_void: bool,
+    as_ok: bool,
     method_name: &str,
     interop_name: &str,
     args: &[HashMap<&str, Value>],
@@ -121,6 +127,7 @@ fn render(
     let mut context = Context::new();
     context.insert("rval", rval);
     context.insert("is_void", &is_void);
+    context.insert("as_ok", &as_ok);
     context.insert("method_name", &method_name);
     context.insert("interop_name", &interop_name);
     context.insert("args", args);
@@ -140,6 +147,31 @@ fn render_async(
     context.insert("interop_name", interop_name);
     context.insert("args", args);
     Ok(templates.render("service/body_methods_async.cs", &context)?)
+}
+
+struct ResultRval {
+    /// Whether the interop call should be suffixed with `.AsOk()`.
+    as_ok: bool,
+    /// The resolved return type name (Ok type), or `None` if not a Result.
+    rval_name: Option<String>,
+    /// Whether the resolved Ok type is void.
+    is_void: bool,
+}
+
+/// If the return type is `Result<T, E>`, resolve the Ok type name and mark for `.AsOk()`.
+fn resolve_result_rval(rval_kind: Option<&TypeKind>, types: &model::types::all::Pass) -> ResultRval {
+    match rval_kind {
+        Some(TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _))) => {
+            let ok_is_void = matches!(types.get(*ok_ty).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
+            let ok_name = if ok_is_void {
+                "void".to_string()
+            } else {
+                types.get(*ok_ty).map_or_else(|| "void".to_string(), |t| t.name.clone())
+            };
+            ResultRval { as_ok: true, rval_name: Some(ok_name), is_void: ok_is_void }
+        }
+        _ => ResultRval { as_ok: false, rval_name: None, is_void: false },
+    }
 }
 
 fn resolve_task_type_from_result(result_kind: &TypeKind, types: &model::types::all::Pass) -> String {
