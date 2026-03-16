@@ -3,6 +3,7 @@ pub mod conversion;
 pub mod fns;
 pub mod header;
 pub mod master;
+pub mod pattern;
 pub mod service;
 pub mod types;
 pub mod r#using;

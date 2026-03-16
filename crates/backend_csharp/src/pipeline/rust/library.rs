@@ -143,7 +143,7 @@ pub struct IntermediateOutputPasses {
     pub service_body_methods: output::service::body::methods::Pass,
     pub services: output::service::all::Pass,
     pub header: output::header::Pass,
-    pub pattern_utf8string: output::types::patterns::utf8string::Pass,
+    pub pattern_utf8string: output::pattern::utf8string::Pass,
     pub util: output::types::util::Pass,
     pub using: output::r#using::Pass,
 }
@@ -257,7 +257,7 @@ impl RustLibrary {
                 service_body_methods: output::service::body::methods::Pass::new(config.output_service_body_methods),
                 services: output::service::all::Pass::new(config.output_services),
                 header: output::header::Pass::new(config.output_header),
-                pattern_utf8string: output::types::patterns::utf8string::Pass::new(Default::default()),
+                pattern_utf8string: output::pattern::utf8string::Pass::new(Default::default()),
                 util: output::types::util::Pass::new(config.output_util),
                 using: output::r#using::Pass::new(config.output_using),
             },
