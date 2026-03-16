@@ -1,4 +1,4 @@
-use crate::lang::TypeId;
+use crate::lang::{FunctionId, TypeId};
 
 /// How a function's return value is transformed in an overload.
 #[derive(Clone, Debug)]
@@ -40,4 +40,9 @@ pub enum OverloadKind {
     /// The `FnTransforms` covers all remaining arg transforms (ref, delegate wrap)
     /// so that async overloads compose with body-style transforms.
     Async(FnTransforms),
+}
+
+pub struct Overload {
+    kind: OverloadKind,
+    base: FunctionId,
 }
