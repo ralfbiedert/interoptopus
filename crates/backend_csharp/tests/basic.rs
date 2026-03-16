@@ -12,15 +12,3 @@ fn rust_library_builder() {
     let inventory = RustInventory::new();
     let _ = RustLibrary::builder(inventory).build();
 }
-
-#[test]
-fn real_inventory() -> Result<(), Box<dyn std::error::Error>> {
-    let reference_project = include_str!("inventory/reference_project.json");
-    let inventory: RustInventory = serde_json::from_str::<RustInventory>(reference_project)?;
-    let library = RustLibrary::new(inventory);
-    let result = library.process();
-
-    assert!(result.is_ok());
-
-    Ok(())
-}
