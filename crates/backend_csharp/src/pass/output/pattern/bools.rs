@@ -25,18 +25,13 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, rendered: HashMap::default() }
     }
 
-    pub fn process(
-        &mut self,
-        _pass_meta: &mut crate::pass::PassMeta,
-        output_master: &output::master::Pass,
-        types: &model::types::all::Pass,
-    ) -> OutputResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::master::Pass, types: &model::types::all::Pass) -> OutputResult {
         let templates = output_master.templates();
 
         // Check if any type in the model is a Bool (primitive or pattern).
-        let has_bool = types.iter().any(|(_, ty)| {
-            matches!(&ty.kind, TypeKind::Primitive(Primitive::Bool) | TypeKind::TypePattern(TypePattern::Bool))
-        });
+        let has_bool = types
+            .iter()
+            .any(|(_, ty)| matches!(&ty.kind, TypeKind::Primitive(Primitive::Bool) | TypeKind::TypePattern(TypePattern::Bool)));
 
         for file in output_master.outputs_of(FileType::Csharp) {
             let content = if has_bool {

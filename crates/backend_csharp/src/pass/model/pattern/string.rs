@@ -39,7 +39,7 @@ impl Pass {
         let mut destroy = None;
         let mut clone = None;
 
-        for (_fn_id, rust_fn) in rs_functions {
+        for rust_fn in rs_functions.values() {
             if rust_fn.name.starts_with("interoptopus_string_create") {
                 create = Some(rust_fn.name.clone());
             } else if rust_fn.name.starts_with("interoptopus_string_destroy") {

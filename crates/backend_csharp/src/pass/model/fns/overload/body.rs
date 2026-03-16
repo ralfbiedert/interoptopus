@@ -19,9 +19,9 @@ use crate::lang::functions::overload::{ArgTransform, FnTransforms, Overload, Ove
 use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
 use crate::lang::meta::Emission;
 use crate::lang::types::OverloadFamily;
-use crate::lang::types::{Decorators, Type};
 use crate::lang::types::kind::task::Task;
 use crate::lang::types::kind::{DelegateKind, Primitive, TypeKind, TypePattern};
+use crate::lang::types::{Decorators, Type};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::model::fns::overload::{IntPtrEligibility, derive_overload_id, intptr_eligibility, is_eligible_intptr};
@@ -78,7 +78,9 @@ impl Pass {
             let has_delegate = transformable_args.iter().any(|a| is_delegate_class(a.ty, types));
 
             // If any IntPtr argument's target type is not yet resolved, defer.
-            let has_any_unknown = transformable_args.iter().any(|a| matches!(intptr_eligibility(a.ty, types), IntPtrEligibility::Unknown));
+            let has_any_unknown = transformable_args
+                .iter()
+                .any(|a| matches!(intptr_eligibility(a.ty, types), IntPtrEligibility::Unknown));
             if has_any_unknown {
                 continue;
             }

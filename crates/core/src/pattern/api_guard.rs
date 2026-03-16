@@ -88,7 +88,13 @@ impl TypeInfo for ApiVersion {
     }
 
     fn ty() -> crate::lang::types::Type {
-        crate::lang::types::Type { emission: Emission::FileEmission(FileEmission::Common), docs: Docs::empty(), visibility: Visibility::Public, name: "ApiVersion".to_string(), kind: Self::kind() }
+        crate::lang::types::Type {
+            emission: Emission::FileEmission(FileEmission::Common),
+            docs: Docs::empty(),
+            visibility: Visibility::Public,
+            name: "ApiVersion".to_string(),
+            kind: Self::kind(),
+        }
     }
 
     fn register(inventory: &mut impl crate::inventory::Inventory) {

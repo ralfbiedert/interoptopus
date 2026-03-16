@@ -6,8 +6,8 @@
 
 use crate::lang::TypeId;
 use crate::lang::meta::Emission;
-use crate::lang::types::{Decorators, MarshalAs, ParamDecorator, RvalDecorator, Type};
 use crate::lang::types::kind::{TypeKind, TypePattern};
+use crate::lang::types::{Decorators, MarshalAs, ParamDecorator, RvalDecorator, Type};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
@@ -54,10 +54,9 @@ impl Pass {
 
             // Create the Type
             let decorators = match kind {
-                TypeKind::TypePattern(TypePattern::CStrPointer) => Decorators {
-                    param: Some(ParamDecorator::MarshalAs(MarshalAs::LPStr)),
-                    rval: Some(RvalDecorator::MarshalAs(MarshalAs::LPStr)),
-                },
+                TypeKind::TypePattern(TypePattern::CStrPointer) => {
+                    Decorators { param: Some(ParamDecorator::MarshalAs(MarshalAs::LPStr)), rval: Some(RvalDecorator::MarshalAs(MarshalAs::LPStr)) }
+                }
                 _ => Decorators::default(),
             };
 

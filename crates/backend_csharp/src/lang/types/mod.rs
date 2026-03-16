@@ -24,7 +24,7 @@ pub enum MarshalAs {
 impl std::fmt::Display for MarshalAs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            MarshalAs::LPStr => write!(f, "UnmanagedType.LPStr"),
+            Self::LPStr => write!(f, "UnmanagedType.LPStr"),
         }
     }
 }
@@ -40,9 +40,9 @@ pub enum ParamDecorator {
 impl std::fmt::Display for ParamDecorator {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ParamDecorator::Ref => write!(f, "ref"),
-            ParamDecorator::Out => write!(f, "out"),
-            ParamDecorator::MarshalAs(m) => write!(f, "[MarshalAs({m})]"),
+            Self::Ref => write!(f, "ref"),
+            Self::Out => write!(f, "out"),
+            Self::MarshalAs(m) => write!(f, "[MarshalAs({m})]"),
         }
     }
 }

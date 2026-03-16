@@ -2,9 +2,9 @@
 //! so they participate in dispatch routing like any other type.
 
 use crate::lang::meta::{Emission, FileEmission};
-use crate::lang::types::{Decorators, Type};
 use crate::lang::types::csharp;
 use crate::lang::types::kind::{TypeKind, Util};
+use crate::lang::types::{Decorators, Type};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 

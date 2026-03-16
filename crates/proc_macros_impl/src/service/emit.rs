@@ -366,7 +366,7 @@ impl ServiceModel {
 
         quote_spanned! { method.name.span() =>
             #docs
-            #[allow(clippy::used_underscore_items)]
+            #[allow(clippy::used_underscore_items, clippy::forget_non_drop)]
             #[::interoptopus::ffi]
             unsafe fn #function_name #enhanced_generics(
                 #async_params

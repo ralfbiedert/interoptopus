@@ -141,7 +141,13 @@ impl TypeInfo for String {
     }
 
     fn ty() -> Type {
-        Type { emission: Emission::FileEmission(FileEmission::Common), docs: Docs::empty(), visibility: Visibility::Public, name: "String".to_string(), kind: Self::kind() }
+        Type {
+            emission: Emission::FileEmission(FileEmission::Common),
+            docs: Docs::empty(),
+            visibility: Visibility::Public,
+            name: "String".to_string(),
+            kind: Self::kind(),
+        }
     }
 
     fn register(inventory: &mut impl Inventory) {

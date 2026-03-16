@@ -46,7 +46,7 @@ impl Pass {
 
                     // Arrays need special `fixed` buffer syntax in unmanaged structs.
                     if let Some(TypeKind::Array(arr)) = types.get(f.ty).map(|t| &t.kind) {
-                        let element_name = types.get(arr.ty).map(|t| t.name.as_str()).unwrap_or("byte");
+                        let element_name = types.get(arr.ty).map_or("byte", |t| t.name.as_str());
                         m.insert("is_fixed_array", Value::Bool(true));
                         m.insert("element_type", Value::String(element_name.to_string()));
                         m.insert("len", Value::from(arr.len as u64));

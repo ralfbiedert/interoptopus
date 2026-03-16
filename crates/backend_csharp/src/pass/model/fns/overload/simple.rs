@@ -54,7 +54,11 @@ impl Pass {
             // Check if any argument is an eligible IntPtr.
             // If any argument's eligibility is still unknown (target type not yet resolved),
             // defer and retry on the next iteration rather than permanently rejecting.
-            let has_any_unknown = original_fn.signature.arguments.iter().any(|arg| matches!(intptr_eligibility(arg.ty, types), IntPtrEligibility::Unknown));
+            let has_any_unknown = original_fn
+                .signature
+                .arguments
+                .iter()
+                .any(|arg| matches!(intptr_eligibility(arg.ty, types), IntPtrEligibility::Unknown));
             if has_any_unknown {
                 continue; // Defer — don't mark as processed
             }

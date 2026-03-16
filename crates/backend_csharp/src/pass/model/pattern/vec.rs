@@ -26,7 +26,7 @@ pub struct VecHelpers {
 
 pub struct Pass {
     info: PassInfo,
-    /// Maps a C# Vec TypeId to its helper function entry points.
+    /// Maps a C# Vec `TypeId` to its helper function entry points.
     helpers: HashMap<TypeId, VecHelpers>,
 }
 
@@ -36,13 +36,7 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, helpers: HashMap::default() }
     }
 
-    pub fn process(
-        &mut self,
-        pass_meta: &mut crate::pass::PassMeta,
-        id_map: &model::id_map::Pass,
-        rs_functions: &Functions,
-        rs_types: &Types,
-    ) -> ModelResult {
+    pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &model::id_map::Pass, rs_functions: &Functions, rs_types: &Types) -> ModelResult {
         let mut outcome = Unchanged;
 
         // Collect create entry points keyed by the Vec TypeId they produce.
@@ -54,20 +48,18 @@ impl Pass {
         // The destroy function's first param is `Vec<T>` directly.
         let mut destroys: HashMap<interoptopus::inventory::TypeId, String> = HashMap::new();
 
-        for (_fn_id, rust_fn) in rs_functions {
+        for rust_fn in rs_functions.values() {
             if rust_fn.name.starts_with("interoptopus_vec_create") {
-                if let Some(last_arg) = rust_fn.signature.arguments.last() {
-                    // Resolve ReadWritePointer → inner type (the Vec<T>)
-                    if let Some(ty) = rs_types.get(&last_arg.ty) {
-                        if let TypeKind::ReadWritePointer(inner_id) = &ty.kind {
-                            creates.insert(*inner_id, rust_fn.name.clone());
-                        }
-                    }
+                if let Some(last_arg) = rust_fn.signature.arguments.last()
+                    && let Some(ty) = rs_types.get(&last_arg.ty)
+                    && let TypeKind::ReadWritePointer(inner_id) = &ty.kind
+                {
+                    creates.insert(*inner_id, rust_fn.name.clone());
                 }
-            } else if rust_fn.name.starts_with("interoptopus_vec_destroy") {
-                if let Some(first_arg) = rust_fn.signature.arguments.first() {
-                    destroys.insert(first_arg.ty, rust_fn.name.clone());
-                }
+            } else if rust_fn.name.starts_with("interoptopus_vec_destroy")
+                && let Some(first_arg) = rust_fn.signature.arguments.first()
+            {
+                destroys.insert(first_arg.ty, rust_fn.name.clone());
             }
         }
 
@@ -83,7 +75,8 @@ impl Pass {
                 continue;
             };
 
-            self.helpers.insert(cs_vec_id, VecHelpers { create_entry_point: create_name.clone(), destroy_entry_point: destroy_name.clone() });
+            self.helpers
+                .insert(cs_vec_id, VecHelpers { create_entry_point: create_name.clone(), destroy_entry_point: destroy_name.clone() });
             outcome.changed();
         }
 

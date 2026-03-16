@@ -59,10 +59,11 @@ impl Pass {
 
                 let mut context = Context::new();
 
-                let rval_decorator = match &rval_type.decorators.rval {
-                    Some(crate::lang::types::RvalDecorator::MarshalAs(m)) => Some(format!("return: MarshalAs({m})")),
-                    None => None,
-                };
+                let rval_decorator = rval_type
+                    .decorators
+                    .rval
+                    .as_ref()
+                    .map(|crate::lang::types::RvalDecorator::MarshalAs(m)| format!("return: MarshalAs({m})"));
 
                 context.insert("name", name);
                 context.insert("symbol", name);
