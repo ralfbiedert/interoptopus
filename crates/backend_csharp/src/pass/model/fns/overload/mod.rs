@@ -6,20 +6,38 @@ use crate::pass::model;
 pub mod body;
 pub mod simple;
 
+/// Result of checking IntPtr eligibility for `ref` overloads.
+pub(crate) enum IntPtrEligibility {
+    /// Not an IntPtr at all, or definitely ineligible.
+    Ineligible,
+    /// Eligible for `ref` overloads.
+    Eligible,
+    /// Target type not yet resolved — must defer.
+    Unknown,
+}
+
 /// Check whether an argument type is an `IntPtr` whose pointee is eligible for `ref` overloads.
-fn is_eligible_intptr(ty: TypeId, types: &model::types::all::Pass) -> bool {
+pub(crate) fn intptr_eligibility(ty: TypeId, types: &model::types::all::Pass) -> IntPtrEligibility {
     let Some(TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target })) = types.get(ty).map(|t| &t.kind) else {
-        return false;
+        return IntPtrEligibility::Ineligible;
     };
 
-    // Exclude void targets — `ref void` is not valid C#.
-    if let Some(t) = types.get(*target)
-        && matches!(t.kind, TypeKind::Primitive(Primitive::Void) | TypeKind::TypePattern(TypePattern::CVoid))
-    {
-        return false;
-    }
+    let Some(target_type) = types.get(*target) else {
+        return IntPtrEligibility::Unknown;
+    };
 
-    true
+    match &target_type.kind {
+        // `ref void` is not valid C#.
+        TypeKind::Primitive(Primitive::Void) | TypeKind::TypePattern(TypePattern::CVoid) => IntPtrEligibility::Ineligible,
+        // Opaque and service types have no C# struct definition, so `ref OpaqueType` is invalid.
+        TypeKind::Opaque | TypeKind::Service => IntPtrEligibility::Ineligible,
+        _ => IntPtrEligibility::Eligible,
+    }
+}
+
+/// Check whether an argument type is an `IntPtr` whose pointee is eligible for `ref` overloads.
+fn is_eligible_intptr(ty: TypeId, types: &model::types::all::Pass) -> bool {
+    matches!(intptr_eligibility(ty, types), IntPtrEligibility::Eligible)
 }
 
 fn derive_overload_id(original_id: FunctionId, signature: &Signature) -> FunctionId {

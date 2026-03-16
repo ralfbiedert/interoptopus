@@ -1,3 +1,4 @@
+unsafe
 {
     if ({{ field }} == null) { throw new InvalidOperationException("Array '{{ field }}' must not be null"); }
     if ({{ field }}.Length != {{ len }}) { throw new InvalidOperationException("Array size mismatch for '{{ field }}'"); }

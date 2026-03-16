@@ -73,6 +73,15 @@ impl Pass {
                     context.insert("element_type", element_name);
                     context.insert("unmanaged_element_type", &unmanaged_name);
                     context.insert("method", method);
+                    // Element conversion method names for non-blittable elements.
+                    let element_to_managed = managed_conversion
+                        .managed_conversion(element_ty_id)
+                        .map(|mc| match mc {
+                            ManagedConversion::Into => "IntoManaged",
+                            _ => "ToManaged",
+                        })
+                        .unwrap_or("ToManaged");
+                    context.insert("element_to_managed", element_to_managed);
                     templates.render("pattern/slice/marshalling.cs", &context)?
                 };
 

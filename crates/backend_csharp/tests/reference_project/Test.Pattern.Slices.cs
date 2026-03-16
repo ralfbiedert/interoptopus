@@ -66,11 +66,13 @@ public class TestPatternSlices
     {
         var data = new byte[] {1, 2, 3}.SliceMut();
 
-        Interop.pattern_ffi_slice_6(ref data, x =>
+        var callback = new CallbackU8(x =>
         {
             Assert.Equal(1, x);
             return 0;
         });
+        Interop.pattern_ffi_slice_6(ref data, callback);
+        callback.Dispose();
 
         data.Dispose();
     }

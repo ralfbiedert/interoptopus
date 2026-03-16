@@ -15,7 +15,14 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
     {{ ctors | indent }}
 
     {{ to_string | indent }}
-
+{% if is_disposable %}
+    public void Dispose()
+    {
+        {%- for v in disposable_variants %}
+        if (_variant == {{ v.tag }}) {{ v.name }}?.Dispose();
+        {%- endfor %}
+    }
+{% endif %}
     [CustomMarshaller(typeof({{ name }}), MarshalMode.Default, typeof(Marshaller))]
     private struct MarshallerMeta { }
 
@@ -37,10 +44,10 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+        public Unmanaged ToUnmanaged() { return _managed.{{ marshaller_to_unmanaged }}(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public {{ name }} ToManaged() { return _unmanaged.ToManaged(); }
+        public {{ name }} ToManaged() { return _unmanaged.{{ marshaller_to_managed }}(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Free() {}

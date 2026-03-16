@@ -75,6 +75,11 @@ impl Pass {
                     result_ty_name.clone()
                 };
 
+                let result_to_managed = match managed_conversion.managed_conversion(result_ty_id) {
+                    Some(ManagedConversion::Into) => "IntoManaged",
+                    _ => "ToManaged",
+                };
+
                 let mut context = Context::new();
                 context.insert("trampoline_name", &trampoline_name);
                 context.insert("result_ty_name", result_ty_name);
@@ -82,6 +87,7 @@ impl Pass {
                 context.insert("task_inner_ty", &task_inner_ty);
                 context.insert("is_task_void", &is_task_void);
                 context.insert("has_unmanaged", &has_unmanaged);
+                context.insert("result_to_managed", result_to_managed);
 
                 let rendered = templates.render("types/asynk/trampoline.cs", &context)?;
                 rendered_trampolines.push(rendered);

@@ -3,7 +3,7 @@
 use crate::lang::TypeId;
 use crate::lang::types::kind::TypeKind;
 use crate::pass::{OutputResult, PassInfo, model, output};
-use interoptopus_backends::template::Context;
+use interoptopus_backends::template::{Context, Value};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -36,29 +36,41 @@ impl Pass {
 
             let name = &ty.name;
 
-            let fields: Vec<HashMap<&str, String>> = composite
+            let fields: Vec<HashMap<&str, Value>> = composite
                 .fields
                 .iter()
                 .map(|f| {
-                    let ty_name = unmanaged_names
-                        .name(f.ty)
-                        .cloned()
-                        .unwrap_or_else(|| types.get(f.ty).map(|t| t.name.clone()).unwrap_or_default());
-                    let to_managed = managed.to_managed_suffix(f.ty).to_string();
-
                     let mut m = HashMap::new();
-                    m.insert("name", f.name.clone());
-                    m.insert("type", ty_name);
-                    m.insert("to_managed", to_managed);
+                    m.insert("name", Value::String(f.name.clone()));
+
+                    // Arrays need special `fixed` buffer syntax in unmanaged structs.
+                    if let Some(TypeKind::Array(arr)) = types.get(f.ty).map(|t| &t.kind) {
+                        let element_name = types.get(arr.ty).map(|t| t.name.as_str()).unwrap_or("byte");
+                        m.insert("is_fixed_array", Value::Bool(true));
+                        m.insert("element_type", Value::String(element_name.to_string()));
+                        m.insert("len", Value::from(arr.len as u64));
+                    } else {
+                        let ty_name = unmanaged_names
+                            .name(f.ty)
+                            .cloned()
+                            .unwrap_or_else(|| types.get(f.ty).map(|t| t.name.clone()).unwrap_or_default());
+                        m.insert("type", Value::String(ty_name));
+                    }
+
+                    let to_managed = managed.to_managed_suffix(f.ty).to_string();
+                    m.insert("to_managed", Value::String(to_managed));
                     if let Some(custom) = field_conversions.custom_to_managed(*type_id, &f.name) {
-                        m.insert("custom_to_managed", custom.to_string());
+                        m.insert("custom_to_managed", Value::String(custom.to_string()));
                     }
                     m
                 })
                 .collect();
 
+            let to_managed_method = managed.to_managed_name(*type_id);
+
             let mut context = Context::new();
             context.insert("name", name);
+            context.insert("to_managed_method", to_managed_method);
             context.insert("fields", &fields);
 
             let rendered = templates.render("types/composite/body_unmanaged.cs", &context)?;

@@ -19,7 +19,7 @@ public partial class {{ name }} : IDisposable
             var size = sizeof({{ unmanaged_element_type }});
             var ptr = IntPtr.Add(_data, i * size);
             var unmanaged = Marshal.PtrToStructure<{{ unmanaged_element_type }}>(ptr);
-            return unmanaged.ToManaged();
+            return unmanaged.{{ element_to_managed }}();
         }
     }
 
@@ -57,6 +57,8 @@ public partial class {{ name }} : IDisposable
         unmanaged._len = _len;
         return unmanaged;
     }
+
+    internal Unmanaged AsUnmanaged() => ToUnmanaged();
 
     [CustomMarshaller(typeof({{ name }}), MarshalMode.Default, typeof(Marshaller))]
     private struct MarshallerMeta { }

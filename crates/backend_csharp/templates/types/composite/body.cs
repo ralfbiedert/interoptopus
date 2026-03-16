@@ -8,7 +8,14 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
     {{ to_unmanaged | indent }}
 
     {{ as_unmanaged | indent }}
-
+{% if is_disposable %}
+    public void Dispose()
+    {
+        {%- for field in disposable_fields %}
+        {{ field.name }}?.Dispose();
+        {%- endfor %}
+    }
+{% endif %}
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public override string ToString()
     {
@@ -35,10 +42,10 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+        public Unmanaged ToUnmanaged() { return _managed.{{ marshaller_to_unmanaged }}(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public {{ name }} ToManaged() { return _unmanaged.ToManaged(); }
+        public {{ name }} ToManaged() { return _unmanaged.{{ marshaller_to_managed }}(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Free() {}

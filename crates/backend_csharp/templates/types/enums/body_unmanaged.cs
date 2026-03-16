@@ -10,7 +10,7 @@ public unsafe struct Unmanaged
     {%- endfor %}
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    internal {{ name }} ToManaged()
+    internal {{ name }} {{ to_managed_method }}()
     {
         var _managed = new {{ name }}();
         _managed._variant = _variant;

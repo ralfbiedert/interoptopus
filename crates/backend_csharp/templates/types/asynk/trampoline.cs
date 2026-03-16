@@ -20,7 +20,7 @@ public class {{ trampoline_name }}
         lock (InFlight) { InFlight.Remove((ulong) csPtr, out tcs); }
 
         {% if has_unmanaged %}var unmanaged = Marshal.PtrToStructure<{{ unmanaged_result_ty }}>(data);
-        var managed = unmanaged.ToManaged();{% else %}var managed = Marshal.PtrToStructure<{{ result_ty_name }}>(data);{% endif %}
+        var managed = unmanaged.{{ result_to_managed }}();{% else %}var managed = Marshal.PtrToStructure<{{ result_ty_name }}>(data);{% endif %}
         if (managed.IsOk) { tcs.SetResult({% if is_task_void %}true{% else %}managed.AsOk(){% endif %}); }
         else { tcs.SetException(managed.ExceptionForVariant()); }
     }

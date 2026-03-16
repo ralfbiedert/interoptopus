@@ -55,8 +55,11 @@ impl Pass {
                 })
                 .collect();
 
+            let to_managed_method = managed.to_managed_name(*type_id);
+
             let mut context = Context::new();
             context.insert("name", name);
+            context.insert("to_managed_method", to_managed_method);
             context.insert("variants", &variants);
 
             let rendered = templates.render("types/enums/body_unmanaged.cs", &context)?;

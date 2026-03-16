@@ -13,7 +13,7 @@ use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
 use crate::lang::types::OverloadFamily;
 use crate::lang::types::kind::TypeKind;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
+use crate::pass::model::fns::overload::{IntPtrEligibility, derive_overload_id, intptr_eligibility, is_eligible_intptr};
 use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashSet;
 
@@ -49,11 +49,15 @@ impl Pass {
                 continue;
             }
 
-            // Check if any argument is an eligible IntPtr (pointee is AsIs or To, not a class).
-            // If any argument's eligibility is unknown (managed_conversion not yet available),
-            // we must defer and retry on the next iteration rather than permanently rejecting.
-            let has_any_eligible = original_fn.signature.arguments.iter().any(|arg| is_eligible_intptr(arg.ty, types));
+            // Check if any argument is an eligible IntPtr.
+            // If any argument's eligibility is still unknown (target type not yet resolved),
+            // defer and retry on the next iteration rather than permanently rejecting.
+            let has_any_unknown = original_fn.signature.arguments.iter().any(|arg| matches!(intptr_eligibility(arg.ty, types), IntPtrEligibility::Unknown));
+            if has_any_unknown {
+                continue; // Defer — don't mark as processed
+            }
 
+            let has_any_eligible = original_fn.signature.arguments.iter().any(|arg| is_eligible_intptr(arg.ty, types));
             if !has_any_eligible {
                 self.processed.insert(original_id);
                 continue;

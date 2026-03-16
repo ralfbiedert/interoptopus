@@ -2,11 +2,15 @@
 public unsafe struct Unmanaged
 {
     {%- for field in fields %}
+    {%- if field.is_fixed_array %}
+    internal fixed {{ field.element_type }} {{ field.name }}[{{ field.len }}];
+    {%- else %}
     internal {{ field.type }} {{ field.name }};
+    {%- endif %}
     {%- endfor %}
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    internal {{ name }} ToManaged()
+    internal {{ name }} {{ to_managed_method }}()
     {
         var _managed = new {{ name }}();
         {%- for field in fields %}
