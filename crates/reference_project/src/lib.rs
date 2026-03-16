@@ -23,6 +23,7 @@ pub mod patterns {
 }
 pub mod services {
     pub mod asynk {
+        pub mod async_ctor;
         pub mod basic;
         pub mod result;
         pub mod sleep;
@@ -196,6 +197,7 @@ pub fn inventory() -> RustInventory {
         .register(extra_type!(types::num::IVec3))
         .register(extra_type!(types::num::TransparentNum))
         // Services
+        .register(service!(services::asynk::async_ctor::ServiceAsyncCtor))
         .register(service!(services::asynk::basic::ServiceAsyncBasic))
         .register(service!(services::asynk::sleep::ServiceAsyncSleep))
         .register(service!(services::asynk::vecstring::ServiceAsyncVecString))

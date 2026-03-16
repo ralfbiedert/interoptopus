@@ -10,7 +10,11 @@ impl ServiceModel {
 
         // Generate constructor functions
         for ctor in &self.constructors {
-            functions.push(self.emit_constructor_function(ctor));
+            if ctor.is_async {
+                functions.push(self.emit_async_constructor_function(ctor));
+            } else {
+                functions.push(self.emit_constructor_function(ctor));
+            }
         }
 
         // Generate destructor function
@@ -243,6 +247,86 @@ impl ServiceModel {
         }
     }
 
+    fn emit_async_constructor_function(&self, ctor: &ServiceMethod) -> TokenStream {
+        let service_name_snake = self.service_name_snake_case();
+        let ctor_name = &ctor.name;
+        let function_name = format_ident!("{}_{}", service_name_snake, ctor_name);
+
+        let docs = self.emit_docs(&ctor.docs);
+        let params = self.emit_params(&ctor.inputs);
+        let param_names = self.emit_param_names(&ctor.inputs);
+
+        let service_type = &self.service_type;
+        let service_name = &self.service_name;
+        let generics = &self.generics;
+
+        // Extract the runtime type from ReceiverKind::AsyncCtor
+        let ReceiverKind::AsyncCtor(runtime_type) = &ctor.receiver_kind else {
+            unreachable!("emit_async_constructor_function called with non-AsyncCtor receiver")
+        };
+
+        // Extract error type from the constructor's return type
+        let error_type = Self::extract_error_type_from_constructor(ctor);
+
+        // For generic types, we need to use the concrete type with turbofish syntax
+        let service_call = if self.generics.params.is_empty() {
+            quote_spanned! { ctor.name.span() => #service_name::#ctor_name }
+        } else {
+            quote_spanned! { ctor.name.span() => <#service_type>::#ctor_name }
+        };
+
+        // Callback type is Result<*const ServiceType, Error>
+        let callback_type = quote_spanned! { ctor.name.span() =>
+            <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type>
+        };
+
+        let async_params = if ctor.inputs.is_empty() {
+            quote_spanned! { ctor.name.span() =>
+                runtime: *const #runtime_type,
+                callback: ::interoptopus::pattern::asynk::AsyncCallback<#callback_type>
+            }
+        } else {
+            quote_spanned! { ctor.name.span() =>
+                runtime: *const #runtime_type,
+                #params,
+                callback: ::interoptopus::pattern::asynk::AsyncCallback<#callback_type>
+            }
+        };
+
+        quote_spanned! { ctor.name.span() =>
+            #docs
+            #[allow(clippy::used_underscore_items)]
+            #[::interoptopus::ffi]
+            unsafe fn #function_name #generics(
+                #async_params
+            ) {
+                unsafe {
+                    use ::interoptopus::pattern::asynk::AsyncRuntime;
+
+                    let _runtime_arc = ::std::sync::Arc::from_raw(runtime);
+                    let _runtime_invoke = ::std::sync::Arc::clone(&_runtime_arc);
+                    let _runtime_inside = ::std::sync::Arc::clone(&_runtime_arc);
+                    ::std::mem::forget(_runtime_arc); // Don't drop the original
+
+                    _runtime_invoke.spawn(move |_ctx| async move {
+                        let _async_runtime = ::interoptopus::pattern::asynk::Async::new(_runtime_inside, _ctx);
+                        let _result = #service_call(_async_runtime, #param_names).await;
+                        match _result {
+                            ::interoptopus::ffi::Ok(service_instance) => {
+                                callback.call(&::interoptopus::ffi::Ok(
+                                    ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
+                                ));
+                            }
+                            ::interoptopus::ffi::Err(err) => callback.call(&::interoptopus::ffi::Err(err)),
+                            ::interoptopus::ffi::Result::Panic => callback.call(&::interoptopus::ffi::Result::Panic),
+                            ::interoptopus::ffi::Result::Null => callback.call(&::interoptopus::ffi::Result::Null),
+                        }
+                    });
+                }
+            }
+        }
+    }
+
     fn emit_destructor_function(&self) -> TokenStream {
         let service_name_snake = self.service_name_snake_case();
         let function_name = format_ident!("{}_destroy", service_name_snake);
@@ -281,6 +365,9 @@ impl ServiceModel {
             ReceiverKind::Shared => self.emit_shared_method(method, &function_name, &docs),
             ReceiverKind::Mutable => self.emit_mutable_method(method, &function_name, &docs),
             ReceiverKind::AsyncThis => self.emit_async_method(method, &function_name, &docs),
+            ReceiverKind::AsyncCtor(_) => {
+                unreachable!("Async constructors should be in the constructors list, not methods")
+            }
             ReceiverKind::None => {
                 if method.is_async {
                     // This shouldn't happen as async methods should have Async<Self> parameter
@@ -538,7 +625,9 @@ impl ServiceModel {
         let service_type = &self.service_type;
         let base_service_name = self.get_base_service_name();
 
-        let async_verification = if self.is_async {
+        // Only assert AsyncRuntime on the service type if it has Async<Self> methods
+        let has_async_this_methods = self.methods.iter().any(|m| matches!(m.receiver_kind, ReceiverKind::AsyncThis));
+        let async_verification = if has_async_this_methods {
             quote_spanned! { self.service_name.span() =>
                 const fn _assert_async<T: ::interoptopus::pattern::asynk::AsyncRuntime>() {}
                 _assert_async::<#service_type>();
@@ -546,6 +635,25 @@ impl ServiceModel {
         } else {
             quote_spanned! { self.service_name.span() => }
         };
+
+        // For async constructors, assert AsyncRuntime on the runtime type (not the service)
+        let async_ctor_runtime_verification: Vec<TokenStream> = self
+            .constructors
+            .iter()
+            .filter_map(|ctor| {
+                if let ReceiverKind::AsyncCtor(runtime_type) = &ctor.receiver_kind {
+                    let ctor_span = ctor.name.span();
+                    Some(quote_spanned! { ctor_span =>
+                        {
+                            const fn _assert_async_ctor_runtime<T: ::interoptopus::pattern::asynk::AsyncRuntime>() {}
+                            _assert_async_ctor_runtime::<#runtime_type>();
+                        }
+                    })
+                } else {
+                    None
+                }
+            })
+            .collect();
 
         // Generate SERVICE_CTOR_SAFE checks for constructor return types
         let ctor_verification_blocks: Vec<TokenStream> = self
@@ -569,7 +677,7 @@ impl ServiceModel {
         let async_method_verification_blocks: Vec<TokenStream> = self
             .methods
             .iter()
-            .filter(|method| method.is_async && method.receiver_kind == ReceiverKind::AsyncThis)
+            .filter(|method| method.is_async && matches!(method.receiver_kind, ReceiverKind::AsyncThis))
             .map(|method| {
                 let method_span = method.name.span();
                 // Create a validation that checks if Async<ServiceType> can be used
@@ -602,6 +710,7 @@ impl ServiceModel {
             const _: () = {
                 #base_service_verification
                 #async_verification
+                #(#async_ctor_runtime_verification)*
                 #async_safe_verification
                 #(#ctor_verification_blocks)*
                 #(#async_method_verification_blocks)*
