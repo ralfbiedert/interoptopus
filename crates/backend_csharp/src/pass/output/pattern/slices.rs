@@ -64,7 +64,7 @@ impl Pass {
                     context.insert("element_type", element_name);
                     context.insert("is_mut", &is_mut);
                     context.insert("method", method);
-                    templates.render("types/slice/fast.cs", &context)?
+                    templates.render("pattern/slice/fast.cs", &context)?
                 } else {
                     let unmanaged_name = unmanaged_names.name(element_ty_id).cloned().unwrap_or_else(|| format!("{element_name}.Unmanaged"));
 
@@ -73,7 +73,7 @@ impl Pass {
                     context.insert("element_type", element_name);
                     context.insert("unmanaged_element_type", &unmanaged_name);
                     context.insert("method", method);
-                    templates.render("types/slice/marshalling.cs", &context)?
+                    templates.render("pattern/slice/marshalling.cs", &context)?
                 };
 
                 rendered_slices.push(rendered);
