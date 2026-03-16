@@ -12,8 +12,11 @@ Interoptopus is a polyglot bindings generator for Rust libraries. It allows you 
 - `just ci` - Run full CI locally (build, fmt check, clippy, test)
 - `just build` - Build all workspace crates with all features.
 - `just test` - Run all tests with all features via `cargo nextest`
-- `just test-agent` - Can be used by agents to test a specific task (feel free to modify `Justfile`)
+- `just test-agent` - Can be used by agents to test a specific task
 - `cargo check --workspace` - Quick check all crates
+
+Agents may modify the `Justfile` section `test-agent` for their needs w.r.t the task at hand.
+
 
 ### Setup
 - `just binstall-deps` - Install required tools (`cargo-insta`, `cargo-nextest`) via `cargo-binstall`

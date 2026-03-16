@@ -8,7 +8,7 @@ mod reference_project {
     use interoptopus_csharp::RustLibrary;
 
     #[test]
-    fn prerequisites() -> Result<(), Box<dyn std::error::Error>> {
+    fn interop() -> Result<(), Box<dyn std::error::Error>> {
         let multibuf = RustLibrary::builder(reference_project::inventory())
             .dll_name("foo")
             .dispatch(Dispatch::custom(|x, _| match x.emission {

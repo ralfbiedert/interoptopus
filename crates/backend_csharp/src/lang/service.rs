@@ -5,7 +5,7 @@ new_id!(ServiceIdCs);
 
 pub struct Service {
     pub ty: TypeId,
-    pub ctors: Vec<FunctionId>,   // These are interop functions, we might have more overloads
-    pub methods: Vec<FunctionId>, // These are interop functions, we might have more overloads
+    pub ctors: Vec<FunctionId>,   // These are interop functions and overloads for which to emit methods for
+    pub methods: Vec<FunctionId>, // These are interop functions and overloads for which to emit methods for
     pub destructor: FunctionId,
 }

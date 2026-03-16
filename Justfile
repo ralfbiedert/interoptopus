@@ -26,3 +26,4 @@ binstall-deps:
 test-agent:
     # Agents: Feel free to update the test logic here for the task at hand.
     # cargo test TODO
+    cargo test --test mod reference_project::interop

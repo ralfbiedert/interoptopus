@@ -1,7 +1,7 @@
 use crate::lang::{FunctionId, TypeId};
 
 /// How a function's return value is transformed in an overload.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum RvalTransform {
     /// Return value passes through unchanged.
     PassThrough,
@@ -10,7 +10,7 @@ pub enum RvalTransform {
 }
 
 /// How a single argument is transformed in an overload.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum ArgTransform {
     /// Argument passes through unchanged.
     PassThrough,
@@ -22,14 +22,17 @@ pub enum ArgTransform {
 
 /// Per-function overload transforms describing how each argument and the return
 /// value differ from the original native signature.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct FnTransforms {
     pub rval: RvalTransform,
+    /// The args refer to the overloaded function. If an overloads is missing a parameter
+    /// (e.g., for async overloads that omit the last callback), this list is shorter than
+    /// the original list of params.
     pub args: Vec<ArgTransform>,
 }
 
 /// Distinguishes the kind of each function overload registered in `overload::all`.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum OverloadKind {
     /// Simple overload: `IntPtr` → ref. No function body needed.
     Simple,
@@ -42,6 +45,7 @@ pub enum OverloadKind {
     Async(FnTransforms),
 }
 
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Overload {
     kind: OverloadKind,
     base: FunctionId,

@@ -21,11 +21,13 @@ pub struct Function {
     pub emission: Emission,
     pub name: String,
     pub signature: Signature,
+    // pub kind: FunctionKind,
 }
 
+#[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum FunctionKind {
     /// A base function with canonical (base) types, e.g., `IntPtr` only.
-    Basic,
+    Original,
     /// A function that calls a base function (or at least replaces parameters like `IntPtr` -> `ref uint`).
     Overload(Overload),
 }
