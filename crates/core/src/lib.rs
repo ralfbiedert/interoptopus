@@ -1,4 +1,4 @@
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 //!
 //! [![crates.io-badge]][crates.io-url]
 //! [![docs.rs-badge]][docs.rs-url]
@@ -162,9 +162,6 @@
 
 pub use error::Error;
 
-#[cfg(feature = "derive")]
-pub use interoptopus_proc::{AsyncRuntime, ffi};
-
 mod error;
 pub mod ffi;
 pub mod inventory;
@@ -174,6 +171,9 @@ pub mod wire;
 
 #[doc(hidden)]
 pub mod proc;
+
+#[cfg(feature = "derive")]
+pub use proc::{ffi, AsyncRuntime};
 
 #[cfg(feature = "tokio")]
 pub mod rt;

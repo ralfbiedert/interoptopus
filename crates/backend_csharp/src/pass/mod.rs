@@ -1,5 +1,7 @@
-use crate::Error;
+#![doc(hidden)]
+
 use crate::lang::TypeId;
+use crate::Error;
 use std::cmp::PartialEq;
 
 pub mod macros;

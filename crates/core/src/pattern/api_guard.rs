@@ -199,21 +199,3 @@ macro_rules! api_guard {
         }
     }};
 }
-
-#[macro_export]
-macro_rules! api_guard2 {
-    ($f:tt) => {{
-        #[$crate::ffi_function]
-        pub fn __api_guard() -> $crate::pattern::api_guard::ApiVersion {
-            $f().into()
-        }
-
-        use $crate::lang::Register;
-
-        |x: &mut $crate::inventory::RustInventory| {
-            // TODO
-            // - register __api_guard (this should automatically register the ApiGuard type)
-            todo ...
-        }
-    }};
-}

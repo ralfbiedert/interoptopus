@@ -1,12 +1,12 @@
 # Builds the workspace with all features.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
 build verbose="":
-    cargo build --all-features {{verbose}}
+    cargo build --all-features {{ verbose }}
 
 # Checks unit tests.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
 test verbose="" package="":
-    cargo nextest run --all-features {{verbose}}
+    cargo nextest run --all-features {{ verbose }}
 
 # Runs C# tests via dotnet.
 test-dotnet:
@@ -30,9 +30,11 @@ binstall-deps:
     cargo binstall cargo-insta --disable-telemetry --no-confirm --secure
     cargo binstall cargo-nextest --disable-telemetry --no-confirm --secure
 
+# Opens cargo docs using nightly for doc feature bubbles.
+docs:
+    RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --no-deps --open
 
 # Can be used by agents for the current task.
 test-agent:
     # Agents: Feel free to update the test logic here for the task at hand.
     # cargo test --test mod reference_project::interop
-

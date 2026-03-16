@@ -7,6 +7,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 
+/// See [`interoptopus::proc::ffi`](https://docs.rs/interoptopus/latest/interoptopus/proc/macro.ffi.html) for full documentation.
 #[proc_macro_attribute]
 pub fn ffi(attr: TokenStream, item: TokenStream) -> TokenStream {
     interoptopus_proc_impl::ffi(attr.into(), item.into()).into()
