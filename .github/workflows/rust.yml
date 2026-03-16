@@ -38,11 +38,11 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1.15
         with:
           components: rustfmt, clippy
-      - name: Rust - Install Basics
+      - name: Rust - Install Bootstrap Tools
         uses: taiki-e/install-action@v2
         with:
           tool: just, cargo-binstall
-      - name: Rust - Install Tools
+      - name: Rust - Install Rust Tools
         run: just binstall-deps
       - name: Run CI
         run: just ci --verbose
