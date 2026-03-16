@@ -1,3 +1,4 @@
+#![doc = include_str!("../README.md")]
 #![allow(unused)] // TODO: For now, since lots of bare bones structs
 #![allow(unexpected_cfgs)]
 #![allow(clippy::too_many_arguments)] // Pass functions take many context parameters by design

@@ -1,14 +1,6 @@
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::just_underscores_and_digits)]
-
-//! A reference project for [Interoptopus](https://github.com/ralfbiedert/interoptopus).
-//!
-//! This project tries to use every Interoptopus feature at least once.
-//! When submitting new features or making changes to existing ones the types and functions in
-//! here will ensure existing backends still work as expected.
-//!
-//! Note, many items here are deliberately not documented as testing how and if documentation
-//! is generated is part of the test.
+#![doc = include_str!("../README.md")]
 
 use interoptopus::inventory::RustInventory;
 use interoptopus::{builtins_string, builtins_vec, constant, extra_type, ffi, function, service};

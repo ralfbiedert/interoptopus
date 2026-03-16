@@ -34,6 +34,10 @@ binstall-deps:
 docs:
     RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --no-deps --open
 
+# Updates the top-level README from the core crate's README (the source of truth).
+update-readme:
+    cp crates/core/README.md README.md
+
 # Can be used by agents for the current task.
 test-agent:
     # Agents: Feel free to update the test logic here for the task at hand.

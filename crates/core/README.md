@@ -5,7 +5,7 @@
 [![rust-version-badge]][rust-version-url]
 [![rust-build-badge]][rust-build-url]
 
-## Interoptopus 🐙
+# Interoptopus 🐙
 
 The polyglot bindings generator for your library.
 
@@ -21,32 +21,32 @@ as you could have reasonably written them yourself, but never magic or hiding th
 you actually wanted to expose.
 
 
-### Code you write ...
+## Code you write ...
 
 ```rust
-#[ffi_type]
+# use interoptopus::{ffi, function};
+# use interoptopus::inventory::RustInventory;
+#[ffi]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
 }
 
-#[ffi_function]
+#[ffi]
 pub fn my_function(input: Vec2) {
     println!("{}", input.x);
 }
 
 // List functions you want to export, types are inferred.
-pub fn ffi_inventory() -> Inventory {
-    InventoryBuilder::new()
+pub fn ffi_inventory() -> RustInventory {
+    RustInventory::new()
         .register(function!(my_function))
         .validate()
-        .build()
 }
-
 ```
 
 
-### ... Interoptopus generates
+## ... Interoptopus generates
 
 | Language | Crate | Sample Output<sup>1</sup> | Status |
 | --- | --- | --- | --- |
@@ -61,7 +61,7 @@ pub fn ffi_inventory() -> Inventory {
 <sup>2</sup> Add basic support for a new language in just a few hours. [No pull request needed](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).<br/>
 
 
-### Getting Started 🍼
+## Getting Started 🍼
 
 If you want to ...
 - **get started** see the [**hello world**](https://github.com/ralfbiedert/interoptopus/tree/master/examples/hello_world),
@@ -69,7 +69,7 @@ If you want to ...
 - **understand what's possible**, see the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src),
 - **support a new language**, [**copy the C backend**](https://github.com/ralfbiedert/interoptopus/tree/master/crates/backend_c).
 
-### Supported Rust Constructs
+## Supported Rust Constructs
 
 See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src) for an overview:
 - [functions](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/functions) (freestanding functions and delegates)
@@ -79,7 +79,7 @@ See the [**reference project**](https://github.com/ralfbiedert/interoptopus/tree
 - [services](https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/services) (turn to classes in C# and Python, and async methods)
 
 
-### Performance 🏁
+## Performance 🏁
 
 Generated low-level bindings are _zero cost_ w.r.t. hand-crafted bindings for that language.
 
@@ -115,16 +115,16 @@ For a quick overview, this table lists some common round trip times in _ns / cal
 <br/>
 
 
-### Feature Flags
+## Feature Flags
 
 Gated behind **feature flags**, these enable:
 
-- `derive` - Proc macros such as `ffi_type`, ...
+- `derive` - Proc macros such as `#[ffi]`.
 - `serde` - Serde attributes on internal types.
 - `log` - Invoke [log](https://crates.io/crates/log) on FFI errors.
 
 
-### Changelog
+## Changelog
 
 - **v0.15** - Massive cleanup, bugfix, UX overhaul (+syn2).
 - **v0.14** - Better inventory UX.
@@ -133,12 +133,12 @@ Gated behind **feature flags**, these enable:
 Also see our [upgrade instructions](https://github.com/ralfbiedert/interoptopus/blob/master/UPGRADE_INSTRUCTIONS.md).
 
 
-### FAQ
+## FAQ
 
 - [FAQ and Safety Guides](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md).
 
 
-### Contributing
+## Contributing
 
 PRs are very welcome!
 
