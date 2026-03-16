@@ -41,6 +41,6 @@ jobs:
       - name: Rust - Install Tools
         uses: taiki-e/install-action@v2
         with:
-          tool: just, cargo-binstall
+          tool: just, cargo-binstall, cargo-insta, cargo-nextest
       - name: Run CI
         run: just ci --verbose
