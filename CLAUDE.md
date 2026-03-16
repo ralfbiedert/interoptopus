@@ -9,15 +9,15 @@ Interoptopus is a polyglot bindings generator for Rust libraries. It allows you 
 ## Development Commands
 
 ### Core Commands
-- `cargo build` - Build all workspace crates
-- `cargo test` - Run all tests 
-- `just update-bindings` - Update generated bindings with env var set
-
-
-### Working with Individual Crates
-- `cargo build -p interoptopus` - Build core crate
-- `cargo test -p interoptopus_csharp` - Test C# backend (next-gen)
+- `just ci` - Run full CI locally (build, fmt check, clippy, test)
+- `just build` - Build all workspace crates with all features.
+- `just test` - Run all tests with all features via `cargo nextest`
+- `just test-agent` - Can be used by agents to test a specific task (feel free to modify `Justfile`)
 - `cargo check --workspace` - Quick check all crates
+
+### Setup
+- `just binstall-deps` - Install required tools (`cargo-insta`, `cargo-nextest`) via `cargo-binstall`
+
 
 ## Architecture
 
