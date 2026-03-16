@@ -7,14 +7,14 @@
 //! for each eligible `IntPtr` argument. Registers produced overloads into the
 //! central `overload::all` pass.
 
-use crate::lang::FunctionId;
 use crate::lang::functions::overload::{Overload, OverloadKind};
 use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
-use crate::lang::types::OverloadFamily;
 use crate::lang::types::kind::TypeKind;
-use crate::pass::Outcome::Unchanged;
+use crate::lang::types::OverloadFamily;
+use crate::lang::FunctionId;
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
-use crate::pass::{ModelResult, PassInfo, model};
+use crate::pass::Outcome::Unchanged;
+use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashSet;
 
 #[derive(Default)]
@@ -35,14 +35,16 @@ impl Pass {
     pub fn process(
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
-        originals: &model::fns::originals::Pass,
         all: &mut model::fns::all::Pass,
         types: &model::types::all::Pass,
         overloads: &model::types::overload::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
-        for (&original_id, original_fn) in originals.iter() {
+        // Collect originals first to avoid borrowing `all` mutably while iterating.
+        let originals: Vec<_> = all.originals().map(|(&id, f)| (id, f.clone())).collect();
+
+        for &(original_id, ref original_fn) in &originals {
             if self.processed.contains(&original_id) {
                 continue;
             }
@@ -100,9 +102,5 @@ impl Pass {
         }
 
         Ok(outcome)
-    }
-
-    pub fn iter(&self) -> impl Iterator<Item = FunctionId> + '_ {
-        self.overloads.iter().copied()
     }
 }

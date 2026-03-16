@@ -41,7 +41,7 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, config, outputs: vec![], type_routing: HashMap::new(), fn_routing: HashMap::new() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, types: &model::types::all::Pass, fn_originals: &model::fns::originals::Pass) -> OutputResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, types: &model::types::all::Pass, fns_all: &model::fns::all::Pass) -> OutputResult {
         let mut seen_files: HashSet<Target> = HashSet::new();
 
         // Classify all emittable types
@@ -56,7 +56,7 @@ impl Pass {
         }
 
         // Classify all emittable original functions
-        for (&fn_id, func) in fn_originals.iter() {
+        for (&fn_id, func) in fns_all.originals() {
             let Some(file_emission) = func.emission.file_emission() else { continue };
 
             let item = Item { kind: ItemKind::Function(fn_id, func.clone()), emission: file_emission.clone() };

@@ -20,7 +20,8 @@ use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
 use crate::lang::meta::Emission;
 use crate::lang::types::OverloadFamily;
 use crate::lang::types::Type;
-use crate::lang::types::kind::{DelegateKind, Primitive, Task, TypeKind, TypePattern};
+use crate::lang::types::kind::task::Task;
+use crate::lang::types::kind::{DelegateKind, Primitive, TypeKind, TypePattern};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
@@ -45,7 +46,6 @@ impl Pass {
     pub fn process(
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
-        originals: &model::fns::originals::Pass,
         fns_all: &mut model::fns::all::Pass,
         kinds: &mut model::types::kind::Pass,
         names: &mut model::types::names::Pass,
@@ -54,7 +54,10 @@ impl Pass {
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
-        for (&original_id, original_fn) in originals.iter() {
+        // Collect originals first to avoid borrowing `fns_all` mutably while iterating.
+        let originals: Vec<_> = fns_all.originals().map(|(&id, f)| (id, f.clone())).collect();
+
+        for &(original_id, ref original_fn) in &originals {
             if self.processed.contains(&original_id) {
                 continue;
             }
