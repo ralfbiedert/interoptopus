@@ -43,6 +43,7 @@ pub struct RustLibraryConfig {
     pub model_service_map: model::service::all::Config,
     pub model_service_method_names: model::service::method::names::Config,
     pub model_service_method_overload: model::service::method::overload::Config,
+    pub model_pattern_string: model::pattern::string::Config,
     pub model_pattern_vec: model::pattern::vec::Config,
     pub output_master: output::master::Config,
     pub output_unmanaged_conversion: output::conversion::unmanaged_conversion::Config,
@@ -113,6 +114,7 @@ pub struct ModelPasses {
     pub service_all: model::service::all::Pass,
     pub service_method_names: model::service::method::names::Pass,
     pub service_method_overload: model::service::method::overload::Pass,
+    pub pattern_string: model::pattern::string::Pass,
     pub pattern_vec: model::pattern::vec::Pass,
 }
 
@@ -229,6 +231,7 @@ impl RustLibrary {
                 service_all: model::service::all::Pass::new(config.model_service_map),
                 service_method_names: model::service::method::names::Pass::new(config.model_service_method_names),
                 service_method_overload: model::service::method::overload::Pass::new(config.model_service_method_overload),
+                pattern_string: model::pattern::string::Pass::new(config.model_pattern_string),
                 pattern_vec: model::pattern::vec::Pass::new(config.model_pattern_vec),
             },
             output_master: output::master::Pass::new(config.output_master),
@@ -332,6 +335,7 @@ impl RustLibrary {
             r.run(m.fn_overload_simple.process(&mut pass_meta, &mut m.fns_all, &m.type_all, &m.type_overload_all))?;
             r.run(m.fn_overload_body.process(&mut pass_meta, &mut m.fns_all, &mut m.type_kinds, &mut m.type_names, &mut m.type_all, &m.type_overload_all))?;
             r.run(m.type_async_types.process(&mut pass_meta, &m.fns_all))?;
+            r.run(m.pattern_string.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.pattern_vec.process(&mut pass_meta, &m.id_maps, &self.inventory.functions, &self.inventory.types))?;
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
             r.run(m.service_method_names.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
@@ -383,7 +387,7 @@ impl RustLibrary {
         o.service_body_methods.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names)?;
         o.services.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &o.service_body_ctors, &o.service_body_methods)?;
         o.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
-        o.pattern_utf8string.process(&mut pass_meta, &self.output_master)?;
+        o.pattern_utf8string.process(&mut pass_meta, &self.output_master, &m.pattern_string)?;
         o.util.process(&mut pass_meta, &self.output_master)?;
         o.using.process(&mut pass_meta, &self.output_master)?;
         self.plugin_post_output_pass()?;

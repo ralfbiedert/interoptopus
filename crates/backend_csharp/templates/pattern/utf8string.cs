@@ -119,17 +119,17 @@ public partial class Utf8String : IDisposable
 
     public partial class InteropHelper
     {
-        [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_create")]
+        [LibraryImport(Interop.NativeLib, EntryPoint = "{{ create_entry_point }}")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 
         public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
 
-        [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_destroy")]
+        [LibraryImport(Interop.NativeLib, EntryPoint = "{{ destroy_entry_point }}")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 
         public static partial long interoptopus_string_destroy(Unmanaged utf8);
 
-        [LibraryImport(Interop.NativeLib, EntryPoint = "interoptopus_string_clone")]
+        [LibraryImport(Interop.NativeLib, EntryPoint = "{{ clone_entry_point }}")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 
         public static partial long interoptopus_string_clone(ref Unmanaged orig, ref Unmanaged cloned);
