@@ -143,6 +143,7 @@ pub struct IntermediateOutputPasses {
     pub service_body_methods: output::service::body::methods::Pass,
     pub services: output::service::all::Pass,
     pub header: output::header::Pass,
+    pub pattern_utf8string: output::types::patterns::utf8string::Pass,
     pub util: output::types::util::Pass,
     pub using: output::r#using::Pass,
 }
@@ -255,6 +256,7 @@ impl RustLibrary {
                 service_body_methods: output::service::body::methods::Pass::new(config.output_service_body_methods),
                 services: output::service::all::Pass::new(config.output_services),
                 header: output::header::Pass::new(config.output_header),
+                pattern_utf8string: output::types::patterns::utf8string::Pass::new(Default::default()),
                 util: output::types::util::Pass::new(config.output_util),
                 using: output::r#using::Pass::new(config.output_using),
             },
@@ -372,6 +374,7 @@ impl RustLibrary {
         o.service_body_methods.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names)?;
         o.services.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &o.service_body_ctors, &o.service_body_methods)?;
         o.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
+        o.pattern_utf8string.process(&mut pass_meta, &self.output_master)?;
         o.util.process(&mut pass_meta, &self.output_master)?;
         o.using.process(&mut pass_meta, &self.output_master)?;
         self.plugin_post_output_pass()?;

@@ -3,6 +3,5 @@
 pub enum Util {
     InteropException,
     EnumException,
-    Utf8String,
     AsyncCallbackCommon,
 }

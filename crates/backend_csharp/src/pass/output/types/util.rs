@@ -36,9 +36,6 @@ impl Pass {
             if output_master.type_belongs_to(csharp::UTIL_ENUM_EXCEPTION, file) {
                 parts.push(templates.render("types/util/enum_exception.cs", &Context::new())?.trim().to_string());
             }
-            if output_master.type_belongs_to(csharp::UTIL_UTF8STRING, file) {
-                parts.push(templates.render("types/util/utf8string.cs", &Context::new())?.trim().to_string());
-            }
             if output_master.type_belongs_to(csharp::UTIL_ASYNC_CALLBACK_COMMON, file) {
                 parts.push(templates.render("types/util/async_callback_common.cs", &Context::new())?.trim().to_string());
             }

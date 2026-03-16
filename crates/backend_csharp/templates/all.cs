@@ -52,5 +52,10 @@ namespace {{ namespace }} {
     {{ trampoline | indent }}
 {%- endfor %}
 
+{%- if pattern_utf8string and pattern_utf8string != "" %}
+
+    {{ pattern_utf8string | indent }}
+{%- endif %}
+
     {{ util | indent }}
 }

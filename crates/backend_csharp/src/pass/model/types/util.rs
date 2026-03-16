@@ -36,7 +36,6 @@ impl Pass {
         let utils = [
             (csharp::UTIL_INTEROP_EXCEPTION, "InteropException", Util::InteropException),
             (csharp::UTIL_ENUM_EXCEPTION, "EnumException", Util::EnumException),
-            (csharp::UTIL_UTF8STRING, "Utf8String", Util::Utf8String),
             (csharp::UTIL_ASYNC_CALLBACK_COMMON, "AsyncCallbackCommonNative", Util::AsyncCallbackCommon),
         ];
 
