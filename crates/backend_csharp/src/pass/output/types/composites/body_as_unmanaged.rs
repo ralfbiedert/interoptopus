@@ -27,6 +27,7 @@ impl Pass {
         types: &model::types::all::Pass,
         managed: &output::conversion::unmanaged_conversion::Pass,
         field_conversions: &output::conversion::fields::Pass,
+        nullable: &model::types::info::nullable::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -39,7 +40,13 @@ impl Pass {
                 .fields
                 .iter()
                 .map(|f| {
-                    let as_unmanaged = managed.as_unmanaged_suffix(f.ty).to_string();
+                    let suffix = managed.as_unmanaged_suffix(f.ty);
+                    let is_nullable = nullable.is_nullable(f.ty).unwrap_or(false);
+                    let as_unmanaged = if is_nullable && !suffix.is_empty() {
+                        format!("?{suffix} ?? default")
+                    } else {
+                        suffix.to_string()
+                    };
 
                     let mut m = HashMap::new();
                     m.insert("name", f.name.clone());

@@ -27,6 +27,7 @@ pub struct RustLibraryConfig {
     pub model_type_map_struct_fields: model::types::kind::struct_fields::Config,
     pub model_type_managed_conversion: model::types::info::managed_conversion::Config,
     pub model_type_disposable: model::types::info::disposable::Config,
+    pub model_type_nullable: model::types::info::nullable::Config,
     pub model_type_struct_class: model::types::info::struct_class::Config,
     pub model_type_map_struct: model::types::kind::r#struct::Config,
     pub model_type_names: model::types::names::Config,
@@ -99,6 +100,7 @@ pub struct ModelPasses {
     pub type_map_struct_fields: model::types::kind::struct_fields::Pass,
     pub type_managed_conversion: model::types::info::managed_conversion::Pass,
     pub type_disposable: model::types::info::disposable::Pass,
+    pub type_nullable: model::types::info::nullable::Pass,
     pub type_struct_class: model::types::info::struct_class::Pass,
     pub type_map_struct: model::types::kind::r#struct::Pass,
     pub type_names: model::types::names::Pass,
@@ -217,6 +219,7 @@ impl RustLibrary {
                 type_map_struct_fields: model::types::kind::struct_fields::Pass::new(config.model_type_map_struct_fields),
                 type_managed_conversion: model::types::info::managed_conversion::Pass::new(config.model_type_managed_conversion),
                 type_disposable: model::types::info::disposable::Pass::new(config.model_type_disposable),
+                type_nullable: model::types::info::nullable::Pass::new(config.model_type_nullable),
                 type_struct_class: model::types::info::struct_class::Pass::new(config.model_type_struct_class),
                 type_map_struct: model::types::kind::r#struct::Pass::new(config.model_type_map_struct),
                 type_names: model::types::names::Pass::new(config.model_type_names),
@@ -327,6 +330,7 @@ impl RustLibrary {
             r.run(m.type_map_struct_fields.process(&mut pass_meta, &m.id_maps, &self.inventory.types))?;
             r.run(m.type_managed_conversion.process(&mut pass_meta, &m.type_all))?;
             r.run(m.type_disposable.process(&mut pass_meta, &m.type_managed_conversion, &m.type_all))?;
+            r.run(m.type_nullable.process(&mut pass_meta, &m.type_all))?;
             r.run(m.type_struct_class.process(&mut pass_meta, &m.type_managed_conversion, &m.type_all))?;
             r.run(m.type_map_struct.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &m.type_map_struct_fields, &self.inventory.types))?;
             r.run(m.type_names.process(&mut pass_meta, &m.id_maps, &m.type_kinds, &self.inventory.types))?;
@@ -375,8 +379,8 @@ impl RustLibrary {
         o.conversion_fields.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.composite_ty.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class)?;
         o.composite_body_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.unmanaged_names, &o.conversion_fields)?;
-        o.composite_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields)?;
-        o.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields)?;
+        o.composite_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields, &m.type_nullable)?;
+        o.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields, &m.type_nullable)?;
         o.composite_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.unmanaged_conversion, &o.composite_body_unmanaged, &o.composite_body_to_unmanaged, &o.composite_body_as_unmanaged)?;
         o.composites.process(&mut pass_meta, &self.output_master, &m.type_all, &o.composite_ty, &o.composite_body)?;
         o.delegates.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;

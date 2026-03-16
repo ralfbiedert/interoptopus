@@ -37,10 +37,10 @@ impl Pass {
                 }
 
                 let name = &function.name;
-                let rval = types
+                let rval_type = types
                     .get(function.signature.rval)
-                    .map(|t| &t.name)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of function `{name}`")))?;
+                let rval = &rval_type.name;
 
                 let mut args: Vec<HashMap<&str, String>> = Vec::new();
                 for arg in &function.signature.arguments {
@@ -59,10 +59,16 @@ impl Pass {
 
                 let mut context = Context::new();
 
+                let rval_decorator = match &rval_type.decorators.rval {
+                    Some(crate::lang::types::RvalDecorator::MarshalAs(m)) => Some(format!("return: MarshalAs({m})")),
+                    None => None,
+                };
+
                 context.insert("name", name);
                 context.insert("symbol", name);
                 context.insert("args", &args);
                 context.insert("rval", rval);
+                context.insert("rval_decorator", &rval_decorator);
 
                 let import = templates.render("fns/rust.cs", &context)?;
                 imports.push(import);

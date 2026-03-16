@@ -7,7 +7,7 @@ pub mod body;
 pub mod simple;
 
 /// Result of checking IntPtr eligibility for `ref` overloads.
-pub(crate) enum IntPtrEligibility {
+enum IntPtrEligibility {
     /// Not an IntPtr at all, or definitely ineligible.
     Ineligible,
     /// Eligible for `ref` overloads.
@@ -17,7 +17,7 @@ pub(crate) enum IntPtrEligibility {
 }
 
 /// Check whether an argument type is an `IntPtr` whose pointee is eligible for `ref` overloads.
-pub(crate) fn intptr_eligibility(ty: TypeId, types: &model::types::all::Pass) -> IntPtrEligibility {
+fn intptr_eligibility(ty: TypeId, types: &model::types::all::Pass) -> IntPtrEligibility {
     let Some(TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target })) = types.get(ty).map(|t| &t.kind) else {
         return IntPtrEligibility::Ineligible;
     };
