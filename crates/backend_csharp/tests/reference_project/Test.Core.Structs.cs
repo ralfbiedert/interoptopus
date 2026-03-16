@@ -11,6 +11,6 @@ public class TestStructs
             val = true
         });
         
-        Assert.True(rval);
+        Assert.True(rval.Is);
     }
 }

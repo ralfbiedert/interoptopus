@@ -72,6 +72,15 @@ public partial class {{ name }} : IDisposable
         return rval;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    internal Unmanaged AsUnmanaged()
+    {
+        var rval = new Unmanaged();
+        rval._callback = _ptr;
+        rval._data = IntPtr.Zero;
+        return rval;
+    }
+
     [CustomMarshaller(typeof({{ name }}), MarshalMode.Default, typeof(Marshaller))]
     private struct MarshallerMeta {  }
 

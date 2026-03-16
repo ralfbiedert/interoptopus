@@ -14,7 +14,7 @@ test-dotnet:
     cargo build -p reference_project
     cargo test --test mod reference_project::interop
     # Run .NET tests
-    dotnet test crates/backend_csharp/tests/reference_project/reference_project.csproj
+    dotnet test crates/backend_csharp/tests/reference_project/reference_project_tests.csproj
 
 # Checks extra linting
 lint:
