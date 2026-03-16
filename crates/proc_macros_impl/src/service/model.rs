@@ -42,10 +42,10 @@ pub struct ServiceParameter {
 
 #[derive(Clone)]
 pub enum ReceiverKind {
-    None,         // Constructor
-    Shared,       // &self
-    Mutable,      // &mut self
-    AsyncThis,    // Async<Self>
+    None,                 // Constructor
+    Shared,               // &self
+    Mutable,              // &mut self
+    AsyncThis,            // Async<Self>
     AsyncCtor(Box<Type>), // Async<Runtime> where Runtime != Self — async constructor
 }
 

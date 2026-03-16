@@ -1,6 +1,6 @@
 use crate::patterns::result::Error;
-use interoptopus::pattern::asynk::Async;
 use interoptopus::ffi;
+use interoptopus::pattern::asynk::Async;
 
 use super::basic::ServiceAsyncBasic;
 
