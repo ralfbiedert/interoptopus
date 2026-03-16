@@ -383,6 +383,10 @@ impl ServiceModel {
                         let _async_this = ::interoptopus::pattern::asynk::Async::new(_instance_inside, _ctx);
                         let _result = #service_type::#method_name(_async_this, #param_names).await;
                         callback.call(&_result);
+                        // Prevent Rust from dropping owned data (e.g. ffi::String) after the
+                        // callback, since the foreign side took ownership of the raw pointers
+                        // during the callback.
+                        ::std::mem::forget(_result);
                     });
                     ::interoptopus::ffi::Ok(::std::ptr::null())
                 }
