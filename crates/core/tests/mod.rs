@@ -21,13 +21,14 @@ mod types {
 }
 
 #[test]
-fn proc() {
+fn proc_const() {
     let t = TestCases::new();
-
-    // const
     t.pass("tests/proc/const/basic.rs");
+}
 
-    // fn
+#[test]
+fn proc_fn() {
+    let t = TestCases::new();
     t.compile_fail("tests/proc/fn/attr_extern_c.rs");
     t.compile_fail("tests/proc/fn/attr_no_mangle.rs");
     t.pass("tests/proc/fn/basic.rs");
@@ -39,8 +40,11 @@ fn proc() {
     t.pass("tests/proc/fn/ref_lt.rs");
     t.pass("tests/proc/fn/unsafe.rs");
     t.pass("tests/proc/fn/wildcard.rs");
+}
 
-    // svc
+#[test]
+fn proc_svc() {
+    let t = TestCases::new();
     t.pass("tests/proc/svc/async_basic.rs");
     t.pass("tests/proc/svc/async_double.rs");
     t.compile_fail("tests/proc/svc/async_mut_self.rs");
@@ -52,8 +56,11 @@ fn proc() {
     t.pass("tests/proc/svc/lifetime.rs");
     // t.compile_fail("tests/proc/svc/module.rs"); TODO: later
     t.compile_fail("tests/proc/svc/opaque.rs"); // TODO: should have better error warning about `opaque`
+}
 
-    // ty
+#[test]
+fn proc_ty() {
+    let t = TestCases::new();
     t.pass("tests/proc/ty/basic.rs");
     t.compile_fail("tests/proc/ty/empty_struct.rs");
     t.compile_fail("tests/proc/ty/empty_unit.rs");
