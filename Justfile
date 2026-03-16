@@ -8,6 +8,14 @@ build verbose="":
 test verbose="" package="":
     cargo nextest run --all-features {{verbose}}
 
+# Runs C# tests via dotnet.
+test-dotnet:
+    # Make sure the DLL + Interop files exist
+    cargo build -p reference_project
+    cargo test --test mod reference_project::interop
+    # Run .NET tests
+    dotnet test crates/backend_csharp/tests/reference_project/reference_project.csproj
+
 # Checks extra linting
 lint:
     cargo fmt --check
@@ -22,7 +30,9 @@ binstall-deps:
     cargo binstall cargo-insta --disable-telemetry --no-confirm --secure
     cargo binstall cargo-nextest --disable-telemetry --no-confirm --secure
 
+
 # Can be used by agents for the current task.
 test-agent:
     # Agents: Feel free to update the test logic here for the task at hand.
     # cargo test --test mod reference_project::interop
+
