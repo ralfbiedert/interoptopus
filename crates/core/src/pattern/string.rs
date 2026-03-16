@@ -1,7 +1,7 @@
 //! Like a regular [`String`](std::string::String), but FFI safe.
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Emission, Visibility};
+use crate::lang::meta::{Emission, FileEmission, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::io::{Read, Write};
 use std::mem::forget;
@@ -93,7 +93,7 @@ impl TypeInfo for String {
     }
 
     fn ty() -> Type {
-        Type { emission: Emission::Common, docs: crate::lang::meta::Docs::empty(), visibility: Visibility::Public, name: "String".to_string(), kind: Self::kind() }
+        Type { emission: Emission::FileEmission(FileEmission::Common), docs: crate::lang::meta::Docs::empty(), visibility: Visibility::Public, name: "String".to_string(), kind: Self::kind() }
     }
 
     fn register(inventory: &mut impl Inventory) {

@@ -11,7 +11,7 @@ impl ConstantModel {
         let constant_value = self.constant_value_tokens();
         let docs_content = self.docs_content();
         let visibility = quote! { ::interoptopus::lang::meta::Visibility::Public };
-        let emission = quote! { ::interoptopus::lang::meta::Emission::Common };
+        let emission = quote! { ::interoptopus::lang::meta::Emission::FileEmission(::interoptopus::lang::meta::FileEmission::Common) };
 
         let constant_info_impl = quote! {
             #[allow(non_camel_case_types)]

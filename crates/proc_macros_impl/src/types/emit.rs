@@ -311,13 +311,13 @@ impl TypeModel {
     fn emit_emission(&self) -> TokenStream {
         match &self.args.module {
             Some(crate::types::args::ModuleKind::Named(name)) => {
-                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::Module(#name.to_string()) }
+                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::FileEmission(::interoptopus::lang::meta::FileEmission::CustomModule(::interoptopus::lang::meta::Module::new(#name))) }
             }
             Some(crate::types::args::ModuleKind::Common) => {
-                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::Common }
+                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::FileEmission(::interoptopus::lang::meta::FileEmission::Common) }
             }
             None => {
-                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::Default }
+                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::FileEmission(::interoptopus::lang::meta::FileEmission::Default) }
             }
         }
     }

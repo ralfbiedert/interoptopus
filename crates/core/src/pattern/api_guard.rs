@@ -43,7 +43,7 @@
 //!
 use crate::inventory::RustInventory;
 use crate::inventory::TypeId;
-use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
 use crate::lang::types::{SerializationError, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
@@ -88,7 +88,7 @@ impl TypeInfo for ApiVersion {
     }
 
     fn ty() -> crate::lang::types::Type {
-        crate::lang::types::Type { emission: Emission::Common, docs: Docs::empty(), visibility: Visibility::Public, name: "ApiVersion".to_string(), kind: Self::kind() }
+        crate::lang::types::Type { emission: Emission::FileEmission(FileEmission::Common), docs: Docs::empty(), visibility: Visibility::Public, name: "ApiVersion".to_string(), kind: Self::kind() }
     }
 
     fn register(inventory: &mut impl crate::inventory::Inventory) {

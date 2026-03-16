@@ -1,6 +1,6 @@
 use crate::bad_wire;
 use crate::inventory::Inventory;
-use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
 use crate::lang::types::SerializationError;
 use crate::lang::types::wire::WireIO;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
@@ -141,7 +141,7 @@ impl TypeInfo for String {
     }
 
     fn ty() -> Type {
-        Type { emission: Emission::Common, docs: Docs::empty(), visibility: Visibility::Public, name: "String".to_string(), kind: Self::kind() }
+        Type { emission: Emission::FileEmission(FileEmission::Common), docs: Docs::empty(), visibility: Visibility::Public, name: "String".to_string(), kind: Self::kind() }
     }
 
     fn register(inventory: &mut impl Inventory) {

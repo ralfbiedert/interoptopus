@@ -25,7 +25,7 @@
 //! ```
 //!
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use crate::{Error, bad_wire};
 use std::ffi::CStr;
@@ -137,7 +137,7 @@ impl TypeInfo for CStrPtr<'_> {
     }
 
     fn ty() -> Type {
-        Type { emission: Emission::Common, docs: Docs::empty(), visibility: Visibility::Public, name: "CStrPtr".to_string(), kind: Self::kind() }
+        Type { emission: Emission::FileEmission(FileEmission::Common), docs: Docs::empty(), visibility: Visibility::Public, name: "CStrPtr".to_string(), kind: Self::kind() }
     }
 
     fn register(inventory: &mut impl Inventory) {

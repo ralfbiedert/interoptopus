@@ -80,7 +80,7 @@ fn lookup_emission(cs_type_id: TypeId, id_maps: &model::id_map::Pass, rs_types: 
     // Try to find the corresponding Rust type by checking all Rust types
     for (rust_id, rust_ty) in rs_types {
         if id_maps.ty(*rust_id) == Some(cs_type_id) {
-            return Emission::from_rust(&rust_ty.emission);
+            return rust_ty.emission.clone();
         }
     }
     // Synthesized types (e.g., overload siblings) won't be in the inventory;
