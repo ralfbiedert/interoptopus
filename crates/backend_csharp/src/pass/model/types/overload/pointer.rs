@@ -84,7 +84,7 @@ impl Pass {
                     emission: Emission::Builtin,
                     name: pointee_name.clone(),
                     kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }),
-                    decorators: Decorators { param: Some(ParamDecorator::Ref) },
+                    decorators: Decorators { param: Some(ParamDecorator::Ref), ..Default::default() },
                 },
             );
             types.set(
@@ -93,7 +93,7 @@ impl Pass {
                     emission: Emission::Builtin,
                     name: pointee_name.clone(),
                     kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }),
-                    decorators: Decorators { param: Some(ParamDecorator::Out) },
+                    decorators: Decorators { param: Some(ParamDecorator::Out), ..Default::default() },
                 },
             );
 

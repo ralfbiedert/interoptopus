@@ -28,14 +28,14 @@ public class TestRefs
     {
         var x = 123L;
         var rval = Interop.ref3(ref x);
-        Assert.Equal(true, rval);
+        Assert.Equal(true, rval.Is);
     }
 
     [Fact]
     public void ref4()
     {
         var x = 123L;
-        var rval = Interop.ref4(ref x);
+        var rval = Interop.ref4(ref x).Is;
         Assert.Equal(true, rval);
     }
 

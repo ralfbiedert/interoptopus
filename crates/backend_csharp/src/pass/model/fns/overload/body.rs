@@ -24,7 +24,7 @@ use crate::lang::types::kind::task::Task;
 use crate::lang::types::kind::{DelegateKind, Primitive, TypeKind, TypePattern};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
+use crate::pass::model::fns::overload::{IntPtrEligibility, derive_overload_id, intptr_eligibility, is_eligible_intptr};
 use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashSet;
 
@@ -55,7 +55,9 @@ impl Pass {
         let mut outcome = Unchanged;
 
         // Collect originals first to avoid borrowing `fns_all` mutably while iterating.
-        let originals: Vec<_> = fns_all.originals().map(|(&id, f)| (id, f.clone())).collect();
+        // Sort by ID for deterministic iteration order.
+        let mut originals: Vec<_> = fns_all.originals().map(|(&id, f)| (id, f.clone())).collect();
+        originals.sort_by_key(|(id, _)| *id);
 
         for &(original_id, ref original_fn) in &originals {
             if self.processed.contains(&original_id) {
@@ -74,6 +76,12 @@ impl Pass {
             };
 
             let has_delegate = transformable_args.iter().any(|a| is_delegate_class(a.ty, types));
+
+            // If any IntPtr argument's target type is not yet resolved, defer.
+            let has_any_unknown = transformable_args.iter().any(|a| matches!(intptr_eligibility(a.ty, types), IntPtrEligibility::Unknown));
+            if has_any_unknown {
+                continue;
+            }
 
             // Nothing to do for this function
             if async_result_ty.is_none() && !has_delegate {

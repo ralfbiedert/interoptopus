@@ -56,6 +56,11 @@ namespace {{ namespace }} {
     {{ trampoline | indent }}
 {%- endfor %}
 
+{%- if pattern_bools and pattern_bools != "" %}
+
+    {{ pattern_bools | indent }}
+{%- endif %}
+
 {%- if pattern_utf8string and pattern_utf8string != "" %}
 
     {{ pattern_utf8string | indent }}

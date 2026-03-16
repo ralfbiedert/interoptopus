@@ -1,3 +1,4 @@
+[NativeMarshalling(typeof(MarshallerMeta))]
 public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposable{% endif %}
 {
     {%- for item in unmanaged_variants %}

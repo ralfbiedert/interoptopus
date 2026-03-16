@@ -16,7 +16,7 @@ public class TestArrayNested
             y = 2.0f,
             z = 3.0f
         }, result.field_vec);
-        Assert.Equal(true, result.field_bool);
+        Assert.Equal(true, result.field_bool.Is);
         Assert.Equal(42, result.field_int);
         Assert.Equal(Enumerable.Range(1, 5).Select(i => (ushort)i).ToArray(), result.field_array);
         Assert.Equal(Enumerable.Range(1, 16).Select(i => (byte)i).ToArray(), result.field_struct.data);
@@ -34,7 +34,7 @@ public class TestArrayNested
             y = 2.0f,
             z = 3.0f
         }, result.field_vec);
-        Assert.Equal(true, result.field_bool);
+        Assert.Equal(true, result.field_bool.Is);
         Assert.Equal(42, result.field_int);
         Assert.Equal(Enumerable.Range(1, 5).Select(i => (ushort)i).ToArray(), result.field_array);
         Assert.Equal(Enumerable.Range(1, 16).Select(i => (byte)i).ToArray(), result.field_struct.data);

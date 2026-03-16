@@ -42,7 +42,9 @@ impl Pass {
         let mut outcome = Unchanged;
 
         // Collect originals first to avoid borrowing `all` mutably while iterating.
-        let originals: Vec<_> = all.originals().map(|(&id, f)| (id, f.clone())).collect();
+        // Sort by ID for deterministic iteration order.
+        let mut originals: Vec<_> = all.originals().map(|(&id, f)| (id, f.clone())).collect();
+        originals.sort_by_key(|(id, _)| *id);
 
         for &(original_id, ref original_fn) in &originals {
             if self.processed.contains(&original_id) {

@@ -11,7 +11,7 @@ public class TestBasics
     public void primitive_u8() { Assert.Equal(255, Interop.primitive_u8(0)); }
 
     [Fact]
-    public void primitive_bool() { Assert.Equal(false, Interop.primitive_bool(true)); }
+    public void primitive_bool() { Assert.Equal(Bool.False, Interop.primitive_bool(Bool.True)); }
 
     [Fact]
     public void primitive_i64() { Assert.Equal(-123, Interop.primitive_i64(123)); }

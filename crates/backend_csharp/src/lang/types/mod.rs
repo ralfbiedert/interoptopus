@@ -47,10 +47,17 @@ impl std::fmt::Display for ParamDecorator {
     }
 }
 
+/// Decorators for function / method return values.
+#[derive(Clone, Debug)]
+pub enum RvalDecorator {
+    MarshalAs(MarshalAs),
+}
+
 /// Can decorate a type with additional attributes in generated C# code.
 #[derive(Clone, Debug, Default)]
 pub struct Decorators {
     pub param: Option<ParamDecorator>,
+    pub rval: Option<RvalDecorator>,
 }
 
 #[derive(Clone, Debug)]

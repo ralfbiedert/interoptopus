@@ -75,6 +75,7 @@ pub struct RustLibraryConfig {
     pub output_service_body_ctors: output::service::body::ctors::Config,
     pub output_service_body_methods: output::service::body::methods::Config,
     pub output_services: output::service::all::Config,
+    pub output_pattern_bools: output::pattern::bools::Config,
     pub output_header: output::header::Config,
     pub output_util: output::types::util::Config,
     pub output_using: output::r#using::Config,
@@ -149,6 +150,7 @@ pub struct IntermediateOutputPasses {
     pub service_body_methods: output::service::body::methods::Pass,
     pub services: output::service::all::Pass,
     pub header: output::header::Pass,
+    pub pattern_bools: output::pattern::bools::Pass,
     pub pattern_utf8string: output::pattern::utf8string::Pass,
     pub util: output::types::util::Pass,
     pub using: output::r#using::Pass,
@@ -266,6 +268,7 @@ impl RustLibrary {
                 service_body_methods: output::service::body::methods::Pass::new(config.output_service_body_methods),
                 services: output::service::all::Pass::new(config.output_services),
                 header: output::header::Pass::new(config.output_header),
+                pattern_bools: output::pattern::bools::Pass::new(config.output_pattern_bools),
                 pattern_utf8string: output::pattern::utf8string::Pass::new(Default::default()),
                 util: output::types::util::Pass::new(config.output_util),
                 using: output::r#using::Pass::new(config.output_using),
@@ -387,6 +390,7 @@ impl RustLibrary {
         o.service_body_methods.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names)?;
         o.services.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &o.service_body_ctors, &o.service_body_methods)?;
         o.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
+        o.pattern_bools.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.pattern_utf8string.process(&mut pass_meta, &self.output_master, &m.pattern_string)?;
         o.util.process(&mut pass_meta, &self.output_master)?;
         o.using.process(&mut pass_meta, &self.output_master)?;

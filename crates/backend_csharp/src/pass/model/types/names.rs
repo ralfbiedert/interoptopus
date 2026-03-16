@@ -83,7 +83,7 @@ impl Pass {
                     format!("{element}[]")
                 }
                 TypeKind::TypePattern(p) => match p {
-                    TypePattern::Bool => "bool".to_string(),
+                    TypePattern::Bool => "Bool".to_string(),
                     TypePattern::CChar => "byte".to_string(),
                     TypePattern::CVoid => "void".to_string(),
                     TypePattern::CStrPointer => "string".to_string(),
@@ -129,7 +129,7 @@ impl Pass {
 fn primitive_name(p: Primitive) -> &'static str {
     match p {
         Primitive::Void => "void",
-        Primitive::Bool => "bool",
+        Primitive::Bool => "Bool",
         Primitive::Byte => "byte",
         Primitive::UShort => "ushort",
         Primitive::UInt => "uint",
