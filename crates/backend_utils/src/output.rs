@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt;
 use std::fs;
 use std::path::Path;
 
@@ -47,5 +48,17 @@ impl Multibuf {
 
     pub fn iter(&self) -> impl Iterator<Item = (&String, &String)> {
         self.buffers.iter()
+    }
+}
+
+impl fmt::Display for Multibuf {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut keys: Vec<_> = self.buffers.keys().collect();
+        keys.sort();
+        for name in keys {
+            writeln!(f, "=== {name} ===")?;
+            write!(f, "{}", self.buffers[name])?;
+        }
+        Ok(())
     }
 }
