@@ -41,7 +41,6 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         originals: &model::fns::originals::Pass,
         fns_all: &mut model::fns::all::Pass,
-        overload_all: &mut model::fns::overload::all::Pass,
         types: &model::types::all::Pass,
         type_overloads: &model::types::overload::all::Pass,
     ) -> ModelResult {
@@ -101,10 +100,9 @@ impl Pass {
                     emission: original_fn.emission.clone(),
                     name: original_fn.name.clone(),
                     signature: sig,
-                    kind: FunctionKind::Overload(Overload { kind: OverloadKind::Body(transforms.clone()), base: original_id }),
+                    kind: FunctionKind::Overload(Overload { kind: OverloadKind::Body(transforms), base: original_id }),
                 };
                 fns_all.register(id, func);
-                overload_all.register(original_id, id, OverloadKind::Body(transforms));
                 outcome.changed();
             }
 
@@ -117,10 +115,9 @@ impl Pass {
                     emission: original_fn.emission.clone(),
                     name: original_fn.name.clone(),
                     signature: sig,
-                    kind: FunctionKind::Overload(Overload { kind: OverloadKind::Async(transforms.clone()), base: original_id }),
+                    kind: FunctionKind::Overload(Overload { kind: OverloadKind::Async(transforms), base: original_id }),
                 };
                 fns_all.register(id, func);
-                overload_all.register(original_id, id, OverloadKind::Async(transforms));
                 outcome.changed();
             }
 

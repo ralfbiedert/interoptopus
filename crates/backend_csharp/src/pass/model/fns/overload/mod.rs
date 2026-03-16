@@ -3,7 +3,6 @@ use crate::lang::types::kind::{Pointer, PointerKind, Primitive, TypeKind, TypePa
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::model;
 
-pub mod all;
 pub mod body;
 pub mod simple;
 

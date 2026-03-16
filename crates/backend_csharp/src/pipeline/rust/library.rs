@@ -37,7 +37,6 @@ pub struct RustLibraryConfig {
     pub model_type_util: model::types::util::Config,
     pub model_fn_all: model::fns::all::Config,
     pub model_fn_originals: model::fns::originals::Config,
-    pub model_fn_overload_all: model::fns::overload::all::Config,
     pub model_fn_overload_simple: model::fns::overload::simple::Config,
     pub model_fn_overload_body: model::fns::overload::body::Config,
     pub model_type_async_types: model::types::info::async_types::Config,
@@ -106,7 +105,6 @@ pub struct ModelPasses {
     pub type_util: model::types::util::Pass,
     pub fns_all: model::fns::all::Pass,
     pub fn_originals: model::fns::originals::Pass,
-    pub fn_overload_all: model::fns::overload::all::Pass,
     pub fn_overload_simple: model::fns::overload::simple::Pass,
     pub fn_overload_body: model::fns::overload::body::Pass,
     pub type_async_types: model::types::info::async_types::Pass,
@@ -219,7 +217,6 @@ impl RustLibrary {
                 type_util: model::types::util::Pass::new(config.model_type_util),
                 fns_all: model::fns::all::Pass::new(config.model_fn_all),
                 fn_originals: model::fns::originals::Pass::new(config.model_fn_originals),
-                fn_overload_all: model::fns::overload::all::Pass::new(config.model_fn_overload_all),
                 fn_overload_simple: model::fns::overload::simple::Pass::new(config.model_fn_overload_simple),
                 fn_overload_body: model::fns::overload::body::Pass::new(config.model_fn_overload_body),
                 type_async_types: model::types::info::async_types::Pass::new(config.model_type_async_types),
@@ -323,9 +320,9 @@ impl RustLibrary {
             r.run(m.type_all.process(&mut pass_meta, &m.type_kinds, &m.type_names, &m.id_maps, &self.inventory.types))?;
             r.run(m.type_util.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_all))?;
             r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &mut m.fns_all, &self.inventory.functions))?;
-            r.run(m.fn_overload_simple.process(&mut pass_meta, &m.fn_originals, &mut m.fns_all, &mut m.fn_overload_all, &m.type_all, &m.type_overload_all))?;
-            r.run(m.fn_overload_body.process(&mut pass_meta, &m.fn_originals, &mut m.fns_all, &mut m.fn_overload_all, &m.type_all, &m.type_overload_all))?;
-            r.run(m.type_async_types.process(&mut pass_meta, &m.fn_originals, &m.fn_overload_all))?;
+            r.run(m.fn_overload_simple.process(&mut pass_meta, &m.fn_originals, &mut m.fns_all, &m.type_all, &m.type_overload_all))?;
+            r.run(m.fn_overload_body.process(&mut pass_meta, &m.fn_originals, &mut m.fns_all, &m.type_all, &m.type_overload_all))?;
+            r.run(m.type_async_types.process(&mut pass_meta, &m.fns_all))?;
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
             r.run(m.service_method_names.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
             r.run(m.service_method_overload.process(&mut pass_meta, &mut m.service_all, &m.fns_all, &m.type_all))?;

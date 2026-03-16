@@ -7,11 +7,11 @@
 //! for each eligible `IntPtr` argument. Registers produced overloads into the
 //! central `overload::all` pass.
 
+use crate::lang::FunctionId;
 use crate::lang::functions::overload::{Overload, OverloadKind};
 use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
 use crate::lang::types::OverloadFamily;
-use crate::lang::types::kind::{Pointer, PointerKind, TypeKind};
-use crate::lang::{FunctionId, TypeId};
+use crate::lang::types::kind::TypeKind;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
 use crate::pass::{ModelResult, PassInfo, model};
@@ -37,7 +37,6 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         originals: &model::fns::originals::Pass,
         all: &mut model::fns::all::Pass,
-        overload_all: &mut model::fns::overload::all::Pass,
         types: &model::types::all::Pass,
         overloads: &model::types::overload::all::Pass,
     ) -> ModelResult {
@@ -95,7 +94,6 @@ impl Pass {
             };
 
             all.register(overload_id, overload_fn);
-            overload_all.register(original_id, overload_id, OverloadKind::Simple);
             self.overloads.insert(overload_id);
             self.processed.insert(original_id);
             outcome.changed();
