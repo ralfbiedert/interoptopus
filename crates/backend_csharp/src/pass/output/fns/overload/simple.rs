@@ -1,9 +1,10 @@
 //! Writes function import declarations for simple overloads.
 //!
 //! Simple overloads do not contain a body — they are plain `DllImport` declarations.
-//! The overload IDs come from the simple model pass, with the actual Function
-//! objects looked up from `fns::all`.
+//! The overload functions are identified via their `FunctionKind::Overload` with
+//! `OverloadKind::Simple`, queried from the central `fns::all` pass.
 
+use crate::lang::functions::FunctionKind;
 use crate::lang::functions::overload::OverloadKind;
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, model, output};
@@ -28,9 +29,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        originals: &model::fns::originals::Pass,
-        overload_all: &model::fns::overload::all::Pass,
-        fn_all: &model::fns::all::Pass,
+        fns_all: &model::fns::all::Pass,
         types: &model::types::all::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
@@ -38,47 +37,44 @@ impl Pass {
         for output in output_master.outputs_of(FileType::Csharp) {
             let mut imports = Vec::new();
 
-            for (&original_id, _) in originals.iter() {
-                if !output_master.fn_belongs_to(original_id, output) {
+            for (&overload_id, function) in fns_all.overloads() {
+                // Only simple overloads get rendered here
+                let FunctionKind::Overload(ref overload) = function.kind else { continue };
+                if !matches!(overload.kind, OverloadKind::Simple) {
                     continue;
                 }
 
-                let Some(entries) = overload_all.overloads_for(original_id) else { continue };
-
-                for (overload_id, kind) in entries {
-                    if !matches!(kind, OverloadKind::Simple) {
-                        continue;
-                    }
-
-                    let Some(function) = fn_all.get(*overload_id) else { continue };
-                    let name = &function.name;
-                    let rval = types
-                        .get(function.signature.rval)
-                        .map(|t| &t.name)
-                        .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of overload `{name}`")))?;
-
-                    let mut args: Vec<HashMap<&str, &str>> = Vec::new();
-                    for arg in &function.signature.arguments {
-                        let arg_ty = types
-                            .get(arg.ty)
-                            .map(|t| &t.name)
-                            .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of overload `{}`", arg.name, name)))?;
-                        let mut m = HashMap::new();
-                        m.insert("name", arg.name.as_str());
-                        m.insert("ty", arg_ty.as_str());
-                        args.push(m);
-                    }
-
-                    let mut context = Context::new();
-
-                    context.insert("name", name);
-                    context.insert("symbol", name);
-                    context.insert("args", &args);
-                    context.insert("rval", rval);
-
-                    let import = templates.render("fns/overload/simple.cs", &context)?;
-                    imports.push(import);
+                if !output_master.fn_belongs_to(overload.base, output) {
+                    continue;
                 }
+
+                let name = &function.name;
+                let rval = types
+                    .get(function.signature.rval)
+                    .map(|t| &t.name)
+                    .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of overload `{name}`")))?;
+
+                let mut args: Vec<HashMap<&str, &str>> = Vec::new();
+                for arg in &function.signature.arguments {
+                    let arg_ty = types
+                        .get(arg.ty)
+                        .map(|t| &t.name)
+                        .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of overload `{}`", arg.name, name)))?;
+                    let mut m = HashMap::new();
+                    m.insert("name", arg.name.as_str());
+                    m.insert("ty", arg_ty.as_str());
+                    args.push(m);
+                }
+
+                let mut context = Context::new();
+
+                context.insert("name", name);
+                context.insert("symbol", name);
+                context.insert("args", &args);
+                context.insert("rval", rval);
+
+                let import = templates.render("fns/overload/simple.cs", &context)?;
+                imports.push(import);
             }
 
             imports.sort();

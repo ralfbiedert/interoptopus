@@ -5,7 +5,7 @@
 //! not any overloads we produced afterwards)
 
 use crate::lang::FunctionId;
-use crate::lang::functions::{Argument, Function, Signature};
+use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
 use crate::lang::meta::Emission;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
@@ -68,7 +68,8 @@ impl Pass {
             }
 
             let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
-            let cs_function = Function { emission: Emission::from_rust(&rust_fn.emission), name: rust_fn.name.clone(), signature: cs_signature };
+            let cs_function =
+                Function { emission: Emission::from_rust(&rust_fn.emission), name: rust_fn.name.clone(), signature: cs_signature, kind: FunctionKind::Original };
 
             all.register(cs_id, cs_function.clone());
             self.functions.insert(cs_id, cs_function);

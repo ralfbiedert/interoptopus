@@ -12,8 +12,8 @@
 //! would create two C# methods with identical parameter signatures differing only in
 //! return type, which C# does not allow.
 
-use crate::lang::functions::overload::{ArgTransform, FnTransforms, OverloadKind, RvalTransform};
-use crate::lang::functions::{Argument, Function, Signature};
+use crate::lang::functions::overload::{ArgTransform, FnTransforms, Overload, OverloadKind, RvalTransform};
+use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
 use crate::lang::types::OverloadFamily;
 use crate::lang::types::kind::{DelegateKind, TypeKind, TypePattern};
 use crate::lang::{FunctionId, TypeId};
@@ -96,8 +96,13 @@ impl Pass {
             if has_delegate && async_result_ty.is_none() {
                 let sig = Signature { arguments: overload_args.clone(), rval: original_fn.signature.rval };
                 let id = derive_overload_id(original_id, &sig);
-                let func = Function { emission: original_fn.emission.clone(), name: original_fn.name.clone(), signature: sig };
                 let transforms = FnTransforms { rval: RvalTransform::PassThrough, args: arg_transforms.clone() };
+                let func = Function {
+                    emission: original_fn.emission.clone(),
+                    name: original_fn.name.clone(),
+                    signature: sig,
+                    kind: FunctionKind::Overload(Overload { kind: OverloadKind::Body(transforms.clone()), base: original_id }),
+                };
                 fns_all.register(id, func);
                 overload_all.register(original_id, id, OverloadKind::Body(transforms));
                 outcome.changed();
@@ -107,8 +112,13 @@ impl Pass {
             if let Some(result_ty_id) = async_result_ty {
                 let sig = Signature { arguments: overload_args, rval: result_ty_id };
                 let id = derive_overload_id(original_id, &sig);
-                let func = Function { emission: original_fn.emission.clone(), name: original_fn.name.clone(), signature: sig };
                 let transforms = FnTransforms { rval: RvalTransform::AsyncTask(result_ty_id), args: arg_transforms };
+                let func = Function {
+                    emission: original_fn.emission.clone(),
+                    name: original_fn.name.clone(),
+                    signature: sig,
+                    kind: FunctionKind::Overload(Overload { kind: OverloadKind::Async(transforms.clone()), base: original_id }),
+                };
                 fns_all.register(id, func);
                 overload_all.register(original_id, id, OverloadKind::Async(transforms));
                 outcome.changed();

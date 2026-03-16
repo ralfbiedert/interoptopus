@@ -23,7 +23,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        fn_maps: &model::fns::originals::Pass,
+        fns_all: &model::fns::all::Pass,
         types: &model::types::all::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
@@ -31,7 +31,7 @@ impl Pass {
         for output in output_master.outputs_of(FileType::Csharp) {
             let mut imports = Vec::new();
 
-            for (&id, function) in fn_maps.iter() {
+            for (&id, function) in fns_all.originals() {
                 if !output_master.fn_belongs_to(id, output) {
                     continue;
                 }

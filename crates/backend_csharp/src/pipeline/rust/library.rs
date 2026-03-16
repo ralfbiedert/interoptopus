@@ -328,7 +328,7 @@ impl RustLibrary {
             r.run(m.type_async_types.process(&mut pass_meta, &m.fn_originals, &m.fn_overload_all))?;
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
             r.run(m.service_method_names.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
-            r.run(m.service_method_overload.process(&mut pass_meta, &m.service_all, &m.fn_overload_all))?;
+            r.run(m.service_method_overload.process(&mut pass_meta, &mut m.service_all, &m.fns_all, &m.type_all))?;
 
             for plugin in &mut self.plugins {
                 let post_model = PostModelPass::from_model(m);
@@ -367,12 +367,12 @@ impl RustLibrary {
         o.composites.process(&mut pass_meta, &self.output_master, &m.type_all, &o.composite_ty, &o.composite_body)?;
         o.delegates.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
         o.slices.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_managed_conversion, &o.unmanaged_names)?;
-        o.fns_rust.process(&mut pass_meta, &self.output_master, &m.fn_originals, &m.type_all)?;
-        o.fns_overload_simple.process(&mut pass_meta, &self.output_master, &m.fn_originals, &m.fn_overload_all, &m.fns_all, &m.type_all)?;
-        o.fns_overload_body.process(&mut pass_meta, &self.output_master, &m.fn_overload_all, &m.fn_originals, &m.type_all, &m.type_overload_all)?;
+        o.fns_rust.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all)?;
+        o.fns_overload_simple.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all)?;
+        o.fns_overload_body.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all, &m.type_overload_all)?;
         o.asynk.process(&mut pass_meta, &self.output_master, &m.type_async_types, &m.type_all, &m.type_managed_conversion)?;
         o.service_body_ctors.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names)?;
-        o.service_body_methods.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names, &m.fn_overload_all)?;
+        o.service_body_methods.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names)?;
         o.services.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &o.service_body_ctors, &o.service_body_methods)?;
         o.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         o.util.process(&mut pass_meta, &self.output_master)?;

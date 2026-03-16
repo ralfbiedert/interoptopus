@@ -47,6 +47,6 @@ pub enum OverloadKind {
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Overload {
-    kind: OverloadKind,
-    base: FunctionId,
+    pub kind: OverloadKind,
+    pub base: FunctionId,
 }

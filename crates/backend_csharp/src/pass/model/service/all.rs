@@ -47,6 +47,10 @@ impl Pass {
         Ok(outcome)
     }
 
+    pub fn get_mut(&mut self, id: ServiceId) -> Option<&mut Service> {
+        self.services.get_mut(&id)
+    }
+
     pub fn iter(&self) -> impl Iterator<Item = (&ServiceId, &Service)> {
         self.services.iter()
     }

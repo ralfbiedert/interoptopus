@@ -1,10 +1,12 @@
 //! Renders body and async overload function declarations.
 //!
-//! Iterates `overload::all` for `Body` and `Async` overload kinds. For each,
-//! resolves arg transforms (ref, delegate wrap) from type overload families and
-//! renders via the shared `fns/overload/body.cs` template. Async overloads set
-//! `is_async = true` which switches the template to trampoline + Task return.
+//! Iterates `fns::all` for overloads with `Body` and `Async` kinds. For each,
+//! resolves arg transforms from the `Overload` data stored in the function's
+//! `FunctionKind`, and renders via the shared `fns/overload/body.cs` template.
+//! Async overloads set `is_async = true` which switches the template to
+//! trampoline + Task return.
 
+use crate::lang::functions::FunctionKind;
 use crate::lang::functions::overload::{ArgTransform, FnTransforms, OverloadKind, RvalTransform};
 use crate::lang::functions::{Argument, Function};
 use crate::lang::types::OverloadFamily;
@@ -33,8 +35,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
-        overload_all: &model::fns::overload::all::Pass,
-        originals: &model::fns::originals::Pass,
+        fns_all: &model::fns::all::Pass,
         types: &model::types::all::Pass,
         type_overloads: &model::types::overload::all::Pass,
     ) -> OutputResult {
@@ -44,23 +45,24 @@ impl Pass {
             let mut body = Vec::new();
             let mut asynk = Vec::new();
 
-            for (&fn_id, original_fn) in originals.iter() {
-                if !output_master.fn_belongs_to(fn_id, file) {
+            for (&overload_id, function) in fns_all.overloads() {
+                let FunctionKind::Overload(ref overload) = function.kind else { continue };
+
+                if !output_master.fn_belongs_to(overload.base, file) {
                     continue;
                 }
 
-                let Some(entries) = overload_all.overloads_for(fn_id) else { continue };
+                // Look up the original function for context (native args, rval)
+                let Some(original_fn) = fns_all.get(overload.base) else { continue };
 
-                for (_, kind) in entries {
-                    match kind {
-                        OverloadKind::Body(transforms) => {
-                            body.push(render(original_fn, transforms, types, type_overloads, templates)?);
-                        }
-                        OverloadKind::Async(transforms) => {
-                            asynk.push(render(original_fn, transforms, types, type_overloads, templates)?);
-                        }
-                        OverloadKind::Simple => {}
+                match &overload.kind {
+                    OverloadKind::Body(transforms) => {
+                        body.push(render(original_fn, transforms, types, type_overloads, templates)?);
                     }
+                    OverloadKind::Async(transforms) => {
+                        asynk.push(render(original_fn, transforms, types, type_overloads, templates)?);
+                    }
+                    OverloadKind::Simple => {}
                 }
             }
 

@@ -1,8 +1,8 @@
 pub mod overload;
 
+use crate::lang::TypeId;
 use crate::lang::functions::overload::Overload;
 use crate::lang::meta::Emission;
-use crate::lang::TypeId;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Argument {
@@ -21,7 +21,7 @@ pub struct Function {
     pub emission: Emission,
     pub name: String,
     pub signature: Signature,
-    // pub kind: FunctionKind,
+    pub kind: FunctionKind,
 }
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
