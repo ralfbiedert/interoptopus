@@ -43,6 +43,10 @@ namespace {{ namespace }} {
 
     {{ slice | indent }}
 {%- endfor %}
+{%- for vec in vecs %}
+
+    {{ vec | indent }}
+{%- endfor %}
 {%- for service in services %}
 
     {{ service | indent }}

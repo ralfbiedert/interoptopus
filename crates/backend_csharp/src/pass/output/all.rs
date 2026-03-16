@@ -42,6 +42,7 @@ impl Pass {
             let composites = intermediary.composites.composites_for(file).unwrap();
             let delegates = intermediary.delegates.delegates_for(file).unwrap();
             let slices = intermediary.slices.slices_for(file).unwrap();
+            let vecs = intermediary.vecs.vecs_for(file).unwrap();
             let services = intermediary.services.services_for(file).unwrap();
             let async_trampolines = intermediary.asynk.trampolines_for(file).unwrap();
             let pattern_utf8string = intermediary.pattern_utf8string.utf8string_for(file).unwrap();
@@ -61,6 +62,7 @@ impl Pass {
             context.insert("composites", &composites);
             context.insert("delegates", &delegates);
             context.insert("slices", &slices);
+            context.insert("vecs", &vecs);
             context.insert("services", &services);
             context.insert("async_trampolines", &async_trampolines);
             context.insert("pattern_utf8string", &pattern_utf8string);
