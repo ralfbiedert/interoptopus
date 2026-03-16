@@ -3,7 +3,7 @@ use crate::service::args::FfiServiceArgs;
 use crate::skip::has_ffi_skip_attribute;
 use proc_macro2::Span;
 use syn::spanned::Spanned;
-use syn::{FnArg, Generics, Ident, ImplItem, ItemImpl, Pat, ReturnType, Type, Visibility};
+use syn::{FnArg, Generics, Ident, ImplItem, ItemImpl, Pat, PathSegment, ReturnType, Type, Visibility};
 
 #[derive(Clone)]
 #[allow(dead_code)]
@@ -40,15 +40,17 @@ pub struct ServiceParameter {
     pub span: Span,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone)]
 pub enum ReceiverKind {
-    None,      // Constructor
-    Shared,    // &self
-    Mutable,   // &mut self
-    AsyncThis, // Async<Self>
+    None,         // Constructor
+    Shared,       // &self
+    Mutable,      // &mut self
+    AsyncThis,    // Async<Self>
+    AsyncCtor(Box<Type>), // Async<Runtime> where Runtime != Self — async constructor
 }
 
 impl ServiceModel {
+    #[allow(clippy::too_many_lines)]
     pub fn from_impl_item(input: ItemImpl, args: FfiServiceArgs) -> syn::Result<Self> {
         // Extract service type and name
         let service_type = match input.self_ty.as_ref() {
@@ -103,14 +105,14 @@ impl ServiceModel {
                         FnArg::Typed(typed_arg) => {
                             let param_type = (*typed_arg.ty).clone();
 
-                            // Check for special Async<Self> parameter (first parameter in async functions)
+                            // Check for special Async<X> parameter (first parameter in async functions)
                             if i == 0
                                 && is_async
                                 && let Type::Path(path) = &param_type
                                 && let Some(segment) = path.path.segments.last()
                                 && segment.ident == "Async"
                             {
-                                receiver_kind = ReceiverKind::AsyncThis;
+                                receiver_kind = receiver_kind_from_async_param(segment);
                                 continue; // Don't add to inputs, regardless of pattern
                             }
 
@@ -154,12 +156,16 @@ impl ServiceModel {
                         ReceiverKind::AsyncThis => {
                             // Valid async method
                         }
+                        ReceiverKind::AsyncCtor(_) => {
+                            // Valid async constructor
+                        }
                     }
                 }
 
-                // Async methods are never constructors, regardless of receiver kind
-                match (receiver_kind, is_async) {
+                // Classify: sync constructors and async constructors go to constructors, everything else to methods
+                match (&receiver_kind, is_async) {
                     (ReceiverKind::None, false) => constructors.push(service_method),
+                    (ReceiverKind::AsyncCtor(_), true) => constructors.push(service_method),
                     _ => methods.push(service_method),
                 }
             }
@@ -202,5 +208,37 @@ impl ServiceModel {
 
             result
         }
+    }
+}
+
+/// Determine the [`ReceiverKind`] for an `Async<X>` first parameter.
+///
+/// Returns [`ReceiverKind::AsyncThis`] when the inner type is `Self` (i.e. a
+/// regular async method), or [`ReceiverKind::AsyncCtor`] when it is any other
+/// type (i.e. an async constructor that borrows a foreign runtime).
+fn receiver_kind_from_async_param(segment: &PathSegment) -> ReceiverKind {
+    let Some(inner_type) = extract_async_inner_type(segment) else {
+        // Could not extract a type argument — default to async method.
+        return ReceiverKind::AsyncThis;
+    };
+
+    if let Type::Path(inner_path) = inner_type
+        && let Some(inner_segment) = inner_path.path.segments.last()
+        && inner_segment.ident == "Self"
+    {
+        ReceiverKind::AsyncThis
+    } else {
+        ReceiverKind::AsyncCtor(Box::new(inner_type.clone()))
+    }
+}
+
+/// Extract the first type argument from `Async<T>`, returning `Some(&T)`.
+fn extract_async_inner_type(segment: &PathSegment) -> Option<&Type> {
+    if let syn::PathArguments::AngleBracketed(args) = &segment.arguments
+        && let Some(syn::GenericArgument::Type(inner)) = args.args.first()
+    {
+        Some(inner)
+    } else {
+        None
     }
 }

@@ -15,7 +15,7 @@ impl ServiceModel {
     fn validate_async_constraints(&self, input: &ItemImpl) -> syn::Result<()> {
         if self.is_async {
             for method in &self.methods {
-                if method.receiver_kind == ReceiverKind::Mutable {
+                if matches!(method.receiver_kind, ReceiverKind::Mutable) {
                     // Find the receiver span in the method to point the error there
                     let error_span = if let Some(ImplItem::Fn(method_fn)) = input
                         .items
