@@ -10,7 +10,7 @@
 
 use crate::lang::ServiceId;
 use crate::lang::functions::FunctionKind;
-use crate::lang::functions::overload::{OverloadKind, RvalTransform};
+use crate::lang::functions::overload::OverloadKind;
 use crate::lang::types::kind::{PointerKind, Primitive, TypeKind, TypePattern};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::{Context, Value};
@@ -68,15 +68,12 @@ impl Pass {
                         let Some(original_fn) = fns.get(overload.base) else { continue };
                         let Some(base_method_name) = method_names.get(overload.base) else { continue };
 
-                        if let OverloadKind::Async(transforms) = &overload.kind {
-                            if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval {
-                                let task_rval = types
-                                    .get(result_ty_id)
-                                    .map_or_else(|| "Task".to_string(), |t| resolve_task_type_from_result(&t.kind, types));
-                                let async_args = build_args(&method_fn.signature.arguments[1..], types);
+                        if matches!(&overload.kind, OverloadKind::Async(_)) {
+                            // Async overload: rval is a Task type registered by the model pass
+                            let task_rval = types.get(method_fn.signature.rval).map_or_else(|| "Task".to_string(), |t| t.name.clone());
+                            let async_args = build_args(&method_fn.signature.arguments[1..], types);
 
-                                rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args)?);
-                            }
+                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args)?);
                         } else {
                             // Simple or Body overload: render like a base method but with
                             // the overloaded signature
@@ -179,20 +176,5 @@ fn resolve_result_rval(rval_kind: Option<&TypeKind>, types: &model::types::all::
             ResultRval { as_ok: true, rval_name: Some(ok_name), is_void: ok_is_void }
         }
         _ => ResultRval { as_ok: false, rval_name: None, is_void: false },
-    }
-}
-
-fn resolve_task_type_from_result(result_kind: &TypeKind, types: &model::types::all::Pass) -> String {
-    match result_kind {
-        TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _)) => {
-            let ok_kind = types.get(*ok_ty).map(|t| &t.kind);
-            if matches!(ok_kind, Some(TypeKind::Primitive(Primitive::Void))) {
-                "Task".to_string()
-            } else {
-                let ok_name = types.get(*ok_ty).map_or_else(|| "void".to_string(), |t| t.name.clone());
-                format!("Task<{ok_name}>")
-            }
-        }
-        _ => "Task".to_string(),
     }
 }

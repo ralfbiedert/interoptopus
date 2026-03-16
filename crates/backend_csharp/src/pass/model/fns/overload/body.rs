@@ -11,11 +11,16 @@
 //! When both conditions are true, only the Async overload is emitted. Emitting both
 //! would create two C# methods with identical parameter signatures differing only in
 //! return type, which C# does not allow.
+//!
+//! For async overloads, this pass also creates `Task` / `Task<T>` types in the type
+//! system and sets the overload function's rval to the registered Task `TypeId`.
 
 use crate::lang::functions::overload::{ArgTransform, FnTransforms, Overload, OverloadKind, RvalTransform};
 use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
+use crate::lang::meta::Emission;
 use crate::lang::types::OverloadFamily;
-use crate::lang::types::kind::{DelegateKind, TypeKind, TypePattern};
+use crate::lang::types::Type;
+use crate::lang::types::kind::{DelegateKind, Primitive, Task, TypeKind, TypePattern};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
@@ -36,12 +41,15 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, processed: HashSet::default() }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn process(
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         originals: &model::fns::originals::Pass,
         fns_all: &mut model::fns::all::Pass,
-        types: &model::types::all::Pass,
+        kinds: &mut model::types::kind::Pass,
+        names: &mut model::types::names::Pass,
+        types: &mut model::types::all::Pass,
         type_overloads: &model::types::overload::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
@@ -63,7 +71,6 @@ impl Pass {
             };
 
             let has_delegate = transformable_args.iter().any(|a| is_delegate_class(a.ty, types));
-            let has_intptr = transformable_args.iter().any(|a| is_eligible_intptr(a.ty, types));
 
             // Nothing to do for this function
             if async_result_ty.is_none() && !has_delegate {
@@ -108,7 +115,10 @@ impl Pass {
 
             // Produce Async overload if last arg is AsyncCallback
             if let Some(result_ty_id) = async_result_ty {
-                let sig = Signature { arguments: overload_args, rval: result_ty_id };
+                // Resolve the Task return type from the Result type
+                let task_ty_id = resolve_or_create_task_type(result_ty_id, types, kinds, names);
+
+                let sig = Signature { arguments: overload_args, rval: task_ty_id };
                 let id = derive_overload_id(original_id, &sig);
                 let transforms = FnTransforms { rval: RvalTransform::AsyncTask(result_ty_id), args: arg_transforms };
                 let func = Function {
@@ -126,6 +136,48 @@ impl Pass {
 
         Ok(outcome)
     }
+}
+
+/// Resolves or creates a `Task` / `Task<T>` type for the given Result type.
+///
+/// Given a `Result<OkTy, ErrTy>`, creates:
+/// - `Task` if `OkTy` is void
+/// - `Task<OkName>` otherwise
+///
+/// Returns the `TypeId` of the Task type.
+fn resolve_or_create_task_type(
+    result_ty_id: TypeId,
+    types: &mut model::types::all::Pass,
+    kinds: &mut model::types::kind::Pass,
+    names: &mut model::types::names::Pass,
+) -> TypeId {
+    let result_ty = types.get(result_ty_id);
+
+    let (inner, task_name) = match result_ty.map(|t| &t.kind) {
+        Some(TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _))) => {
+            let ok_is_void = matches!(types.get(*ok_ty).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
+            if ok_is_void {
+                (None, "Task".to_string())
+            } else {
+                let ok_name = types.get(*ok_ty).map_or_else(|| "void".to_string(), |t| t.name.clone());
+                (Some(*ok_ty), format!("Task<{ok_name}>"))
+            }
+        }
+        _ => (None, "Task".to_string()),
+    };
+
+    // Derive a stable TypeId from the result type
+    let task_ty_id = TypeId::from_id(result_ty_id.id().derive(0x_7461_736B_5F74_7970)); // "task_typ"
+
+    // Only register if not already present
+    if types.get(task_ty_id).is_none() {
+        let kind = TypeKind::Task(Task { inner });
+        kinds.set(task_ty_id, kind.clone());
+        names.set(task_ty_id, task_name.clone());
+        types.set(task_ty_id, Type { emission: Emission::Builtin, name: task_name, kind });
+    }
+
+    task_ty_id
 }
 
 /// If the last arg is `AsyncCallback<T>` where T is a Result, returns the `TypeId` of T.

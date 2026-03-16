@@ -156,6 +156,9 @@ impl Pass {
                 // Helpers are always move
                 TypeKind::AsyncHelper(_) | TypeKind::WireHelper(_) => ManagedConversion::Into,
 
+                // Task types are only used as async overload return types
+                TypeKind::Task(_) => ManagedConversion::AsIs,
+
                 // Util types are backend-generated; no managed conversion needed
                 TypeKind::Util => ManagedConversion::AsIs,
             };

@@ -57,10 +57,10 @@ impl Pass {
 
                 match &overload.kind {
                     OverloadKind::Body(transforms) => {
-                        body.push(render(original_fn, transforms, types, type_overloads, templates)?);
+                        body.push(render(original_fn, function, transforms, types, type_overloads, templates)?);
                     }
                     OverloadKind::Async(transforms) => {
-                        asynk.push(render(original_fn, transforms, types, type_overloads, templates)?);
+                        asynk.push(render(original_fn, function, transforms, types, type_overloads, templates)?);
                     }
                     OverloadKind::Simple => {}
                 }
@@ -88,6 +88,7 @@ impl Pass {
 
 fn render(
     original_fn: &Function,
+    overload_fn: &Function,
     transforms: &FnTransforms,
     types: &model::types::all::Pass,
     type_overloads: &model::types::overload::all::Pass,
@@ -109,18 +110,11 @@ fn render(
     // Build native call forwarding names (applying ref/wrap transforms)
     let native_args = build_native_args(original_args, &transforms.args);
 
-    // Return type
-    let rval = if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval {
-        let result_ty = types
-            .get(result_ty_id)
-            .ok_or_else(|| crate::Error::MissingTypeName(format!("async result type for `{name}`")))?;
-        resolve_task_type(&result_ty.kind, types)
-    } else {
-        types
-            .get(original_fn.signature.rval)
-            .map(|t| t.name.clone())
-            .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of overload `{name}`")))?
-    };
+    // Return type: use the overload function's rval directly (Task type for async, original for body)
+    let rval = types
+        .get(overload_fn.signature.rval)
+        .map(|t| t.name.clone())
+        .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of overload `{name}`")))?;
 
     let is_void = !is_async && matches!(types.get(original_fn.signature.rval).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
 
@@ -221,19 +215,4 @@ fn build_native_args(args: &[Argument], transforms: &[ArgTransform]) -> Vec<Hash
             m
         })
         .collect()
-}
-
-fn resolve_task_type(result_kind: &TypeKind, types: &model::types::all::Pass) -> String {
-    match result_kind {
-        TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _)) => {
-            let ok_kind = types.get(*ok_ty).map(|t| &t.kind);
-            if matches!(ok_kind, Some(TypeKind::Primitive(Primitive::Void))) {
-                "Task".to_string()
-            } else {
-                let ok_name = types.get(*ok_ty).map_or_else(|| "void".to_string(), |t| t.name.clone());
-                format!("Task<{ok_name}>")
-            }
-        }
-        _ => "Task".to_string(),
-    }
 }
