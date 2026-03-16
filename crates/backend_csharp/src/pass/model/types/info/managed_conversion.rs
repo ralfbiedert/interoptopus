@@ -160,7 +160,7 @@ impl Pass {
                 TypeKind::Task(_) => ManagedConversion::AsIs,
 
                 // Util types are backend-generated; no managed conversion needed
-                TypeKind::Util => ManagedConversion::AsIs,
+                TypeKind::Util(_) => ManagedConversion::AsIs,
             };
 
             self.managed_conversion.insert(*cs_id, conversion);

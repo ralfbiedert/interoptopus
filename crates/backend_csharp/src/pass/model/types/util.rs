@@ -4,7 +4,7 @@
 use crate::lang::meta::{Emission, FileEmission};
 use crate::lang::types::Type;
 use crate::lang::types::csharp;
-use crate::lang::types::kind::TypeKind;
+use crate::lang::types::kind::{TypeKind, Util};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 
@@ -34,16 +34,17 @@ impl Pass {
         }
 
         let utils = [
-            (csharp::UTIL_INTEROP_EXCEPTION, "InteropException"),
-            (csharp::UTIL_ENUM_EXCEPTION, "EnumException"),
-            (csharp::UTIL_UTF8STRING, "Utf8String"),
-            (csharp::UTIL_ASYNC_CALLBACK_COMMON, "AsyncCallbackCommonNative"),
+            (csharp::UTIL_INTEROP_EXCEPTION, "InteropException", Util::InteropException),
+            (csharp::UTIL_ENUM_EXCEPTION, "EnumException", Util::EnumException),
+            (csharp::UTIL_UTF8STRING, "Utf8String", Util::Utf8String),
+            (csharp::UTIL_ASYNC_CALLBACK_COMMON, "AsyncCallbackCommonNative", Util::AsyncCallbackCommon),
         ];
 
-        for (id, name) in utils {
-            kinds.set(id, TypeKind::Util);
+        for (id, name, variant) in utils {
+            let kind = TypeKind::Util(variant);
+            kinds.set(id, kind.clone());
             names.set(id, name.to_string());
-            types.set(id, Type { emission: Emission::FileEmission(FileEmission::Common), name: name.to_string(), kind: TypeKind::Util });
+            types.set(id, Type { emission: Emission::FileEmission(FileEmission::Common), name: name.to_string(), kind });
         }
 
         self.done = true;

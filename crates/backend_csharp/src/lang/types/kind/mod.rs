@@ -9,6 +9,7 @@ mod pattern;
 mod pointer;
 mod primitive;
 pub mod task;
+mod util;
 
 pub use self::{
     array::Array,
@@ -18,6 +19,7 @@ pub use self::{
     pattern::TypePattern,
     pointer::{IntPtrHint, Pointer, PointerKind},
     primitive::Primitive,
+    util::Util,
 };
 
 #[derive(Debug, Clone)]
@@ -33,6 +35,6 @@ pub enum TypeKind {
     Service,
     Task(Task), // C# `Task` or `Task<T>` return type for async overloads.
     TypePattern(TypePattern),
-    Util,               // A backend-specific utility type (e.g., `InteropException`, `Utf8String` helper class).
+    Util(Util),          // A backend-specific utility type (e.g., `InteropException`, `Utf8String` helper class).
     WireHelper(TypeId), // TODO?
 }

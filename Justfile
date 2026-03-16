@@ -25,5 +25,4 @@ binstall-deps:
 # Can be used by agents for the current task.
 test-agent:
     # Agents: Feel free to update the test logic here for the task at hand.
-    # cargo test TODO
     cargo test --test mod reference_project::interop
