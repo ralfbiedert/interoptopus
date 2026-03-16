@@ -2,7 +2,7 @@
 //! so they participate in dispatch routing like any other type.
 
 use crate::lang::meta::{Emission, FileEmission};
-use crate::lang::types::Type;
+use crate::lang::types::{Decorators, Type};
 use crate::lang::types::csharp;
 use crate::lang::types::kind::{TypeKind, Util};
 use crate::pass::Outcome::Unchanged;
@@ -43,7 +43,7 @@ impl Pass {
             let kind = TypeKind::Util(variant);
             kinds.set(id, kind.clone());
             names.set(id, name.to_string());
-            types.set(id, Type { emission: Emission::FileEmission(FileEmission::Common), name: name.to_string(), kind });
+            types.set(id, Type { emission: Emission::FileEmission(FileEmission::Common), name: name.to_string(), kind, decorators: Decorators::default() });
         }
 
         self.done = true;

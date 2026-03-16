@@ -6,7 +6,8 @@
 
 use crate::lang::TypeId;
 use crate::lang::meta::Emission;
-use crate::lang::types::Type;
+use crate::lang::types::{Decorators, MarshalAs, ParamDecorator, Type};
+use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
@@ -52,7 +53,12 @@ impl Pass {
             let emission = lookup_emission(*type_id, id_maps, rs_types);
 
             // Create the Type
-            let ty = Type { emission, name: name.clone(), kind: kind.clone() };
+            let decorators = match kind {
+                TypeKind::TypePattern(TypePattern::CStrPointer) => Decorators { param: Some(ParamDecorator::MarshalAs(MarshalAs::LPStr)) },
+                _ => Decorators::default(),
+            };
+
+            let ty = Type { emission, name: name.clone(), kind: kind.clone(), decorators };
 
             self.types.insert(*type_id, ty);
             outcome.changed();

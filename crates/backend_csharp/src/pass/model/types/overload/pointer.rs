@@ -8,7 +8,7 @@
 use crate::lang::TypeId;
 use crate::lang::meta::Emission;
 use crate::lang::types::kind::{Pointer, PointerKind, TypeKind};
-use crate::lang::types::{OverloadFamily, PointerFamily, Type};
+use crate::lang::types::{Decorators, OverloadFamily, ParamDecorator, PointerFamily, Type};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashSet;
@@ -73,25 +73,27 @@ impl Pass {
             kinds.set(by_ref_id, TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }));
             kinds.set(by_out_id, TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }));
 
-            // Register names
-            names.set(by_ref_id, format!("ref {pointee_name}"));
-            names.set(by_out_id, format!("out {pointee_name}"));
+            // Register names (base pointee name, without ref/out prefix)
+            names.set(by_ref_id, pointee_name.clone());
+            names.set(by_out_id, pointee_name.clone());
 
             // Register in the all pass so they're fully resolved
             types.set(
                 by_ref_id,
                 Type {
                     emission: Emission::Builtin,
-                    name: format!("ref {pointee_name}"),
+                    name: pointee_name.clone(),
                     kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }),
+                    decorators: Decorators { param: Some(ParamDecorator::Ref) },
                 },
             );
             types.set(
                 by_out_id,
                 Type {
                     emission: Emission::Builtin,
-                    name: format!("out {pointee_name}"),
+                    name: pointee_name.clone(),
                     kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }),
+                    decorators: Decorators { param: Some(ParamDecorator::Out) },
                 },
             );
 

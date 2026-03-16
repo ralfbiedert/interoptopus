@@ -42,15 +42,18 @@ impl Pass {
                     .map(|t| &t.name)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of function `{name}`")))?;
 
-                let mut args: Vec<HashMap<&str, &str>> = Vec::new();
+                let mut args: Vec<HashMap<&str, String>> = Vec::new();
                 for arg in &function.signature.arguments {
-                    let arg_ty = types
+                    let arg_type = types
                         .get(arg.ty)
-                        .map(|t| &t.name)
                         .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of function `{}`", arg.name, name)))?;
                     let mut m = HashMap::new();
-                    m.insert("name", arg.name.as_str());
-                    m.insert("ty", arg_ty.as_str());
+                    m.insert("name", arg.name.clone());
+                    let decorated = match &arg_type.decorators.param {
+                        Some(d) => format!("{d} {}", arg_type.name),
+                        None => arg_type.name.clone(),
+                    };
+                    m.insert("ty", decorated);
                     args.push(m);
                 }
 

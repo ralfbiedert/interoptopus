@@ -38,13 +38,17 @@ impl Pass {
             for ctor_fn_id in &service.ctors {
                 let Some(ctor_fn) = fns.get(*ctor_fn_id) else { continue };
 
-                let mut args: Vec<HashMap<&str, &str>> = Vec::new();
+                let mut args: Vec<HashMap<&str, String>> = Vec::new();
 
                 for arg in &ctor_fn.signature.arguments {
-                    let Some(arg_ty) = types.get(arg.ty).map(|t| &t.name) else { continue };
+                    let Some(arg_type) = types.get(arg.ty) else { continue };
                     let mut m = HashMap::new();
-                    m.insert("name", arg.name.as_str());
-                    m.insert("ty", arg_ty.as_str());
+                    m.insert("name", arg.name.clone());
+                    let decorated = match &arg_type.decorators.param {
+                        Some(d) => format!("{d} {}", arg_type.name),
+                        None => arg_type.name.clone(),
+                    };
+                    m.insert("ty", decorated);
                     args.push(m);
                 }
 

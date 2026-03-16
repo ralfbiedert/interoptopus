@@ -109,9 +109,13 @@ impl Pass {
 fn build_args(args: &[crate::lang::functions::Argument], types: &model::types::all::Pass) -> Vec<HashMap<&'static str, Value>> {
     args.iter()
         .filter_map(|arg| {
-            let ty_name = types.get(arg.ty).map(|t| &t.name)?;
-            let is_ref = matches!(types.get(arg.ty).map(|t| &t.kind), Some(TypeKind::Pointer(p)) if p.kind == PointerKind::ByRef);
-            Some(make_arg(&arg.name, ty_name, is_ref))
+            let arg_type = types.get(arg.ty)?;
+            let is_ref = matches!(&arg_type.kind, TypeKind::Pointer(p) if p.kind == PointerKind::ByRef);
+            let decorated = match &arg_type.decorators.param {
+                Some(d) => format!("{d} {}", arg_type.name),
+                None => arg_type.name.clone(),
+            };
+            Some(make_arg(&arg.name, &decorated, is_ref))
         })
         .collect()
 }

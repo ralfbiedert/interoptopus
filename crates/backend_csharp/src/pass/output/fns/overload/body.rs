@@ -156,11 +156,14 @@ fn resolve_args(
 
         match transform {
             ArgTransform::PassThrough => {
-                let ty_name = types
+                let arg_type = types
                     .get(arg.ty)
-                    .map(|t| &t.name)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of overload `{}`", arg.name, fn_name)))?;
-                m.insert("ty", Value::String(ty_name.clone()));
+                let decorated = match &arg_type.decorators.param {
+                    Some(d) => format!("{d} {}", arg_type.name),
+                    None => arg_type.name.clone(),
+                };
+                m.insert("ty", Value::String(decorated));
                 m.insert("is_ref", Value::String("false".into()));
                 m.insert("is_wrap", Value::String("false".into()));
             }
@@ -168,11 +171,14 @@ fn resolve_args(
                 let Some(OverloadFamily::Pointer(family)) = type_overloads.get(arg.ty) else {
                     return Err(crate::Error::MissingTypeName(format!("pointer family for arg `{}` of overload `{}`", arg.name, fn_name)));
                 };
-                let ty_name = types
+                let arg_type = types
                     .get(family.by_ref)
-                    .map(|t| &t.name)
                     .ok_or_else(|| crate::Error::MissingTypeName(format!("ref type for arg `{}` of overload `{}`", arg.name, fn_name)))?;
-                m.insert("ty", Value::String(ty_name.clone()));
+                let decorated = match &arg_type.decorators.param {
+                    Some(d) => format!("{d} {}", arg_type.name),
+                    None => arg_type.name.clone(),
+                };
+                m.insert("ty", Value::String(decorated));
                 m.insert("is_ref", Value::String("true".into()));
                 m.insert("is_wrap", Value::String("false".into()));
             }

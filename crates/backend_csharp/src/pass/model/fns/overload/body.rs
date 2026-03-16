@@ -19,7 +19,7 @@ use crate::lang::functions::overload::{ArgTransform, FnTransforms, Overload, Ove
 use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
 use crate::lang::meta::Emission;
 use crate::lang::types::OverloadFamily;
-use crate::lang::types::Type;
+use crate::lang::types::{Decorators, Type};
 use crate::lang::types::kind::task::Task;
 use crate::lang::types::kind::{DelegateKind, Primitive, TypeKind, TypePattern};
 use crate::lang::{FunctionId, TypeId};
@@ -177,7 +177,7 @@ fn resolve_or_create_task_type(
         let kind = TypeKind::Task(Task { inner });
         kinds.set(task_ty_id, kind.clone());
         names.set(task_ty_id, task_name.clone());
-        types.set(task_ty_id, Type { emission: Emission::Builtin, name: task_name, kind });
+        types.set(task_ty_id, Type { emission: Emission::Builtin, name: task_name, kind, decorators: Decorators::default() });
     }
 
     task_ty_id

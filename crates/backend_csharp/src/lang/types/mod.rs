@@ -21,6 +21,14 @@ pub enum MarshalAs {
     LPStr,
 }
 
+impl std::fmt::Display for MarshalAs {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MarshalAs::LPStr => write!(f, "UnmanagedType.LPStr"),
+        }
+    }
+}
+
 /// Decorators for function / method parameters.
 #[derive(Clone, Debug)]
 pub enum ParamDecorator {
@@ -29,17 +37,18 @@ pub enum ParamDecorator {
     MarshalAs(MarshalAs),
 }
 
-impl ParamDecorator {
-    pub fn to_string(&self) -> String {
+impl std::fmt::Display for ParamDecorator {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ParamDecorator::Ref => "ref".to_string(),
-            ParamDecorator::Out => "out".to_string(),
-            ParamDecorator::MarshalAs(m) => format!("[MarshalAs({})]", m),
+            ParamDecorator::Ref => write!(f, "ref"),
+            ParamDecorator::Out => write!(f, "out"),
+            ParamDecorator::MarshalAs(m) => write!(f, "[MarshalAs({m})]"),
         }
     }
 }
 
-#[derive(Clone, Debug)]
+/// Can decorate a type with additional attributes in generated C# code.
+#[derive(Clone, Debug, Default)]
 pub struct Decorators {
     pub param: Option<ParamDecorator>,
 }
