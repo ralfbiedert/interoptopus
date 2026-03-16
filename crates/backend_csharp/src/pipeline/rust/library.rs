@@ -66,7 +66,8 @@ pub struct RustLibraryConfig {
     pub output_composite_body_to_unmanaged: output::types::composites::body_to_unmanaged::Config,
     pub output_composite_body_as_unmanaged: output::types::composites::body_as_unmanaged::Config,
     pub output_composite: output::types::composites::all::Config,
-    pub output_delegates: output::types::delegates::all::Config,
+    pub output_delegates_class: output::types::delegates::class::Config,
+    pub output_delegates_signature: output::types::delegates::signature::Config,
     pub output_slices: output::pattern::slices::Config,
     pub output_vecs: output::pattern::vec::Config,
     pub output_fn_imports: output::fns::rust::Config,
@@ -141,7 +142,8 @@ pub struct IntermediateOutputPasses {
     pub composite_body_as_unmanaged: output::types::composites::body_as_unmanaged::Pass,
     pub composite_body: output::types::composites::body::Pass,
     pub composites: output::types::composites::all::Pass,
-    pub delegates: output::types::delegates::all::Pass,
+    pub delegates_class: output::types::delegates::class::Pass,
+    pub delegates_signature: output::types::delegates::signature::Pass,
     pub slices: output::pattern::slices::Pass,
     pub vecs: output::pattern::vec::Pass,
     pub fns_rust: output::fns::rust::Pass,
@@ -260,7 +262,8 @@ impl RustLibrary {
                 composite_body_as_unmanaged: output::types::composites::body_as_unmanaged::Pass::new(config.output_composite_body_as_unmanaged),
                 composite_body: output::types::composites::body::Pass::new(config.output_composite_body),
                 composites: output::types::composites::all::Pass::new(config.output_composite),
-                delegates: output::types::delegates::all::Pass::new(config.output_delegates),
+                delegates_class: output::types::delegates::class::Pass::new(config.output_delegates_class),
+                delegates_signature: output::types::delegates::signature::Pass::new(config.output_delegates_signature),
                 slices: output::pattern::slices::Pass::new(config.output_slices),
                 vecs: output::pattern::vec::Pass::new(config.output_vecs),
                 fns_rust: output::fns::rust::Pass::new(config.output_fn_imports),
@@ -383,7 +386,8 @@ impl RustLibrary {
         o.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields, &m.type_nullable)?;
         o.composite_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.unmanaged_conversion, &o.composite_body_unmanaged, &o.composite_body_to_unmanaged, &o.composite_body_as_unmanaged)?;
         o.composites.process(&mut pass_meta, &self.output_master, &m.type_all, &o.composite_ty, &o.composite_body)?;
-        o.delegates.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
+        o.delegates_class.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
+        o.delegates_signature.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.slices.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_managed_conversion, &o.unmanaged_names)?;
         o.vecs.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_managed_conversion, &o.unmanaged_names, &m.pattern_vec)?;
         o.fns_rust.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all)?;

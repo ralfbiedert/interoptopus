@@ -1,1 +1,2 @@
-pub mod all;
+pub mod class;
+pub mod signature;

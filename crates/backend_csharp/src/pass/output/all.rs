@@ -40,7 +40,9 @@ impl Pass {
             let async_trampoline_fields = intermediary.asynk.trampoline_fields_for(file).unwrap();
             let enums = intermediary.enums.enums_for(file).unwrap();
             let composites = intermediary.composites.composites_for(file).unwrap();
-            let delegates = intermediary.delegates.delegates_for(file).unwrap();
+            let delegates_class = intermediary.delegates_class.delegates_for(file).unwrap();
+            let delegates_signature = intermediary.delegates_signature.delegates_for(file).unwrap();
+            let delegates: Vec<&str> = delegates_class.iter().chain(delegates_signature.iter()).map(String::as_str).collect();
             let slices = intermediary.slices.slices_for(file).unwrap();
             let vecs = intermediary.vecs.vecs_for(file).unwrap();
             let services = intermediary.services.services_for(file).unwrap();
