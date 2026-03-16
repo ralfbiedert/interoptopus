@@ -36,9 +36,9 @@ impl Pass {
             skip_mapped!(kinds, id_map, rust_id);
 
             // Extract the Rust signature from either FnPointer or NamedCallback
-            let rust_signature = match &ty.kind {
-                lang::types::TypeKind::FnPointer(sig) => sig,
-                lang::types::TypeKind::TypePattern(lang::types::TypePattern::NamedCallback(sig)) => sig,
+            let (rust_signature, delegate_kind) = match &ty.kind {
+                lang::types::TypeKind::FnPointer(sig) => (sig, DelegateKind::Signature),
+                lang::types::TypeKind::TypePattern(lang::types::TypePattern::NamedCallback(sig)) => (sig, DelegateKind::Class),
                 _ => continue,
             };
 
@@ -70,7 +70,7 @@ impl Pass {
 
             let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
 
-            kinds.set(cs_id, TypeKind::Delegate(Delegate { kind: DelegateKind::Class, signature: cs_signature }));
+            kinds.set(cs_id, TypeKind::Delegate(Delegate { kind: delegate_kind, signature: cs_signature }));
             outcome.changed();
         }
 

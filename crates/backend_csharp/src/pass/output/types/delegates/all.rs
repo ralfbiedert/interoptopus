@@ -41,13 +41,39 @@ impl Pass {
 
                 let type_kind = &ty.kind;
                 let delegate = match type_kind {
-                    TypeKind::Delegate(d) if d.kind == DelegateKind::Class => d,
+                    TypeKind::Delegate(d) => d,
                     _ => continue,
                 };
                 let signature = &delegate.signature;
 
                 let name = &ty.name;
 
+                // Signature delegates are simple [UnmanagedFunctionPointer] declarations
+                if delegate.kind == DelegateKind::Signature {
+                    let rval_managed = types.get(signature.rval).map_or_else(|| "void".to_string(), |t| t.name.clone());
+
+                    let mut args: Vec<HashMap<String, String>> = Vec::new();
+                    for arg in &signature.arguments {
+                        let Some(arg_managed) = types.get(arg.ty).map(|t| &t.name) else {
+                            continue;
+                        };
+                        let mut m = HashMap::new();
+                        m.insert("name".to_string(), arg.name.clone());
+                        m.insert("managed_type".to_string(), arg_managed.clone());
+                        args.push(m);
+                    }
+
+                    let mut context = Context::new();
+                    context.insert("name", name);
+                    context.insert("rval_managed", &rval_managed);
+                    context.insert("args", &args);
+
+                    let rendered = templates.render("types/delegate/signature.cs", &context)?;
+                    rendered_delegates.push(rendered);
+                    continue;
+                }
+
+                // Class delegates get the full wrapper class treatment
                 // Determine return type info
                 let rval_kind = types.get(signature.rval).map(|t| &t.kind);
                 let rval_managed = types.get(signature.rval).map_or_else(|| "void".to_string(), |t| t.name.clone());

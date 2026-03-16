@@ -1,3 +1,4 @@
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);
 
 [StructLayout(LayoutKind.Sequential)]

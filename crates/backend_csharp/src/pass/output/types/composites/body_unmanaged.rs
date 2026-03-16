@@ -3,6 +3,7 @@
 use crate::lang::TypeId;
 use crate::lang::types::kind::TypeKind;
 use crate::pass::{OutputResult, PassInfo, model, output};
+use interoptopus::lang::types::Layout;
 use interoptopus_backends::template::{Context, Value};
 use std::collections::HashMap;
 
@@ -68,10 +69,13 @@ impl Pass {
 
             let to_managed_method = managed.to_managed_name(*type_id);
 
+            let is_packed = composite.repr.layout == Layout::Packed;
+
             let mut context = Context::new();
             context.insert("name", name);
             context.insert("to_managed_method", to_managed_method);
             context.insert("fields", &fields);
+            context.insert("is_packed", &is_packed);
 
             let rendered = templates.render("types/composite/body_unmanaged.cs", &context)?;
             self.composite_body_unmanaged.insert(*type_id, rendered);

@@ -1,4 +1,8 @@
+{%- if is_packed %}
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+{%- else %}
 [StructLayout(LayoutKind.Sequential)]
+{%- endif %}
 public unsafe struct Unmanaged
 {
     {%- for field in fields %}

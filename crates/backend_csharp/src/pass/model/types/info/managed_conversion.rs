@@ -43,7 +43,10 @@ impl Pass {
                 // Direct C# value types — no marshalling needed
                 TypeKind::Primitive(_) => ManagedConversion::AsIs,
                 TypeKind::Pointer(_) => ManagedConversion::AsIs,
-                TypeKind::Delegate(_) => ManagedConversion::To,
+                TypeKind::Delegate(d) => match d.kind {
+                    DelegateKind::Signature => ManagedConversion::AsIs,
+                    DelegateKind::Class => ManagedConversion::To,
+                },
 
                 // Services and opaques transfer ownership
                 TypeKind::Service => ManagedConversion::Into,
