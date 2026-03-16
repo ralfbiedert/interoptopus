@@ -1,5 +1,5 @@
-use crate::lang::types::kind::task::Task;
 use crate::lang::TypeId;
+use crate::lang::types::kind::task::Task;
 
 mod array;
 mod composite;
@@ -35,6 +35,6 @@ pub enum TypeKind {
     Service,
     Task(Task), // C# `Task` or `Task<T>` return type for async overloads.
     TypePattern(TypePattern),
-    Util(Util),          // A backend-specific utility type (e.g., `InteropException`, `Utf8String` helper class).
+    Util(Util),         // A backend-specific utility type (e.g., `InteropException`, `Utf8String` helper class).
     WireHelper(TypeId), // TODO?
 }

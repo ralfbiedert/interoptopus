@@ -7,14 +7,14 @@
 //! for each eligible `IntPtr` argument. Registers produced overloads into the
 //! central `overload::all` pass.
 
+use crate::lang::FunctionId;
 use crate::lang::functions::overload::{Overload, OverloadKind};
 use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
-use crate::lang::types::kind::TypeKind;
 use crate::lang::types::OverloadFamily;
-use crate::lang::FunctionId;
-use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
+use crate::lang::types::kind::TypeKind;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::model::fns::overload::{derive_overload_id, is_eligible_intptr};
+use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashSet;
 
 #[derive(Default)]

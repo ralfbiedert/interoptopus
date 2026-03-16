@@ -188,6 +188,7 @@ impl RustLibrary {
         RustLibraryBuilder::new(inventory)
     }
 
+    #[allow(clippy::default_trait_access)]
     pub(crate) fn with_config(inventory: RustInventory, config: RustLibraryConfig) -> Self {
         Self {
             inventory,
