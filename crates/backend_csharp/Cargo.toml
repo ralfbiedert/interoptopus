@@ -1,5 +1,6 @@
 [package]
 name = "interoptopus_csharp"
+description = "The C# backend for Interoptopus."
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
