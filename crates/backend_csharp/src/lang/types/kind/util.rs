@@ -4,4 +4,5 @@ pub enum Util {
     InteropException,
     EnumException,
     AsyncCallbackCommon,
+    WireBuffer,
 }

@@ -37,6 +37,7 @@ impl Pass {
             (csharp::UTIL_INTEROP_EXCEPTION, "InteropException", Util::InteropException),
             (csharp::UTIL_ENUM_EXCEPTION, "EnumException", Util::EnumException),
             (csharp::UTIL_ASYNC_CALLBACK_COMMON, "AsyncCallbackCommonNative", Util::AsyncCallbackCommon),
+            (csharp::UTIL_WIRE_BUFFER, "WireBuffer", Util::WireBuffer),
         ];
 
         for (id, name, variant) in utils {

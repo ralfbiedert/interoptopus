@@ -66,5 +66,10 @@ namespace {{ namespace }} {
     {{ pattern_utf8string | indent }}
 {%- endif %}
 
+{%- if pattern_wire_buffer and pattern_wire_buffer != "" %}
+
+    {{ pattern_wire_buffer | indent }}
+{%- endif %}
+
     {{ util | indent }}
 }

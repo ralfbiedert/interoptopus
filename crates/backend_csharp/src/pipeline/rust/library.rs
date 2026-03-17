@@ -47,6 +47,7 @@ pub struct RustLibraryConfig {
     pub model_service_method_overload: model::service::method::overload::Config,
     pub model_pattern_string: model::pattern::string::Config,
     pub model_pattern_vec: model::pattern::vec::Config,
+    pub model_pattern_wire: model::pattern::wire::Config,
     pub output_master: output::master::Config,
     pub output_unmanaged_conversion: output::conversion::unmanaged_conversion::Config,
     pub output_unmanaged_names: output::conversion::unmanaged_names::Config,
@@ -79,6 +80,7 @@ pub struct RustLibraryConfig {
     pub output_service_body_methods: output::service::body::methods::Config,
     pub output_services: output::service::all::Config,
     pub output_pattern_bools: output::pattern::bools::Config,
+    pub output_pattern_wire_buffer: output::pattern::wire_buffer::Config,
     pub output_header: output::header::Config,
     pub output_util: output::types::util::Config,
     pub output_using: output::r#using::Config,
@@ -121,6 +123,7 @@ pub struct ModelPasses {
     pub service_method_overload: model::service::method::overload::Pass,
     pub pattern_string: model::pattern::string::Pass,
     pub pattern_vec: model::pattern::vec::Pass,
+    pub pattern_wire: model::pattern::wire::Pass,
 }
 
 pub struct IntermediateOutputPasses {
@@ -157,6 +160,7 @@ pub struct IntermediateOutputPasses {
     pub header: output::header::Pass,
     pub pattern_bools: output::pattern::bools::Pass,
     pub pattern_utf8string: output::pattern::utf8string::Pass,
+    pub pattern_wire_buffer: output::pattern::wire_buffer::Pass,
     pub util: output::types::util::Pass,
     pub using: output::r#using::Pass,
 }
@@ -264,6 +268,7 @@ impl RustLibrary {
                 service_method_overload: model::service::method::overload::Pass::new(config.model_service_method_overload),
                 pattern_string: model::pattern::string::Pass::new(config.model_pattern_string),
                 pattern_vec: model::pattern::vec::Pass::new(config.model_pattern_vec),
+                pattern_wire: model::pattern::wire::Pass::new(config.model_pattern_wire),
             },
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
@@ -300,6 +305,7 @@ impl RustLibrary {
                 header: output::header::Pass::new(config.output_header),
                 pattern_bools: output::pattern::bools::Pass::new(config.output_pattern_bools),
                 pattern_utf8string: output::pattern::utf8string::Pass::new(Default::default()),
+                pattern_wire_buffer: output::pattern::wire_buffer::Pass::new(config.output_pattern_wire_buffer),
                 util: output::types::util::Pass::new(config.output_util),
                 using: output::r#using::Pass::new(config.output_using),
             },
@@ -373,6 +379,7 @@ impl RustLibrary {
             r.run(m.type_async_types.process(&mut pass_meta, &m.fns_all))?;
             r.run(m.pattern_string.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.pattern_vec.process(&mut pass_meta, &m.id_maps, &self.inventory.functions, &self.inventory.types))?;
+            r.run(m.pattern_wire.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
             r.run(m.service_method_names.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
             r.run(m.service_method_overload.process(&mut pass_meta, &mut m.service_all, &m.fns_all, &m.type_all))?;
@@ -426,6 +433,7 @@ impl RustLibrary {
         o.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         o.pattern_bools.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.pattern_utf8string.process(&mut pass_meta, &self.output_master, &m.pattern_string)?;
+        o.pattern_wire_buffer.process(&mut pass_meta, &self.output_master, &m.pattern_wire)?;
         o.util.process(&mut pass_meta, &self.output_master)?;
         o.using.process(&mut pass_meta, &self.output_master)?;
         self.plugin_post_output_pass()?;
