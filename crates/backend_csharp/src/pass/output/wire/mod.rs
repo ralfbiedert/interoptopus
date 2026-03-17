@@ -8,10 +8,10 @@
 use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, model, output};
-use interoptopus::inventory::Types as RsTypes;
+use interoptopus::inventory::{TypeId as RsTypeId, Types as RsTypes};
 use interoptopus::lang::types::{Primitive, Struct, TypeKind as RsTypeKind, WireOnly};
 use interoptopus_backends::template::Context;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Default)]
 pub struct Config {}
@@ -103,6 +103,34 @@ impl Pass {
 
                 let rendered = templates.render("wire/wire_type.cs", &context)?;
                 rendered_wires.push(rendered);
+
+                // Emit helper classes for nested structs with WireOnly fields
+                // that won't be emitted by the regular struct pass.
+                if let RsTypeKind::Struct(s) = &inner_rust_ty.kind {
+                    let mut nested = Vec::new();
+                    codegen.collect_nested_structs(s, &mut nested, &mut HashSet::new());
+                    // Exclude the top-level inner type (already emitted above).
+                    nested.retain(|id| *id != inner_rust_id);
+
+                    for nested_id in nested {
+                        let Some(nested_ty) = rs_types.get(&nested_id) else { continue };
+                        let RsTypeKind::Struct(nested_s) = &nested_ty.kind else { continue };
+
+                        let nested_name = codegen.cs_type_name(nested_id);
+                        let nested_fields: Vec<String> = nested_s
+                            .fields
+                            .iter()
+                            .map(|f| format!("public {} {};", codegen.cs_type_name(f.ty), f.name))
+                            .collect();
+
+                        let mut ctx = Context::new();
+                        ctx.insert("class_name", &nested_name);
+                        ctx.insert("field_decls", &nested_fields);
+
+                        let rendered = templates.render("wire/wire_helper_class.cs", &ctx)?;
+                        rendered_wires.push(rendered);
+                    }
+                }
             }
 
             rendered_wires.sort();
@@ -140,6 +168,46 @@ impl WireCodeGen<'_> {
             }
             RsTypeKind::Struct(_) => ty.name.clone(),
             _ => "object".to_string(),
+        }
+    }
+
+    /// Recursively collects all struct type IDs reachable from `s` that contain
+    /// WireOnly fields (and thus won't be emitted by the regular struct pass).
+    fn collect_nested_structs(&self, s: &Struct, out: &mut Vec<RsTypeId>, visited: &mut HashSet<RsTypeId>) {
+        for f in &s.fields {
+            self.collect_nested_from_type(f.ty, out, visited);
+        }
+    }
+
+    fn collect_nested_from_type(&self, ty_id: RsTypeId, out: &mut Vec<RsTypeId>, visited: &mut HashSet<RsTypeId>) {
+        if !visited.insert(ty_id) {
+            return;
+        }
+        let Some(ty) = self.rs_types.get(&ty_id) else { return };
+        match &ty.kind {
+            RsTypeKind::Struct(s) => {
+                // Check if this struct has any WireOnly fields.
+                let has_wire_only = s.fields.iter().any(|f| {
+                    self.rs_types
+                        .get(&f.ty)
+                        .is_some_and(|ft| matches!(&ft.kind, RsTypeKind::WireOnly(_)))
+                });
+                if has_wire_only {
+                    out.push(ty_id);
+                }
+                // Recurse into fields regardless.
+                for f in &s.fields {
+                    self.collect_nested_from_type(f.ty, out, visited);
+                }
+            }
+            RsTypeKind::WireOnly(WireOnly::Vec(inner)) => {
+                self.collect_nested_from_type(*inner, out, visited);
+            }
+            RsTypeKind::WireOnly(WireOnly::Map(k, v)) => {
+                self.collect_nested_from_type(*k, out, visited);
+                self.collect_nested_from_type(*v, out, visited);
+            }
+            _ => {}
         }
     }
 

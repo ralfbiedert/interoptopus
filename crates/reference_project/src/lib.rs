@@ -49,7 +49,6 @@ pub fn inventory() -> RustInventory {
         // Functions
         .register(builtins_string!())
         .register(builtins_wire!())
-        // TODO: Duplicate symbols!
         .register(builtins_vec!(u8))
         .register(builtins_vec!(ffi::String))
         .register(builtins_vec!(types::basic::Vec3f32))
@@ -183,8 +182,7 @@ pub fn inventory() -> RustInventory {
         // Wire
         .register(function!(wire::basic::wire_accept_string_1))
         .register(function!(wire::basic::wire_accept_string_2))
-        .register(function!(wire::miracles::perform_miracles))
-        .register(function!(wire::miracles::perform_half_miracles))
+        .register(function!(wire::nested::wire_deeply_nested))
         // Constants
         .register(constant!(constants::U8))
         .register(constant!(constants::F32_MIN_POSITIVE))
