@@ -1,6 +1,7 @@
 // use interoptopus::ffi::CStrPtr;
 use interoptopus::inventory::Inventory;
-use interoptopus::wire::{Wire, Wireable};
+use interoptopus::lang::types::WireIO;
+use interoptopus::wire::Wire;
 use interoptopus::{ffi, function, pattern};
 
 pub mod engine;
@@ -21,12 +22,15 @@ pub struct Return {
 #[ffi]
 pub fn start_server(mut server_name: Wire<Something>) -> Wire<Return> {
     let server_name = server_name.unwire().unwrap();
-    if server_name.name.is_empty() {
-        return Return { field: 0 }.wire();
+    let result = if server_name.name.is_empty() {
+        Return { field: 0 }
+    } else {
+        core_library::start_server(server_name.name.to_string());
+        Return { field: 1 }
     };
-
-    core_library::start_server(server_name.name.to_string());
-    Return { field: 1 }.wire()
+    let mut out = Wire::with_size(result.live_size());
+    out.serialize(&result).unwrap();
+    out
 }
 
 pub fn ffi_inventory() -> Inventory {

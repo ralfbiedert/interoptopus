@@ -1,5 +1,6 @@
 use interoptopus::ffi;
-use interoptopus::wire::{Wire, Wireable};
+use interoptopus::lang::types::WireIO;
+use interoptopus::wire::Wire;
 
 #[ffi]
 pub struct MyWiredType {
@@ -12,7 +13,9 @@ pub struct MyWiredType {
 #[ffi]
 fn perform_miracles(mut input: Wire<MyWiredType>) -> Wire<MyWiredType> {
     let w = input.unwire().expect("Something went wrong");
-    w.wire()
+    let mut out = Wire::with_size(w.live_size());
+    out.serialize(&w).unwrap();
+    out
 }
 
 #[ffi]
@@ -24,5 +27,8 @@ fn perform_half_miracles(mut input: Wire<MyWiredType>, other: ffi::String) -> ff
 
 #[ffi]
 fn perform_half_miracles_in_other_direction(input: ffi::String) -> Wire<'static, MyWiredType> {
-    MyWiredType { name: input.as_str().to_owned(), values: vec![] }.wire()
+    let value = MyWiredType { name: input.as_str().to_owned(), values: vec![] };
+    let mut out = Wire::with_size(value.live_size());
+    out.serialize(&value).unwrap();
+    out
 }

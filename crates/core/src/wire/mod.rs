@@ -1,7 +1,5 @@
 //! Serialize complex objects into flat byte buffers and transfer them over FFI.
 //!
-//! # Motivation
-//!
 //! Not every Rust type is `repr(C)`. Types like `String`, `Vec<T>`, `HashMap<K, V>`,
 //! and arbitrary user structs containing them cannot be passed directly through an FFI
 //! boundary. `Wire<T>` solves this by serializing the value into a flat byte buffer on
@@ -9,14 +7,14 @@
 //!
 //! # How it works
 //!
-//! A [`Wire<T>`] is a thin `repr(C)` wrapper around a [`WireBuffer`] — a pointer + length
-//! + capacity triplet that is safe to pass through `extern "C"` function signatures.
+//! A [`Wire<T>`] is a thin `repr(C)` wrapper around a [`WireBuffer`] — a pointer + length + capacity
+//! triplet that is safe to pass through `extern "C"` function signatures.
 //!
-//! ## Lifecycle (Rust → foreign)
+//! ### Rust -> Foreign
 //!
-//! 1. **Serialize** — call [`Wireable::wire()`] (allocates) or
-//!    [`Wireable::wire_with_buffer()`] (borrows caller-supplied memory) to produce a
-//!    `Wire<T>` whose buffer contains the serialized bytes.
+//! 1. **Serialize** — create a [`Wire::with_size`] (allocates) or
+//!    [`Wire::new_with_buffer`] (borrows caller-supplied memory), then call
+//!    [`Wire::serialize`] to write the value into the buffer.
 //! 2. **Transfer** — return the `Wire<T>` from an `extern "C"` function. Because
 //!    `Wire<T>` is `repr(C)`, it crosses the FFI boundary as a plain struct copy.
 //! 3. **Deserialize** — on the foreign side (e.g., C#), read the buffer bytes and
@@ -24,7 +22,7 @@
 //! 4. **Free** — call `interoptopus_wire_destroy` (emitted by [`builtins_wire!`]) to
 //!    drop the Rust-allocated buffer. Borrowed buffers (capacity == 0) are a no-op.
 //!
-//! ## Lifecycle (foreign → Rust)
+//! ### Foreign -> Rust
 //!
 //! 1. **Allocate & pin** — on the foreign side, allocate a byte buffer (e.g., C#
 //!    `stackalloc`) and pin it so the GC will not move it.
@@ -34,6 +32,18 @@
 //!    into an `extern "C"` function.
 //! 4. **Deserialize** — on the Rust side, call [`Wire::unwire()`] to get the real `T`.
 //! 5. **Free** — the foreign side unpins / drops its own buffer.
+//!
+//! # Example
+//!
+//! Here we use an actual `HashMap<String, String>` from `std` to demonstrate the transfer of
+//! a complex object over FFI.
+//!
+//! ```rust
+//! # use std::collections::HashMap;
+//! # use interoptopus::wire::Wire;
+//! #[ffi]
+//! fn call_with_string(_input: Wire<HashMap<String, String>>) { }
+//! ```
 //!
 //! # Wire format
 //!
@@ -52,20 +62,10 @@
 //! | `(A, B, …)` | Each element serialized in order |
 //! | User structs | Each field serialized in declaration order |
 //!
-//! The wire format is **not self-describing** — both sides must agree on the exact type
+//! The wire format is not self-describing, both sides must agree on the exact type
 //! layout. The `#[ffi]` proc macro generates matching serialization code on both
 //! the Rust side ([`WireIO`]) and the foreign side.
 //!
-//! # Trait overview
-//!
-//! - [`WireIO`] — serialize, deserialize, and compute byte size. Implemented for
-//!   primitives, `bool`, `String`, `Vec`, `HashMap`, `Option`, tuples, and any
-//!   user struct annotated with `#[ffi]`.
-//! - [`Wireable`] — blanket-implemented for `T: WireIO + 'static`; provides the
-//!   convenience methods [`wire()`](Wireable::wire) and
-//!   [`wire_with_buffer()`](Wireable::wire_with_buffer).
-//! - [`Unwireable`] — blanket-implemented for `Wire<T>`; provides [`unwire()`](Unwireable::unwire).
-
 mod buffer;
 
 pub use buffer::WireBuffer;
@@ -76,84 +76,8 @@ use std::marker::PhantomData;
 
 /// Wraps and transfers complex objects over FFI.
 ///
-/// The backing storage uses a ptr+size representation that can safely cross FFI boundaries.
-///
-/// # Examples
-///
-/// ## Creating owned Wire (allocates new buffer):
-/// ```rust
-/// use interoptopus::wire::Wire;
-///
-/// // Pre-allocated owned buffer
-/// let wire: Wire<String> = Wire::with_size(1024);
-/// assert!(wire.is_owned());
-/// ```
-///
-/// ## Creating borrowed Wire (uses external buffer):
-/// ```rust
-/// use interoptopus::wire::Wire;
-///
-/// let mut buffer = [0u8; 15];
-/// let wire: Wire<String> = Wire::new_with_buffer(&mut buffer);
-/// assert!(!wire.is_owned());
-/// ```
-///
-/// ## FFI Usage Example:
-/// ```rust
-/// use interoptopus::wire::{Wire, Wireable};
-///
-/// extern "C" fn process_data(mut input: Wire<String>) -> Wire<String> {
-///     let string = input.unwire();
-///
-///     // Process and return new Wire
-///     String::from("reply").wire()
-/// }
-/// ```
-///
-/// ## Complete C# Integration Example
-///
-/// When using the C# backend, the following Rust code:
-/// ```rust,ignore
-/// #[ffi]
-/// pub struct UserData {
-///     pub name: String,
-///     pub age: u32,
-///     pub active: bool,
-/// }
-///
-/// #[ffi]
-/// pub fn process_user(user: Wire<UserData>) -> Wire<UserData> {
-///     let mut data = user.unwire().unwrap();
-///     data.age += 1;
-///     data.active = true;
-///     data.wire()
-/// }
-/// ```
-///
-/// Can be used from C# code:
-/// ```csharp
-/// public static UserData ProcessUser(UserData user)
-/// {
-///     int bufferSize = user.WireSize();
-///     Span<byte> buffer = stackalloc byte[bufferSize];
-///
-///     // Pin the GC memory so it is not moved while calling Rust.
-///     fixed (byte* bufferPtr = buffer)
-///     {
-///         var wireInput = WireOfUserData.From(user, bufferPtr, bufferSize);
-///         var wireResult = process_user(wireInput);
-///
-///         try
-///         {
-///             return wireResult.Unwire();
-///         }
-///         finally
-///         {
-///             wireResult.Dispose();
-///         }
-///     }
-/// }
-/// ```
+/// The backing storage uses a (ptr, size) representation that can safely cross
+/// FFI boundaries.
 ///
 #[repr(C)]
 pub struct Wire<'my, T>
