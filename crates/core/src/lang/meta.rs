@@ -29,7 +29,7 @@ impl Module {
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum FileEmission {
-    /// This is a 'common' type (like Slice<u8>) that needs to be emitted in some interop file,
+    /// This is a 'common' type (like `Slice<u8>`) that needs to be emitted in some interop file,
     /// is not a builtin, but not specific to any customer project.
     Common,
     /// Variants for which the user never specified anything.

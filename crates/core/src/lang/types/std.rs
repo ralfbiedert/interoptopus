@@ -69,7 +69,7 @@ impl_ptr!(Option<&'_ T>, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01
 
 /// Derives the [`TypeId`] of `*const T` from the [`TypeId`] of `T`.
 ///
-/// This uses the same derive constant as [`impl_ptr!`] for `*const T`, `&T`,
+/// This uses the same derive constant as `impl_ptr!` for `*const T`, `&T`,
 /// and `Option<&T>`, so the result matches `<*const T>::id()` for concrete types.
 #[must_use]
 pub fn type_id_ptr(x: TypeId) -> TypeId {
@@ -78,7 +78,7 @@ pub fn type_id_ptr(x: TypeId) -> TypeId {
 
 /// Derives the [`TypeId`] of `*mut T` from the [`TypeId`] of `T`.
 ///
-/// This uses the same derive constant as [`impl_ptr!`] for `*mut T`, `&mut T`,
+/// This uses the same derive constant as `impl_ptr!` for `*mut T`, `&mut T`,
 /// and `NonNull<T>`, so the result matches `<*mut T>::id()` for concrete types.
 #[must_use]
 pub fn type_id_ptr_mut(x: TypeId) -> TypeId {

@@ -60,7 +60,7 @@
 //! ```
 //!
 //! The reasons for this are somewhat technical, but it boils down to us being unable to generally
-//! implement [`TypeInfo`](crate::lang::TypeInfo) for _all_ types you may want to use;
+//! implement [`TypeInfo`](crate::lang::types::TypeInfo) for _all_ types you may want to use;
 //! [`FFISlice`](crate::pattern::slice::Slice) here being one of them.
 //! To fix this, you can replace `pub type CallbackSlice = ...` with a `callback!` call
 //! which should generate a helper type that works.

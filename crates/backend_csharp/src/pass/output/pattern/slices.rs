@@ -1,4 +1,4 @@
-//! Renders slice types (Slice<T> and `SliceMut`<T>) per output file.
+//! Renders slice types (`Slice<T>` and `SliceMut<T>`) per output file.
 //!
 //! For each slice type, determines whether to use the "fast" (blittable) or
 //! "marshalling" template based on the element type's `ManagedConversion`.

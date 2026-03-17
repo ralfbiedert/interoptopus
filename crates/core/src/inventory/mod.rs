@@ -51,7 +51,7 @@ pub type Services = HashMap<ServiceId, Service>;
 /// Trait implemented by inventory types that can accept FFI item registrations.
 ///
 /// You typically don't need to use this directly — the registration macros
-/// ([`function!`], [`service!`], etc.) call these methods for you.
+/// ([`function`](crate::function!), [`service`](crate::service!), etc.) call these methods for you.
 pub trait Inventory {
     /// Register a type.
     fn register_type(&mut self, id: TypeId, ty: Type);

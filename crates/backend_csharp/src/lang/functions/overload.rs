@@ -39,7 +39,7 @@ pub enum OverloadKind {
     /// Body overload: delegate wrapping, ref args. Has a function body with
     /// try/finally for disposal.
     Body(FnTransforms),
-    /// Async overload: removes the callback arg, returns Task<T>.
+    /// Async overload: removes the callback arg, returns `Task<T>`.
     /// The `FnTransforms` covers all remaining arg transforms (ref, delegate wrap)
     /// so that async overloads compose with body-style transforms.
     Async(FnTransforms),

@@ -4,7 +4,7 @@
 //! # Examples
 //!
 //! Functions returning a [`Result`] might receive special treatment in backends supporting
-//! exception handling. For example, a [`service`](crate::pattern::service) method defined
+//! exception handling. For example, a [`service`](crate::lang::service) method defined
 //! as:
 //!
 //! ```

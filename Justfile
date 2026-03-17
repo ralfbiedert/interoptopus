@@ -3,7 +3,7 @@
 build verbose="":
     cargo build --all-features {{ verbose }}
 
-# Checks unit tests.
+# Run unit tests, check semantic correctness.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
 test verbose="" package="":
     cargo nextest run --all-features {{ verbose }}
@@ -17,10 +17,11 @@ test-dotnet:
     # Run .NET tests
     dotnet test crates/backend_csharp/tests/reference_project/reference_project_tests.csproj
 
-# Checks extra linting
+# Run linters, check tidiness.
 lint:
     cargo fmt --check
     cargo clippy -- -D warnings
+    RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
     diff -q crates/core/README.md README.md # Make sure top-level README is up to date.
 
 # Runs all tests CI would perform before merging a PR.
