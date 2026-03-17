@@ -1,6 +1,6 @@
 [package]
 name = "core_library_ffi_build"
-version = "0.1.0"
+version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish = false
@@ -14,5 +14,5 @@ core_library_ffi = { path = "../core_library_ffi" }
 
 [build-dependencies]
 core_library_ffi = { path = "../core_library_ffi" }
-interoptopus = { path = "../../../crates/core" }
-interoptopus_backend_csharp = { path = "../../../crates/backend_csharp_old" }
+interoptopus.workspace = true
+interoptopus_csharp.workspace = true

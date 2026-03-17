@@ -9,9 +9,7 @@ members = [
     "crates/proc_macros_impl",
     "crates/reference_project",
     "examples/hello_world",
-    # TODO: DELETE THIS SECTION - Excluded for now while refactoring
     # "examples/real_project_layout/*",
-    # "tests",
 ]
 
 resolver = "3"

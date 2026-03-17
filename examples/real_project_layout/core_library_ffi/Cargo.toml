@@ -1,10 +1,10 @@
 [package]
 name = "core_library_ffi"
-version = "0.1.0"
+version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish = false
 
 [dependencies]
 core_library = { path = "../core_library" }
-interoptopus = { path = "../../../crates/core" }
+interoptopus.workspace = true
