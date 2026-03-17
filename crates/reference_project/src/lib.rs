@@ -182,7 +182,8 @@ pub fn inventory() -> RustInventory {
         // Wire
         .register(function!(wire::basic::wire_accept_string_1))
         .register(function!(wire::basic::wire_accept_string_2))
-        .register(function!(wire::nested::wire_deeply_nested))
+        .register(function!(wire::nested::wire_deeply_nested_1))
+        .register(function!(wire::nested::wire_deeply_nested_2))
         // Constants
         .register(constant!(constants::U8))
         .register(constant!(constants::F32_MIN_POSITIVE))

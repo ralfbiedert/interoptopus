@@ -1,7 +1,7 @@
 //! Wire output passes for `Wire<T>` C# code generation.
 //!
 //! Split into focused submodules:
-//! - [`codegen`] — Shared C# code generation logic (type mapping, serialize/deserialize/size emission)
+//! - [`WireCodeGen`] — Shared C# code generation logic (type mapping, serialize/deserialize/size emission)
 //! - [`wire_type`] — Renders `WireOf*` structs for each `Wire<T>` pattern
 //! - [`helper_classes`] — Emits managed classes for nested structs with `WireOnly` fields
 //! - [`all`] — Assembles wire_type and helper_classes results per output file
@@ -17,7 +17,6 @@ use interoptopus::lang::types::{Primitive, Struct, TypeKind as RsTypeKind, WireO
 ///
 /// A shared utility used by the wire output passes. It walks the Rust type graph recursively
 /// translating primitives, `WireOnly` types, and user structs into inline C# statements.
-/// Type name mapping is delegated to [`model::wire`](crate::pass::model::wire).
 pub struct WireCodeGen<'a> {
     pub rs_types: &'a RsTypes,
 }
@@ -47,7 +46,7 @@ impl WireCodeGen<'_> {
         let mut lines = Vec::new();
         for f in &s.fields {
             let access = format!("{val}.{}", f.name);
-            self.emit_serialize(&mut lines, f.ty, &access, 0);
+            self.emit_serialize(&mut lines, f.ty, &access, 0, 0);
         }
         lines.join("\n")
     }
@@ -58,7 +57,7 @@ impl WireCodeGen<'_> {
         lines.push(format!("var result = new {type_name}();"));
         for f in &s.fields {
             let target = format!("result.{}", f.name);
-            self.emit_deserialize(&mut lines, f.ty, &target, 0);
+            self.emit_deserialize(&mut lines, f.ty, &target, 0, 0);
         }
         lines.push("return result;".to_string());
         lines.join("\n")
@@ -70,77 +69,90 @@ impl WireCodeGen<'_> {
         lines.push("var _size = 0;".to_string());
         for f in &s.fields {
             let access = format!("{val}.{}", f.name);
-            self.emit_size(&mut lines, f.ty, &access, 0);
+            self.emit_size(&mut lines, f.ty, &access, 0, 0);
         }
         lines.push("return _size;".to_string());
         lines.join("\n")
     }
 
     /// Emits C# statements to serialize a value of the given Rust type.
-    pub fn emit_serialize(&self, lines: &mut Vec<String>, ty_id: TypeId, val: &str, depth: usize) {
+    pub fn emit_serialize(&self, lines: &mut Vec<String>, ty_id: TypeId, val: &str, depth: usize, indent: usize) {
         let Some(ty) = self.rs_types.get(&ty_id) else { return };
+        let p = pad(indent);
         match &ty.kind {
-            RsTypeKind::Primitive(p) => {
-                if *p == Primitive::Bool {
-                    lines.push(format!("writer.Write({val} ? (byte)1 : (byte)0);"));
+            RsTypeKind::Primitive(prim) => {
+                if *prim == Primitive::Bool {
+                    lines.push(format!("{p}writer.Write({val} ? (byte)1 : (byte)0);"));
                 } else {
-                    lines.push(format!("writer.Write({val});"));
+                    lines.push(format!("{p}writer.Write({val});"));
                 }
             }
             RsTypeKind::WireOnly(WireOnly::String) => {
-                lines.push(format!("{{ var _bytes = System.Text.Encoding.UTF8.GetBytes({val} ?? \"\"); writer.Write((uint)_bytes.Length); writer.Write(_bytes); }}"));
+                lines.push(format!("{p}{{ var _bytes = System.Text.Encoding.UTF8.GetBytes({val} ?? \"\"); writer.Write((uint)_bytes.Length); writer.Write(_bytes); }}"));
             }
             RsTypeKind::WireOnly(WireOnly::Vec(inner_id)) => {
                 let iter = format!("_item{depth}");
-                lines.push(format!("writer.Write((uint)({val}?.Count ?? 0));"));
-                lines.push(format!("if ({val} != null) {{ foreach (var {iter} in {val}) {{"));
-                self.emit_serialize(lines, *inner_id, &iter, depth + 1);
-                lines.push("} }".to_string());
+                let pi = pad(indent + 1);
+                lines.push(format!("{p}writer.Write((uint)({val}?.Count ?? 0));"));
+                lines.push(format!("{p}if ({val} != null)"));
+                lines.push(format!("{p}{{"));
+                lines.push(format!("{pi}foreach (var {iter} in {val})"));
+                lines.push(format!("{pi}{{"));
+                self.emit_serialize(lines, *inner_id, &iter, depth + 1, indent + 2);
+                lines.push(format!("{pi}}}"));
+                lines.push(format!("{p}}}"));
             }
             RsTypeKind::WireOnly(WireOnly::Map(k_id, v_id)) => {
                 let kv = format!("_kv{depth}");
-                lines.push(format!("writer.Write((uint)({val}?.Count ?? 0));"));
-                lines.push(format!("if ({val} != null) {{ foreach (var {kv} in {val}) {{"));
-                self.emit_serialize(lines, *k_id, &format!("{kv}.Key"), depth + 1);
-                self.emit_serialize(lines, *v_id, &format!("{kv}.Value"), depth + 1);
-                lines.push("} }".to_string());
+                let pi = pad(indent + 1);
+                lines.push(format!("{p}writer.Write((uint)({val}?.Count ?? 0));"));
+                lines.push(format!("{p}if ({val} != null)"));
+                lines.push(format!("{p}{{"));
+                lines.push(format!("{pi}foreach (var {kv} in {val})"));
+                lines.push(format!("{pi}{{"));
+                self.emit_serialize(lines, *k_id, &format!("{kv}.Key"), depth + 1, indent + 2);
+                self.emit_serialize(lines, *v_id, &format!("{kv}.Value"), depth + 1, indent + 2);
+                lines.push(format!("{pi}}}"));
+                lines.push(format!("{p}}}"));
             }
             RsTypeKind::Struct(s) => {
                 for f in &s.fields {
-                    self.emit_serialize(lines, f.ty, &format!("{val}.{}", f.name), depth);
+                    self.emit_serialize(lines, f.ty, &format!("{val}.{}", f.name), depth, indent);
                 }
             }
             _ => {
-                lines.push(format!("/* unsupported wire type for {val} */"));
+                lines.push(format!("{p}/* unsupported wire type for {val} */"));
             }
         }
     }
 
     /// Emits C# statements to deserialize a value and assign it to `target`.
-    pub fn emit_deserialize(&self, lines: &mut Vec<String>, ty_id: TypeId, target: &str, depth: usize) {
+    pub fn emit_deserialize(&self, lines: &mut Vec<String>, ty_id: TypeId, target: &str, depth: usize, indent: usize) {
         let Some(ty) = self.rs_types.get(&ty_id) else { return };
+        let p = pad(indent);
         match &ty.kind {
-            RsTypeKind::Primitive(p) => {
-                lines.push(format!("{target} = {};", cs_read_primitive(*p)));
+            RsTypeKind::Primitive(prim) => {
+                lines.push(format!("{p}{target} = {};", cs_read_primitive(*prim)));
             }
             RsTypeKind::WireOnly(WireOnly::String) => {
-                lines.push(format!(
-                    "{{ var _len = reader.ReadUInt32(); {target} = _len > 0 ? System.Text.Encoding.UTF8.GetString(reader.ReadBytes((int)_len)) : \"\"; }}"
-                ));
+                lines.push(format!("{p}{{ var _len = reader.ReadUInt32(); {target} = _len > 0 ? System.Text.Encoding.UTF8.GetString(reader.ReadBytes((int)_len)) : \"\"; }}"));
             }
             RsTypeKind::WireOnly(WireOnly::Vec(inner_id)) => {
                 let cs_inner = self.cs_type_name(*inner_id);
                 let count = format!("_count{depth}");
                 let idx = format!("_i{depth}");
-                lines.push(format!("{{ var {count} = reader.ReadUInt32(); {target} = new List<{cs_inner}>((int){count});"));
-                lines.push(format!("for (uint {idx} = 0; {idx} < {count}; {idx}++) {{"));
-
                 let elem_var = format!("_elem{depth}");
-                let cs_inner_for_decl = self.cs_type_name(*inner_id);
-                lines.push(format!("{cs_inner_for_decl} {elem_var} = default;"));
-                self.emit_deserialize(lines, *inner_id, &elem_var, depth + 1);
-                lines.push(format!("{target}.Add({elem_var});"));
-                lines.push("} }".to_string());
+                let pi = pad(indent + 1);
+                lines.push(format!("{p}{{"));
+                lines.push(format!("{pi}var {count} = reader.ReadUInt32();"));
+                lines.push(format!("{pi}{target} = new List<{cs_inner}>((int){count});"));
+                lines.push(format!("{pi}for (uint {idx} = 0; {idx} < {count}; {idx}++)"));
+                lines.push(format!("{pi}{{"));
+                lines.push(format!("{pi}    {cs_inner} {elem_var} = default;"));
+                self.emit_deserialize(lines, *inner_id, &elem_var, depth + 1, indent + 2);
+                lines.push(format!("{pi}    {target}.Add({elem_var});"));
+                lines.push(format!("{pi}}}"));
+                lines.push(format!("{p}}}"));
             }
             RsTypeKind::WireOnly(WireOnly::Map(k_id, v_id)) => {
                 let cs_k = self.cs_type_name(*k_id);
@@ -149,61 +161,82 @@ impl WireCodeGen<'_> {
                 let idx = format!("_i{depth}");
                 let k_var = format!("_key{depth}");
                 let v_var = format!("_val{depth}");
-                lines.push(format!("{{ var {count} = reader.ReadUInt32(); {target} = new Dictionary<{cs_k}, {cs_v}>((int){count});"));
-                lines.push(format!("for (uint {idx} = 0; {idx} < {count}; {idx}++) {{"));
-                lines.push(format!("{cs_k} {k_var} = default;"));
-                self.emit_deserialize(lines, *k_id, &k_var, depth + 1);
-                lines.push(format!("{cs_v} {v_var} = default;"));
-                self.emit_deserialize(lines, *v_id, &v_var, depth + 1);
-                lines.push(format!("{target}[{k_var}] = {v_var};"));
-                lines.push("} }".to_string());
+                let pi = pad(indent + 1);
+                let pi2 = pad(indent + 2);
+                lines.push(format!("{p}{{"));
+                lines.push(format!("{pi}var {count} = reader.ReadUInt32();"));
+                lines.push(format!("{pi}{target} = new Dictionary<{cs_k}, {cs_v}>((int){count});"));
+                lines.push(format!("{pi}for (uint {idx} = 0; {idx} < {count}; {idx}++)"));
+                lines.push(format!("{pi}{{"));
+                lines.push(format!("{pi2}{cs_k} {k_var} = default;"));
+                self.emit_deserialize(lines, *k_id, &k_var, depth + 1, indent + 2);
+                lines.push(format!("{pi2}{cs_v} {v_var} = default;"));
+                self.emit_deserialize(lines, *v_id, &v_var, depth + 1, indent + 2);
+                lines.push(format!("{pi2}{target}[{k_var}] = {v_var};"));
+                lines.push(format!("{pi}}}"));
+                lines.push(format!("{p}}}"));
             }
             RsTypeKind::Struct(s) => {
                 let struct_name = self.cs_type_name(ty_id);
-                lines.push(format!("{target} = new {struct_name}();"));
+                lines.push(format!("{p}{target} = new {struct_name}();"));
                 for f in &s.fields {
-                    self.emit_deserialize(lines, f.ty, &format!("{target}.{}", f.name), depth);
+                    self.emit_deserialize(lines, f.ty, &format!("{target}.{}", f.name), depth, indent);
                 }
             }
             _ => {
-                lines.push(format!("/* unsupported wire type for {target} */"));
+                lines.push(format!("{p}/* unsupported wire type for {target} */"));
             }
         }
     }
 
     /// Emits C# statements that add the wire size of `val` to `_size`.
-    pub fn emit_size(&self, lines: &mut Vec<String>, ty_id: TypeId, val: &str, depth: usize) {
+    pub fn emit_size(&self, lines: &mut Vec<String>, ty_id: TypeId, val: &str, depth: usize, indent: usize) {
         let Some(ty) = self.rs_types.get(&ty_id) else { return };
+        let p = pad(indent);
         match &ty.kind {
-            RsTypeKind::Primitive(p) => {
-                lines.push(format!("_size += {};", cs_primitive_size(*p)));
+            RsTypeKind::Primitive(prim) => {
+                lines.push(format!("{p}_size += {};", cs_primitive_size(*prim)));
             }
             RsTypeKind::WireOnly(WireOnly::String) => {
-                lines.push(format!("_size += 4 + System.Text.Encoding.UTF8.GetByteCount({val} ?? \"\");"));
+                lines.push(format!("{p}_size += 4 + System.Text.Encoding.UTF8.GetByteCount({val} ?? \"\");"));
             }
             RsTypeKind::WireOnly(WireOnly::Vec(inner_id)) => {
                 let iter = format!("_item{depth}");
-                lines.push("_size += 4;".to_string());
-                lines.push(format!("if ({val} != null) {{ foreach (var {iter} in {val}) {{"));
-                self.emit_size(lines, *inner_id, &iter, depth + 1);
-                lines.push("} }".to_string());
+                let pi = pad(indent + 1);
+                lines.push(format!("{p}_size += 4;"));
+                lines.push(format!("{p}if ({val} != null)"));
+                lines.push(format!("{p}{{"));
+                lines.push(format!("{pi}foreach (var {iter} in {val})"));
+                lines.push(format!("{pi}{{"));
+                self.emit_size(lines, *inner_id, &iter, depth + 1, indent + 2);
+                lines.push(format!("{pi}}}"));
+                lines.push(format!("{p}}}"));
             }
             RsTypeKind::WireOnly(WireOnly::Map(k_id, v_id)) => {
                 let kv = format!("_kv{depth}");
-                lines.push("_size += 4;".to_string());
-                lines.push(format!("if ({val} != null) {{ foreach (var {kv} in {val}) {{"));
-                self.emit_size(lines, *k_id, &format!("{kv}.Key"), depth + 1);
-                self.emit_size(lines, *v_id, &format!("{kv}.Value"), depth + 1);
-                lines.push("} }".to_string());
+                let pi = pad(indent + 1);
+                lines.push(format!("{p}_size += 4;"));
+                lines.push(format!("{p}if ({val} != null)"));
+                lines.push(format!("{p}{{"));
+                lines.push(format!("{pi}foreach (var {kv} in {val})"));
+                lines.push(format!("{pi}{{"));
+                self.emit_size(lines, *k_id, &format!("{kv}.Key"), depth + 1, indent + 2);
+                self.emit_size(lines, *v_id, &format!("{kv}.Value"), depth + 1, indent + 2);
+                lines.push(format!("{pi}}}"));
+                lines.push(format!("{p}}}"));
             }
             RsTypeKind::Struct(s) => {
                 for f in &s.fields {
-                    self.emit_size(lines, f.ty, &format!("{val}.{}", f.name), depth);
+                    self.emit_size(lines, f.ty, &format!("{val}.{}", f.name), depth, indent);
                 }
             }
             _ => {}
         }
     }
+}
+
+fn pad(indent: usize) -> String {
+    "    ".repeat(indent)
 }
 
 fn cs_primitive_name(p: Primitive) -> &'static str {

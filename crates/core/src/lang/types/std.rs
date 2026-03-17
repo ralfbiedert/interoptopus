@@ -1,16 +1,12 @@
 use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
-use crate::lang::types::SerializationError;
 use crate::lang::types::wire::WireIO;
+use crate::lang::types::SerializationError;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::mem::MaybeUninit;
-// TODO
-// trait Foo {}
-// impl<'a> Foo for &'a str {}
-// impl Foo for &'static str {}
 
 macro_rules! impl_ptr {
     ($t:ty, $name:expr, $kind:tt, $id:expr) => {

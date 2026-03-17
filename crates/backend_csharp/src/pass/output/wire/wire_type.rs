@@ -62,16 +62,16 @@ impl Pass {
                     (true, fields, codegen.serialize_struct_body(s, "value"), codegen.deserialize_struct_body(s, &inner_name), codegen.size_struct_body(s, "value"))
                 } else {
                     let mut ser = Vec::new();
-                    codegen.emit_serialize(&mut ser, inner_rust_id, "value", 0);
+                    codegen.emit_serialize(&mut ser, inner_rust_id, "value", 0, 0);
 
                     let mut deser = Vec::new();
                     deser.push(format!("{inner_name} result = default;"));
-                    codegen.emit_deserialize(&mut deser, inner_rust_id, "result", 0);
+                    codegen.emit_deserialize(&mut deser, inner_rust_id, "result", 0, 0);
                     deser.push("return result;".to_string());
 
                     let mut size_lines = Vec::new();
                     size_lines.push("var _size = 0;".to_string());
-                    codegen.emit_size(&mut size_lines, inner_rust_id, "value", 0);
+                    codegen.emit_size(&mut size_lines, inner_rust_id, "value", 0, 0);
                     size_lines.push("return _size;".to_string());
 
                     (false, vec![], ser.join("\n"), deser.join("\n"), size_lines.join("\n"))

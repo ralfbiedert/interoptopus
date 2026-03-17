@@ -1,11 +1,15 @@
 use interoptopus::ffi;
-use interoptopus::lang::types::WireIO;
 use interoptopus::wire::Wire;
 use std::collections::HashMap;
 
 #[ffi]
+pub struct DeeplyNestedWire4 {
+    a: u32,
+}
+
+#[ffi]
 pub struct DeeplyNestedWire3 {
-    x: HashMap<u32, u32>,
+    x: HashMap<u32, DeeplyNestedWire4>,
     y: String,
 }
 
@@ -21,4 +25,10 @@ pub struct DeeplyNestedWire1 {
 }
 
 #[ffi]
-pub fn wire_deeply_nested(_: Wire<DeeplyNestedWire1>) {}
+pub fn wire_deeply_nested_1(mut x: Wire<DeeplyNestedWire1>) -> u32 {
+    let x = x.unwire().unwrap();
+    x.values.iter().next().unwrap().1.values.iter().next().unwrap().x.iter().next().unwrap().1.a
+}
+
+#[ffi]
+pub fn wire_deeply_nested_2(_: DeeplyNestedWire4) {}

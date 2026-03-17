@@ -4,7 +4,10 @@ public partial class {{ inner_type }}
 {%- for field in field_decls %}
     {{ field }}
 {%- endfor %}
+}
 
+public partial class {{ inner_type }}
+{
     public {{ wire_name }} Wire()
     {
         return {{ wire_name }}.From(this);
@@ -15,7 +18,10 @@ public partial class {{ inner_type }}
 public partial struct {{ wire_name }}
 {
     public WireBuffer Buffer;
+}
 
+public partial struct {{ wire_name }}
+{
     public static {{ wire_name }} From({{ inner_type }} value)
     {
         var size = CalculateSize(value);

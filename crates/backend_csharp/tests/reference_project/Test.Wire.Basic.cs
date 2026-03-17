@@ -18,9 +18,8 @@ public class TestWireBasic
         var x = new MyString
         {
             x = "hello world"
-        };
-        var wired = x.Wire();
+        }.Wire();
 
-        Interop.wire_accept_string_2(wired);
+        Interop.wire_accept_string_2(x);
     }
 }
