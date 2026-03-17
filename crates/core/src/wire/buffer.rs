@@ -1,7 +1,19 @@
+//! FFI-safe buffer backing [`Wire<T>`](super::Wire).
+//!
+//! A `WireBuffer` is the raw storage behind every `Wire<T>`. It tracks a `data` pointer, a
+//! `len` (bytes written), and a `capacity`. The `capacity` field doubles as an ownership
+//! discriminant:
+//!
+//! - **`capacity > 0`** — the buffer owns a Rust `Vec<u8>` allocation. Dropping it on the
+//!   Rust side reconstructs and frees the Vec. When returned over FFI, the foreign side
+//!   must call `interoptopus_wire_destroy` instead.
+//! - **`capacity == 0`** — the buffer borrows memory from the caller (e.g., a C# pinned
+//!   `stackalloc` region). Dropping it is a no-op.
+
 use std::io::{Read, Write};
 use std::marker::PhantomData;
 
-/// FFI buffer that can represent both owned and borrowed data
+/// FFI-safe buffer that can represent both owned and borrowed byte storage.
 #[repr(C)]
 pub struct WireBuffer<'a> {
     data: *mut u8,
@@ -152,6 +164,18 @@ impl std::io::Read for WireBufferReader<'_> {
 
 impl Drop for WireBuffer<'_> {
     fn drop(&mut self) {
-        // Explicitly do nothing here as the wire buffer must be deallocated on the other side.
+        // Free owned buffers. When a Wire<T> is returned over FFI, the value is moved
+        // (no Drop runs on the Rust side), so the other side frees it via
+        // `interoptopus_wire_destroy`. This Drop only fires when a Wire is created and
+        // dropped on the Rust side without being passed over FFI.
+        if self.is_owned() && !self.data.is_null() {
+            unsafe {
+                let _ = Vec::from_raw_parts(
+                    self.data,
+                    usize::try_from(self.len).expect("Invalid Wire buffer len"),
+                    usize::try_from(self.capacity).expect("Invalid Wire buffer capacity"),
+                );
+            }
+        }
     }
 }

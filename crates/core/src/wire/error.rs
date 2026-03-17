@@ -1,5 +1,6 @@
-/// If a wire transfer goes wrong.
-// @todo play with implementing it as a struct?
+//! Error types for wire serialization / deserialization failures.
+
+/// Returned when a wire serialize or deserialize operation fails.
 #[derive(Debug)]
 pub enum WireError {
     Io(std::io::Error),

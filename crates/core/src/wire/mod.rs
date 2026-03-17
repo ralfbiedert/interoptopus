@@ -1,4 +1,69 @@
-//! Transfer complex object hierarchies over FFI.
+//! Serialize complex objects into flat byte buffers and transfer them over FFI.
+//!
+//! # Motivation
+//!
+//! Not every Rust type is `repr(C)`. Types like `String`, `Vec<T>`, `HashMap<K, V>`,
+//! and arbitrary user structs containing them cannot be passed directly through an FFI
+//! boundary. `Wire<T>` solves this by serializing the value into a flat byte buffer on
+//! one side of the boundary and deserializing it on the other.
+//!
+//! # How it works
+//!
+//! A [`Wire<T>`] is a thin `repr(C)` wrapper around a [`WireBuffer`] — a pointer + length
+//! + capacity triplet that is safe to pass through `extern "C"` function signatures.
+//!
+//! ## Lifecycle (Rust → foreign)
+//!
+//! 1. **Serialize** — call [`Wireable::wire()`] (allocates) or
+//!    [`Wireable::wire_with_buffer()`] (borrows caller-supplied memory) to produce a
+//!    `Wire<T>` whose buffer contains the serialized bytes.
+//! 2. **Transfer** — return the `Wire<T>` from an `extern "C"` function. Because
+//!    `Wire<T>` is `repr(C)`, it crosses the FFI boundary as a plain struct copy.
+//! 3. **Deserialize** — on the foreign side (e.g., C#), read the buffer bytes and
+//!    reconstruct the managed type.
+//! 4. **Free** — call `interoptopus_wire_destroy` (emitted by [`builtins_wire!`]) to
+//!    drop the Rust-allocated buffer. Borrowed buffers (capacity == 0) are a no-op.
+//!
+//! ## Lifecycle (foreign → Rust)
+//!
+//! 1. **Allocate & pin** — on the foreign side, allocate a byte buffer (e.g., C#
+//!    `stackalloc`) and pin it so the GC will not move it.
+//! 2. **Serialize** — write the managed object into that buffer using the generated
+//!    `WireOf*` helper.
+//! 3. **Transfer** — pass the `Wire<T>` (with `capacity == 0`, marking it borrowed)
+//!    into an `extern "C"` function.
+//! 4. **Deserialize** — on the Rust side, call [`Wire::unwire()`] to get the real `T`.
+//! 5. **Free** — the foreign side unpins / drops its own buffer.
+//!
+//! # Wire format
+//!
+//! All values are written in **little-endian** byte order, sequentially, with no padding
+//! or alignment between fields:
+//!
+//! | Type | Format |
+//! |---|---|
+//! | `u8`..`u128`, `i8`..`i128`, `f32`, `f64` | Fixed-size little-endian bytes |
+//! | `usize` / `isize` | Platform-width little-endian (8 bytes on 64-bit) |
+//! | `bool` | 1 byte (`0x00` = false, `0x01` = true) |
+//! | `String` | `usize` byte-length, then UTF-8 bytes |
+//! | `Vec<T>` | `usize` element count, then each element serialized in order |
+//! | `HashMap<K,V>` | `usize` entry count, then each key followed by value |
+//! | `Option<T>` | 1 byte tag (bool), then value bytes if `Some` |
+//! | `(A, B, …)` | Each element serialized in order |
+//! | User structs | Each field serialized in declaration order |
+//!
+//! The wire format is **not self-describing** — both sides must agree on the exact type
+//! layout. The `#[ffi]` proc macro generates matching serialization code on both
+//! the Rust side ([`Ser`] / [`De`]) and the foreign side.
+//!
+//! # Trait overview
+//!
+//! - [`Ser`] — serialize `&self` into a `Write` sink, and compute `storage_size`.
+//! - [`De`] — deserialize `Self` from a `Read` source.
+//! - [`Wireable`] — blanket-implemented for `T: Ser + De + 'static`; provides the
+//!   convenience methods [`wire()`](Wireable::wire) and
+//!   [`wire_with_buffer()`](Wireable::wire_with_buffer).
+//! - [`Unwireable`] — blanket-implemented for `Wire<T>`; provides [`unwire()`](Unwireable::unwire).
 
 mod buffer;
 mod error;
@@ -151,21 +216,6 @@ impl<'a, T: Ser + De> Wire<'a, T> {
         T::de(&mut self.buf.reader())
     }
 
-    // /// Get a pointer to the buffer data
-    // pub fn as_ptr(&self) -> *const u8 {
-    //     self.buf.data as *const u8
-    // }
-
-    // /// Get the length of the buffer
-    // pub fn len(&self) -> u64 {
-    //     self.buf.len
-    // }
-
-    // /// Get the capacity of the buffer
-    // pub fn capacity(&self) -> u64 {
-    //     self.buf.capacity
-    // }
-
     /// Check if this Wire owns its buffer data
     #[must_use]
     pub fn is_owned(&self) -> bool {
@@ -197,37 +247,6 @@ where
     }
 }
 
-// Wire means:
-// On CSharp side:
-// - allocate and pin buffer
-// - serialize WireOfInput to that buffer
-// - pass it over to the fn
-// On Rust side:
-// - deserializ from Wire<Input>'s buffer into Input
-// - do stuff with input
-// - allocate or borrow Wire<Output>'s buffer
-// - serialize Output into Wire buffer
-// - pass Wire<Output> over to C#
-// On CSharp side:
-// - deserialize from WireOfOutput to Output
-// - drop rust buffer
-// - unpin and drop CSharp buffer for WireOfInput
-//
-// WireOfInput takes Input and writes it into a pinned buf
-// Wire<Input> takes buf SLICE and deserializes Input from there
-// Wire<Output> takes owned buf and serializes Output to it
-// WireOfOutput takes buf over ffi and deserializes Output from it
-
-// // for fn service_name(input: Wire<Input>, input2: Wire<Input>) -> Wire<Output>;
-// fixed (var buf = new byte[input.estimated_size()+input2.estimated_size()]) {
-//     WireOfInput.serialize(input, buf);
-//     WireOfInput.serialize(input2, buf+input.estimated_size());
-//     var out = service_name(buf);
-//     var output = WireOfOutput.deserialize(out);
-// }
-
-// Wire<Input>::de(buf_slice)->Input
-
 /// Emits and registers helper functions used by [`Wire`](crate::wire::Wire).
 #[macro_export]
 macro_rules! builtins_wire {
@@ -242,11 +261,6 @@ macro_rules! builtins_wire {
             }
             let _ = unsafe { Vec::from_raw_parts(data, usize::try_from(len).expect("Invalid vec length"), usize::try_from(capacity).expect("Invalid vec capacity")) };
         }
-
-        // #[$crate::ffi_function]
-        // pub fn interoptopus_string_destroy(utf8: $crate::pattern::string::String) -> i64 {
-        //     0
-        // }
 
         let items = vec![interoptopus_wire_destroy::function_info()];
         let builtins = $crate::pattern::builtins::Builtins::new(items);

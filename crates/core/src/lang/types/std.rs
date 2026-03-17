@@ -156,12 +156,17 @@ impl TypeInfo for String {
 }
 
 impl WireIO for String {
-    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
-        todo!()
+    fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+        (self.len() as u32).write(out)?;
+        out.write_all(self.as_bytes())?;
+        Ok(())
     }
 
-    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
-        todo!()
+    fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+        let len = u32::read(input)? as usize;
+        let mut buf = vec![0u8; len];
+        input.read_exact(&mut buf)?;
+        Self::from_utf8(buf).map_err(|e| SerializationError::Io(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))
     }
 
     fn live_size(&self) -> usize {
@@ -197,16 +202,25 @@ impl<T: TypeInfo> TypeInfo for Vec<T> {
 }
 
 impl<T: WireIO> WireIO for Vec<T> {
-    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
-        todo!()
+    fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+        (self.len() as u32).write(out)?;
+        for item in self {
+            item.write(out)?;
+        }
+        Ok(())
     }
 
-    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
-        todo!()
+    fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+        let len = u32::read(input)? as usize;
+        let mut vec = Self::with_capacity(len);
+        for _ in 0..len {
+            vec.push(T::read(input)?);
+        }
+        Ok(vec)
     }
 
     fn live_size(&self) -> usize {
-        todo!()
+        4 + self.iter().map(WireIO::live_size).sum::<usize>()
     }
 }
 
@@ -239,17 +253,32 @@ impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap
     }
 }
 
-impl<K: WireIO, V: WireIO, S: ::std::hash::BuildHasher> WireIO for HashMap<K, V, S> {
-    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
-        todo!()
+impl<K: WireIO, V: WireIO, S: ::std::hash::BuildHasher + Default> WireIO for HashMap<K, V, S>
+where
+    K: Eq + core::hash::Hash,
+{
+    fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+        (self.len() as u32).write(out)?;
+        for (k, v) in self {
+            k.write(out)?;
+            v.write(out)?;
+        }
+        Ok(())
     }
 
-    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
-        todo!()
+    fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+        let len = u32::read(input)? as usize;
+        let mut map = Self::with_capacity_and_hasher(len, Default::default());
+        for _ in 0..len {
+            let k = K::read(input)?;
+            let v = V::read(input)?;
+            map.insert(k, v);
+        }
+        Ok(map)
     }
 
     fn live_size(&self) -> usize {
-        todo!()
+        4 + self.iter().map(|(k, v)| k.live_size() + v.live_size()).sum::<usize>()
     }
 }
 
