@@ -1,3 +1,4 @@
+#![doc(hidden)]
 //! Loads the embedded Tera templates used for C# code generation.
 
 use interoptopus_backends::template::TemplateEngine;

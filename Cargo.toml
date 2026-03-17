@@ -1,5 +1,7 @@
 [workspace]
 members = [
+    "crates/backend_c",
+    "crates/backend_cpython",
     "crates/backend_csharp",
     "crates/backend_utils",
     "crates/core",
@@ -27,6 +29,8 @@ version = "0.16.0-alpha.1"
 interoptopus = { path = "crates/core", version = "=0.16.0-alpha.1" }
 interoptopus_proc = { path = "crates/proc_macros", version = "=0.16.0-alpha.1" }
 interoptopus_proc_impl = { path = "crates/proc_macros_impl", version = "=0.16.0-alpha.1" }
+interoptopus_c = { path = "crates/backend_c", version = "=0.16.0-alpha.1" }
+interoptopus_cpython = { path = "crates/backend_cpython", version = "=0.16.0-alpha.1" }
 interoptopus_csharp = { path = "crates/backend_csharp", version = "=0.16.0-alpha.1" }
 interoptopus_backends = { path = "crates/backend_utils", version = "=0.16.0-alpha.1" }
 # Not published (no version dependency):

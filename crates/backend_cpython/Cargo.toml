@@ -1,0 +1,15 @@
+[package]
+name = "interoptopus_cpython"
+description = "Python ctypes binding generation for Interoptopus"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+interoptopus.workspace = true
+
+[lints]
+workspace = true
