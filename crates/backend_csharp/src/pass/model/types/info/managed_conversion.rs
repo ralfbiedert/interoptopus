@@ -165,6 +165,9 @@ impl Pass {
 
                 // Util types are backend-generated; no managed conversion needed
                 TypeKind::Util(_) => ManagedConversion::AsIs,
+
+                // WireOnly types exist only for wire serialization; no direct managed conversion
+                TypeKind::WireOnly(_) => ManagedConversion::AsIs,
             };
 
             self.managed_conversion.insert(*cs_id, conversion);

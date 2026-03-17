@@ -1,4 +1,5 @@
 use crate::lang::types::kind::task::Task;
+use crate::lang::types::kind::wire::WireOnly;
 use crate::lang::TypeId;
 
 mod array;
@@ -10,6 +11,7 @@ mod pointer;
 mod primitive;
 pub mod task;
 mod util;
+pub mod wire;
 
 pub use self::{
     array::Array,
@@ -37,4 +39,5 @@ pub enum TypeKind {
     TypePattern(TypePattern),
     Util(Util),   // A backend-specific utility type (e.g., `InteropException`, `Utf8String` helper class).
     Wire(TypeId), // TODO?
+    WireOnly(WireOnly),
 }
