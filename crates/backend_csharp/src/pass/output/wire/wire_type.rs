@@ -4,13 +4,13 @@
 //! `From()`, `Unwire()`, `CalculateSize()`, and `Dispose()` methods. When the
 //! inner type is a struct, also emits a managed class with a `.Wire()` helper.
 
-use super::codegen::WireCodeGen;
 use crate::output::{FileType, Output};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus::inventory::Types as RsTypes;
 use interoptopus::lang::types::TypeKind as RsTypeKind;
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
+use crate::pass::output::wire::WireCodeGen;
 
 #[derive(Default)]
 pub struct Config {}
@@ -57,36 +57,25 @@ impl Pass {
                 let Some(inner_rust_ty) = rs_types.get(&inner_rust_id) else { continue };
                 let inner_name = codegen.cs_type_name(inner_rust_id);
 
-                let (has_managed_class, field_decls, serialize_body, deserialize_body, size_body) =
-                    if let RsTypeKind::Struct(s) = &inner_rust_ty.kind {
-                        let fields: Vec<String> = s
-                            .fields
-                            .iter()
-                            .map(|f| format!("public {} {};", codegen.cs_type_name(f.ty), f.name))
-                            .collect();
-                        (
-                            true,
-                            fields,
-                            codegen.serialize_struct_body(s, "value"),
-                            codegen.deserialize_struct_body(s, &inner_name),
-                            codegen.size_struct_body(s, "value"),
-                        )
-                    } else {
-                        let mut ser = Vec::new();
-                        codegen.emit_serialize(&mut ser, inner_rust_id, "value", 0);
+                let (has_managed_class, field_decls, serialize_body, deserialize_body, size_body) = if let RsTypeKind::Struct(s) = &inner_rust_ty.kind {
+                    let fields: Vec<String> = s.fields.iter().map(|f| format!("public {} {};", codegen.cs_type_name(f.ty), f.name)).collect();
+                    (true, fields, codegen.serialize_struct_body(s, "value"), codegen.deserialize_struct_body(s, &inner_name), codegen.size_struct_body(s, "value"))
+                } else {
+                    let mut ser = Vec::new();
+                    codegen.emit_serialize(&mut ser, inner_rust_id, "value", 0);
 
-                        let mut deser = Vec::new();
-                        deser.push(format!("{inner_name} result = default;"));
-                        codegen.emit_deserialize(&mut deser, inner_rust_id, "result", 0);
-                        deser.push("return result;".to_string());
+                    let mut deser = Vec::new();
+                    deser.push(format!("{inner_name} result = default;"));
+                    codegen.emit_deserialize(&mut deser, inner_rust_id, "result", 0);
+                    deser.push("return result;".to_string());
 
-                        let mut size_lines = Vec::new();
-                        size_lines.push("var _size = 0;".to_string());
-                        codegen.emit_size(&mut size_lines, inner_rust_id, "value", 0);
-                        size_lines.push("return _size;".to_string());
+                    let mut size_lines = Vec::new();
+                    size_lines.push("var _size = 0;".to_string());
+                    codegen.emit_size(&mut size_lines, inner_rust_id, "value", 0);
+                    size_lines.push("return _size;".to_string());
 
-                        (false, vec![], ser.join("\n"), deser.join("\n"), size_lines.join("\n"))
-                    };
+                    (false, vec![], ser.join("\n"), deser.join("\n"), size_lines.join("\n"))
+                };
 
                 let mut context = Context::new();
                 context.insert("wire_name", wire_name);
