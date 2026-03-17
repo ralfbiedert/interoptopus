@@ -56,7 +56,9 @@ public partial struct WireBuffer
         var _unmanaged = new Unmanaged();
         _unmanaged.data = data;
         _unmanaged.len = len;
-        _unmanaged.capacity = capacity;
+        // C#-owned buffers (capacity < 0) appear as borrowed (capacity = 0)
+        // to Rust so it won't try to free them. C# retains ownership.
+        _unmanaged.capacity = capacity > 0 ? capacity : 0;
         return _unmanaged;
     }
 

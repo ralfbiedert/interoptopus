@@ -84,9 +84,12 @@ impl Pass {
                         codegen.emit_deserialize(&mut deser, inner_rust_id, "result", 0);
                         deser.push("return result;".to_string());
 
-                        let size = format!("return {};", codegen.emit_size(inner_rust_id, "value"));
+                        let mut size_lines = Vec::new();
+                        size_lines.push("var _size = 0;".to_string());
+                        codegen.emit_size(&mut size_lines, inner_rust_id, "value", 0);
+                        size_lines.push("return _size;".to_string());
 
-                        (false, vec![], ser.join("\n"), deser.join("\n"), size)
+                        (false, vec![], ser.join("\n"), deser.join("\n"), size_lines.join("\n"))
                     };
 
                 let mut context = Context::new();
@@ -164,16 +167,14 @@ impl WireCodeGen<'_> {
 
     /// Generates the size calculation body for a struct.
     fn size_struct_body(&self, s: &Struct, val: &str) -> String {
-        let mut parts = Vec::new();
+        let mut lines = Vec::new();
+        lines.push("var _size = 0;".to_string());
         for f in &s.fields {
             let access = format!("{val}.{}", f.name);
-            parts.push(self.emit_size(f.ty, &access));
+            self.emit_size(&mut lines, f.ty, &access, 0);
         }
-        if parts.is_empty() {
-            "return 0;".to_string()
-        } else {
-            format!("return {};", parts.join("\n    + "))
-        }
+        lines.push("return _size;".to_string());
+        lines.join("\n")
     }
 
     /// Emits C# statements to serialize a value of the given Rust type.
@@ -274,40 +275,38 @@ impl WireCodeGen<'_> {
         }
     }
 
-    /// Returns a C# expression computing the wire size of a value.
-    fn emit_size(&self, ty_id: interoptopus::inventory::TypeId, val: &str) -> String {
-        let Some(ty) = self.rs_types.get(&ty_id) else {
-            return "0".to_string();
-        };
+    /// Emits C# statements that add the wire size of `val` to `_size`.
+    fn emit_size(&self, lines: &mut Vec<String>, ty_id: interoptopus::inventory::TypeId, val: &str, depth: usize) {
+        let Some(ty) = self.rs_types.get(&ty_id) else { return };
         match &ty.kind {
-            RsTypeKind::Primitive(p) => cs_primitive_size(*p).to_string(),
+            RsTypeKind::Primitive(p) => {
+                lines.push(format!("_size += {};", cs_primitive_size(*p)));
+            }
             RsTypeKind::WireOnly(WireOnly::String) => {
-                format!("(4 + System.Text.Encoding.UTF8.GetByteCount({val} ?? \"\"))")
+                lines.push(format!("_size += 4 + System.Text.Encoding.UTF8.GetByteCount({val} ?? \"\");"));
             }
             RsTypeKind::WireOnly(WireOnly::Vec(inner_id)) => {
-                let inner_size = self.emit_size_lambda(*inner_id);
-                format!("(4 + ({val}?.Sum(_e => {inner_size}) ?? 0))")
+                let iter = format!("_item{depth}");
+                lines.push(format!("_size += 4;"));
+                lines.push(format!("if ({val} != null) {{ foreach (var {iter} in {val}) {{"));
+                self.emit_size(lines, *inner_id, &iter, depth + 1);
+                lines.push("} }".to_string());
             }
             RsTypeKind::WireOnly(WireOnly::Map(k_id, v_id)) => {
-                let k_size = self.emit_size_lambda(*k_id);
-                let v_size = self.emit_size_lambda(*v_id);
-                format!("(4 + ({val}?.Sum(_kv => {{ var _k = _kv.Key; var _v = _kv.Value; return {k_size} + {v_size}; }}) ?? 0))")
+                let kv = format!("_kv{depth}");
+                lines.push(format!("_size += 4;"));
+                lines.push(format!("if ({val} != null) {{ foreach (var {kv} in {val}) {{"));
+                self.emit_size(lines, *k_id, &format!("{kv}.Key"), depth + 1);
+                self.emit_size(lines, *v_id, &format!("{kv}.Value"), depth + 1);
+                lines.push("} }".to_string());
             }
             RsTypeKind::Struct(s) => {
-                let parts: Vec<String> = s.fields.iter().map(|f| self.emit_size(f.ty, &format!("{val}.{}", f.name))).collect();
-                if parts.is_empty() {
-                    "0".to_string()
-                } else {
-                    format!("({})", parts.join(" + "))
+                for f in &s.fields {
+                    self.emit_size(lines, f.ty, &format!("{val}.{}", f.name), depth);
                 }
             }
-            _ => "0".to_string(),
+            _ => {}
         }
-    }
-
-    /// Returns a size expression usable inside a LINQ lambda where the element is `_e`.
-    fn emit_size_lambda(&self, ty_id: interoptopus::inventory::TypeId) -> String {
-        self.emit_size(ty_id, "_e")
     }
 }
 

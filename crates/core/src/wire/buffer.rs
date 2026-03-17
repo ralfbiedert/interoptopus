@@ -67,10 +67,14 @@ impl<'a> WireBuffer<'a> {
         self.len == 0
     }
 
-    /// Check if this buffer owns its data
+    /// Check if this buffer owns its data (Rust-allocated).
+    ///
+    /// Only positive capacity indicates Rust ownership. Negative capacity
+    /// signals foreign-allocated memory (e.g., C# `Marshal.AllocHGlobal`),
+    /// and zero means borrowed.
     #[must_use]
     pub const fn is_owned(&self) -> bool {
-        self.capacity != 0
+        self.capacity > 0
     }
 
     /// Get a slice view of the buffer

@@ -1,7 +1,19 @@
 /// Base unique identifier for FFI entities.
-#[derive(Hash, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Hash, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Id(u128);
+
+impl core::fmt::Debug for Id {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "Id(0x{:032x})", self.0)
+    }
+}
+
+impl core::fmt::Display for Id {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "0x{:032x}", self.0)
+    }
+}
 
 impl Id {
     /// Creates an `Id` from a raw `u128` value.
@@ -40,10 +52,16 @@ impl Id {
 macro_rules! new_id {
     ($(#[$meta:meta])* $t:ident) => {
         $(#[$meta])*
-        #[derive(Hash, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+        #[derive(Debug, Hash, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
         #[allow(unexpected_cfgs, reason = "All crates share same feature")]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub struct $t($crate::inventory::Id);
+
+        impl core::fmt::Display for $t {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                write!(f, "{}", self.0)
+            }
+        }
 
         impl $t {
             #[must_use]

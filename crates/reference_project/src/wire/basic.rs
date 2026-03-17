@@ -1,7 +1,6 @@
 use interoptopus::ffi;
 use interoptopus::wire::Wire;
 
-// TODO: This fails to codegen on C#
 #[ffi]
 pub fn wire_accept_string_1(_input: Wire<String>) {}
 
