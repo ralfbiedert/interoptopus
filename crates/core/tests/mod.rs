@@ -47,6 +47,7 @@ fn proc_macros() {
     t.compile_fail("tests/proc/svc/async_ref_self.rs");
     t.pass("tests/proc/svc/basic.rs");
     t.pass("tests/proc/svc/ctor.rs");
+    t.compile_fail("tests/proc/svc/ctor_forbidden_name.rs");
     t.compile_fail("tests/proc/svc/ctor_rval_bad_self.rs");
     t.compile_fail("tests/proc/svc/ctor_rval_omit.rs");
     t.pass("tests/proc/svc/lifetime.rs");

@@ -62,7 +62,7 @@
 //!
 //! #[ffi]
 //! impl Counter {
-//!     pub fn new() -> ffi::Result<Self, MyError> {
+//!     pub fn create() -> ffi::Result<Self, MyError> {
 //!         ffi::Ok(Self { count: 0 })
 //!     }
 //!

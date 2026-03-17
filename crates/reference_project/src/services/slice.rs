@@ -10,7 +10,7 @@ pub struct ServiceVariousSlices {
 // Regular implementation of methods.
 #[ffi]
 impl ServiceVariousSlices {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         ffi::Ok(Self { data: vec![123; 64] })
     }
 

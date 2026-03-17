@@ -8,7 +8,7 @@ fn async_service() {
     let item: ItemImpl = parse_quote! {
         #[ffi]
         impl Service {
-            pub fn new() -> ffi::Result<Self, Error> {
+            pub fn create() -> ffi::Result<Self, Error> {
                 ffi::Ok(Self)
             }
 
@@ -30,7 +30,7 @@ fn async_constructor() {
     let item: ItemImpl = parse_quote! {
         #[ffi]
         impl Service {
-            pub async fn new(runtime: Async<Runtime>) -> ffi::Result<Self, Error> {
+            pub async fn create(runtime: Async<Runtime>) -> ffi::Result<Self, Error> {
                 ffi::Ok(Self)
             }
 

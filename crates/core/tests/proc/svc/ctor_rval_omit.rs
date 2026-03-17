@@ -10,7 +10,7 @@ struct Service;
 
 #[ffi]
 impl Service {
-    pub fn new() {}
+    pub fn create() {}
 }
 
 fn main() {}

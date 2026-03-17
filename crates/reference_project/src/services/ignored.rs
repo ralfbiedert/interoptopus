@@ -6,7 +6,7 @@ pub struct ServiceIgnoringMethods {}
 
 #[ffi]
 impl ServiceIgnoringMethods {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         ffi::Result::Ok(Self {})
     }
 

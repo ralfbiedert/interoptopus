@@ -11,7 +11,7 @@ pub struct ServiceOnPanic {
 // Regular implementation of methods.
 #[ffi]
 impl ServiceOnPanic {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         ffi::Ok(Self { c_string: CString::new("Hello new_with").unwrap() })
     }
 

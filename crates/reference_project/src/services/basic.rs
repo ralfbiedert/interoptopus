@@ -6,7 +6,7 @@ pub struct ServiceBasic {}
 
 #[ffi]
 impl ServiceBasic {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         ffi::Ok(Self {})
     }
 }

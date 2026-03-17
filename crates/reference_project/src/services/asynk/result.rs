@@ -13,7 +13,7 @@ pub struct ServiceAsyncResult {
 
 #[ffi]
 impl ServiceAsyncResult {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         result_to_ffi(|| {
             let rt = Tokio::new();
             Ok(Self { rt })
