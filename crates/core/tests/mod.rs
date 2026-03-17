@@ -21,14 +21,13 @@ mod types {
 }
 
 #[test]
-fn proc_const() {
+fn proc_macros() {
     let t = TestCases::new();
-    t.pass("tests/proc/const/basic.rs");
-}
 
-#[test]
-fn proc_fn() {
-    let t = TestCases::new();
+    // Constants
+    t.pass("tests/proc/const/basic.rs");
+
+    // Functions
     t.compile_fail("tests/proc/fn/attr_extern_c.rs");
     t.compile_fail("tests/proc/fn/attr_no_mangle.rs");
     t.pass("tests/proc/fn/basic.rs");
@@ -40,11 +39,8 @@ fn proc_fn() {
     t.pass("tests/proc/fn/ref_lt.rs");
     t.pass("tests/proc/fn/unsafe.rs");
     t.pass("tests/proc/fn/wildcard.rs");
-}
 
-#[test]
-fn proc_svc() {
-    let t = TestCases::new();
+    // Services
     t.pass("tests/proc/svc/async_basic.rs");
     t.pass("tests/proc/svc/async_double.rs");
     t.compile_fail("tests/proc/svc/async_mut_self.rs");
@@ -56,12 +52,8 @@ fn proc_svc() {
     t.pass("tests/proc/svc/lifetime.rs");
     // t.compile_fail("tests/proc/svc/module.rs"); TODO: later
     t.compile_fail("tests/proc/svc/opaque.rs"); // TODO: should have better error warning about `opaque`
-}
 
-#[test]
-fn proc_ty() {
-    let t = TestCases::new();
-    t.pass("tests/proc/ty/basic.rs");
+    // Types
     t.compile_fail("tests/proc/ty/empty_struct.rs");
     t.compile_fail("tests/proc/ty/empty_unit.rs");
     t.compile_fail("tests/proc/ty/field_non_wire.rs");
