@@ -7,6 +7,7 @@ build verbose="":
 [arg("verbose", long="verbose", short="v", value="--verbose")]
 test verbose="" package="":
     cargo nextest run --all-features {{ verbose }}
+    cargo test --doc --all-features
 
 # Runs C# tests via dotnet.
 test-dotnet:
@@ -20,6 +21,7 @@ test-dotnet:
 lint:
     cargo fmt --check
     cargo clippy -- -D warnings
+    diff -q crates/core/README.md README.md # Make sure top-level README is up to date.
 
 # Runs all tests CI would perform before merging a PR.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
@@ -31,8 +33,8 @@ binstall-deps:
     cargo binstall cargo-nextest --disable-telemetry --no-confirm --secure
 
 # Opens cargo docs using nightly for doc feature bubbles.
-docs:
-    RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --no-deps --open
+docs open="":
+    RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc -p interoptopus --all-features --no-deps {{ open }}
 
 # Updates the top-level README from the core crate's README (the source of truth).
 update-readme:

@@ -20,7 +20,7 @@
 //!     RustInventory::new()
 //!         .register(api_guard!(ffi_inventory)) // <- You must name the current function.
 //!         .validate()                          //    since it will be called at runtime
-//!                                      //    but cannot be inferred.
+//!                                              //    but cannot be inferred.
 //! }
 //! ```
 //! In backends that support API guards an error message like this might be emitted if you try load

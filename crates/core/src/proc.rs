@@ -119,8 +119,45 @@
 pub use interoptopus_proc::ffi;
 
 
+/// Derives the [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime) trait for a service struct
+/// by forwarding to one of its fields.
+///
+/// The macro looks for the runtime field in this order:
+/// 1. A field annotated with `#[runtime]`.
+/// 2. A field named `runtime`.
+///
+/// The chosen field's type must itself implement [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime). The generated impl
+/// delegates [`spawn`](crate::pattern::asynk::AsyncRuntime::spawn) to that field.
+///
+/// # Example
+///
+/// ```rust
+/// use interoptopus::{AsyncRuntime, ffi};
+/// use interoptopus::rt::Tokio;
+///
+/// #[ffi(service)]
+/// #[derive(AsyncRuntime)]
+/// pub struct MyService {
+///     runtime: Tokio,
+/// }
+/// ```
+///
+/// When the field is not named `runtime`, mark it with `#[runtime]`:
+///
+/// ```rust
+/// use interoptopus::{AsyncRuntime, ffi};
+/// use interoptopus::rt::Tokio;
+///
+/// #[ffi(service)]
+/// #[derive(AsyncRuntime)]
+/// pub struct MyService {
+///     #[runtime]
+///     rt: Tokio,
+/// }
+/// ```
 #[cfg(feature = "derive")]
 pub use interoptopus_proc::AsyncRuntime;
+
 
 /// Strips module paths from a fully-qualified Rust type name, preserving generic structure.
 ///

@@ -13,13 +13,12 @@
 //!
 //! ```
 //! # use interoptopus::ffi;
-//!
+//! #
 //! #[ffi]
 //! pub fn write_file(file: *const u8) -> i8 {
 //!    let file = unsafe { /* ... */ };
 //!    0
 //! }
-//!
 //! ```
 //!
 //! you would instead accept an [`ffi::String`](crate::pattern::string::String) and return an [`ffi::Result`](crate::pattern::result::Result):
@@ -31,13 +30,12 @@
 //! # pub enum MyError {
 //! #    Bad
 //! # }
-//!
+//! #
 //! #[ffi]
 //! pub fn write_file(file: ffi::String) -> ffi::Result<(), MyError> {
 //!    let file = file.as_str();
 //!    ffi::Ok(())
 //! }
-//!
 //! ```
 //! That way you won't have to write `unsafe` code, _and_ you get more idiomatic code in most
 //! backends. For example, in C# you might end up with a simple `WriteFile("foo.txt")` call
@@ -55,7 +53,7 @@
 //!   to a Python `class`.
 //!
 //! - The pattern is not supported and will be **omitted, if the pattern was merely an aggregate** of
-//!   existing items. Examples include the [`service`] pattern in C which will not
+//!   existing items. Examples include the service (see below) pattern in C which will not
 //!   be emitted. However, this will not pose a problem as all constituent types and methods (functions)
 //!   are still available as raw bindings.
 //!
@@ -66,7 +64,7 @@
 //! # Pattern Composition
 //!
 //! Due to a lack of expressiveness in other languages, patterns usually compose without issues in Rust, but
-//! not in all backends. For example, something like `Slice<Result<Option<String>, Error>>` is supported in
+//! not in all backends. For example, something like `ffi::Slice<ffi::Result<ffi::Option<ffi::String>, Error>>` is supported in
 //! Rust without issues, but its UX might suffer in Python.
 
 #[doc(hidden)]

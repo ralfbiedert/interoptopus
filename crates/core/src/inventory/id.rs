@@ -1,13 +1,19 @@
+/// Base unique identifier for FFI entities.
 #[derive(Hash, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Id(u128);
 
 impl Id {
+    /// Creates an `Id` from a raw `u128` value.
     #[must_use]
     pub const fn new(id: u128) -> Self {
         Self(id)
     }
 
+    /// Produces a new `Id` by mixing in an additional `u128` value.
+    ///
+    /// Uses XOR and multiplication to combine `self` with `x` into a
+    /// deterministic but well-distributed result.
     #[must_use]
     pub const fn derive(self, x: u128) -> Self {
         let a = self.0;
@@ -21,6 +27,7 @@ impl Id {
         Self(result)
     }
 
+    /// Produces a new `Id` by mixing in another `Id`.
     #[must_use]
     pub const fn derive_id(self, x: Self) -> Self {
         self.derive(x.0)
@@ -31,7 +38,8 @@ impl Id {
 #[macro_export]
 #[allow(unexpected_cfgs, reason = "All crates share same feature")]
 macro_rules! new_id {
-    ($t:ident) => {
+    ($(#[$meta:meta])* $t:ident) => {
+        $(#[$meta])*
         #[derive(Hash, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
         #[allow(unexpected_cfgs, reason = "All crates share same feature")]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -88,10 +96,22 @@ macro_rules! id {
     }};
 }
 
-new_id!(TypeId);
-new_id!(ConstantId);
-new_id!(FunctionId);
-new_id!(ServiceId);
+new_id!(
+    #[doc(hidden)]
+    TypeId
+);
+new_id!(
+    #[doc(hidden)]
+    ConstantId
+);
+new_id!(
+    #[doc(hidden)]
+    FunctionId
+);
+new_id!(
+    #[doc(hidden)]
+    ServiceId
+);
 
 #[doc(hidden)]
 #[must_use]

@@ -1,6 +1,23 @@
 use crate::pattern::asynk::AsyncRuntime;
 use std::sync::Arc;
 
+/// A ready-made [`AsyncRuntime`] backed by a multi-threaded Tokio runtime.
+///
+/// Use this as the runtime field in async service structs. It creates a
+/// multi-threaded Tokio runtime with all features enabled on construction.
+///
+/// # Example
+///
+/// ```rust
+/// use interoptopus::{AsyncRuntime, ffi};
+/// use interoptopus::rt::Tokio;
+///
+/// #[ffi(service)]
+/// #[derive(AsyncRuntime)]
+/// pub struct MyAsyncService {
+///     runtime: Tokio,
+/// }
+/// ```
 #[derive(Clone)]
 pub struct Tokio {
     rt: Arc<tokio::runtime::Runtime>,
