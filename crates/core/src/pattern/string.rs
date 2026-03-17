@@ -121,7 +121,7 @@ impl WireIO for String {
     }
 }
 
-/// Emits helper functions used by [`String`](crate::pattern::string::String).
+/// Emits and registers helper functions used by [`String`](crate::pattern::string::String).
 #[macro_export]
 macro_rules! builtins_string {
     () => {{

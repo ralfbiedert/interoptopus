@@ -1,7 +1,7 @@
 //! Like a regular [`Vec`](std::vec::Vec), but FFI safe.<sup>🚧</sup>
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::io::{Read, Write};
 use std::mem::forget;
@@ -127,7 +127,7 @@ impl<T> Drop for Vec<T> {
     }
 }
 
-/// Emits helper functions used by [`Vec`](crate::pattern::vec::Vec).
+/// Emits and registers helper functions used by [`Vec`](crate::pattern::vec::Vec).
 #[macro_export]
 macro_rules! builtins_vec {
     ($t:ty) => {{

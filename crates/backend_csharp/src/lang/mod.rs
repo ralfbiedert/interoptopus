@@ -1,6 +1,9 @@
+#![doc(hidden)]
+//! The core C# language model we understand (types, functions, ...).
+
 pub mod constant;
 pub mod functions;
-pub mod id;
+mod id;
 pub mod meta;
 pub mod pattern;
 pub mod service;

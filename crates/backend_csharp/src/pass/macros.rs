@@ -4,6 +4,7 @@
 /// ```ignore
 /// let rust_array = try_extract_kind!(ty, Array);
 /// ```
+#[doc(hidden)]
 #[macro_export]
 macro_rules! try_extract_kind {
     ($ty:expr, $variant:ident) => {
@@ -21,6 +22,7 @@ macro_rules! try_extract_kind {
 /// ```ignore
 /// skip_mapped!(kinds, id_map, rust_id);
 /// ```
+#[doc(hidden)]
 #[macro_export]
 macro_rules! skip_mapped {
     ($kinds:expr, $id_map:expr, $rust_id:expr) => {
@@ -42,6 +44,7 @@ macro_rules! skip_mapped {
 /// ```ignore
 /// let cs_ty = try_resolve!(id_map.ty(rust_ty), pass_meta, self.info, MissingItem::RustType(rust_ty));
 /// ```
+#[doc(hidden)]
 #[macro_export]
 macro_rules! try_resolve {
     ($option:expr, $pass_meta:expr, $info:expr, $missing:expr) => {

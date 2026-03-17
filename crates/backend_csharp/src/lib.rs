@@ -16,4 +16,4 @@ mod macros;
 mod pipeline;
 
 pub use error::Error;
-pub use pipeline::{RustLibrary, RustLibraryConfig};
+pub use pipeline::{RustLibrary, RustLibraryBuilder, RustLibraryConfig};

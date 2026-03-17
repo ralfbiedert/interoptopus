@@ -1,12 +1,19 @@
 use std::fmt::{Display, Formatter};
 
+/// Errors that can occur during backend code generation.
 #[derive(Debug)]
 pub enum Error {
+    /// An I/O error while reading or writing assets.
     AssetError(std::io::Error),
+    /// A requested asset path was not found in the archive.
     AssetNotFound(String),
+    /// An asset file was not valid UTF-8.
     AssetUtf8Error(String, std::string::FromUtf8Error),
+    /// The `OUT_DIR` environment variable is not set (expected in `build.rs`).
     MissingOutDir,
+    /// Failed to strip a path prefix.
     PathStripError,
+    /// A Tera template failed to render.
     TemplateRender(tera::Error),
 }
 

@@ -81,8 +81,7 @@ pub fn pascal_to_snake(name: &str) -> String {
     result
 }
 
-/// Derives a method name from a service function name by stripping the `snake_case`
-/// service prefix and `PascalCase`ing the remainder.
+/// Derives a method name from a service function name.
 ///
 /// Given a `PascalCase` type name (e.g. `ServiceBasic`) and a `snake_case` function name
 /// (e.g. `service_basic_do_something`), strips the prefix to produce `DoSomething`.

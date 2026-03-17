@@ -1,5 +1,16 @@
-/// Renders a template.
-// #[allow(clippy::crate_in_macro_def, reason = "We do want to access one of backend crates' templates, not this one")]
+/// Renders a Tera template, optionally with key-value context pairs.
+///
+/// # Usage
+///
+/// Without context:
+/// ```ignore
+/// let output = render!(engine, "my_template.cs")?;
+/// ```
+///
+/// With context variables:
+/// ```ignore
+/// let output = render!(engine, "my_template.cs", ("name", &name), ("is_public", &true))?;
+/// ```
 #[macro_export]
 macro_rules! render {
     ($engine:expr, $template:expr) => {{

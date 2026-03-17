@@ -1,28 +1,38 @@
+//! Multi-file output buffering for code generation.
+
 use std::collections::HashMap;
 use std::fmt;
 use std::fs;
 use std::path::Path;
 
+/// A collection of named output buffers, typically one per generated file.
+///
+/// Backends build up a `Multibuf` during code generation, then write all buffers
+/// to disk at the end via [`write_buffers_to`](Multibuf::write_buffers_to).
 #[derive(Debug, Default)]
 pub struct Multibuf {
     buffers: HashMap<String, String>,
 }
 
 impl Multibuf {
+    /// Creates an empty `Multibuf`.
     #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Adds or replaces a named buffer with the given content.
     pub fn add_buffer(&mut self, name: impl AsRef<str>, value: String) {
         self.buffers.insert(name.as_ref().to_string(), value);
     }
 
+    /// Returns the content of the named buffer, if it exists.
     #[must_use]
     pub fn buffer(&self, name: &str) -> Option<&String> {
         self.buffers.get(name)
     }
 
+    /// Writes the named buffer to the current directory.
     pub fn write_buffer(&self, name: &str) -> Result<(), std::io::Error> {
         self.write_buffer_to(".", name)
     }
@@ -46,6 +56,7 @@ impl Multibuf {
         Ok(())
     }
 
+    /// Iterates over all `(name, content)` pairs.
     pub fn iter(&self) -> impl Iterator<Item = (&String, &String)> {
         self.buffers.iter()
     }

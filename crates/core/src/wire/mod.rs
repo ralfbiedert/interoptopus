@@ -228,7 +228,7 @@ where
 
 // Wire<Input>::de(buf_slice)->Input
 
-/// Emits helper functions used by [`Wire`](crate::wire::Wire).
+/// Emits and registers helper functions used by [`Wire`](crate::wire::Wire).
 #[macro_export]
 macro_rules! builtins_wire {
     () => {{

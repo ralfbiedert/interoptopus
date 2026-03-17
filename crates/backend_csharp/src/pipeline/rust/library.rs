@@ -1,14 +1,15 @@
-use crate::Error;
 use crate::pass::meta;
 use crate::pass::model;
 use crate::pass::output;
 use crate::pass::{OutputResult, PassMeta};
-use crate::pipeline::{RustLibraryBuilder, loop_model_passes_until_done};
+use crate::pipeline::{loop_model_passes_until_done, RustLibraryBuilder};
 use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
+use crate::Error;
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
 
+#[doc(hidden)]
 #[derive(Default)]
 pub struct RustLibraryConfig {
     pub meta_info: meta::info::Config,
@@ -160,6 +161,27 @@ pub struct IntermediateOutputPasses {
     pub using: output::r#using::Pass,
 }
 
+/// The main entry point for C# code generation.
+///
+/// Holds the full multi-pass pipeline: inventory, model passes, output passes, and
+/// plugins. Call [`process`](RustLibrary::process) to run the pipeline and produce
+/// a [`Multibuf`] containing the generated `.cs` files.
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use interoptopus_csharp::RustLibrary;
+/// # use interoptopus::inventory::RustInventory;
+///
+/// # let inventory = RustInventory::default();
+/// let output = RustLibrary::builder(inventory)
+///     .dll_name("my_lib")
+///     .build()
+///     .process()
+///     .expect("code generation failed");
+///
+/// output.write_buffers_to("bindings/").unwrap();
+/// ```
 pub struct RustLibrary {
     // Basic input
     inventory: RustInventory,
@@ -190,11 +212,13 @@ pub struct RustLibrary {
 }
 
 impl RustLibrary {
+    /// Creates a new `RustLibrary` with default configuration.
     #[must_use]
     pub fn new(inventory: RustInventory) -> Self {
         Self::with_config(inventory, RustLibraryConfig::default())
     }
 
+    /// Returns a builder for configuring the code generation pipeline.
     #[must_use]
     pub fn builder(inventory: RustInventory) -> RustLibraryBuilder {
         RustLibraryBuilder::new(inventory)
@@ -285,6 +309,7 @@ impl RustLibrary {
         }
     }
 
+    /// Registers a plugin that can hook into model and output passes.
     #[must_use]
     pub fn register_plugin(mut self, plugin: impl RustLibraryPlugin + 'static) -> Self {
         self.plugins.push(Box::new(plugin));
@@ -307,6 +332,7 @@ impl RustLibrary {
 
 
     #[rustfmt::skip]
+    /// Runs the full code generation pipeline and returns the generated output buffers.
     pub fn process(mut self) -> Result<Multibuf, Error> {
         self.plugin_init_pass();
         let mut pass_meta = PassMeta::default();

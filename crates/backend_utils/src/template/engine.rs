@@ -27,6 +27,7 @@ impl TemplateEngine {
         Ok(x)
     }
 
+    /// Renders the named template with the given Tera context.
     pub fn render(&self, path: impl AsRef<str>, context: &Context) -> Result<String, Error> {
         let rendered = self.tera.render(path.as_ref(), context)?;
         Ok(rendered)

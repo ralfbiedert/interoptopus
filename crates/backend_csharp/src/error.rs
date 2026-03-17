@@ -1,11 +1,15 @@
 use std::fmt::{Display, Formatter};
 
+/// Errors that can occur during C# code generation.
 #[derive(Debug)]
 pub enum Error {
+    /// The model pass loop did not converge within the iteration limit.
     PassLimit,
+    /// A Tera template failed to render.
     TemplateError(interoptopus_backends::Error),
+    /// A type was referenced but has no C# name assigned.
     MissingTypeName(String),
-    /// If `dotnet` was found, but an actual command failed.
+    /// The `dotnet` CLI was found but a command it ran failed.
     DotNetCliCommandFailed(String),
 }
 
