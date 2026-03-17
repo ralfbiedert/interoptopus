@@ -1,6 +1,6 @@
 //! Assembles all wire output into a single list of rendered strings per output file.
 //!
-//! Combines results from the `wire_type` pass (WireOf* structs) and the
+//! Combines results from the `wire_type` pass (`WireOf*` structs) and the
 //! `helper_classes` pass (nested managed classes) into a unified, sorted list
 //! that the final assembly pass can insert into each output file.
 

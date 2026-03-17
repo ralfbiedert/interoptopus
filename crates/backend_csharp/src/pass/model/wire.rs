@@ -6,9 +6,9 @@
 //! them as `TypeKind::WireOnly(WireOnly::Composite(...))` in the type model so
 //! the output passes can emit them like any other type.
 
+use crate::lang::TypeId;
 use crate::lang::types::kind::wire::WireOnly as CsWireOnly;
 use crate::lang::types::kind::{Composite, Field, TypeKind};
-use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use interoptopus::inventory::{TypeId as RsTypeId, Types as RsTypes};
@@ -45,7 +45,7 @@ impl Pass {
         let mut outcome = Unchanged;
         let mut registered: HashSet<RsTypeId> = HashSet::new();
 
-        for (_rust_id, rust_ty) in rs_types {
+        for rust_ty in rs_types.values() {
             let inner_rust_id = match &rust_ty.kind {
                 RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Wire(inner)) => *inner,
                 _ => continue,
@@ -79,12 +79,7 @@ impl Pass {
                     .iter()
                     .filter_map(|f| {
                         let cs_field_ty = id_map.ty(f.ty)?;
-                        Some(Field {
-                            name: f.name.clone(),
-                            docs: f.docs.clone(),
-                            visibility: map_visibility(f.visibility),
-                            ty: cs_field_ty,
-                        })
+                        Some(Field { name: f.name.clone(), docs: f.docs.clone(), visibility: map_visibility(f.visibility), ty: cs_field_ty })
                     })
                     .collect();
 
@@ -108,7 +103,7 @@ fn map_visibility(vis: RsVisibility) -> crate::lang::meta::Visibility {
     }
 }
 
-/// Recursively collects struct TypeIds reachable from `s` that have WireOnly fields.
+/// Recursively collects struct `TypeId`s reachable from `s` that have `WireOnly` fields.
 fn collect_nested_structs(rs_types: &RsTypes, s: &Struct, out: &mut Vec<RsTypeId>, visited: &mut HashSet<RsTypeId>) {
     for f in &s.fields {
         collect_nested_from_type(rs_types, f.ty, out, visited);
@@ -122,9 +117,10 @@ fn collect_nested_from_type(rs_types: &RsTypes, ty_id: RsTypeId, out: &mut Vec<R
     let Some(ty) = rs_types.get(&ty_id) else { return };
     match &ty.kind {
         RsTypeKind::Struct(s) => {
-            let has_wire_only = s.fields.iter().any(|f| {
-                rs_types.get(&f.ty).is_some_and(|ft| matches!(&ft.kind, RsTypeKind::WireOnly(_)))
-            });
+            let has_wire_only = s
+                .fields
+                .iter()
+                .any(|f| rs_types.get(&f.ty).is_some_and(|ft| matches!(&ft.kind, RsTypeKind::WireOnly(_))));
             if has_wire_only {
                 out.push(ty_id);
             }

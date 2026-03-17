@@ -1,8 +1,8 @@
 use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
-use crate::lang::types::wire::WireIO;
 use crate::lang::types::SerializationError;
+use crate::lang::types::wire::WireIO;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
 use std::collections::HashMap;
 use std::io::{Read, Write};
@@ -153,7 +153,7 @@ impl TypeInfo for String {
 
 impl WireIO for String {
     fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
-        (self.len() as u32).write(out)?;
+        u32::try_from(self.len())?.write(out)?;
         out.write_all(self.as_bytes())?;
         Ok(())
     }
@@ -199,7 +199,7 @@ impl<T: TypeInfo> TypeInfo for Vec<T> {
 
 impl<T: WireIO> WireIO for Vec<T> {
     fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
-        (self.len() as u32).write(out)?;
+        u32::try_from(self.len())?.write(out)?;
         for item in self {
             item.write(out)?;
         }
@@ -249,12 +249,9 @@ impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap
     }
 }
 
-impl<K: WireIO, V: WireIO, S: ::std::hash::BuildHasher + Default> WireIO for HashMap<K, V, S>
-where
-    K: Eq + core::hash::Hash,
-{
+impl<K: WireIO + Eq + core::hash::Hash, V: WireIO, S: ::std::hash::BuildHasher + Default> WireIO for HashMap<K, V, S> {
     fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
-        (self.len() as u32).write(out)?;
+        u32::try_from(self.len())?.write(out)?;
         for (k, v) in self {
             k.write(out)?;
             v.write(out)?;

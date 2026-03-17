@@ -97,10 +97,10 @@ impl Pass {
                     TypePattern::Wire(t) => {
                         // The inner type of Wire may not have a C# TypeKind (its fields use
                         // WireOnly types), so resolve the name from the Rust inventory directly.
-                        let rust_name = rs_types.iter()
+                        let rust_name = rs_types
+                            .iter()
                             .find(|(rid, _)| id_map.ty(**rid) == Some(*t))
-                            .map(|(_, ty)| sanitize_rust_name(&ty.name))
-                            .unwrap_or_else(|| "Unknown".to_string());
+                            .map_or_else(|| "Unknown".to_string(), |(_, ty)| sanitize_rust_name(&ty.name));
                         format!("WireOf{}", rust_to_pascal(&rust_name))
                     }
                     TypePattern::Result(ok, err, _) => {

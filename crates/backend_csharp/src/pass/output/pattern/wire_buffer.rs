@@ -1,7 +1,7 @@
-//! Renders the `WireBuffer` utility type for serialized Wire<T> transfers.
+//! Renders the `WireBuffer` utility type for serialized `Wire<T>` transfers.
 //!
 //! The `WireBuffer` is a composite struct matching the Rust `WireBuffer`
-//! layout (IntPtr + int + int). It provides managed/unmanaged conversion
+//! layout (`IntPtr` + int + int). It provides managed/unmanaged conversion
 //! and a marshaller, following the same pattern as other composite types.
 //! Only emitted when `builtins_wire!()` is registered.
 
@@ -25,12 +25,7 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, rendered: HashMap::default() }
     }
 
-    pub fn process(
-        &mut self,
-        _pass_meta: &mut crate::pass::PassMeta,
-        output_master: &output::master::Pass,
-        pattern_wire: &model::pattern::wire::Pass,
-    ) -> OutputResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::master::Pass, pattern_wire: &model::pattern::wire::Pass) -> OutputResult {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(FileType::Csharp) {

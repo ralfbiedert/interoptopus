@@ -31,7 +31,7 @@ lint:
 
 # Runs all tests CI would perform before merging a PR.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
-ci verbose="": (build verbose) (test verbose) lint
+ci verbose="": (build verbose) (test verbose) test-dotnet lint
 
 # Install all required tools, needs `binstall`, see https://github.com/cargo-bins/cargo-binstall
 binstall-deps force="":

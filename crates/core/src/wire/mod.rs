@@ -19,7 +19,7 @@
 //!    `Wire<T>` is `repr(C)`, it crosses the FFI boundary as a plain struct copy.
 //! 3. **Deserialize** — on the foreign side (e.g., C#), read the buffer bytes and
 //!    reconstruct the managed type.
-//! 4. **Free** — call `interoptopus_wire_destroy` (emitted by [`builtins_wire!`]) to
+//! 4. **Free** — call `interoptopus_wire_destroy` (emitted by `builtins_wire!`) to
 //!    drop the Rust-allocated buffer. Borrowed buffers (capacity == 0) are a no-op.
 //!
 //! ### Foreign -> Rust
@@ -72,7 +72,7 @@ pub use buffer::WireBuffer;
 
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
+use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::marker::PhantomData;
 

@@ -4,7 +4,7 @@
 //! - [`WireCodeGen`] — Shared C# code generation logic (type mapping, serialize/deserialize/size emission)
 //! - [`wire_type`] — Renders `WireOf*` structs for each `Wire<T>` pattern
 //! - [`helper_classes`] — Emits managed classes for nested structs with `WireOnly` fields
-//! - [`all`] — Assembles wire_type and helper_classes results per output file
+//! - [`all`] — Assembles `wire_type` and `helper_classes` results per output file
 
 pub mod all;
 pub mod helper_classes;
@@ -23,6 +23,7 @@ pub struct WireCodeGen<'a> {
 
 impl WireCodeGen<'_> {
     /// Maps a Rust type to its C# managed type name.
+    #[must_use]
     pub fn cs_type_name(&self, ty_id: TypeId) -> String {
         let Some(ty) = self.rs_types.get(&ty_id) else {
             return "object".to_string();
@@ -42,6 +43,7 @@ impl WireCodeGen<'_> {
     }
 
     /// Generates the serialize method body for a struct.
+    #[must_use]
     pub fn serialize_struct_body(&self, s: &Struct, val: &str) -> String {
         let mut lines = Vec::new();
         for f in &s.fields {
@@ -52,6 +54,7 @@ impl WireCodeGen<'_> {
     }
 
     /// Generates the deserialize method body for a struct.
+    #[must_use]
     pub fn deserialize_struct_body(&self, s: &Struct, type_name: &str) -> String {
         let mut lines = Vec::new();
         lines.push(format!("var result = new {type_name}();"));
@@ -64,6 +67,7 @@ impl WireCodeGen<'_> {
     }
 
     /// Generates the size calculation body for a struct.
+    #[must_use]
     pub fn size_struct_body(&self, s: &Struct, val: &str) -> String {
         let mut lines = Vec::new();
         lines.push("var _size = 0;".to_string());
@@ -135,7 +139,9 @@ impl WireCodeGen<'_> {
                 lines.push(format!("{p}{target} = {};", cs_read_primitive(*prim)));
             }
             RsTypeKind::WireOnly(WireOnly::String) => {
-                lines.push(format!("{p}{{ var _len = reader.ReadUInt32(); {target} = _len > 0 ? System.Text.Encoding.UTF8.GetString(reader.ReadBytes((int)_len)) : \"\"; }}"));
+                lines.push(format!(
+                    "{p}{{ var _len = reader.ReadUInt32(); {target} = _len > 0 ? System.Text.Encoding.UTF8.GetString(reader.ReadBytes((int)_len)) : \"\"; }}"
+                ));
             }
             RsTypeKind::WireOnly(WireOnly::Vec(inner_id)) => {
                 let cs_inner = self.cs_type_name(*inner_id);

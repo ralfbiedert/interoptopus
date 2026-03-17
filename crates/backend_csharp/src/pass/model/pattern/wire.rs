@@ -2,7 +2,7 @@
 //!
 //! The `builtins_wire!` macro emits a single helper function with a fixed name prefix.
 //! This pass scans the Rust inventory for it and stores the entry-point name
-//! so that the wire_buffer output pass can emit the nested `InteropHelper` import.
+//! so that the `wire_buffer` output pass can emit the nested `InteropHelper` import.
 
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo};

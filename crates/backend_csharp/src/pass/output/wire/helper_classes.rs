@@ -4,14 +4,14 @@
 //! by the model wire pass. This output pass renders them as simple `partial class`
 //! declarations with public fields.
 
-use crate::lang::types::kind::wire::WireOnly;
 use crate::lang::types::kind::TypeKind;
+use crate::lang::types::kind::wire::WireOnly;
 use crate::output::{FileType, Output};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::output::wire::WireCodeGen;
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus::inventory::Types as RsTypes;
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
-use crate::pass::output::wire::WireCodeGen;
 
 #[derive(Default)]
 pub struct Config {}
@@ -80,14 +80,14 @@ impl Pass {
 }
 
 /// Resolves the C# type name for a field. Tries the C# type model first,
-/// falls back to the Rust-based wire codegen for WireOnly types.
+/// falls back to the Rust-based wire codegen for `WireOnly` types.
 fn resolve_field_type_name(cs_ty: crate::lang::TypeId, types: &model::types::all::Pass, id_map: &model::id_map::Pass, codegen: &WireCodeGen<'_>) -> String {
     // Try C# type model first.
     if let Some(t) = types.get(cs_ty) {
         return t.name.clone();
     }
     // Fall back: find the Rust TypeId and resolve via wire codegen.
-    for (rs_id, _) in codegen.rs_types {
+    for rs_id in codegen.rs_types.keys() {
         if id_map.ty(*rs_id) == Some(cs_ty) {
             return codegen.cs_type_name(*rs_id);
         }

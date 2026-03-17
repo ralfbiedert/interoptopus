@@ -43,11 +43,11 @@ impl Pass {
             for rust_field in &rust_struct.fields {
                 // Skip structs with WireOnly fields — they are only used through Wire serialization
                 // and should not become C# composite types.
-                if let Some(field_rs_ty) = rs_types.get(&rust_field.ty) {
-                    if matches!(&field_rs_ty.kind, lang::types::TypeKind::WireOnly(_)) {
-                        all_fields_available = false;
-                        break;
-                    }
+                if let Some(field_rs_ty) = rs_types.get(&rust_field.ty)
+                    && matches!(&field_rs_ty.kind, lang::types::TypeKind::WireOnly(_))
+                {
+                    all_fields_available = false;
+                    break;
                 }
 
                 // Look up the C# TypeId for this field's type

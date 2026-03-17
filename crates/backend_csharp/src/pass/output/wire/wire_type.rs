@@ -5,12 +5,12 @@
 //! inner type is a struct, also emits a managed class with a `.Wire()` helper.
 
 use crate::output::{FileType, Output};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::output::wire::WireCodeGen;
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus::inventory::Types as RsTypes;
 use interoptopus::lang::types::TypeKind as RsTypeKind;
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
-use crate::pass::output::wire::WireCodeGen;
 
 #[derive(Default)]
 pub struct Config {}

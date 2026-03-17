@@ -8,11 +8,11 @@
 //! Compounds and enums are at least `To`. If any field/variant is `Into`, the
 //! compound/enum is also `Into`.
 
-use crate::lang::types::kind::{DelegateKind, TypeKind};
-use crate::lang::types::ManagedConversion;
 use crate::lang::TypeId;
+use crate::lang::types::ManagedConversion;
+use crate::lang::types::kind::{DelegateKind, TypeKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashMap;
 
 #[derive(Default)]

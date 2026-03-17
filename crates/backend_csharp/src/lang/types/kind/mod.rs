@@ -1,6 +1,6 @@
+use crate::lang::TypeId;
 use crate::lang::types::kind::task::Task;
 use crate::lang::types::kind::wire::WireOnly;
-use crate::lang::TypeId;
 
 mod array;
 mod composite;

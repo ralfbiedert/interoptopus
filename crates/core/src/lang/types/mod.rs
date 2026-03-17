@@ -179,3 +179,9 @@ impl From<::std::io::Error> for SerializationError {
         Self::Io(e)
     }
 }
+
+impl From<::std::num::TryFromIntError> for SerializationError {
+    fn from(e: ::std::num::TryFromIntError) -> Self {
+        Self::Io(::std::io::Error::new(::std::io::ErrorKind::InvalidData, e))
+    }
+}
