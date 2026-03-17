@@ -1,10 +1,10 @@
-//! Convenience patterns like [services](crate::pattern::service), [strings](crate::pattern::string), [results](crate::pattern::result::Result) and [options](crate::pattern::option::Option).
+//! Convenience patterns like [strings](crate::pattern::string), [results](crate::pattern::result::Result) and [options](crate::pattern::option::Option).
 //!
 //! Patterns are optional types and constructs you can use. Most patterns are automatically applied
 //! once you use their corresponding type.
 //!
 //! Backends which support a pattern will then generate _additional_ language-specific helpers
-//! and bindings  for it. In any case, regardless whether a pattern is supported by a backend or not,
+//! and bindings for it. In any case, regardless whether a pattern is supported by a backend or not,
 //! fallback bindings will be available.
 //!
 //! ## Pattern Usage
@@ -42,26 +42,65 @@
 //! that automatically converts the used `string` to UTF-8, and in turn converts a failed result
 //! to a CLR exception.
 //!
-//! ## Pattern Backend Support
+//! ## Services
+//!
+//! Services turn a Rust `impl` blocks into a class-like constructs in target languages (e.g., a
+//! C# class with methods, constructor and `IDisposable`). To create a service:
+//!
+//! - Annotate the struct with `#[ffi(service)]`.
+//! - Annotate the `impl` block with `#[ffi]`.
+//! - Provide at least one constructor returning `ffi::Result<Self, E>`.
+//!
+//! ```rust
+//! use interoptopus::ffi;
+//!
+//! #[ffi]
+//! pub enum MyError { General }
+//!
+//! #[ffi(service)]
+//! pub struct Counter { count: u32 }
+//!
+//! #[ffi]
+//! impl Counter {
+//!     pub fn new() -> ffi::Result<Self, MyError> {
+//!         ffi::Ok(Self { count: 0 })
+//!     }
+//!
+//!     pub fn increment(&mut self) {
+//!         self.count += 1;
+//!     }
+//!
+//!     pub fn get(&self) -> u32 {
+//!         self.count
+//!     }
+//! }
+//! ```
+//!
+//! The `#[ffi]` macro on the `impl` block generates standalone FFI functions for each public
+//! method, plus a destructor. A backend then groups these into a class. Methods marked with
+//! `#[ffi::skip]` or non-`pub` methods are excluded.
+//!
+//! For async services, additionally derive [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime)
+//! and include a runtime field (see [`rt::Tokio`](crate::rt::Tokio)).
+//!
+//! ## Backend Support
 //!
 //! Patterns are exclusively **designed _on top of_ existing, C-compatible functions and types**.
 //! That means a backend will handle a pattern in one of three ways:
 //!
 //! - The pattern is **supported** and the backend will generate the raw, underlying type and / or
 //!   a language-specific abstraction that safely and conveniently handles it. Examples
-//!   include converting a [`String`](crate::pattern::string::String) to a C# `string`, or a [`service`]
-//!   to a Python `class`.
+//!   include converting a [`String`](crate::pattern::string::String) to a C# `string`, or a
+//!   service to a Python `class`.
 //!
 //! - The pattern is not supported and will be **omitted, if the pattern was merely an aggregate** of
-//!   existing items. Examples include the service (see below) pattern in C which will not
-//!   be emitted. However, this will not pose a problem as all constituent types and methods (functions)
-//!   are still available as raw bindings.
+//!   existing items. For example, a service in C will not be emitted as a class, but all its
+//!   constituent types and functions are still available as raw bindings.
 //!
 //! - The pattern is not supported and will be **replaced with a fallback type**. Examples include
-//!   the [`CStrPointer`](string) which will become a regular `*const char` in C.
+//!   the [`CStrPointer`](crate::pattern::cstr::CStrPtr) which will become a regular `*const char` in C.
 //!
-//!
-//! # Pattern Composition
+//! ## Composition
 //!
 //! Due to a lack of expressiveness in other languages, patterns usually compose without issues in Rust, but
 //! not in all backends. For example, something like `ffi::Slice<ffi::Result<ffi::Option<ffi::String>, Error>>` is supported in
