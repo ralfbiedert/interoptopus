@@ -43,6 +43,6 @@ jobs:
         with:
           tool: just, cargo-binstall
       - name: Rust - Install Rust Tools
-        run: just binstall-deps
+        run: just binstall-deps --force
       - name: Run CI
         run: just ci --verbose
