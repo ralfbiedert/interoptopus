@@ -20,14 +20,14 @@ use std::mem::swap;
 /// use interoptopus::inventory::RustInventory;
 ///
 /// #[ffi]
-/// pub fn add(a: u32, b: u32) -> u32 { a + b }
+/// pub fn my_add(a: u32, b: u32) -> u32 { a + b }
 ///
 /// #[ffi]
 /// pub const MAX: u32 = 100;
 ///
 /// pub fn ffi_inventory() -> RustInventory {
 ///     RustInventory::new()
-///         .register(function!(add))
+///         .register(function!(my_add))
 ///         .register(constant!(MAX))
 ///         .validate()
 /// }

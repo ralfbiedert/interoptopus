@@ -7,7 +7,7 @@
 /// # use interoptopus::{ffi, extra_type};
 /// # use interoptopus::inventory::RustInventory;
 /// #[ffi]
-/// pub struct Extra { pub value: u32 }
+/// pub struct Extra { pub count: u32 }
 ///
 /// pub fn ffi_inventory() -> RustInventory {
 ///     RustInventory::new()
@@ -36,11 +36,11 @@ macro_rules! extra_type {
 /// # use interoptopus::{ffi, function};
 /// # use interoptopus::inventory::RustInventory;
 /// #[ffi]
-/// pub fn add(a: u32, b: u32) -> u32 { a + b }
+/// pub fn my_add(a: u32, b: u32) -> u32 { a + b }
 ///
 /// pub fn ffi_inventory() -> RustInventory {
 ///     RustInventory::new()
-///         .register(function!(add))
+///         .register(function!(my_add))
 ///         .validate()
 /// }
 /// ```
@@ -92,12 +92,12 @@ macro_rules! constant {
 /// pub enum MyError { General }
 ///
 /// #[ffi(service)]
-/// pub struct MyService { value: u32 }
+/// pub struct MyService { count: u32 }
 ///
 /// #[ffi]
 /// impl MyService {
-///     pub fn new() -> ffi::Result<Self, MyError> { ffi::Ok(Self { value: 0 }) }
-///     pub fn get(&self) -> u32 { self.value }
+///     pub fn new() -> ffi::Result<Self, MyError> { ffi::Ok(Self { count: 0 }) }
+///     pub fn fetch(&self) -> u32 { self.count }
 /// }
 ///
 /// pub fn ffi_inventory() -> RustInventory {

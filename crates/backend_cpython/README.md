@@ -1,4 +1,4 @@
-# interoptopus_cpython
+# `interoptopus_cpython`
 
 Python backend for [Interoptopus](https://crates.io/crates/interoptopus).
 

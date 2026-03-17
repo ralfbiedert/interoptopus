@@ -1,4 +1,4 @@
-# interoptopus_csharp
+# `interoptopus_csharp`
 
 C# backend for [Interoptopus](https://crates.io/crates/interoptopus).
 
@@ -24,7 +24,6 @@ use interoptopus_csharp::RustLibrary;
 #[ffi]
 pub fn my_function(x: u32) -> u32 { x + 1 }
 
-#[test]
 fn generate_bindings() -> Result<(), Box<dyn std::error::Error>> {
     let inventory = RustInventory::new()
         .register(function!(my_function))

@@ -1,4 +1,4 @@
-# interoptopus_proc_impl
+# `interoptopus_proc_impl`
 
 Internal proc macro implementation for [Interoptopus](https://crates.io/crates/interoptopus).
 

@@ -6,12 +6,12 @@
 //! ```rust
 //! use interoptopus::ffi;
 //!
-//! # #[interoptopus::ffi]
+//! # #[ffi]
 //! # pub enum MyError { General }
 //! #
-//! #[interoptopus::ffi]
-//! pub fn get_name(id: u32) -> ffi::Result<ffi::String, MyError> {
-//!     ffi::Ok("hello".into())
+//! #[ffi]
+//! pub fn lookup_name(id: u32) -> ffi::Result<ffi::String, MyError> {
+//!     ffi::Ok("hello".to_string().into())
 //! }
 //! ```
 //!

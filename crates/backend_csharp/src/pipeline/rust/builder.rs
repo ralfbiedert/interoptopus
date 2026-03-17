@@ -16,12 +16,14 @@ impl RustLibraryBuilder {
     }
 
     /// Sets the dispatch strategy that routes items to output files.
+    #[must_use]
     pub fn dispatch(mut self, dispatch: Dispatch) -> Self {
         self.config.output_master.dispatch = dispatch;
         self
     }
 
     /// Sets the native library name used in `[DllImport("...")]` declarations.
+    #[must_use]
     pub fn dll_name(mut self, dll_name: impl AsRef<str>) -> Self {
         self.config.meta_info.dll_name = dll_name.as_ref().to_string();
         self
@@ -37,6 +39,7 @@ impl RustLibraryBuilder {
     }
 
     /// Builds the configured [`RustLibrary`], ready for [`process`](RustLibrary::process).
+    #[must_use]
     pub fn build(self) -> RustLibrary {
         RustLibrary::with_config(self.inventory, self.config)
     }

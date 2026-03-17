@@ -118,7 +118,6 @@
 #[cfg(feature = "derive")]
 pub use interoptopus_proc::ffi;
 
-
 /// Derives the [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime) trait for a service struct
 /// by forwarding to one of its fields.
 ///
@@ -157,7 +156,6 @@ pub use interoptopus_proc::ffi;
 /// ```
 #[cfg(feature = "derive")]
 pub use interoptopus_proc::AsyncRuntime;
-
 
 /// Strips module paths from a fully-qualified Rust type name, preserving generic structure.
 ///

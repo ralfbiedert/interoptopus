@@ -1,4 +1,4 @@
-# interoptopus_backends
+# `interoptopus_backends`
 
 Shared utilities for [Interoptopus](https://crates.io/crates/interoptopus) backends.
 

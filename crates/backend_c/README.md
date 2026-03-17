@@ -1,4 +1,4 @@
-# interoptopus_c
+# `interoptopus_c`
 
 C header backend for [Interoptopus](https://crates.io/crates/interoptopus).
 

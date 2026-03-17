@@ -75,7 +75,7 @@ See the [**reference project**][reference-project]
 for an overview:
 
 - [functions][ref-functions]
- (freestanding functions and delegates)
+  (freestanding functions and delegates)
 - [types][ref-types] (composites,
   enums, opaques, references, ...)
 - [constants][ref-constants] (
