@@ -8,14 +8,14 @@ public class TestPatternServicesResult
     [Fact]
     public void New()
     {
-        var service = ServiceResult.New();
+        var service = ServiceResult.Create();
         service.Dispose();
     }
 
     [Fact]
     public void Test()
     {
-        var service = ServiceResult.New();
+        var service = ServiceResult.Create();
         Assert.Throws<EnumException<Error>>(() => service.Test());
         service.Dispose();
     }
@@ -23,7 +23,7 @@ public class TestPatternServicesResult
     [Fact]
     public void ResultU32()
     {
-        var service = ServiceResult.New();
+        var service = ServiceResult.Create();
         Assert.Equal(123u, service.ResultU32());
         service.Dispose();
     }
@@ -31,7 +31,7 @@ public class TestPatternServicesResult
     [Fact]
     public void ResultString()
     {
-        var service = ServiceResult.New();
+        var service = ServiceResult.Create();
         Assert.Equal("hello world", service.ResultString().IntoString());
         service.Dispose();
     }
@@ -39,7 +39,7 @@ public class TestPatternServicesResult
     [Fact]
     public void ResultOptionEnum()
     {
-        var service = ServiceResult.New();
+        var service = ServiceResult.Create();
         Assert.Equal(OptionEnumPayload.Some(EnumPayload.C(123)), service.ResultOptionEnum());
         service.Dispose();
     }
@@ -47,7 +47,7 @@ public class TestPatternServicesResult
     [Fact]
     public void ResultSlice()
     {
-        var service = ServiceResult.New();
+        var service = ServiceResult.Create();
         var slice = new uint[] {0, 1, 2}.Slice();
         Assert.Equal(2u, service.ResultSlice(slice, 2ul));
         slice.Dispose();

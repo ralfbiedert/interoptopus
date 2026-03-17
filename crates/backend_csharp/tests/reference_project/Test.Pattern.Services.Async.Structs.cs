@@ -12,7 +12,7 @@ public class TestPatternServicesAsyncStructs
     [Fact]
     public async void ProcessStruct()
     {
-        var s = ServiceAsyncStructs.New();
+        var s = ServiceAsyncStructs.Create();
         var a = new NestedArray
         {
             field_array = new ushort[5],

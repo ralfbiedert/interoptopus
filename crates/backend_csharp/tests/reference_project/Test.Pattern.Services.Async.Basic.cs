@@ -12,7 +12,7 @@ public class TestPatternServicesAsyncBasic
     [Fact]
     public async void Call()
     {
-        var s = ServiceAsyncBasic.New();
+        var s = ServiceAsyncBasic.Create();
         await s.Call();
     }
 }

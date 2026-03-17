@@ -16,7 +16,7 @@ public class TestPatternServicesString
         var str = "Hello World";
         var rval = string.Empty;
 
-        var s = ServiceStrings.New();
+        var s = ServiceStrings.Create();
         s.CallbackString(str.Utf8(), s1 => rval = s1.IntoString());
         s.Dispose();
 

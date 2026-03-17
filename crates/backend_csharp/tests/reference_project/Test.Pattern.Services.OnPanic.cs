@@ -7,7 +7,7 @@ public class TestPatternServicesOnPanic
     [Fact]
     public void ReturnResult()
     {
-        var service = ServiceOnPanic.New();
+        var service = ServiceOnPanic.Create();
         service.ReturnResult(123);
         service.Dispose();
     }
@@ -15,7 +15,7 @@ public class TestPatternServicesOnPanic
     [Fact]
     public void ReturnDefaultValue()
     {
-        var service = ServiceOnPanic.New();
+        var service = ServiceOnPanic.Create();
         Assert.Equal(123u, service.ReturnDefaultValue(123u));
         service.Dispose();
     }

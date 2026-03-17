@@ -6,7 +6,7 @@ public class TestPatternServicesSlices
     [Fact]
     public void ReturnSliceMut()
     {
-        var s = ServiceVariousSlices.New();
+        var s = ServiceVariousSlices.Create();
         var slice = s.ReturnSliceMut();
         slice[0] = 44;
         s.Dispose();
@@ -15,7 +15,7 @@ public class TestPatternServicesSlices
     [Fact]
     public void ReturnSlice()
     {
-        var s = ServiceVariousSlices.New();
+        var s = ServiceVariousSlices.Create();
         var slice = s.ReturnSlice();
         Assert.Equal(slice.Count, 64);
         Assert.Equal(123, (int) slice[0]);

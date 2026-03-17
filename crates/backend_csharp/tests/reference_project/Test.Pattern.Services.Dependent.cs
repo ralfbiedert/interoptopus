@@ -6,7 +6,7 @@ public class TestPatternServicesDependent
     [Fact]
     public void NewMainAndDependent()
     {
-        var main = ServiceMain.New(123);
+        var main = ServiceMain.Create(123);
         var dependent = ServiceDependent.FromMain(main.Context);
 
 
