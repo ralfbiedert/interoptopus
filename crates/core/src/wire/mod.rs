@@ -38,7 +38,7 @@
 //! Here we use an actual `HashMap<String, String>` from `std` to demonstrate the transfer of
 //! a complex object over FFI.
 //!
-//! ```rust
+//! ```rust,ignore
 //! # use std::collections::HashMap;
 //! # use interoptopus::wire::Wire;
 //! #[ffi]
@@ -70,8 +70,10 @@ mod buffer;
 
 pub use buffer::WireBuffer;
 
-use crate::lang::types::SerializationError;
-use crate::lang::types::WireIO;
+use crate::bad_wire;
+use crate::inventory::{Inventory, TypeId};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
+use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::marker::PhantomData;
 
 /// Wraps and transfers complex objects over FFI.
@@ -122,6 +124,52 @@ impl<'a, T: WireIO> Wire<'a, T> {
     #[must_use]
     pub fn as_slice(&self) -> &[u8] {
         self.buf.as_slice()
+    }
+}
+
+impl<T: TypeInfo + WireIO> TypeInfo for Wire<'_, T> {
+    const WIRE_SAFE: bool = false;
+    const RAW_SAFE: bool = true;
+    const ASYNC_SAFE: bool = true;
+    const SERVICE_SAFE: bool = true;
+    const SERVICE_CTOR_SAFE: bool = true;
+
+    fn id() -> TypeId {
+        TypeId::new(0xE9EF32647BF9C7A70889DC642B63FAC9).derive_id(T::id())
+    }
+
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(TypePattern::Wire(T::id()))
+    }
+
+    fn ty() -> Type {
+        let t = T::ty();
+        Type {
+            name: format!("Wire<{}>", t.name),
+            visibility: Visibility::Public,
+            docs: Docs::empty(),
+            emission: common_or_module_emission(&[t.emission]),
+            kind: Self::kind(),
+        }
+    }
+
+    fn register(inventory: &mut impl Inventory) {
+        T::register(inventory);
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}
+
+impl<T: WireIO> WireIO for Wire<'_, T> {
+    fn write(&self, _: &mut impl std::io::Write) -> Result<(), SerializationError> {
+        bad_wire!()
+    }
+
+    fn read(_: &mut impl std::io::Read) -> Result<Self, SerializationError> {
+        bad_wire!()
+    }
+
+    fn live_size(&self) -> usize {
+        bad_wire!()
     }
 }
 

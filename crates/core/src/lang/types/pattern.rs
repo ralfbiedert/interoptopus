@@ -32,4 +32,6 @@ pub enum TypePattern {
     AsyncCallback(TypeId),
     /// A growable array (`ffi::Vec<T>`).
     Vec(TypeId),
+    /// A wire-serialized value (`Wire<T>`).
+    Wire(TypeId),
 }

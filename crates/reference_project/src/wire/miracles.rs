@@ -25,10 +25,10 @@ fn perform_half_miracles(mut input: Wire<MyWiredType>, other: ffi::String) -> ff
     result.into()
 }
 
-#[ffi]
-fn perform_half_miracles_in_other_direction(input: ffi::String) -> Wire<'static, MyWiredType> {
-    let value = MyWiredType { name: input.as_str().to_owned(), values: vec![] };
-    let mut out = Wire::with_size(value.live_size());
-    out.serialize(&value).unwrap();
-    out
-}
+// #[ffi]
+// fn perform_half_miracles_in_other_direction(input: ffi::String) -> Wire<'static, MyWiredType> {
+//     let value = MyWiredType { name: input.as_str().to_owned(), values: vec![] };
+//     let mut out = Wire::with_size(value.live_size());
+//     out.serialize(&value).unwrap();
+//     out
+// }

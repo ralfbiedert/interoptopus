@@ -15,4 +15,5 @@ pub enum TypePattern {
     CChar,
     CVoid,
     AsyncCallback(TypeId),
+    Wire(TypeId),
 }

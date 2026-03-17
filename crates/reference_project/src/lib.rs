@@ -42,7 +42,7 @@ pub mod services {
 }
 
 pub mod types;
-// pub mod wire;
+pub mod wire;
 
 pub fn inventory() -> RustInventory {
     RustInventory::new()

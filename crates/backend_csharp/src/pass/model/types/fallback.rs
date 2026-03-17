@@ -97,6 +97,12 @@ impl Pass {
                 lang::types::TypePattern::Bool => TypeKind::Primitive(Primitive::Byte),
                 lang::types::TypePattern::CChar => TypeKind::Primitive(Primitive::SByte),
                 lang::types::TypePattern::CVoid => TypeKind::Primitive(Primitive::Void),
+                lang::types::TypePattern::Wire(_) => {
+                    // { *mut u8, i32, i32 }
+                    let Some(cs_ptr) = id_map.ty(<*mut u8>::id()) else { continue };
+                    let Some(cs_i32) = id_map.ty(i32::id()) else { continue };
+                    TypeKind::Composite(Composite { fields: vec![field("data", cs_ptr), field("len", cs_i32), field("capacity", cs_i32)], repr: Repr::c() })
+                }
                 lang::types::TypePattern::NamedCallback(_) | lang::types::TypePattern::AsyncCallback(_) => {
                     // { *mut c_void, *mut c_void }
                     let Some(cs_void_ptr) = id_map.ty(<*mut std::ffi::c_void>::id()) else { continue };

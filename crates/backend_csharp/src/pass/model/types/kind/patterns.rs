@@ -50,6 +50,7 @@ impl Pass {
                 lang::types::TypePattern::SliceMut(rust_ty) => TypePattern::SliceMut(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty))),
                 lang::types::TypePattern::Vec(rust_ty) => TypePattern::Vec(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty))),
                 lang::types::TypePattern::AsyncCallback(rust_ty) => TypePattern::AsyncCallback(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty))),
+                lang::types::TypePattern::Wire(rust_ty) => TypePattern::Wire(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty))),
 
                 lang::types::TypePattern::Option(rust_ty) => {
                     let cs_ty = try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty));

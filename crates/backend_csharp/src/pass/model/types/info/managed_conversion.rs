@@ -74,6 +74,7 @@ impl Pass {
                         TypePattern::Utf8String => ManagedConversion::Into,
                         TypePattern::Vec(_) => ManagedConversion::Into,
                         TypePattern::AsyncCallback(_) => ManagedConversion::Into,
+                        TypePattern::Wire(_) => ManagedConversion::Into,
 
                         // Option/Result: inspect variant payloads (same logic as DataEnum)
                         TypePattern::Option(_, e) | TypePattern::Result(_, _, e) => {
