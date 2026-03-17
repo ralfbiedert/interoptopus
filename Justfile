@@ -41,6 +41,10 @@ docs open="":
 update-readme:
     cp crates/core/README.md README.md
 
+# Generate 8 random 128-bit IDs in hex format.
+ids:
+    for i in $(seq 1 8); do od -An -tx1 -N16 /dev/urandom | tr -d ' \n' | sed 's/^/0x/' | tr 'a-f' 'A-F'; echo; done
+
 # Can be used by agents for the current task.
 test-agent:
     # Agents: Feel free to update the test logic here for the task at hand.
