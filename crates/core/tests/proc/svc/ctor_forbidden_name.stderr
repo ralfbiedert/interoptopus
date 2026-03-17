@@ -1,0 +1,5 @@
+error: Using the name 'new' can cause conflicts in generated code.
+  --> tests/proc/svc/ctor_forbidden_name.rs:13:12
+   |
+13 |     pub fn new() -> ffi::Result<Self, Error> {
+   |            ^^^

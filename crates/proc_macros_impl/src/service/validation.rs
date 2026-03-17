@@ -42,9 +42,9 @@ impl ServiceModel {
     fn validate_forbidden_names(&self) -> syn::Result<()> {
         // Check constructor method names and parameters
         for constructor in &self.constructors {
-            // if is_forbidden_name(constructor.name.to_string()) {
-            //     return Err(syn::Error::new_spanned(&constructor.name, format!("Using the name '{}' can cause conflicts in generated code.", constructor.name)));
-            // }
+            if is_forbidden_name(constructor.name.to_string()) {
+                return Err(syn::Error::new_spanned(&constructor.name, format!("Using the name '{}' can cause conflicts in generated code.", constructor.name)));
+            }
 
             for param in &constructor.inputs {
                 if is_forbidden_name(param.name.to_string()) {

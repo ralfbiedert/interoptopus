@@ -13,7 +13,7 @@ pub struct ServiceAsyncStructs {
 
 #[ffi]
 impl ServiceAsyncStructs {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         result_to_ffi(|| {
             let runtime = Tokio::new();
             Ok(Self { runtime })

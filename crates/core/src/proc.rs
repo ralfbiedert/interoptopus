@@ -89,7 +89,7 @@
 ///
 /// #[ffi]
 /// impl Counter {
-///     pub fn new() -> ffi::Result<Self, MyError> { ffi::Ok(Self { count: 0 }) }
+///     pub fn create() -> ffi::Result<Self, MyError> { ffi::Ok(Self { count: 0 }) }
 ///     pub fn increment(&mut self) { self.count += 1; }
 ///     pub fn get_count(&self) -> u32 { self.count }
 /// }

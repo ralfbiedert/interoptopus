@@ -96,7 +96,7 @@ macro_rules! constant {
 ///
 /// #[ffi]
 /// impl MyService {
-///     pub fn new() -> ffi::Result<Self, MyError> { ffi::Ok(Self { count: 0 }) }
+///     pub fn create() -> ffi::Result<Self, MyError> { ffi::Ok(Self { count: 0 }) }
 ///     pub fn fetch(&self) -> u32 { self.count }
 /// }
 ///

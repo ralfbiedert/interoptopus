@@ -13,7 +13,7 @@
 //! # #[ffi] pub const MAX: u32 = 100;
 //! # #[ffi(service)] pub struct Service { v: u32 }
 //! # #[ffi] impl Service {
-//! #     pub fn new() -> ffi::Result<Self, MyError> { ffi::Ok(Self { v: 0 }) }
+//! #     pub fn create() -> ffi::Result<Self, MyError> { ffi::Ok(Self { v: 0 }) }
 //! # }
 //! pub fn ffi_inventory() -> RustInventory {
 //!     RustInventory::new()

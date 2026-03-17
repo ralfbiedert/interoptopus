@@ -26,7 +26,7 @@ pub struct ServiceCallbacks {
 // Regular implementation of methods.
 #[ffi]
 impl ServiceCallbacks {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         ffi::Ok(Self { delegate_table: None })
     }
 

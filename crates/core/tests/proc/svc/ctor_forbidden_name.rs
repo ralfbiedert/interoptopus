@@ -10,7 +10,7 @@ struct Service;
 
 #[ffi]
 impl Service {
-    pub fn create() -> ffi::Result<Self, Error> {
+    pub fn new() -> ffi::Result<Self, Error> {
         ffi::Ok(Self)
     }
 }

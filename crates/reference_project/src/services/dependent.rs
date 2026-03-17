@@ -8,7 +8,7 @@ pub struct ServiceMain {
 
 #[ffi]
 impl ServiceMain {
-    pub fn new(x: u32) -> ffi::Result<Self, Error> {
+    pub fn create(x: u32) -> ffi::Result<Self, Error> {
         ffi::Ok(Self { val: x })
     }
 }

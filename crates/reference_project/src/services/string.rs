@@ -9,7 +9,7 @@ pub struct ServiceStrings {}
 // Regular implementation of methods.
 #[ffi]
 impl ServiceStrings {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         ffi::Result::Ok(Self {})
     }
 

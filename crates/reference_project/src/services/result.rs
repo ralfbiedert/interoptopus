@@ -7,7 +7,7 @@ pub struct ServiceResult {}
 
 #[ffi]
 impl ServiceResult {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         ffi::Ok(Self {})
     }
 

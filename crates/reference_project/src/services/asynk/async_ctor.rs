@@ -17,7 +17,7 @@ pub struct ServiceAsyncCtor {
 #[ffi]
 impl ServiceAsyncCtor {
     /// Async constructor that receives a runtime from the caller.
-    pub async fn new(_runtime: Async<ServiceAsyncBasic>, x: u32) -> ffi::Result<Self, Error> {
+    pub async fn new_async(_runtime: Async<ServiceAsyncBasic>, x: u32) -> ffi::Result<Self, Error> {
         ffi::Ok(Self { val: x })
     }
 

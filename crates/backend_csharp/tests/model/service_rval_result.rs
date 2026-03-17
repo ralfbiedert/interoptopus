@@ -17,14 +17,14 @@ pub struct ServiceB {}
 
 #[ffi]
 impl ServiceA {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         ffi::Ok(Self {})
     }
 }
 
 #[ffi]
 impl ServiceB {
-    pub fn new() -> ffi::Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         ffi::Ok(Self {})
     }
 }
