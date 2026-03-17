@@ -8,11 +8,11 @@
 //! Compounds and enums are at least `To`. If any field/variant is `Into`, the
 //! compound/enum is also `Into`.
 
-use crate::lang::TypeId;
-use crate::lang::types::ManagedConversion;
 use crate::lang::types::kind::{DelegateKind, TypeKind};
+use crate::lang::types::ManagedConversion;
+use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{ModelResult, PassInfo, model};
+use crate::pass::{model, ModelResult, PassInfo};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -158,7 +158,7 @@ impl Pass {
                 }
 
                 // Helpers are always move
-                TypeKind::AsyncHelper(_) | TypeKind::WireHelper(_) => ManagedConversion::Into,
+                TypeKind::AsyncHelper(_) | TypeKind::Wire(_) => ManagedConversion::Into,
 
                 // Task types are only used as async overload return types
                 TypeKind::Task(_) => ManagedConversion::AsIs,
