@@ -30,15 +30,12 @@ crates/
 ├── core/                   # Main interoptopus crate with core FFI abstractions
 ├── proc_macros/            # Proc macro crate used by core
 ├── proc_macros_impl/       # Procedural macros (#[ffi_type], #[ffi_function]) incl. testing function
-├── backend_c/              # C header generation (defunct for now)
 ├── backend_csharp/         # Next-gen C# backend (experimental)
-├── backend_csharp_old/     # Old C# backend
 ├── backend_cpython/        # Python bindings generation (defunct for now)
+├── backend_c/              # C header generation (defunct for now)
 ├── backend_utils/          # Shared utilities for backends
 └── reference_project/      # Comprehensive test project using all features
 ```
-
-Note: `backend_csharp_old`, `backend_c`, and `backend_cpython` are currently excluded from the workspace while refactoring is in progress. The active workspace members are `core`, `proc_macros`, `proc_macros_impl`, `backend_csharp`, `backend_utils`, and `reference_project`.
 
 ### Core Components
 
