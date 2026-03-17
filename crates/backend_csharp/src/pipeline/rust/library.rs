@@ -81,6 +81,7 @@ pub struct RustLibraryConfig {
     pub output_services: output::service::all::Config,
     pub output_pattern_bools: output::pattern::bools::Config,
     pub output_pattern_wire_buffer: output::pattern::wire_buffer::Config,
+    pub output_wires: output::wire::Config,
     pub output_header: output::header::Config,
     pub output_util: output::types::util::Config,
     pub output_using: output::r#using::Config,
@@ -161,6 +162,7 @@ pub struct IntermediateOutputPasses {
     pub pattern_bools: output::pattern::bools::Pass,
     pub pattern_utf8string: output::pattern::utf8string::Pass,
     pub pattern_wire_buffer: output::pattern::wire_buffer::Pass,
+    pub wires: output::wire::Pass,
     pub util: output::types::util::Pass,
     pub using: output::r#using::Pass,
 }
@@ -306,6 +308,7 @@ impl RustLibrary {
                 pattern_bools: output::pattern::bools::Pass::new(config.output_pattern_bools),
                 pattern_utf8string: output::pattern::utf8string::Pass::new(Default::default()),
                 pattern_wire_buffer: output::pattern::wire_buffer::Pass::new(config.output_pattern_wire_buffer),
+                wires: output::wire::Pass::new(config.output_wires),
                 util: output::types::util::Pass::new(config.output_util),
                 using: output::r#using::Pass::new(config.output_using),
             },
@@ -434,6 +437,7 @@ impl RustLibrary {
         o.pattern_bools.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.pattern_utf8string.process(&mut pass_meta, &self.output_master, &m.pattern_string)?;
         o.pattern_wire_buffer.process(&mut pass_meta, &self.output_master, &m.pattern_wire)?;
+        o.wires.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
         o.util.process(&mut pass_meta, &self.output_master)?;
         o.using.process(&mut pass_meta, &self.output_master)?;
         self.plugin_post_output_pass()?;

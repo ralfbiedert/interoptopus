@@ -94,7 +94,15 @@ impl Pass {
                     TypePattern::Vec(t) => format!("Vec{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
                     TypePattern::Option(t, _) => format!("Option{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
                     TypePattern::AsyncCallback(t) => "AsyncCallbackCommonNative".to_string(),
-                    TypePattern::Wire(t) => format!("WireOf{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
+                    TypePattern::Wire(t) => {
+                        // The inner type of Wire may not have a C# TypeKind (its fields use
+                        // WireOnly types), so resolve the name from the Rust inventory directly.
+                        let rust_name = rs_types.iter()
+                            .find(|(rid, _)| id_map.ty(**rid) == Some(*t))
+                            .map(|(_, ty)| sanitize_rust_name(&ty.name))
+                            .unwrap_or_else(|| "Unknown".to_string());
+                        format!("WireOf{}", rust_to_pascal(&rust_name))
+                    }
                     TypePattern::Result(ok, err, _) => {
                         let ok_name = rust_to_pascal(resolve_compositional_name!(self, *ok, kinds, pass_meta));
                         let err_name = rust_to_pascal(resolve_compositional_name!(self, *err, kinds, pass_meta));

@@ -70,6 +70,10 @@ namespace {{ namespace }} {
 
     {{ pattern_wire_buffer | indent }}
 {%- endif %}
+{%- for wire in wires %}
+
+    {{ wire | indent }}
+{%- endfor %}
 
     {{ util | indent }}
 }

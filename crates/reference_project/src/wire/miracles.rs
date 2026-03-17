@@ -11,7 +11,7 @@ pub struct MyWiredType {
 // input is a serialized representation, parse it to access MyWiredType.
 // serialize resulting MyWiredType into a buffer and return it as WireOfMyWiredType on C# side
 #[ffi]
-fn perform_miracles(mut input: Wire<MyWiredType>) -> Wire<MyWiredType> {
+pub fn perform_miracles(mut input: Wire<MyWiredType>) -> Wire<MyWiredType> {
     let w = input.unwire().expect("Something went wrong");
     let mut out = Wire::with_size(w.live_size());
     out.serialize(&w).unwrap();
@@ -19,7 +19,7 @@ fn perform_miracles(mut input: Wire<MyWiredType>) -> Wire<MyWiredType> {
 }
 
 #[ffi]
-fn perform_half_miracles(mut input: Wire<MyWiredType>, other: ffi::String) -> ffi::String {
+pub fn perform_half_miracles(mut input: Wire<MyWiredType>, other: ffi::String) -> ffi::String {
     let w = input.unwire().expect("Something went wrong");
     let result = format!("{} {}", w.name, other.as_str());
     result.into()

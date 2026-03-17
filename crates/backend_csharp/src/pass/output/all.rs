@@ -50,6 +50,7 @@ impl Pass {
             let pattern_bools = intermediary.pattern_bools.bool_for(file).unwrap();
             let pattern_utf8string = intermediary.pattern_utf8string.utf8string_for(file).unwrap();
             let pattern_wire_buffer = intermediary.pattern_wire_buffer.wire_buffer_for(file).unwrap();
+            let wires = intermediary.wires.wires_for(file).unwrap();
             let util = intermediary.util.utils_for(file).unwrap();
             let using = intermediary.using.using_for(file).unwrap();
 
@@ -72,6 +73,7 @@ impl Pass {
             context.insert("pattern_bools", &pattern_bools);
             context.insert("pattern_utf8string", &pattern_utf8string);
             context.insert("pattern_wire_buffer", &pattern_wire_buffer);
+            context.insert("wires", &wires);
             context.insert("util", &util);
 
             let final_ = templates.render("all.cs", &context)?;

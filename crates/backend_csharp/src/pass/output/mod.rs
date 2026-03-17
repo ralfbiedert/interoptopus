@@ -7,3 +7,4 @@ pub mod pattern;
 pub mod service;
 pub mod types;
 pub mod r#using;
+pub mod wire;

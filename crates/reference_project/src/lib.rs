@@ -183,10 +183,8 @@ pub fn inventory() -> RustInventory {
         // TODO
         // .register(function!(wire::basic::wire_accept_string_1))
         // .register(function!(wire::basic::wire_accept_string_2))
-        // TODO
-        // .register(function!(wire::miracles::perform_miracles))
-        // .register(function!(wire::miracles::perform_half_miracles))
-        // .register(function!(wire::miracles::perform_half_miracles_in_other_direction))
+        .register(function!(wire::miracles::perform_miracles))
+        .register(function!(wire::miracles::perform_half_miracles))
         // Constants
         .register(constant!(constants::U8))
         .register(constant!(constants::F32_MIN_POSITIVE))
