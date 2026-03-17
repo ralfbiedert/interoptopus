@@ -1,10 +1,19 @@
+//! FFI constants and their values.
+
 use crate::inventory::{ConstantId, Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::PrimitiveValue;
 
+/// Implemented by companion types generated for `#[ffi]` constants.
+///
+/// You do not implement this manually — the `#[ffi]` attribute on a `const` item
+/// generates a zero-sized struct that implements this trait.
 pub trait ConstantInfo {
+    /// The unique identifier for this constant.
     fn id() -> ConstantId;
+    /// Returns the full constant description.
     fn constant() -> Constant;
+    /// Registers this constant with the given inventory.
     fn register(inventory: &mut impl Inventory);
 }
 
@@ -12,21 +21,31 @@ pub trait ConstantInfo {
 #[derive(Clone, Debug, PartialOrd, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Value {
+    /// A primitive value (integer, float, or bool).
     Primitive(PrimitiveValue),
 }
 
+/// A named constant exported across the FFI boundary.
 #[derive(Clone, Debug, PartialOrd, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Constant {
+    /// The name used in generated bindings.
     pub name: String,
+    /// Whether the constant is public or private.
     pub visibility: Visibility,
+    /// Documentation extracted from `///` comments.
     pub docs: Docs,
+    /// Where the constant definition should be placed.
     pub emission: Emission,
+    /// The type of the constant's value.
     pub ty: TypeId,
+    /// The constant's value.
     pub value: Value,
 }
 
+/// Trait for Rust primitive types that can be used as constant values.
 pub trait ConstantValue {
+    /// Wraps `self` in a [`Value`].
     fn value(&self) -> Value;
 }
 

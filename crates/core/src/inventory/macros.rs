@@ -26,7 +26,7 @@ macro_rules! extra_type {
     }};
 }
 
-/// Registers an `#[ffi]` function with the inventory.
+/// Registers a function with the inventory.
 ///
 /// The argument is the function's path (the `#[ffi]` attribute generates a companion
 /// type that implements [`FunctionInfo`](crate::lang::function::FunctionInfo)).
@@ -53,7 +53,7 @@ macro_rules! function {
     }};
 }
 
-/// Registers an `#[ffi]` constant with the inventory.
+/// Registers a constant with the inventory.
 ///
 /// The argument is the constant's path (the `#[ffi]` attribute generates a companion
 /// type that implements [`ConstantInfo`](crate::lang::constant::ConstantInfo)).
@@ -79,7 +79,7 @@ macro_rules! constant {
     }};
 }
 
-/// Registers an `#[ffi]` service with the inventory.
+/// Registers a service with the inventory.
 ///
 /// The argument is the service struct's path. The struct must have both `#[ffi(service)]`
 /// on the struct and `#[ffi]` on its `impl` block. All methods and their types are

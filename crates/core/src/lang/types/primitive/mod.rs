@@ -4,6 +4,7 @@ mod special;
 
 use std::hash::{Hash, Hasher};
 
+/// A primitive FFI type.
 #[derive(Copy, Clone, Debug, PartialOrd, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Primitive {
@@ -23,6 +24,7 @@ pub enum Primitive {
     F64,
 }
 
+/// A concrete primitive value, used for FFI constants.
 #[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PrimitiveValue {

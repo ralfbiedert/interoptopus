@@ -1,3 +1,5 @@
+//! Cross-cutting metadata: documentation, visibility, and emission/placement rules.
+
 /// The visibility of an item when written. Not all backends support all visibility levels.
 #[derive(Clone, Copy, Default, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -17,6 +19,7 @@ pub enum Visibility {
 pub struct Module(String);
 
 impl Module {
+    /// Creates a module identifier from a string (e.g., `"foo.bar"`).
     pub fn new(s: impl Into<String>) -> Self {
         Self(s.into())
     }
@@ -88,6 +91,10 @@ impl Docs {
     }
 }
 
+/// Given a set of inner-type emissions, determines the emission for a composite type.
+///
+/// Returns `Common` if all inner types are builtins or common, `CustomModule` if any
+/// inner type has a custom module, and `Default` otherwise.
 #[must_use]
 pub fn common_or_module_emission(x: &[Emission]) -> Emission {
     if x.iter().all(|x| matches!(x, Emission::Builtin | Emission::FileEmission(FileEmission::Common))) {

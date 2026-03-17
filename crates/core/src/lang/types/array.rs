@@ -5,10 +5,13 @@ use crate::lang::types::{SerializationError, Type, TypeId, TypeInfo, TypeKind};
 use std::io::{Read, Write};
 use std::mem::MaybeUninit;
 
+/// A fixed-size array type `[T; N]`.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Array {
+    /// The element type.
     pub ty: TypeId,
+    /// The array length.
     pub len: usize,
 }
 

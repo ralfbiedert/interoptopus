@@ -1,3 +1,5 @@
+//! Optional runtime support for async services.
+
 use crate::pattern::asynk::AsyncRuntime;
 use std::sync::Arc;
 
