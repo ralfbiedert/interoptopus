@@ -121,7 +121,32 @@ impl WireIO for String {
     }
 }
 
-/// Emits and registers helper functions used by [`String`](crate::pattern::string::String).
+/// Emits and registers helpers for [`ffi::String`](crate::pattern::string::String).
+///
+/// Backends (e.g., C#) use these functions internally so that foreign code can
+/// manage Rust-owned strings without manual pointer arithmetic.
+///
+/// # Usage
+///
+/// Call once in your inventory function and register the result:
+///
+/// ```rust
+/// # use interoptopus::inventory::RustInventory;
+/// # use interoptopus::builtins_string;
+/// pub fn inventory() -> RustInventory {
+///     RustInventory::new()
+///         .register(builtins_string!())
+///         // ... other registrations ...
+///         .validate()
+/// }
+/// ```
+///
+/// # Implementation Details
+///
+/// This macro also generates the following FFI functions:
+/// - `interoptopus_string_create` — creates an `ffi::String` from a raw UTF-8 pointer and length.
+/// - `interoptopus_string_destroy` — drops an `ffi::String`, freeing its memory.
+/// - `interoptopus_string_clone` — clones an `ffi::String`.
 #[macro_export]
 macro_rules! builtins_string {
     () => {{

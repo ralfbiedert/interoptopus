@@ -127,7 +127,44 @@ impl<T> Drop for Vec<T> {
     }
 }
 
-/// Emits and registers helper functions used by [`Vec`](crate::pattern::vec::Vec).
+/// Emits and registers helpers for [`ffi::Vec<T>`](crate::pattern::vec::Vec) types.
+///
+/// Unlike [`builtins_string!`](crate::builtins_string), this macro must be invoked **once
+/// per element type** you want to pass across the FFI boundary, because each concrete `Vec<T>`
+/// requires its own set of helper functions.
+///
+/// # Usage
+///
+/// ```rust
+/// # use interoptopus::inventory::RustInventory;
+/// # use interoptopus::{ffi, builtins_vec};
+/// # #[derive(Copy, Clone, Debug)]
+/// # #[repr(C)]
+/// # pub struct Vec3f32 { pub x: f32, pub y: f32, pub z: f32 }
+/// # impl interoptopus::lang::types::TypeInfo for Vec3f32 {
+/// #     const WIRE_SAFE: bool = false; const RAW_SAFE: bool = true; const ASYNC_SAFE: bool = true;
+/// #     const SERVICE_SAFE: bool = false; const SERVICE_CTOR_SAFE: bool = false;
+/// #     fn id() -> interoptopus::inventory::TypeId { interoptopus::inventory::TypeId::new(0) }
+/// #     fn kind() -> interoptopus::lang::types::TypeKind { todo!() }
+/// #     fn ty() -> interoptopus::lang::types::Type { todo!() }
+/// #     fn register(_: &mut impl interoptopus::inventory::Inventory) {}
+/// # }
+/// pub fn inventory() -> RustInventory {
+///     RustInventory::new()
+///         .register(builtins_vec!(u8))
+///         .register(builtins_vec!(ffi::String))
+///         .register(builtins_vec!(Vec3f32))
+///         // ... other registrations ...
+///         .validate()
+/// }
+/// ```
+///
+/// # Implementation Details
+///
+/// This macro generates the following FFI functions with unique, type-specific symbol names:
+/// - `interoptopus_vec_create` — creates an `ffi::Vec<T>` by copying `len` elements from a raw pointer.
+/// - `interoptopus_vec_destroy` — drops an `ffi::Vec<T>`, freeing its memory.
+///
 #[macro_export]
 macro_rules! builtins_vec {
     ($t:ty) => {{

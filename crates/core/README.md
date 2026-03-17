@@ -93,10 +93,6 @@ That said, even hand-crafted bindings encounter some target-specific overhead
 at the FFI boundary (e.g., marshalling, pinning, and safety checks). For C# that cost
 is often nanoseconds, for Python it can be microseconds.
 
-Detailed call cost tables can be found here: <sup>🔥</sup>
-
-- [**C# call overhead**][csharp-benchmarks]
-
 For a quick overview, this table lists some common round trip times in _ns / call_:
 
 | Construct                              | C#               |
