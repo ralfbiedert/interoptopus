@@ -13,10 +13,10 @@ help: the trait `WireIO` is not implemented for `Bar`
              &T
              &mut T
              ()
-             *const T
-             *mut T
-             CStrPtr<'_>
-             HashMap<K, V, S>
-             MaybeUninit<T>
+             (A, B)
+             (A, B, C)
+             (A, B, C, D)
+             (A, B, C, D, E)
+             (A, B, C, D, E, F)
            and $N others
    = help: see issue #48214

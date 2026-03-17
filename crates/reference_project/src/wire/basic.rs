@@ -1,4 +1,4 @@
-use interoptopus::ffi_function;
+use interoptopus::ffi;
 use interoptopus::wire::Wire;
 
 // TODO: This fails to codegen on C#

@@ -1,3 +1,8 @@
+alias b := build
+alias t := test
+alias d := docs
+alias doc := docs
+
 # Builds the workspace with all features.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
 build verbose="":

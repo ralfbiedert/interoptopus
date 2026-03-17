@@ -319,3 +319,47 @@ impl WireIO for ::std::ffi::c_void {
         bad_wire!()
     }
 }
+
+macro_rules! impl_tuple_wireio {
+    ( $( $name:ident )+ ) => {
+        #[allow(non_snake_case)]
+        impl<$($name: WireIO),+> WireIO for ($($name,)+)
+        {
+            fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+                let ($($name,)+) = self;
+                $(
+                    $name.write(out)?;
+                )+
+                Ok(())
+            }
+
+            fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+                Ok((
+                $(
+                    $name::read(input)?,
+                )+
+                ))
+            }
+
+            fn live_size(&self) -> usize {
+                let ($($name,)+) = self;
+                0 $(
+                    + $name.live_size()
+                )+
+            }
+        }
+    };
+}
+
+impl_tuple_wireio! { A }
+impl_tuple_wireio! { A B }
+impl_tuple_wireio! { A B C }
+impl_tuple_wireio! { A B C D }
+impl_tuple_wireio! { A B C D E }
+impl_tuple_wireio! { A B C D E F }
+impl_tuple_wireio! { A B C D E F G }
+impl_tuple_wireio! { A B C D E F G H }
+impl_tuple_wireio! { A B C D E F G H I }
+impl_tuple_wireio! { A B C D E F G H I J }
+impl_tuple_wireio! { A B C D E F G H I J K }
+impl_tuple_wireio! { A B C D E F G H I J K L }

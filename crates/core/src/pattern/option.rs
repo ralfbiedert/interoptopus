@@ -143,15 +143,24 @@ impl<T: TypeInfo> TypeInfo for Option<T> {
 }
 
 impl<T: WireIO> WireIO for Option<T> {
-    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
-        todo!()
+    fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+        match self {
+            Self::None => 0u8.write(out),
+            Self::Some(v) => {
+                1u8.write(out)?;
+                v.write(out)
+            }
+        }
     }
 
-    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
-        todo!()
+    fn read(input: &mut impl Read) -> Result<Self, SerializationError> {
+        match u8::read(input)? {
+            0 => Ok(Self::None),
+            _ => Ok(Self::Some(T::read(input)?)),
+        }
     }
 
     fn live_size(&self) -> usize {
-        todo!()
+        1 + self.as_ref().map_or(0, WireIO::live_size)
     }
 }

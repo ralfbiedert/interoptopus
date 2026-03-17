@@ -42,66 +42,37 @@
 //!
 //! | Type | Format |
 //! |---|---|
-//! | `u8`..`u128`, `i8`..`i128`, `f32`, `f64` | Fixed-size little-endian bytes |
+//! | `u8`..`u64`, `i8`..`i64`, `f32`, `f64` | Fixed-size little-endian bytes |
 //! | `usize` / `isize` | Platform-width little-endian (8 bytes on 64-bit) |
-//! | `bool` | 1 byte (`0x00` = false, `0x01` = true) |
-//! | `String` | `usize` byte-length, then UTF-8 bytes |
-//! | `Vec<T>` | `usize` element count, then each element serialized in order |
-//! | `HashMap<K,V>` | `usize` entry count, then each key followed by value |
-//! | `Option<T>` | 1 byte tag (bool), then value bytes if `Some` |
+//! | `bool` | 1 byte (`0x00` = false, non-zero = true) |
+//! | `String` | `u32` byte-length (LE), then UTF-8 bytes |
+//! | `Vec<T>` | `u32` element count (LE), then each element serialized in order |
+//! | `HashMap<K,V>` | `u32` entry count (LE), then each key followed by value |
+//! | `Option<T>` | 1 byte tag (`0x00` = None, `0x01` = Some), then value bytes if Some |
 //! | `(A, B, …)` | Each element serialized in order |
 //! | User structs | Each field serialized in declaration order |
 //!
 //! The wire format is **not self-describing** — both sides must agree on the exact type
 //! layout. The `#[ffi]` proc macro generates matching serialization code on both
-//! the Rust side ([`Ser`] / [`De`]) and the foreign side.
+//! the Rust side ([`WireIO`]) and the foreign side.
 //!
 //! # Trait overview
 //!
-//! - [`Ser`] — serialize `&self` into a `Write` sink, and compute `storage_size`.
-//! - [`De`] — deserialize `Self` from a `Read` source.
-//! - [`Wireable`] — blanket-implemented for `T: Ser + De + 'static`; provides the
+//! - [`WireIO`] — serialize, deserialize, and compute byte size. Implemented for
+//!   primitives, `bool`, `String`, `Vec`, `HashMap`, `Option`, tuples, and any
+//!   user struct annotated with `#[ffi]`.
+//! - [`Wireable`] — blanket-implemented for `T: WireIO + 'static`; provides the
 //!   convenience methods [`wire()`](Wireable::wire) and
 //!   [`wire_with_buffer()`](Wireable::wire_with_buffer).
 //! - [`Unwireable`] — blanket-implemented for `Wire<T>`; provides [`unwire()`](Unwireable::unwire).
 
 mod buffer;
-mod error;
-mod serde;
 
 pub use buffer::WireBuffer;
-pub use error::WireError;
-pub use serde::{De, Ser};
 
+use crate::lang::types::SerializationError;
+use crate::lang::types::WireIO;
 use std::marker::PhantomData;
-
-/// Create a Wire from a type, either by allocating or by taking an external buffer.
-pub trait Wireable
-where
-    Self: Ser + De,
-{
-    fn wire<'my>(&self) -> Wire<'my, Self>;
-
-    fn wire_with_buffer<'a>(&self, buf: &'a mut [u8]) -> Wire<'a, Self>;
-}
-
-/// Unwire into the original Base type.
-pub trait Unwireable {
-    type Base;
-    fn unwire(&mut self) -> Result<Self::Base, WireError>;
-}
-
-/// Blanket implementation to let any `Wire<T>` to be unwireable back to T.
-impl<T> Unwireable for Wire<'_, T>
-where
-    T: Ser + De,
-{
-    type Base = T;
-
-    fn unwire(&mut self) -> Result<Self::Base, WireError> {
-        self.unwire()
-    }
-}
 
 /// Wraps and transfers complex objects over FFI.
 ///
@@ -143,14 +114,14 @@ where
 ///
 /// When using the C# backend, the following Rust code:
 /// ```rust,ignore
-/// #[ffi_type(wired)]
+/// #[ffi]
 /// pub struct UserData {
 ///     pub name: String,
 ///     pub age: u32,
 ///     pub active: bool,
 /// }
 ///
-/// #[ffi_function]
+/// #[ffi]
 /// pub fn process_user(user: Wire<UserData>) -> Wire<UserData> {
 ///     let mut data = user.unwire().unwrap();
 ///     data.age += 1;
@@ -187,63 +158,46 @@ where
 #[repr(C)]
 pub struct Wire<'my, T>
 where
-    T: Ser + De + ?Sized,
+    T: WireIO + ?Sized,
 {
     buf: WireBuffer<'my>,          // FFI-safe storage either owned or borrowed
     _phantom: PhantomData<&'my T>, // behaves like a lifetimed reference
 }
 
-impl<'a, T: Ser + De> Wire<'a, T> {
-    /// Creates a new Wire with owned storage pre-allocated to the given capacity
+impl<'a, T: WireIO> Wire<'a, T> {
+    /// Creates a new Wire with owned storage pre-allocated to the given capacity.
     #[must_use]
     pub fn with_size(capacity: usize) -> Wire<'static, T> {
         Wire { buf: WireBuffer::with_size(capacity), _phantom: PhantomData }
     }
 
-    /// Creates a new Wire with borrowed storage from the provided buffer
+    /// Creates a new Wire with borrowed storage from the provided buffer.
     #[allow(clippy::use_self)]
     #[must_use]
     pub fn new_with_buffer(buffer: &'a mut [u8]) -> Wire<'a, T> {
         Wire { buf: WireBuffer::from_slice(buffer), _phantom: PhantomData }
     }
 
-    pub fn serialize(&mut self, value: &T) -> Result<(), WireError> {
-        value.ser(&mut self.buf.writer())
+    /// Serialize a value into this Wire's buffer.
+    pub fn serialize(&mut self, value: &T) -> Result<(), SerializationError> {
+        value.write(&mut self.buf.writer())
     }
 
-    // FIXME: Consume self?
-    pub fn unwire(&mut self) -> Result<T, WireError> {
-        T::de(&mut self.buf.reader())
+    /// Deserialize the value from this Wire's buffer.
+    pub fn unwire(&mut self) -> Result<T, SerializationError> {
+        T::read(&mut self.buf.reader())
     }
 
-    /// Check if this Wire owns its buffer data
+    /// Check if this Wire owns its buffer data.
     #[must_use]
     pub fn is_owned(&self) -> bool {
         self.buf.is_owned()
     }
 
-    /// Get a slice view of the buffer data
+    /// Get a slice view of the buffer data.
     #[must_use]
     pub fn as_slice(&self) -> &[u8] {
         self.buf.as_slice()
-    }
-}
-
-impl<T> Wireable for T
-where
-    T: Ser + De + 'static,
-{
-    fn wire<'my>(&self) -> Wire<'my, Self> {
-        let size = self.storage_size();
-        let mut wire = Wire::with_size(size);
-        wire.serialize(self).expect("Failed to serialize"); // TODO: return Result here
-        wire
-    }
-
-    fn wire_with_buffer<'a>(&self, buf: &'a mut [u8]) -> Wire<'a, Self> {
-        let mut wire = Wire::new_with_buffer(buf);
-        wire.serialize(self).expect("Failed to serialize"); // TODO: return Result here
-        wire
     }
 }
 
