@@ -3,7 +3,7 @@ use interoptopus::wire::Wire;
 
 // TODO: This fails to codegen on C#
 #[ffi]
-fn wire_accept_string_1(_input: Wire<String>) {}
+pub fn wire_accept_string_1(_input: Wire<String>) {}
 
 #[ffi]
 pub struct MyString {

@@ -12,42 +12,31 @@ public partial class {{ inner_type }}
 }
 
 {% endif -%}
-[StructLayout(LayoutKind.Sequential)]
-public unsafe partial struct {{ wire_name }}
+public partial struct {{ wire_name }}
 {
-    byte* Data;
-    int Length;
-    int Capacity;
+    public WireBuffer Buffer;
 
     public static {{ wire_name }} From({{ inner_type }} value)
     {
         var size = CalculateSize(value);
-        var buffer = Marshal.AllocHGlobal(size);
-        var wire = new {{ wire_name }}
-        {
-            Data = (byte*)buffer,
-            Length = size,
-            Capacity = -size
-        };
+        var wire = new {{ wire_name }} { Buffer = WireBuffer.Allocate(size) };
 
         try
         {
-            using var stream = new UnmanagedMemoryStream(wire.Data, wire.Length, wire.Length, FileAccess.Write);
-            using var writer = new BinaryWriter(stream);
+            using var writer = wire.Buffer.Writer();
             {{ serialize_body | indent(prefix = "            ") }}
             return wire;
         }
         catch
         {
-            Marshal.FreeHGlobal(buffer);
+            wire.Dispose();
             throw;
         }
     }
 
     public {{ inner_type }} Unwire()
     {
-        using var stream = new UnmanagedMemoryStream(Data, Length);
-        using var reader = new BinaryReader(stream);
+        using var reader = Buffer.Reader();
         {{ deserialize_body | indent(prefix = "        ") }}
     }
 
@@ -58,18 +47,6 @@ public unsafe partial struct {{ wire_name }}
 
     public void Dispose()
     {
-        if (Data != null)
-        {
-            if (Capacity != 0)
-            {
-                if (Capacity > 0)
-                    WireInterop.interoptopus_wire_destroy((IntPtr)Data, Length, Capacity);
-                else
-                    Marshal.FreeHGlobal((IntPtr)Data);
-            }
-            Data = null;
-            Length = 0;
-            Capacity = 0;
-        }
+        Buffer.Dispose();
     }
 }

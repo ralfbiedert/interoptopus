@@ -177,20 +177,16 @@ impl<T: WireIO> WireIO for Wire<'_, T> {
 #[macro_export]
 macro_rules! builtins_wire {
     () => {{
-        use ::interoptopus::lang::FunctionInfo;
-
-        #[$crate::ffi_function]
-        pub unsafe extern "C" fn interoptopus_wire_destroy(data: *mut u8, len: i32, capacity: i32) {
+        #[$crate::ffi]
+        pub fn interoptopus_wire_destroy(data: *mut u8, len: i32, capacity: i32) {
             if capacity <= 0 {
-                // If the buffer was borrowed or allocated on the opposite FFI side, cannot deallocate it.
                 return;
             }
             let _ = unsafe { Vec::from_raw_parts(data, usize::try_from(len).expect("Invalid vec length"), usize::try_from(capacity).expect("Invalid vec capacity")) };
         }
 
-        let items = vec![interoptopus_wire_destroy::function_info()];
-        let builtins = $crate::pattern::builtins::Builtins::new(items);
-        let pattern = $crate::pattern::LibraryPattern::Builtins(builtins);
-        $crate::inventory::Symbol::Pattern(pattern)
+        |x: &mut $crate::inventory::RustInventory| {
+            <interoptopus_wire_destroy as $crate::lang::function::FunctionInfo>::register(x);
+        }
     }};
 }

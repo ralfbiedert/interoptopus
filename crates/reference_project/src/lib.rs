@@ -3,7 +3,7 @@
 #![doc = include_str!("../README.md")]
 
 use interoptopus::inventory::RustInventory;
-use interoptopus::{builtins_string, builtins_vec, constant, extra_type, ffi, function, service};
+use interoptopus::{builtins_string, builtins_vec, builtins_wire, constant, extra_type, ffi, function, service};
 
 pub mod constants;
 pub mod functions;
@@ -48,7 +48,7 @@ pub fn inventory() -> RustInventory {
     RustInventory::new()
         // Functions
         .register(builtins_string!())
-        // .register(builtins_wire!())
+        .register(builtins_wire!())
         // TODO: Duplicate symbols!
         .register(builtins_vec!(u8))
         .register(builtins_vec!(ffi::String))
@@ -180,9 +180,9 @@ pub fn inventory() -> RustInventory {
         .register(function!(patterns::vec::pattern_vec_6))
         .register(function!(patterns::vec::pattern_vec_7))
         .register(function!(patterns::vec::pattern_vec_8))
-        // TODO
-        // .register(function!(wire::basic::wire_accept_string_1))
-        // .register(function!(wire::basic::wire_accept_string_2))
+        // Wire
+        .register(function!(wire::basic::wire_accept_string_1))
+        .register(function!(wire::basic::wire_accept_string_2))
         .register(function!(wire::miracles::perform_miracles))
         .register(function!(wire::miracles::perform_half_miracles))
         // Constants

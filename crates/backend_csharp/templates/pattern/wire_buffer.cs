@@ -11,6 +11,45 @@ public partial struct WireBuffer
 {
     public WireBuffer() { }
 
+    /// Allocate a C#-owned buffer of the given size.
+    public static unsafe WireBuffer Allocate(int size)
+    {
+        var buf = new WireBuffer();
+        buf.data = Marshal.AllocHGlobal(size);
+        buf.len = size;
+        buf.capacity = -size;
+        return buf;
+    }
+
+    /// Get a BinaryWriter over this buffer.
+    public unsafe BinaryWriter Writer()
+    {
+        return new BinaryWriter(new UnmanagedMemoryStream((byte*)data, len, len, FileAccess.Write));
+    }
+
+    /// Get a BinaryReader over this buffer.
+    public unsafe BinaryReader Reader()
+    {
+        return new BinaryReader(new UnmanagedMemoryStream((byte*)data, len));
+    }
+
+    /// Free the buffer. Rust-allocated buffers (capacity > 0) are freed via
+    /// interoptopus_wire_destroy; C#-allocated buffers (capacity < 0) via
+    /// Marshal.FreeHGlobal. Borrowed buffers (capacity == 0) are not freed.
+    public void Dispose()
+    {
+        if (data != IntPtr.Zero)
+        {
+            if (capacity > 0)
+                WireInterop.interoptopus_wire_destroy(data, len, capacity);
+            else if (capacity < 0)
+                Marshal.FreeHGlobal(data);
+            data = IntPtr.Zero;
+            len = 0;
+            capacity = 0;
+        }
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     internal unsafe Unmanaged ToUnmanaged()
     {
