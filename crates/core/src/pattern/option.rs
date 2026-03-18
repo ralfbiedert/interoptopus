@@ -1,15 +1,17 @@
-//! Like a regular [`Option`](std::option::Option), but FFI safe.
+//! FFI-safe [`Option<T>`](std::option::Option) represented as a discriminated union.
+//!
+//! [`Option<T>`] is a `repr(C)` enum with `None` and `Some(T)` variants,
+//! usable anywhere a regular Rust `Option` would be. Backends that support
+//! the pattern generate idiomatic nullable / optional types.
 //!
 //! # Example
-//!
-//! This function accepts an FFI option and converts it into a Rust option.
 //!
 //! ```
 //! use interoptopus::ffi;
 //!
 //! #[ffi]
 //! pub fn set_value(x: ffi::Option<u8>) {
-//!     let _ = x.into_option();
+//!     let _rust_opt: Option<u8> = x.into_option();
 //! }
 //! ```
 //!

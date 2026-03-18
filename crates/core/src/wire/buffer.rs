@@ -21,31 +21,26 @@ unsafe impl Sync for WireBuffer {}
 impl WireBuffer {
     /// Create a new owned buffer from a Vec
     #[must_use]
-    pub fn from_vec(mut vec: Vec<u8>) -> WireBuffer {
+    pub fn from_vec(mut vec: Vec<u8>) -> Self {
         let data = vec.as_mut_ptr();
         let len = i32::try_from(vec.len()).expect("Too large Wire buffer!");
         let capacity = i32::try_from(vec.capacity()).expect("Too large Wire buffer!");
 
         std::mem::forget(vec); // LEAKS the vec here, must use interoptopus_wire_destroy() to free it
 
-        WireBuffer { data, len, capacity }
+        Self { data, len, capacity }
     }
 
     /// Create an empty owned buffer with capacity
     #[must_use]
-    pub fn with_size(size: usize) -> WireBuffer {
-        WireBuffer::from_vec(vec![0u8; size])
+    pub fn with_size(size: usize) -> Self {
+        Self::from_vec(vec![0u8; size])
     }
 
     /// Get length of the buffer
     #[must_use]
     pub fn len(&self) -> usize {
         usize::try_from(self.len).expect("Invalid Wire buffer len")
-    }
-
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
     }
 
     /// Returns `true` if this buffer owns its data (Rust-allocated, `capacity > 0`).

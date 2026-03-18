@@ -3,7 +3,7 @@
 //! # Example
 //!
 //! Let's imagine you rely on `game_engine::Vec3` that comes from a foreign crate and
-//! you can't attach `#[ffi_type]` to it. Instead you can define your own type `LocalVec3`
+//! you can't attach `#[ffi]` to it. Instead you can define your own type `LocalVec3`
 //! and use it as `Surrogate<Vec3, LocalVec3>` in your interfaces. That way you will
 //! get zero-cost conversion helpers for free.
 //!
@@ -52,7 +52,7 @@ use crate::lang::types::{SerializationError, TypeInfo, WireIO};
 use crate::lang::types::{Type, TypeKind};
 use std::io::{Read, Write};
 use std::marker::PhantomData;
-use std::mem::{ManuallyDrop, transmute};
+use std::mem::{transmute, ManuallyDrop};
 
 /// A marker trait for types that are surrogates for other types.
 ///

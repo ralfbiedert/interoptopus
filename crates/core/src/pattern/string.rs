@@ -1,4 +1,26 @@
-//! Like a regular [`String`](std::string::String), but FFI safe.
+//! Owned, FFI-safe UTF-8 string.
+//!
+//! [`String`] is a `repr(C)` type that mirrors the layout of a Rust
+//! `std::string::String` (pointer + length + capacity). It owns its
+//! allocation and can be passed by value across the FFI boundary.
+//! Backends generate idiomatic string conversions — for example, in C#
+//! it becomes a managed `string` with automatic marshalling.
+//!
+//! The [`builtins_string!`](crate::builtins_string) macro must be
+//! registered in the inventory so that backends can emit the required
+//! helper functions (create / destroy / clone).
+//!
+//! # Example
+//!
+//! ```
+//! use interoptopus::ffi;
+//!
+//! #[ffi]
+//! pub fn greeting(name: ffi::String) -> ffi::String {
+//!     let msg = format!("hello, {}", name.as_str());
+//!     ffi::String::from_string(msg)
+//! }
+//! ```
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Emission, FileEmission, Visibility};

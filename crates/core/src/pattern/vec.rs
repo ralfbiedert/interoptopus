@@ -1,4 +1,26 @@
-//! Like a regular [`Vec`](std::vec::Vec), but FFI safe.<sup>🚧</sup>
+//! Owned, FFI-safe growable array.
+//!
+//! [`Vec<T>`] is a `repr(C)` type that mirrors the layout of a Rust
+//! `std::vec::Vec<T>` (pointer + length + capacity). It owns its
+//! allocation and can be passed by value across the FFI boundary.
+//! Backends generate idiomatic collection wrappers — for example, in C#
+//! each `Vec<T>` becomes a typed class with indexer, enumerator, and
+//! disposal logic.
+//!
+//! The [`builtins_vec!`](crate::builtins_vec) macro must be registered
+//! in the inventory for each element type so that backends can emit the
+//! required create / destroy helper functions.
+//!
+//! # Example
+//!
+//! ```
+//! use interoptopus::ffi;
+//!
+//! #[ffi]
+//! pub fn sum(values: ffi::Vec<f64>) -> f64 {
+//!     values.into_vec().iter().sum()
+//! }
+//! ```
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
@@ -6,6 +28,16 @@ use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePatte
 use std::io::{Read, Write};
 use std::mem::forget;
 
+/// Owned, FFI-safe growable array with the same layout as `std::vec::Vec<T>`.
+///
+/// The type is `repr(C)` with fields `(ptr, len, capacity)` using `u64`
+/// lengths for stable cross-platform ABI. Ownership transfers across the
+/// FFI boundary: once a `Vec<T>` is handed to foreign code, that side is
+/// responsible for calling the generated destroy helper.
+///
+/// Use [`from_vec`](Self::from_vec) or the `From<std::vec::Vec<T>>` impl
+/// to create, and [`into_vec`](Self::into_vec) to consume back into a
+/// standard `Vec`.
 #[derive(Debug)]
 #[repr(C)]
 pub struct Vec<T> {

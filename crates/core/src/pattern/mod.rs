@@ -52,11 +52,11 @@
 //! - Provide at least one constructor returning `ffi::Result<Self, E>`.
 //!
 //! ```rust
-//! use interoptopus::ffi;
-//!
-//! #[ffi]
-//! pub enum MyError { General }
-//!
+//! # use interoptopus::ffi;
+//! #
+//! # #[ffi]
+//! # pub enum MyError { General }
+//! #
 //! #[ffi(service)]
 //! pub struct Counter { count: u32 }
 //!
@@ -69,10 +69,6 @@
 //!     pub fn increment(&mut self) {
 //!         self.count += 1;
 //!     }
-//!
-//!     pub fn get(&self) -> u32 {
-//!         self.count
-//!     }
 //! }
 //! ```
 //!
@@ -81,7 +77,7 @@
 //! `#[ffi::skip]` or non-`pub` methods are excluded.
 //!
 //! For async services, additionally derive [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime)
-//! and include a runtime field (see [`rt::Tokio`](crate::rt::Tokio)).
+//! and include a runtime field (see the [`rt`](crate::rt) module).
 //!
 //! ## Backend Support
 //!
@@ -98,7 +94,7 @@
 //!   constituent types and functions are still available as raw bindings.
 //!
 //! - The pattern is not supported and will be **replaced with a fallback type**. Examples include
-//!   the [`CStrPointer`](crate::pattern::cstr::CStrPtr) which will become a regular `*const char` in C.
+//!   the [`CStrPtr`](crate::pattern::cstr::CStrPtr) which will become a regular `*const char` in C.
 //!
 //! ## Composition
 //!

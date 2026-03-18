@@ -1,4 +1,8 @@
-//! Additional support for primitives like `bool`.
+//! FFI-safe wrappers for primitive types that lack a stable C ABI.
+//!
+//! Rust's `bool` is not guaranteed to have the same representation as C's
+//! `_Bool`. [`Bool`] is a single-byte `repr(C)` type where `1` is `true`
+//! and `0` is `false`, making it safe to pass across the FFI boundary.
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
@@ -94,9 +98,7 @@ impl WireIO for Bool {
     }
 }
 
-/// A wrapper for the `c_char` type to differentiate it from a signed 8-bit integer for platforms
-/// that support this type.
-///
+/// A wrapper for the `c_char` type to differentiate it from a signed 8-bit integer.
 #[repr(transparent)]
 #[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, Deserialize, Serialize))]
 #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]

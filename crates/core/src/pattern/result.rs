@@ -1,30 +1,23 @@
-//! Like a regular [`Result`](std::result::Result), but FFI safe.
+//! FFI-safe [`Result<T, E>`](std::result::Result) with backend-specific error handling.
 //!
+//! [`Result<T, E>`] is a `repr(C)` enum that carries either a success
+//! value or an error variant across the FFI boundary. Backends that
+//! support the pattern translate error variants into idiomatic
+//! exceptions — for example, a C# backend converts a failed result into
+//! a CLR exception automatically.
 //!
-//! # Examples
-//!
-//! Functions returning a [`Result`] might receive special treatment in backends supporting
-//! exception handling. For example, a [`service`](crate::lang::service) method defined
-//! as:
+//! # Example
 //!
 //! ```
-//! # use interoptopus::Error;
-//! #
-//! pub fn my_method() -> Result<(), Error> {
-//!     Ok(())
-//! }
-//! ```
+//! use interoptopus::ffi;
 //!
-//! might receive a binding helper equivalent to:
+//! #[ffi]
+//! pub enum MyError { BadInput }
 //!
-//! ```csharp
-//! public void MyMethod()
-//! {
-//!     var rval = Interop.simple_service_my_method(_context);
-//!     if (rval != FFIError.Ok)
-//!     {
-//!         throw new Exception($"Something went wrong {rval}");
-//!     }
+//! #[ffi]
+//! pub fn parse(x: u32) -> ffi::Result<u32, MyError> {
+//!     if x == 0 { ffi::Err(MyError::BadInput) }
+//!     else { ffi::Ok(x * 2) }
 //! }
 //! ```
 

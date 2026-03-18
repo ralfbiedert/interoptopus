@@ -1,28 +1,22 @@
-//! Pointer like `*const char` that becomes `string` in supported languages.
+//! Null-terminated C string pointer that becomes `string` in supported backends.
+//!
+//! [`CStrPtr`] is a thin `*const c_char` wrapper for passing read-only,
+//! null-terminated, ASCII-compatible strings across the FFI boundary.
+//! For owned UTF-8 strings, prefer [`ffi::String`](crate::pattern::string::String).
 //!
 //! # Example
-//!
-//! In your library you can accept (ASCII- / C-) strings like this:
 //!
 //! ```
 //! use interoptopus::ffi;
 //!
 //! #[ffi]
 //! pub fn call_with_string(s: ffi::CStrPtr) {
-//!     //
+//!     let _rust_str = s.as_str().unwrap_or("");
 //! }
 //! ```
 //!
-//! Backends supporting this pattern might generate the equivalent to the following pseudo-code:
-//!
-//! ```csharp
-//! void call_with_string(string s);
-//! ```
-//!
-//! Backends not supporting this pattern, and C FFI, will see the equivalent of the following C code:
-//! ```c
-//! void call_with_string(uint8_t* s);
-//! ```
+//! In C# and similar backends, the parameter is exposed as a plain `string`.
+//! In C, it maps to `uint8_t*`.
 //!
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
