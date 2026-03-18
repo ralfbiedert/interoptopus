@@ -14,12 +14,19 @@ test verbose="" package="":
     cargo nextest run --all-features {{ verbose }}
     cargo test --doc --all-features
 
-# Runs C# tests via dotnet.
+# Runs .NET tests.
 test-dotnet:
     # Make sure the DLL + Interop files exist
     cargo build -p reference_project
     cargo test --test mod reference_project::interop
     dotnet test crates/backend_csharp/tests/reference_project/reference_project_tests.csproj
+
+# Runs .NET benchmarks.
+bench-dotnet:
+    # Make sure the DLL + Interop files exist
+    cargo build -p reference_project --release
+    cargo test --test mod reference_project::interop
+    dotnet run -c Release --project crates/backend_csharp/benches/dotnet/dotnet_benchmarks.csproj
 
 # Run linters, check tidiness.
 lint:

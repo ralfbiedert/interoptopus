@@ -25,6 +25,7 @@ node_modules
 *.generated
 html
 dist
+RESULTS.md
 
 # Logs
 *.log

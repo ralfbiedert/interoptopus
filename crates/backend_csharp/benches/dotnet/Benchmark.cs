@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Interoptopus;
 using My.Company;
@@ -25,6 +27,18 @@ static class Benchmark {
         var callback_huge_prealloc = new CallbackHugeVecSlice(x => x[0]);
         var serviceAsync = ServiceAsyncBasic.Create();
         var hello_world = "hello world".Utf8();
+        var deeply_nested = new My.Company.DeeplyNestedWire1 {
+            name = new string('x', 50),
+            values = Enumerable.Range(0, 3).ToDictionary(
+                i => (uint)i,
+                i => new My.Company.DeeplyNestedWire2 {
+                    values = Enumerable.Range(0, 3).Select(j => new My.Company.DeeplyNestedWire3 {
+                        x = Enumerable.Range(0, 3).ToDictionary(k => (uint)k, k => new My.Company.DeeplyNestedWire4 { a = (uint)k }),
+                        y = new string('y', 50)
+                    }).ToList()
+                }
+            )
+        };
 
         MeasureResult.Calibrate(Iterations, () => {});
 
@@ -99,6 +113,9 @@ static class Benchmark {
 
         result = MeasureResult.Measure(Iterations, () => Interop.wire_accept_string_1(WireOfString.From("hello world")));
         writer.Add("wire_accept_string_1()", result);
+
+        result = MeasureResult.Measure(Iterations, () => Interop.wire_deeply_nested_1(deeply_nested.Wire()));
+        writer.Add("wire_deeply_nested_1(deeply_nested.Wire())", result);
 
         writer.Write("RESULTS.md");
     }
