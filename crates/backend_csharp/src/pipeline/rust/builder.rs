@@ -1,3 +1,4 @@
+use crate::config::HeaderConfig;
 use crate::dispatch::Dispatch;
 use crate::{RustLibrary, RustLibraryConfig};
 use interoptopus::inventory::RustInventory;
@@ -26,6 +27,13 @@ impl RustLibraryBuilder {
     #[must_use]
     pub fn dll_name(mut self, dll_name: impl AsRef<str>) -> Self {
         self.config.meta_info.dll_name = dll_name.as_ref().to_string();
+        self
+    }
+
+    /// Configures the generation of the file header.
+    #[must_use]
+    pub fn header_config(mut self, header_config: HeaderConfig) -> Self {
+        self.config.output_header = header_config;
         self
     }
 

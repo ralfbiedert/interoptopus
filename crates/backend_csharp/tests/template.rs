@@ -18,6 +18,7 @@ fn render_templates() {
     context.insert("INTEROP_NAMESPACE", "CCC");
     context.insert("INTEROPTOPUS_CRATE", "DDD");
     context.insert("INTEROPTOPUS_VERSION", "EEE");
+    context.insert("emit_version", &true);
 
     let rendered = templates.render("header.cs", &context).unwrap();
 

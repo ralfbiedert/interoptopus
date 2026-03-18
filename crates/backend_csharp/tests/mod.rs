@@ -2,10 +2,11 @@
 mod common;
 
 mod reference_project {
-    use interoptopus_csharp::RustLibrary;
+    use interoptopus_csharp::config::HeaderConfig;
     use interoptopus_csharp::dispatch::Dispatch;
     use interoptopus_csharp::lang::meta::FileEmission;
     use interoptopus_csharp::output::Target;
+    use interoptopus_csharp::RustLibrary;
 
     #[test]
     fn interop() -> Result<(), Box<dyn std::error::Error>> {
@@ -16,6 +17,7 @@ mod reference_project {
                 FileEmission::Default => Target::new("Interop.cs", "My.Company"),
                 FileEmission::CustomModule(_) => Target::new("Interop.cs", "My.Company"),
             }))
+            .header_config(HeaderConfig { emit_version: false })
             .build()
             .process()?;
 

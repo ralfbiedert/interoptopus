@@ -11,6 +11,7 @@ pub mod pass;
 pub mod plugin;
 pub mod template;
 
+pub mod config;
 mod error;
 mod macros;
 mod pipeline;
