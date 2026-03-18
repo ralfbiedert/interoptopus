@@ -5,7 +5,7 @@
 //! and `0` is `false`, making it safe to pass across the FFI boundary.
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Docs, Emission, Visibility};
+use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -76,7 +76,7 @@ impl TypeInfo for Bool {
     }
 
     fn ty() -> Type {
-        Type { name: "Bool".to_string(), visibility: Visibility::Public, docs: Docs::empty(), emission: Emission::Builtin, kind: Self::kind() }
+        Type { name: "Bool".to_string(), visibility: Visibility::Public, docs: Docs::empty(), emission: Emission::FileEmission(FileEmission::Common), kind: Self::kind() }
     }
 
     fn register(inventory: &mut impl Inventory) {

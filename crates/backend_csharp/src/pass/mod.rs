@@ -1,7 +1,7 @@
 #![doc(hidden)]
 
 use crate::Error;
-use crate::lang::TypeId;
+use crate::lang::{FunctionId, TypeId};
 use std::cmp::PartialEq;
 
 pub mod macros;
@@ -32,6 +32,7 @@ pub struct PassInfo {
 #[derive(Debug, Copy, Clone)]
 pub enum MissingItem {
     CsType(TypeId),
+    CsFunction(FunctionId),
     RustType(interoptopus::inventory::TypeId),
 }
 

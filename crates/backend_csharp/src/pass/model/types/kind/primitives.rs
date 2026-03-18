@@ -1,7 +1,7 @@
 //! ...
 
 use crate::lang::types::kind;
-use crate::lang::types::kind::TypeKind;
+use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use crate::{skip_mapped, try_extract_kind, try_resolve};
@@ -30,9 +30,16 @@ impl Pass {
         for (rust_id, ty) in rs_types {
             skip_mapped!(kinds, id_map, rust_id);
             let primitive = try_extract_kind!(ty, Primitive);
-            let primitive = map(*primitive);
             let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
-            kinds.set(cs_id, TypeKind::Primitive(primitive));
+
+            // Rust's Primitive::Bool maps to the C# pattern Bool struct (a byte-backed
+            // blittable type), not to a C# primitive, so it participates in the same
+            // rendering path as TypePattern::Bool.
+            if *primitive == Primitive::Bool {
+                kinds.set(cs_id, TypeKind::TypePattern(TypePattern::Bool));
+            } else {
+                kinds.set(cs_id, TypeKind::Primitive(map(*primitive)));
+            }
         }
 
         Ok(Unchanged)
@@ -42,7 +49,7 @@ impl Pass {
 fn map(p: Primitive) -> kind::Primitive {
     match p {
         Primitive::Void => kind::Primitive::Void,
-        Primitive::Bool => kind::Primitive::Bool,
+        Primitive::Bool => unreachable!("Bool is mapped to TypePattern::Bool, not a C# primitive"),
         Primitive::U8 => kind::Primitive::Byte,
         Primitive::U16 => kind::Primitive::UShort,
         Primitive::U32 => kind::Primitive::UInt,

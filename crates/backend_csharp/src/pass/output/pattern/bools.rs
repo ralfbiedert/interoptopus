@@ -1,11 +1,13 @@
 //! Renders the `Bool` pattern type — a blittable `byte`-backed boolean struct.
 //!
-//! Both `Primitive::Bool` and `TypePattern::Bool` map to this C# `Bool` struct,
-//! which avoids SYSLIB1051 marshalling issues with native `bool` in `LibraryImport`
-//! declarations. The struct is always emitted once per output file that contains
-//! any type mapping to `Bool`.
+//! `TypePattern::Bool` maps to this C# `Bool` struct, which avoids SYSLIB1051
+//! marshalling issues with native `bool` in `LibraryImport` declarations.
+//! Rust's `Primitive::Bool` is also mapped to `TypePattern::Bool` by the
+//! primitives model pass, so all booleans funnel through this single type.
+//! The struct is emitted in the output file that the `Bool` type is routed to
+//! (typically the Common file in multi-file setups).
 
-use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
+use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
@@ -28,13 +30,13 @@ impl Pass {
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::master::Pass, types: &model::types::all::Pass) -> OutputResult {
         let templates = output_master.templates();
 
-        // Check if any type in the model is a Bool (primitive or pattern).
-        let has_bool = types
-            .iter()
-            .any(|(_, ty)| matches!(&ty.kind, TypeKind::Primitive(Primitive::Bool) | TypeKind::TypePattern(TypePattern::Bool)));
-
         for file in output_master.outputs_of(FileType::Csharp) {
-            let content = if has_bool {
+            // Only emit Bool into the output file it is routed to.
+            let file_has_bool = types.iter().any(|(type_id, ty)| {
+                output_master.type_belongs_to(*type_id, file) && matches!(&ty.kind, TypeKind::TypePattern(TypePattern::Bool))
+            });
+
+            let content = if file_has_bool {
                 templates.render("pattern/bool.cs", &Context::new())?.trim().to_string()
             } else {
                 String::new()
