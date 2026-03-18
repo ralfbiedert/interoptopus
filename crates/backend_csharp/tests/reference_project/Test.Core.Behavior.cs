@@ -8,6 +8,10 @@ public class TestBehavior
     [Fact]
     public void behavior_panics()
     {
+        // We must only run this on Windows as SEH is only supported there. On Linux this would abort the process
+        if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            return;
+
         try
         {
             Interop.behavior_panics();

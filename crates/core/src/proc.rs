@@ -53,8 +53,10 @@
 /// | `debug` | Print the generated code to stderr during compilation. |
 ///
 /// The generated function uses `extern "C-unwind"` calling convention. If a panic
-/// reaches the FFI boundary it will unwind into the caller. In C# this surfaces
-/// as a `System.Runtime.InteropServices.SEHException`.
+/// reaches the FFI boundary it will unwind into the caller. What then happens is platform specific.
+/// In C# this can surface as a `System.Runtime.InteropServices.SEHException` on Windows, or process
+/// aborts in other cases. In other words, you should generally avoid panicking in FFI code through
+/// `#[ffi]` functions.
 ///
 /// # Constants
 ///
