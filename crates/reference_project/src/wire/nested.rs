@@ -26,7 +26,7 @@ pub struct DeeplyNestedWire1 {
 
 #[ffi]
 pub fn wire_deeply_nested_1(mut x: Wire<DeeplyNestedWire1>) -> u32 {
-    let w = x.unwire().unwrap();
+    let w = x.try_unwire().unwrap();
     let entry = w.values.values().next().unwrap();
     let inner = entry.values.first().unwrap();
     let nested = inner.x.values().next().unwrap();

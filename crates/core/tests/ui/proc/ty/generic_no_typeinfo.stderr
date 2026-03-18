@@ -1,5 +1,5 @@
 error[E0277]: the trait bound `T: TypeInfo` is not satisfied
- --> tests/proc/ty/generic_no_typeinfo.rs:5:8
+ --> tests/ui/proc/ty/generic_no_typeinfo.rs:5:8
   |
 5 |     x: T,
   |        ^ the trait `TypeInfo` is not implemented for `T`

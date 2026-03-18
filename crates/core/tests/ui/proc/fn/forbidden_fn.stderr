@@ -1,5 +1,5 @@
 error: Using the name 'new' can cause conflicts in generated code.
- --> tests/proc/ty/forbidden_field.rs:5:5
+ --> tests/ui/proc/fn/forbidden_fn.rs:4:4
   |
-5 |     new: u8,
-  |     ^^^
+4 | fn new() {}
+  |    ^^^

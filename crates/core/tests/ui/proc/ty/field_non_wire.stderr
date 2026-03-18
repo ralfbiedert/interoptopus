@@ -1,11 +1,11 @@
 error[E0277]: the trait bound `Bar: WireIO` is not satisfied
-  --> tests/proc/ty/field_non_wire.rs:32:5
+  --> tests/ui/proc/ty/field_non_wire.rs:32:5
    |
 32 |     y: Bar,
    |     ^^^^^^ unsatisfied trait bound
    |
 help: the trait `WireIO` is not implemented for `Bar`
-  --> tests/proc/ty/field_non_wire.rs:8:1
+  --> tests/ui/proc/ty/field_non_wire.rs:8:1
    |
  8 | struct Bar;
    | ^^^^^^^^^^

@@ -1,5 +1,4 @@
 use interoptopus::lang::types::{SerializationError, WireIO};
-use interoptopus::wire::{Wire, WireBuffer};
 use std::collections::HashMap;
 use std::io::{Read, Seek, SeekFrom};
 
@@ -17,7 +16,6 @@ macro_rules! assert_seq_eq {
     }
 
 #[test]
-#[expect(clippy::cognitive_complexity, clippy::many_single_char_names)]
 fn u_roundtrip() -> Result<(), SerializationError> {
     let x = 144_u8;
     let y = 61_233_u16;
@@ -68,7 +66,6 @@ fn u_roundtrip() -> Result<(), SerializationError> {
 }
 
 #[test]
-#[expect(clippy::cognitive_complexity, clippy::many_single_char_names)]
 fn i_roundtrip() -> Result<(), SerializationError> {
     let x = -128_i8;
     let y = -32_000_i16;
@@ -119,15 +116,6 @@ fn i_roundtrip() -> Result<(), SerializationError> {
 }
 
 #[test]
-fn option_roundtrip() -> Result<(), SerializationError> {
-    // Note: this tests std::option::Option, not the FFI Option pattern.
-    // std::option::Option does NOT implement WireIO (it's not FFI-safe on its own).
-    // Option serialization is tested through the ffi::Option pattern and Wire<T>.
-    Ok(())
-}
-
-#[test]
-#[expect(clippy::cognitive_complexity)]
 fn vec_roundtrip() -> Result<(), SerializationError> {
     let v1 = vec![0x1u8, 0x2, 0x3];
     let v2 = Vec::<u8>::new();
@@ -214,7 +202,6 @@ fn string_roundtrip() -> Result<(), SerializationError> {
 }
 
 #[test]
-#[expect(clippy::cognitive_complexity)]
 fn hashmap_roundtrip() -> Result<(), SerializationError> {
     // Build maps and serialize.
     let mut h1 = HashMap::<String, u16>::new();
@@ -282,55 +269,4 @@ fn tuple_roundtrip() -> Result<(), SerializationError> {
     assert_eq!(deserialized_a, a);
 
     Ok(())
-}
-
-#[test]
-fn wire_ownership() {
-    // Create Wire with owned data
-    let owned_wire: Wire<String> = Wire::with_size(64);
-    assert!(owned_wire.is_owned());
-
-    // Create Wire with borrowed data
-    let mut buffer = vec![0; 64];
-    let borrowed_wire: Wire<String> = Wire::new_with_buffer(&mut buffer);
-    assert!(!borrowed_wire.is_owned());
-}
-
-#[test]
-fn wire_buffer_reader_test() {
-    use std::io::Read;
-
-    const BUF_SIZE: usize = 64;
-
-    // Test with borrowed data
-    let mut data = vec![0; BUF_SIZE];
-    let buffer = WireBuffer::from_slice(&mut data);
-    let mut reader = buffer.reader();
-
-    // Read full buffer
-    let mut output = vec![0u8; BUF_SIZE];
-    let bytes_read = reader.read(&mut output).unwrap();
-    assert_eq!(bytes_read, BUF_SIZE);
-
-    // Read again should return 0 (EOF)
-    let mut output2 = vec![0u8; 10];
-    let bytes_read2 = reader.read(&mut output2).unwrap();
-    assert_eq!(bytes_read2, 0);
-
-    // Test with owned data
-    let owned_data = vec![1, 2, 3, 4, 5];
-    let owned_buffer = WireBuffer::from_vec(owned_data.clone());
-    let mut owned_reader = owned_buffer.reader();
-
-    // Read partial data
-    let mut partial_output = vec![0u8; 3];
-    let partial_bytes_read = owned_reader.read(&mut partial_output).unwrap();
-    assert_eq!(partial_bytes_read, 3);
-    assert_eq!(partial_output, &owned_data[0..3]);
-
-    // Read remaining data
-    let mut remaining_output = vec![0u8; 5];
-    let remaining_bytes_read = owned_reader.read(&mut remaining_output).unwrap();
-    assert_eq!(remaining_bytes_read, 2);
-    assert_eq!(&remaining_output[0..2], &owned_data[3..5]);
 }

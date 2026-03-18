@@ -30,7 +30,7 @@
 //!    `WireOf*` helper.
 //! 3. **Transfer** — pass the `Wire<T>` (with `capacity == 0`, marking it borrowed)
 //!    into an `extern "C"` function.
-//! 4. **Deserialize** — on the Rust side, call [`Wire::unwire()`] to get the real `T`.
+//! 4. **Deserialize** — on the Rust side, call [`Wire::try_unwire()`] to get the real `T`.
 //! 5. **Free** — the foreign side unpins / drops its own buffer.
 //!
 //! # Example
@@ -72,7 +72,7 @@ pub use buffer::WireBuffer;
 
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::marker::PhantomData;
 
@@ -84,46 +84,54 @@ use std::marker::PhantomData;
 #[repr(C)]
 pub struct Wire<'my, T>
 where
-    T: WireIO + ?Sized,
+    T: ?Sized,
 {
     buf: WireBuffer<'my>,          // FFI-safe storage either owned or borrowed
     _phantom: PhantomData<&'my T>, // behaves like a lifetimed reference
 }
 
-impl<'a, T: WireIO> Wire<'a, T> {
-    /// Creates a new Wire with owned storage pre-allocated to the given capacity.
-    #[must_use]
-    pub fn with_size(capacity: usize) -> Wire<'static, T> {
-        Wire { buf: WireBuffer::with_size(capacity), _phantom: PhantomData }
+impl<T: TypeInfo + WireIO> Wire<'_, T> {
+    /// Serialize `value` into a new owned [`Wire`].
+    ///
+    /// # Errors
+    /// Returns [`SerializationError`] if `value` cannot be serialized into the buffer.
+    pub fn try_from(value: T) -> Result<Self, SerializationError> {
+        let size = value.live_size();
+        let mut buf = WireBuffer::with_size(size);
+        value.write(&mut buf.writer())?;
+        Ok(Self { buf, _phantom: PhantomData })
     }
 
-    /// Creates a new Wire with borrowed storage from the provided buffer.
-    #[allow(clippy::use_self)]
-    #[must_use]
-    pub fn new_with_buffer(buffer: &'a mut [u8]) -> Wire<'a, T> {
-        Wire { buf: WireBuffer::from_slice(buffer), _phantom: PhantomData }
-    }
-
-    /// Serialize a value into this Wire's buffer.
-    pub fn serialize(&mut self, value: &T) -> Result<(), SerializationError> {
-        value.write(&mut self.buf.writer())
+    /// Serialize `value` into a new owned [`Wire`].
+    ///
+    /// # Panics
+    /// Panics at compile time if `T::WIRE_SAFE` is false.
+    pub fn from(value: T) -> Self {
+        const { assert!(T::WIRE_SAFE) }
+        let size = value.live_size();
+        let mut buf = WireBuffer::with_size(size);
+        value.write(&mut buf.writer()).expect("Types with T::WIRE_SAFE must be wirable!");
+        Self { buf, _phantom: PhantomData }
     }
 
     /// Deserialize the value from this Wire's buffer.
-    pub fn unwire(&mut self) -> Result<T, SerializationError> {
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SerializationError`] if the buffer contents cannot be deserialized
+    /// into `T` (e.g., truncated buffer, malformed data).
+    pub fn try_unwire(&mut self) -> Result<T, SerializationError> {
         T::read(&mut self.buf.reader())
     }
 
-    /// Check if this Wire owns its buffer data.
-    #[must_use]
-    pub fn is_owned(&self) -> bool {
-        self.buf.is_owned()
-    }
-
-    /// Get a slice view of the buffer data.
-    #[must_use]
-    pub fn as_slice(&self) -> &[u8] {
-        self.buf.as_slice()
+    /// Deserialize the value from this Wire's buffer.
+    ///
+    /// # Panics
+    ///
+    /// Panics at compile time if `T::WIRE_SAFE` is false.
+    pub fn unwire(&mut self) -> T {
+        const { assert!(T::WIRE_SAFE) }
+        T::read(&mut self.buf.reader()).expect("Types with T::WIRE_SAFE must be un-wirable!")
     }
 }
 
