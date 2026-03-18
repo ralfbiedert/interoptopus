@@ -134,9 +134,13 @@ impl ApiHash {
     pub fn from(inventory: &RustInventory) -> Self {
         let mut hasher = DefaultHasher::new();
 
-        let types = inventory.types.iter();
-        let functions = inventory.functions.iter();
-        let constants = inventory.constants.iter();
+        let mut types: Vec<_> = inventory.types.iter().collect();
+        let mut functions: Vec<_> = inventory.functions.iter().collect();
+        let mut constants: Vec<_> = inventory.constants.iter().collect();
+
+        types.sort_by_key(|(id, _)| *id);
+        functions.sort_by_key(|(id, _)| *id);
+        constants.sort_by_key(|(id, _)| *id);
 
         for t in types {
             t.hash(&mut hasher);
