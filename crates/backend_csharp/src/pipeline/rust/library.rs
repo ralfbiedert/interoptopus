@@ -74,6 +74,7 @@ pub struct RustLibraryConfig {
     pub output_slices: output::pattern::slices::Config,
     pub output_vecs: output::pattern::vec::Config,
     pub output_fn_imports: output::fns::rust::Config,
+    pub output_fn_api_guard: output::fns::api_guard::Config,
     pub output_fn_overload_simple: output::fns::overload::simple::Config,
     pub output_fn_overload_body: output::fns::overload::body::Config,
     pub output_asynk: output::types::asynk::Config,
@@ -156,6 +157,7 @@ pub struct IntermediateOutputPasses {
     pub slices: output::pattern::slices::Pass,
     pub vecs: output::pattern::vec::Pass,
     pub fns_rust: output::fns::rust::Pass,
+    pub fns_api_guard: output::fns::api_guard::Pass,
     pub fns_overload_simple: output::fns::overload::simple::Pass,
     pub fns_overload_body: output::fns::overload::body::Pass,
     pub asynk: output::types::asynk::Pass,
@@ -305,6 +307,7 @@ impl RustLibrary {
                 slices: output::pattern::slices::Pass::new(config.output_slices),
                 vecs: output::pattern::vec::Pass::new(config.output_vecs),
                 fns_rust: output::fns::rust::Pass::new(config.output_fn_imports),
+                fns_api_guard: output::fns::api_guard::Pass::new(config.output_fn_api_guard),
                 fns_overload_simple: output::fns::overload::simple::Pass::new(config.output_fn_overload_simple),
                 fns_overload_body: output::fns::overload::body::Pass::new(config.output_fn_overload_body),
                 asynk: output::types::asynk::Pass::new(config.output_asynk),
@@ -361,7 +364,7 @@ impl RustLibrary {
         // Model passes
         loop_model_passes_until_done(|r| {
             pass_meta.clear();
-            r.run(self.meta_info.process(&mut pass_meta))?;
+            r.run(self.meta_info.process(&mut pass_meta, &self.inventory))?;
             r.run(m.id_maps.process(&mut pass_meta, &self.inventory.types, &self.inventory.functions, &self.inventory.services))?;
             r.run(m.type_kinds.process(&mut pass_meta))?;
             r.run(m.type_map_primitives.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &self.inventory.types))?;
@@ -437,6 +440,7 @@ impl RustLibrary {
         o.slices.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_managed_conversion, &o.unmanaged_names)?;
         o.vecs.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_managed_conversion, &o.unmanaged_names, &m.pattern_vec)?;
         o.fns_rust.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all)?;
+        o.fns_api_guard.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all, &self.meta_info)?;
         o.fns_overload_simple.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all)?;
         o.fns_overload_body.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all, &m.type_overload_all)?;
         o.asynk.process(&mut pass_meta, &self.output_master, &m.type_async_types, &m.type_all, &m.type_managed_conversion)?;
