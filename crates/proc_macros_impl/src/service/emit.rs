@@ -293,6 +293,13 @@ impl ServiceModel {
             }
         };
 
+        let assert_service_send_sync = quote_spanned! { service_type.span() =>
+            const { ::interoptopus::lang::types::assert_send_sync::<#service_type>() }
+        };
+        let assert_error_send_sync = quote_spanned! { error_type.span() =>
+            const { ::interoptopus::lang::types::assert_send_sync::<#error_type>() }
+        };
+
         quote_spanned! { ctor.name.span() =>
             #docs
             #[allow(clippy::used_underscore_items)]
@@ -300,6 +307,9 @@ impl ServiceModel {
             unsafe fn #function_name #generics(
                 #async_params
             ) {
+                #assert_service_send_sync
+                #assert_error_send_sync
+
                 unsafe {
                     use ::interoptopus::pattern::asynk::AsyncRuntime;
 
@@ -438,6 +448,13 @@ impl ServiceModel {
         // Extract the inner type from ffi::Result<T, E>
         let callback_type = self.extract_async_callback_type(&method.output);
 
+        let assert_return_send_sync = match &method.output {
+            ReturnType::Type(_, ty) => quote_spanned! { ty.span() =>
+                const { ::interoptopus::lang::types::assert_send_sync::<#callback_type>() }
+            },
+            ReturnType::Default => TokenStream::new(),
+        };
+
         let async_params = if method.inputs.is_empty() {
             quote_spanned! { method.name.span() =>
                 instance: *const #service_type,
@@ -458,6 +475,8 @@ impl ServiceModel {
             unsafe fn #function_name #enhanced_generics(
                 #async_params
             ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> #where_clause {
+                #assert_return_send_sync
+
                 unsafe {
                     use ::interoptopus::pattern::asynk::AsyncRuntime;
 

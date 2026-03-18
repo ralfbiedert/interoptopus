@@ -1,0 +1,45 @@
+error[E0277]: `*mut u8` cannot be sent between threads safely
+  --> tests/ui/proc/svc/async_non_send.rs:27:45
+   |
+27 |     pub async fn compute(_: Async<Self>) -> ffi::Result<NonSendType, Error> {
+   |                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `*mut u8` cannot be sent between threads safely
+   |
+   = help: within `interoptopus::ffi::Result<NonSendType, Error>`, the trait `Send` is not implemented for `*mut u8`
+note: required because it appears within the type `NonSendType`
+  --> tests/ui/proc/svc/async_non_send.rs:14:8
+   |
+14 | struct NonSendType {
+   |        ^^^^^^^^^^^
+note: required because it appears within the type `interoptopus::ffi::Result<NonSendType, Error>`
+  --> src/pattern/result.rs
+   |
+   | pub enum Result<T, E> {
+   |          ^^^^^^
+note: required by a bound in `assert_send_sync`
+  --> src/lang/types/mod.rs
+   |
+   | pub const fn assert_send_sync<T: Send + Sync>() {}
+   |                                  ^^^^ required by this bound in `assert_send_sync`
+
+error[E0277]: `*mut u8` cannot be shared between threads safely
+  --> tests/ui/proc/svc/async_non_send.rs:27:45
+   |
+27 |     pub async fn compute(_: Async<Self>) -> ffi::Result<NonSendType, Error> {
+   |                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `*mut u8` cannot be shared between threads safely
+   |
+   = help: within `interoptopus::ffi::Result<NonSendType, Error>`, the trait `Sync` is not implemented for `*mut u8`
+note: required because it appears within the type `NonSendType`
+  --> tests/ui/proc/svc/async_non_send.rs:14:8
+   |
+14 | struct NonSendType {
+   |        ^^^^^^^^^^^
+note: required because it appears within the type `interoptopus::ffi::Result<NonSendType, Error>`
+  --> src/pattern/result.rs
+   |
+   | pub enum Result<T, E> {
+   |          ^^^^^^
+note: required by a bound in `assert_send_sync`
+  --> src/lang/types/mod.rs
+   |
+   | pub const fn assert_send_sync<T: Send + Sync>() {}
+   |                                         ^^^^ required by this bound in `assert_send_sync`

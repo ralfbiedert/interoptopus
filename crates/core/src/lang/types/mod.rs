@@ -160,6 +160,9 @@ pub const fn assert_service_safe<T: TypeInfo>() {
     assert!(T::SERVICE_SAFE);
 }
 
+/// Compile-time assertion that `T` is `Send + Sync`.
+pub const fn assert_send_sync<T: Send + Sync>() {}
+
 /// Compile-time assertion that `T` is a valid service constructor return type.
 #[track_caller]
 pub const fn assert_service_ctor_safe<T: TypeInfo>() {

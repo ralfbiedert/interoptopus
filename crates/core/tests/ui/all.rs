@@ -23,6 +23,7 @@ fn all_ui_tests() {
     // proc/svc
     t.pass("tests/ui/proc/svc/async_basic.rs");
     t.pass("tests/ui/proc/svc/async_double.rs");
+    t.compile_fail("tests/ui/proc/svc/async_non_send.rs");
     t.compile_fail("tests/ui/proc/svc/async_mut_self.rs");
     t.compile_fail("tests/ui/proc/svc/async_ref_self.rs");
     t.pass("tests/ui/proc/svc/basic.rs");
