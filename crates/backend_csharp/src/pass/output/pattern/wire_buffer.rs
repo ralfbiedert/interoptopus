@@ -25,12 +25,12 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, rendered: HashMap::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::master::Pass, pattern_wire: &model::pattern::wire::Pass) -> OutputResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::master::Pass, wire_helpers: &model::wire::helpers::Pass) -> OutputResult {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(FileType::Csharp) {
             let content = if output_master.type_belongs_to(csharp::UTIL_WIRE_BUFFER, file) {
-                if let Some(h) = pattern_wire.helpers() {
+                if let Some(h) = wire_helpers.helpers() {
                     let mut context = Context::new();
                     context.insert("create_entry_point", &h.create_entry_point);
                     context.insert("destroy_entry_point", &h.destroy_entry_point);

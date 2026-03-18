@@ -47,8 +47,8 @@ pub struct RustLibraryConfig {
     pub model_service_method_overload: model::service::method::overload::Config,
     pub model_pattern_string: model::pattern::string::Config,
     pub model_pattern_vec: model::pattern::vec::Config,
-    pub model_pattern_wire: model::pattern::wire::Config,
-    pub model_wire: model::wire::Config,
+    pub model_wire_helpers: model::wire::helpers::Config,
+    pub model_wire_nested: model::wire::nested::Config,
     pub output_master: output::master::Config,
     pub output_unmanaged_conversion: output::conversion::unmanaged_conversion::Config,
     pub output_unmanaged_names: output::conversion::unmanaged_names::Config,
@@ -127,8 +127,8 @@ pub struct ModelPasses {
     pub service_method_overload: model::service::method::overload::Pass,
     pub pattern_string: model::pattern::string::Pass,
     pub pattern_vec: model::pattern::vec::Pass,
-    pub pattern_wire: model::pattern::wire::Pass,
-    pub wire: model::wire::Pass,
+    pub wire_helpers: model::wire::helpers::Pass,
+    pub wire_nested: model::wire::nested::Pass,
 }
 
 pub struct IntermediateOutputPasses {
@@ -276,8 +276,8 @@ impl RustLibrary {
                 service_method_overload: model::service::method::overload::Pass::new(config.model_service_method_overload),
                 pattern_string: model::pattern::string::Pass::new(config.model_pattern_string),
                 pattern_vec: model::pattern::vec::Pass::new(config.model_pattern_vec),
-                pattern_wire: model::pattern::wire::Pass::new(config.model_pattern_wire),
-                wire: model::wire::Pass::new(config.model_wire),
+                wire_helpers: model::wire::helpers::Pass::new(config.model_wire_helpers),
+                wire_nested: model::wire::nested::Pass::new(config.model_wire_nested),
             },
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
@@ -391,8 +391,8 @@ impl RustLibrary {
             r.run(m.type_async_types.process(&mut pass_meta, &m.fns_all))?;
             r.run(m.pattern_string.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.pattern_vec.process(&mut pass_meta, &m.id_maps, &self.inventory.functions, &self.inventory.types))?;
-            r.run(m.pattern_wire.process(&mut pass_meta, &self.inventory.functions))?;
-            r.run(m.wire.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &mut m.type_names, &self.inventory.types))?;
+            r.run(m.wire_helpers.process(&mut pass_meta, &self.inventory.functions))?;
+            r.run(m.wire_nested.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &mut m.type_names, &self.inventory.types))?;
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
             r.run(m.service_method_names.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
             r.run(m.service_method_overload.process(&mut pass_meta, &mut m.service_all, &m.fns_all, &m.type_all))?;
@@ -446,7 +446,7 @@ impl RustLibrary {
         o.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         o.pattern_bools.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.pattern_utf8string.process(&mut pass_meta, &self.output_master, &m.pattern_string)?;
-        o.pattern_wire_buffer.process(&mut pass_meta, &self.output_master, &m.pattern_wire)?;
+        o.pattern_wire_buffer.process(&mut pass_meta, &self.output_master, &m.wire_helpers)?;
         o.wire_types.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
         o.wire_helper_classes.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
         o.wires.process(&mut pass_meta, &self.output_master, &o.wire_types, &o.wire_helper_classes)?;
