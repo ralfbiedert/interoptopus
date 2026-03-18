@@ -4,12 +4,12 @@
 //! names (via the `names` pass). Other passes should prefer querying this pass
 //! over accessing `kind` or `names` directly.
 
+use crate::lang::TypeId;
 use crate::lang::meta::Emission;
 use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::lang::types::{Decorators, MarshalAs, ParamDecorator, RvalDecorator, Type};
-use crate::lang::TypeId;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
 use interoptopus::inventory::Types;
 use std::collections::HashMap;

@@ -32,9 +32,9 @@ impl Pass {
 
         for file in output_master.outputs_of(FileType::Csharp) {
             // Only emit Bool into the output file it is routed to.
-            let file_has_bool = types.iter().any(|(type_id, ty)| {
-                output_master.type_belongs_to(*type_id, file) && matches!(&ty.kind, TypeKind::TypePattern(TypePattern::Bool))
-            });
+            let file_has_bool = types
+                .iter()
+                .any(|(type_id, ty)| output_master.type_belongs_to(*type_id, file) && matches!(&ty.kind, TypeKind::TypePattern(TypePattern::Bool)));
 
             let content = if file_has_bool {
                 templates.render("pattern/bool.cs", &Context::new())?.trim().to_string()

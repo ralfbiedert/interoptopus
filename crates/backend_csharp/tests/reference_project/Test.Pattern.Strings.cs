@@ -130,9 +130,9 @@ public class TestPatternStrings
     public void string_by_out_dont_leak()
     {
         // TODO - Can we somehow measure memory use?
-        var w = new UseString { s1 = "hello".Utf8(), s2 = "world".Utf8() };
         for (var i = 0; i < 1024 * 1024; i++)
         {
+            var w = new UseString { s1 = "hello".Utf8(), s2 = "world".Utf8() };
             var r2 = Interop.pattern_string_6b(ref w);
         }
     }

@@ -49,14 +49,14 @@ impl Pass {
 
         for file in output_master.outputs_of(FileType::Csharp) {
             let content = if let Some((fn_id, ref fn_name)) = guard {
-                if !output_master.fn_belongs_to(fn_id, file) {
-                    String::new()
-                } else {
+                if output_master.fn_belongs_to(fn_id, file) {
                     let mut context = Context::new();
                     context.insert("fn_name", fn_name);
                     context.insert("hash_hex", meta_info.api_hash());
 
                     templates.render("fns/api_guard.cs", &context)?.trim().to_string()
+                } else {
+                    String::new()
                 }
             } else {
                 String::new()

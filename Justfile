@@ -19,7 +19,6 @@ test-dotnet:
     # Make sure the DLL + Interop files exist
     cargo build -p reference_project
     cargo test --test mod reference_project::interop
-    # Run .NET tests
     dotnet test crates/backend_csharp/tests/reference_project/reference_project_tests.csproj
 
 # Run linters, check tidiness.

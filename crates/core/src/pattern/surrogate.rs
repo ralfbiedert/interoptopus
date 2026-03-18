@@ -52,7 +52,7 @@ use crate::lang::types::{SerializationError, TypeInfo, WireIO};
 use crate::lang::types::{Type, TypeKind};
 use std::io::{Read, Write};
 use std::marker::PhantomData;
-use std::mem::{transmute, ManuallyDrop};
+use std::mem::{ManuallyDrop, transmute};
 
 /// A marker trait for types that are surrogates for other types.
 ///

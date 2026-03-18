@@ -1,7 +1,7 @@
 //! Writes top-level file header.
 
 use crate::output::{FileType, Output};
-use crate::pass::{meta, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, meta, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
