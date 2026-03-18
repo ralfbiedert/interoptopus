@@ -43,4 +43,13 @@ public class TestPatternServicesCallbacks
         callbacks.Dispose();
     }
 
+    [Fact]
+    public void CallbackFfiReturn()
+    {
+        var service = ServiceCallbacks.Create();
+
+        service.CallbackFfiReturn((x, y) => ResultVoidError.Ok);
+
+        service.Dispose();
+    }
 }

@@ -22,4 +22,21 @@ public class TestPatternServicesString
 
         Assert.Equal(str, rval);
     }
+
+    [Fact]
+    public void PassCstr()
+    {
+        var s = ServiceStrings.Create();
+        s.PassCstr("hello world");
+        s.Dispose();
+    }
+
+    [Fact]
+    public void ReturnCstr()
+    {
+        var s = ServiceStrings.Create();
+        var result = s.ReturnCstr();
+        Assert.NotNull(result);
+        s.Dispose();
+    }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using My.Company;
 using My.Company.Common;
 using Xunit;
@@ -156,5 +157,26 @@ public class TestPatternDelegates
         Assert.Equal("hello world", r1);
         Assert.Equal("hello world", r2a);
         Assert.Equal("hello world", r2b);
+    }
+
+    [Fact]
+    public void pattern_callback_6()
+    {
+        var cb = Interop.pattern_callback_6();
+        var result = cb.Call(3, 7);
+        Assert.Equal(10, result);
+        cb.Dispose();
+    }
+
+    [Fact]
+    public unsafe void pattern_callback_9()
+    {
+        var result = Interop.pattern_callback_9((IntPtr x, IntPtr y) =>
+        {
+            Marshal.ReadInt32(x);
+            Marshal.ReadInt32(y);
+            Marshal.WriteInt32(y, 42);
+        });
+        Assert.Equal(42, result);
     }
 }

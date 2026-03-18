@@ -120,4 +120,22 @@ public class TestPatternSlices
         use_string.Dispose();
     }
 
+    [Fact]
+    public void pattern_ffi_slice_1b()
+    {
+        var data = new uint[500].SliceMut();
+        var result = Interop.pattern_ffi_slice_1b(data);
+        Assert.Equal(500u, result);
+        data.Dispose();
+    }
+
+    [Fact]
+    public void pattern_ffi_slice_4()
+    {
+        var slice = new byte[] { 1, 2, 3 }.Slice();
+        var sliceMut = new byte[] { 4, 5, 6 }.SliceMut();
+        Interop.pattern_ffi_slice_4(slice, sliceMut);
+        slice.Dispose();
+        sliceMut.Dispose();
+    }
 }
