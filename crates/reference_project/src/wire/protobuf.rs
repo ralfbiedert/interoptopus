@@ -13,3 +13,15 @@ pub extern "C" fn protobuf_deeply_nested_1(data: *const u8, len: usize) -> u32 {
     let nested = inner.x.values().next().unwrap();
     nested.a
 }
+
+#[unsafe(no_mangle)]
+pub extern "C" fn protobuf_vec_string(data: *const u8, len: usize) {
+    let slice = unsafe { std::slice::from_raw_parts(data, len) };
+    let _msg = proto::VecString::decode(slice).unwrap();
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn protobuf_hashmap_string_string(data: *const u8, len: usize) {
+    let slice = unsafe { std::slice::from_raw_parts(data, len) };
+    let _msg = proto::HashMapStringString::decode(slice).unwrap();
+}

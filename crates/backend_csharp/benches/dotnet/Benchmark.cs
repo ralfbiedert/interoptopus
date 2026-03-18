@@ -15,7 +15,57 @@ static partial class Benchmark {
     [LibraryImport("reference_project", EntryPoint = "protobuf_deeply_nested_1")]
     private static unsafe partial uint protobuf_deeply_nested_1(byte* data, nuint len);
 
-    const int Iterations = 100_000;
+    [LibraryImport("reference_project", EntryPoint = "protobuf_vec_string")]
+    private static unsafe partial void protobuf_vec_string(byte* data, nuint len);
+
+    [LibraryImport("reference_project", EntryPoint = "protobuf_hashmap_string_string")]
+    private static unsafe partial void protobuf_hashmap_string_string(byte* data, nuint len);
+
+    const int Iterations = 1000;
+
+    static (long wireNs, long protoPreallocNs) RunVecString(int n, int s)
+    {
+        var vec = Enumerable.Range(0, n).Select(i => new string((char)('a' + i % 26), s)).ToList();
+
+        var proto = new ProtobufBench.VecString();
+        foreach (var v in vec) proto.Values.Add(v);
+
+        var wireResult = MeasureResult.Measure(Iterations, () => Interop.wire_accept_string_3(WireOfVecString.From(vec)));
+
+        var protoResult = MeasureResult.Measure(Iterations, () => {
+            var bytes = proto.ToByteArray();
+            unsafe {
+                fixed (byte* ptr = bytes) {
+                    protobuf_vec_string(ptr, (nuint)bytes.Length);
+                }
+            }
+        });
+
+        return ((long)wireResult.MicroPer1000(), (long)protoResult.MicroPer1000());
+    }
+
+    static (long wireNs, long protoPreallocNs) RunHashMapStringString(int n, int s)
+    {
+        var map = Enumerable.Range(0, n).ToDictionary(
+            i => $"key_{i:D6}" + new string('x', Math.Max(0, s - 10)),
+            i => new string((char)('a' + i % 26), s));
+
+        var proto = new ProtobufBench.HashMapStringString();
+        foreach (var kv in map) proto.Values.Add(kv.Key, kv.Value);
+
+        var wireResult = MeasureResult.Measure(Iterations, () => Interop.wire_accept_string_4(WireOfHashMapStringString.From(map)));
+
+        var protoResult = MeasureResult.Measure(Iterations, () => {
+            var bytes = proto.ToByteArray();
+            unsafe {
+                fixed (byte* ptr = bytes) {
+                    protobuf_hashmap_string_string(ptr, (nuint)bytes.Length);
+                }
+            }
+        });
+
+        return ((long)wireResult.MicroPer1000(), (long)protoResult.MicroPer1000());
+    }
 
     static (long wireNs, long protoAllocNs, long protoPreallocNs) RunWireVsProtobuf(int n, int s)
     {
@@ -165,29 +215,49 @@ static partial class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.wire_accept_string_1(WireOfString.From("hello world")));
         writer.Add("wire_accept_string_1()", result);
 
+        var vec_strings = Enumerable.Range(0, 50).Select(i => new string((char)('a' + i % 26), 50)).ToList();
+        var map_strings = Enumerable.Range(0, 50).ToDictionary(i => $"key_{i:D3}" + new string('x', 44), i => new string((char)('a' + i % 26), 50));
+
+        result = MeasureResult.Measure(Iterations, () => Interop.wire_accept_string_3(WireOfVecString.From(vec_strings)));
+        writer.Add("wire_accept_string_3(Vec<String> x50)", result);
+
+        result = MeasureResult.Measure(Iterations, () => Interop.wire_accept_string_4(WireOfHashMapStringString.From(map_strings)));
+        writer.Add("wire_accept_string_4(HashMap<String,String> x50)", result);
+
         writer.Write("RESULTS.md");
 
         // Wire vs Protobuf parametric comparison
-        int[] ns = { 1, 3, 5, 10 };
+        int[] ns = { 1, 3, 5, 10, 50, 100, 300 };
         int[] ss = { 1, 100, 1000, 10000 };
 
-        Console.WriteLine("\nWire vs Protobuf comparison:");
-        Console.WriteLine("N,S,wire_ns,proto_alloc_ns,proto_prealloc_ns");
-
-        using var csv = File.CreateText("wire_vs_protobuf.csv");
-        csv.WriteLine("N,S,wire_ns,proto_alloc_ns,proto_prealloc_ns");
-
-        foreach (var n in ns) {
-            foreach (var s in ss) {
-                Console.Write($"  N={n}, S={s} ... ");
-                var (wireNs, protoAllocNs, protoPreallocNs) = RunWireVsProtobuf(n, s);
-                var line = $"{n},{s},{wireNs},{protoAllocNs},{protoPreallocNs}";
-                Console.WriteLine($"wire={wireNs}, proto_alloc={protoAllocNs}, proto_prealloc={protoPreallocNs}");
-                csv.WriteLine(line);
-                csv.Flush();
+        Console.WriteLine("\n--- Vec<String> ---");
+        using (var csv = File.CreateText("wire_vs_protobuf_vec_string.csv")) {
+            csv.WriteLine("N,S,wire_ns,proto_ns");
+            foreach (var n in ns) {
+                foreach (var s in ss) {
+                    Console.Write($"  N={n}, S={s} ... ");
+                    var (wireNs, protoNs) = RunVecString(n, s);
+                    Console.WriteLine($"wire={wireNs}, proto={protoNs}");
+                    csv.WriteLine($"{n},{s},{wireNs},{protoNs}");
+                    csv.Flush();
+                }
             }
         }
 
-        Console.WriteLine("\nResults written to wire_vs_protobuf.csv");
+        Console.WriteLine("\n--- HashMap<String,String> ---");
+        using (var csv = File.CreateText("wire_vs_protobuf_hashmap_string.csv")) {
+            csv.WriteLine("N,S,wire_ns,proto_ns");
+            foreach (var n in ns) {
+                foreach (var s in ss) {
+                    Console.Write($"  N={n}, S={s} ... ");
+                    var (wireNs, protoNs) = RunHashMapStringString(n, s);
+                    Console.WriteLine($"wire={wireNs}, proto={protoNs}");
+                    csv.WriteLine($"{n},{s},{wireNs},{protoNs}");
+                    csv.Flush();
+                }
+            }
+        }
+
+        Console.WriteLine("\nResults written to wire_vs_protobuf_vec_string.csv and wire_vs_protobuf_hashmap_string.csv");
     }
 }

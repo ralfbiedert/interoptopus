@@ -21,3 +21,11 @@ message DeeplyNestedWire1 {
     string name = 1;
     map<uint32, DeeplyNestedWire2> values = 2;
 }
+
+message VecString {
+    repeated string values = 1;
+}
+
+message HashMapStringString {
+    map<string, string> values = 1;
+}
