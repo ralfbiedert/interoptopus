@@ -16,6 +16,7 @@ static partial class Benchmark {
 
     const int Iterations = 100_000;
     const int N = 5;
+    const int S = 10000;
 
     static void Main(string[] args)
     {
@@ -34,23 +35,23 @@ static partial class Benchmark {
         var serviceAsync = ServiceAsyncBasic.Create();
         var hello_world = "hello world".Utf8();
         var deeply_nested = new My.Company.DeeplyNestedWire1 {
-            name = new string('x', 50),
+            name = new string('x', S),
             values = Enumerable.Range(0, N).ToDictionary(
                 i => (uint)i,
                 i => new My.Company.DeeplyNestedWire2 {
                     values = Enumerable.Range(0, N).Select(j => new My.Company.DeeplyNestedWire3 {
                         x = Enumerable.Range(0, N).ToDictionary(k => (uint)k, k => new My.Company.DeeplyNestedWire4 { a = (uint)k }),
-                        y = new string('y', 50)
+                        y = new string('y', S)
                     }).ToList()
                 }
             )
         };
 
-        var proto_nested = new ProtobufBench.DeeplyNestedWire1 { Name = new string('x', 50) };
+        var proto_nested = new ProtobufBench.DeeplyNestedWire1 { Name = new string('x', S) };
         foreach (var i in Enumerable.Range(0, N)) {
             var wire2 = new ProtobufBench.DeeplyNestedWire2();
             foreach (var j in Enumerable.Range(0, N)) {
-                var wire3 = new ProtobufBench.DeeplyNestedWire3 { Y = new string('y', 50) };
+                var wire3 = new ProtobufBench.DeeplyNestedWire3 { Y = new string('y', S) };
                 foreach (var k in Enumerable.Range(0, N)) {
                     wire3.X.Add((uint)k, new ProtobufBench.DeeplyNestedWire4 { A = (uint)k });
                 }
