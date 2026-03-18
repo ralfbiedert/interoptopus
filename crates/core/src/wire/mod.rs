@@ -264,7 +264,31 @@ impl<T: WireIO> WireIO for Wire<T> {
     }
 }
 
-/// Emits and registers helper functions used by [`Wire`](crate::wire::Wire).
+/// Emits and registers helpers for [`Wire<T>`](crate::wire::Wire).
+///
+/// Backends (e.g., C#) use these functions internally so that foreign code can
+/// allocate and free Rust-owned wire buffers.
+///
+/// # Usage
+///
+/// Call once in your inventory function and register the result:
+///
+/// ```rust
+/// # use interoptopus::inventory::RustInventory;
+/// # use interoptopus::builtins_wire;
+/// pub fn inventory() -> RustInventory {
+///     RustInventory::new()
+///         .register(builtins_wire!())
+///         // ... other registrations ...
+///         .validate()
+/// }
+/// ```
+///
+/// # Implementation Details
+///
+/// This macro generates the following FFI functions:
+/// - `interoptopus_wire_create` — allocates a wire buffer of a given size.
+/// - `interoptopus_wire_destroy` — drops a wire buffer, freeing its memory.
 #[macro_export]
 macro_rules! builtins_wire {
     () => {{

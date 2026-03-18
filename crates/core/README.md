@@ -123,7 +123,6 @@ Gated behind **feature flags**, these enable:
 
 - `derive` - Proc macros such as `#[ffi]`.
 - `serde` - Serde attributes on internal types.
-- `log` - Invoke [log][log-crate] on FFI errors.
 - `tokio` - Convenience support for async services via Tokio.
 
 ## Changelog
