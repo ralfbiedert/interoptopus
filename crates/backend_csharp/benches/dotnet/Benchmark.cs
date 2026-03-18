@@ -18,7 +18,6 @@ static class Benchmark {
         MeasureResult result;
         var writer = new MarkdownTableWriter();
 
-        long x = 0;
         var short_vec = SliceVec3f32.From(new Vec3f32[10]);
         var short_byte = SliceByte.From(new byte[10]);
         var short_byte_mut = SliceMutByte.From(new byte[10]);

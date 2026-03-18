@@ -20,13 +20,9 @@ namespace Interoptopus
             var n = (double) _n;
             var ticks_for_all_n = (double) _totalTicks;
 
-            // 1 tick = 100 nanos
-            var micros_for_all_n = ticks_for_all_n / 10;
-            var micros_for_one_n = micros_for_all_n / n;
-            var micros_for_1000_n = 1000 * micros_for_one_n;
-
-            // return (100 * ticks_for_all_n / n);
-            return micros_for_1000_n;
+            // ns/call == µs/1000 calls numerically; use Stopwatch.Frequency to be platform-independent
+            var ns_per_call = ticks_for_all_n / n * 1_000_000_000.0 / Stopwatch.Frequency;
+            return ns_per_call;
         }
 
         public MeasureResult(long n, long totalTicks)
