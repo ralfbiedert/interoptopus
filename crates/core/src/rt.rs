@@ -1,4 +1,41 @@
-//! Optional runtime support for async services.
+//! Pre-built async runtimes for FFI services.
+//!
+//! Services that expose `async` methods need an [`AsyncRuntime`] implementor
+//! to spawn futures. This module provides [`Tokio`], a ready-made
+//! implementation backed by a multi-threaded Tokio runtime.
+//!
+//! For a different executor (e.g. single-threaded, or `async-std`),
+//! [`AsyncRuntime`] can be implemented directly on a custom type instead.
+//!
+//! # Example
+//!
+//! A minimal async service with one async method:
+//!
+//! ```rust
+//! # use interoptopus::{AsyncRuntime, ffi};
+//! # use interoptopus::pattern::asynk::Async;
+//! # use interoptopus::rt::Tokio;
+//! #
+//! # #[ffi]
+//! # pub enum Error { Failed }
+//! #
+//! #[ffi(service)]
+//! #[derive(AsyncRuntime)]
+//! pub struct MyService {
+//!     runtime: Tokio,
+//! }
+//!
+//! #[ffi]
+//! impl MyService {
+//!     pub fn create() -> ffi::Result<Self, Error> {
+//!         ffi::Ok(Self { runtime: Tokio::new() })
+//!     }
+//!
+//!     pub async fn compute(_: Async<Self>, x: u32) -> ffi::Result<u32, Error> {
+//!         ffi::Ok(x * 2)
+//!     }
+//! }
+//! ```
 
 use crate::pattern::asynk::AsyncRuntime;
 use std::sync::Arc;
