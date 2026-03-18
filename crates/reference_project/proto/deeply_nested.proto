@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package deeply_nested;
+
+option csharp_namespace = "ProtobufBench";
+
+message DeeplyNestedWire4 {
+    uint32 a = 1;
+}
+
+message DeeplyNestedWire3 {
+    map<uint32, DeeplyNestedWire4> x = 1;
+    string y = 2;
+}
+
+message DeeplyNestedWire2 {
+    repeated DeeplyNestedWire3 values = 1;
+}
+
+message DeeplyNestedWire1 {
+    string name = 1;
+    map<uint32, DeeplyNestedWire2> values = 2;
+}
