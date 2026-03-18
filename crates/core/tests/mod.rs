@@ -23,7 +23,6 @@ mod types {
 }
 
 mod wire {
-    mod buffer;
     mod io;
     mod std;
 }

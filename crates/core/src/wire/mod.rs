@@ -5,12 +5,105 @@
 //! boundary. `Wire<T>` solves this by serializing the value into a flat byte buffer on
 //! one side of the boundary and deserializing it on the other.
 //!
-//! # How it works
+//! # Examples
+//!
+//! ### Accepting a complex argument
+//!
+//! ```rust,ignore
+//! use interoptopus::ffi;
+//! use interoptopus::wire::Wire;
+//! use std::collections::HashMap;
+//!
+//! #[ffi]
+//! pub fn lookup(mut map: Wire<HashMap<String, String>>) -> u32 {
+//!     let map = map.unwire();
+//!     map.len() as u32
+//! }
+//! ```
+//!
+//! ### Returning a complex value
+//!
+//! ```rust,ignore
+//! use interoptopus::ffi;
+//! use interoptopus::wire::Wire;
+//!
+//! #[ffi]
+//! pub fn greeting() -> Wire<String> {
+//!     Wire::from("hello".to_string())
+//! }
+//! ```
+//!
+//! ### Structs containing non-FFI types
+//!
+//! Any `#[ffi]` struct whose fields are not all `repr(C)` can be wrapped in
+//! `Wire<T>`. The proc macro generates matching serialization code on both
+//! sides.
+//!
+//! ```rust,ignore
+//! use interoptopus::ffi;
+//! use interoptopus::wire::Wire;
+//!
+//! #[ffi]
+//! pub struct UserProfile {
+//!     pub name: String,
+//!     pub tags: Vec<String>,
+//! }
+//!
+//! #[ffi]
+//! pub fn accept_profile(mut profile: Wire<UserProfile>) {
+//!     let profile = profile.unwire();
+//!     println!("{}: {:?}", profile.name, profile.tags);
+//! }
+//! ```
+//!
+//! ### Deeply nested types
+//!
+//! `Wire<T>` handles arbitrarily nested structures, including `Vec`, `HashMap`,
+//! and `Option` at any depth:
+//!
+//! ```rust,ignore
+//! use interoptopus::ffi;
+//! use interoptopus::wire::Wire;
+//! use std::collections::HashMap;
+//!
+//! #[ffi]
+//! pub struct Inner { pub value: u32 }
+//!
+//! #[ffi]
+//! pub struct Outer {
+//!     pub items: HashMap<u32, Vec<Inner>>,
+//! }
+//!
+//! #[ffi]
+//! pub fn process(mut data: Wire<Outer>) -> u32 {
+//!     let data = data.unwire();
+//!     data.items.values().flatten().map(|i| i.value).sum()
+//! }
+//! ```
+//!
+//! ### Registering the helpers
+//!
+//! Every crate that uses `Wire<T>` must call [`builtins_wire!`](crate::builtins_wire)
+//! in its inventory so the create/destroy helpers are available to the foreign side:
+//!
+//! ```rust,ignore
+//! use interoptopus::{builtins_wire, function};
+//! use interoptopus::inventory::RustInventory;
+//!
+//! pub fn ffi_inventory() -> RustInventory {
+//!     RustInventory::new()
+//!         .register(function!(greeting))
+//!         .register(builtins_wire!())
+//!         .validate()
+//! }
+//! ```
+//!
+//! # Under the Hood
 //!
 //! A [`Wire<T>`] is essentially a serialized buffer that is safe to pass through
 //! FFI boundaries.
 //!
-//! ### Rust -> Foreign
+//! ## Rust -> Foreign
 //!
 //! 1. **Serialize** — [`Wire::from`] (or [`Wire::try_from`]) serializes the value into a new Rust-allocated buffer.
 //! 2. **Transfer** — the `Wire<T>` is returned from an `#[ffi]` function; as a `repr(C)` struct it crosses the FFI boundary by value.
@@ -18,7 +111,7 @@
 //! 4. **Free** — the foreign side calls `Dispose()` or similar on the wire object, which invokes `interoptopus_wire_destroy`
 //!    (emitted by `builtins_wire!`) to drop the Rust-allocated buffer.
 //!
-//! ### Foreign -> Rust
+//! ## Foreign -> Rust
 //!
 //! 1. **Allocate** — the generated `WireOf*.From(value)` helper calls `interoptopus_wire_create` (emitted by
 //!    `builtins_wire!`) so that Rust allocates the buffer; the foreign side never allocates directly.
@@ -27,19 +120,8 @@
 //! 4. **Deserialize** — [`Wire::unwire`] or [`Wire::try_unwire`] reads `T` from the buffer.
 //! 5. **Free** — Rust drops the `Wire<T>` when the function returns, freeing the buffer.
 //!
-//! # Example
 //!
-//! Here we use an actual `HashMap<String, String>` from `std` to demonstrate the transfer of
-//! a complex object over FFI.
-//!
-//! ```rust,ignore
-//! # use std::collections::HashMap;
-//! # use interoptopus::wire::Wire;
-//! #[ffi]
-//! fn call_with_string(_input: Wire<HashMap<String, String>>) { }
-//! ```
-//!
-//! # Wire format
+//! ## Wire format
 //!
 //! All values are written in **little-endian** byte order, sequentially, with no padding
 //! or alignment between fields:
@@ -62,12 +144,11 @@
 //!
 mod buffer;
 
-pub use buffer::WireBuffer;
-
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use buffer::WireBuffer;
 use std::marker::PhantomData;
 
 /// Wraps and transfers complex objects over FFI.
@@ -76,15 +157,15 @@ use std::marker::PhantomData;
 /// FFI boundaries.
 ///
 #[repr(C)]
-pub struct Wire<'my, T>
+pub struct Wire<T>
 where
     T: ?Sized,
 {
-    buf: WireBuffer<'my>,          // FFI-safe storage either owned or borrowed
-    _phantom: PhantomData<&'my T>, // behaves like a lifetimed reference
+    buf: WireBuffer,
+    _phantom: PhantomData<T>,
 }
 
-impl<T: TypeInfo + WireIO> Wire<'_, T> {
+impl<T: TypeInfo + WireIO> Wire<T> {
     /// Serialize `value` into a new owned [`Wire`].
     ///
     /// # Errors
@@ -129,7 +210,7 @@ impl<T: TypeInfo + WireIO> Wire<'_, T> {
     }
 }
 
-impl<T: TypeInfo + WireIO> TypeInfo for Wire<'_, T> {
+impl<T: TypeInfo + WireIO> TypeInfo for Wire<T> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
@@ -161,7 +242,7 @@ impl<T: TypeInfo + WireIO> TypeInfo for Wire<'_, T> {
     }
 }
 
-impl<T: WireIO> WireIO for Wire<'_, T> {
+impl<T: WireIO> WireIO for Wire<T> {
     fn write(&self, _: &mut impl std::io::Write) -> Result<(), SerializationError> {
         bad_wire!()
     }

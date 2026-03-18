@@ -2,7 +2,7 @@ error[E0080]: evaluation panicked: assertion failed: T::WIRE_SAFE
  --> src/wire/mod.rs
   |
   |         const { assert!(T::WIRE_SAFE) }
-  |                 ^^^^^^^^^^^^^^^^^^^^^ evaluation of `interoptopus::wire::Wire::<'_, interoptopus::ffi::Vec<u32>>::from::{constant#0}` failed here
+  |                 ^^^^^^^^^^^^^^^^^^^^^ evaluation of `interoptopus::wire::Wire::<interoptopus::ffi::Vec<u32>>::from::{constant#0}` failed here
 
 note: erroneous constant encountered
  --> src/wire/mod.rs
@@ -10,7 +10,7 @@ note: erroneous constant encountered
   |         const { assert!(T::WIRE_SAFE) }
   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-note: the above error was encountered while instantiating `fn interoptopus::wire::Wire::<'_, interoptopus::ffi::Vec<u32>>::from`
+note: the above error was encountered while instantiating `fn interoptopus::wire::Wire::<interoptopus::ffi::Vec<u32>>::from`
  --> tests/ui/wire/invalid.rs:8:13
   |
 8 |     let _ = Wire::from(v);

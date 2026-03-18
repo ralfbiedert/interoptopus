@@ -1,59 +1,39 @@
 //! FFI-safe buffer backing [`Wire<T>`](super::Wire).
 //!
 //! A `WireBuffer` is the raw storage behind every `Wire<T>`. It tracks a `data` pointer, a
-//! `len` (bytes written), and a `capacity`. The `capacity` field doubles as an ownership
-//! discriminant:
-//!
-//! - **`capacity > 0`** — the buffer owns a Rust `Vec<u8>` allocation (created via
-//!   `interoptopus_wire_create` or [`WireBuffer::with_size`]). Dropping it on the Rust side
-//!   reconstructs and frees the Vec. When returned to a foreign caller, that caller must
-//!   invoke `interoptopus_wire_destroy` when done.
-//! - **`capacity == 0`** — the buffer is empty or borrows externally-managed memory.
-//!   Dropping it is a no-op.
+//! `len` (bytes written), and a `capacity`. Dropping it on the Rust side reconstructs and
+//! frees the underlying `Vec<u8>`. When returned to a foreign caller, that caller must
+//! invoke `interoptopus_wire_destroy` when done.
 
 use std::io::{Read, Write};
-use std::marker::PhantomData;
 
-/// FFI-safe buffer that can represent both owned and borrowed byte storage.
+/// FFI-safe buffer that can represent owned byte storage.
 #[repr(C)]
-pub struct WireBuffer<'a> {
+pub struct WireBuffer {
     data: *mut u8,
     len: i32,
     capacity: i32,
-    _phantom: PhantomData<&'a [u8]>,
 }
 
-unsafe impl Send for WireBuffer<'_> {}
-unsafe impl Sync for WireBuffer<'_> {}
+unsafe impl Send for WireBuffer {}
+unsafe impl Sync for WireBuffer {}
 
-impl<'a> WireBuffer<'a> {
+impl WireBuffer {
     /// Create a new owned buffer from a Vec
     #[must_use]
-    pub fn from_vec(mut vec: Vec<u8>) -> WireBuffer<'static> {
+    pub fn from_vec(mut vec: Vec<u8>) -> WireBuffer {
         let data = vec.as_mut_ptr();
         let len = i32::try_from(vec.len()).expect("Too large Wire buffer!");
         let capacity = i32::try_from(vec.capacity()).expect("Too large Wire buffer!");
 
         std::mem::forget(vec); // LEAKS the vec here, must use interoptopus_wire_destroy() to free it
 
-        WireBuffer { data, len, capacity, _phantom: PhantomData }
-    }
-
-    /// Create a new borrowed buffer from a slice
-    #[allow(clippy::use_self, reason = "We want to keep the explicit lifetime")]
-    #[must_use]
-    pub fn from_slice(slice: &'a mut [u8]) -> WireBuffer<'a> {
-        WireBuffer {
-            data: slice.as_mut_ptr(),
-            len: i32::try_from(slice.len()).expect("Too large Wire buffer!"),
-            capacity: 0, // indicates borrowed
-            _phantom: PhantomData,
-        }
+        WireBuffer { data, len, capacity }
     }
 
     /// Create an empty owned buffer with capacity
     #[must_use]
-    pub fn with_size(size: usize) -> WireBuffer<'static> {
+    pub fn with_size(size: usize) -> WireBuffer {
         WireBuffer::from_vec(vec![0u8; size])
     }
 
@@ -105,18 +85,18 @@ impl<'a> WireBuffer<'a> {
 }
 
 /// Allows serializing types into a wire buffer storage.
-struct WireBufferWriter<'a, 'b> {
-    buf: &'a mut WireBuffer<'b>,
+struct WireBufferWriter<'a> {
+    buf: &'a mut WireBuffer,
     pos: usize,
 }
 
-impl<'a, 'b> WireBufferWriter<'a, 'b> {
-    pub fn new(buf: &'a mut WireBuffer<'b>) -> Self {
+impl<'a> WireBufferWriter<'a> {
+    pub fn new(buf: &'a mut WireBuffer) -> Self {
         Self { buf, pos: 0 }
     }
 }
 
-impl std::io::Write for WireBufferWriter<'_, '_> {
+impl std::io::Write for WireBufferWriter<'_> {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         let data = self.buf.as_slice_mut();
         let remaining = data.len().saturating_sub(self.pos);
@@ -138,7 +118,7 @@ impl std::io::Write for WireBufferWriter<'_, '_> {
 /// Allows deserializing types from a wire buffer storage.
 /// This is NOT a zerocopy implementation.
 struct WireBufferReader<'a> {
-    buf: &'a WireBuffer<'a>,
+    buf: &'a WireBuffer,
     pos: usize,
 }
 
@@ -163,7 +143,7 @@ impl std::io::Read for WireBufferReader<'_> {
     }
 }
 
-impl Drop for WireBuffer<'_> {
+impl Drop for WireBuffer {
     fn drop(&mut self) {
         // Free owned buffers. When a Wire<T> is returned over FFI, the value is moved
         // (no Drop runs on the Rust side), so the other side frees it via
@@ -178,5 +158,42 @@ impl Drop for WireBuffer<'_> {
                 );
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn wire_ownership() {
+        let owned_wire_buffer = WireBuffer::with_size(64);
+        assert!(owned_wire_buffer.is_owned());
+    }
+
+    #[test]
+    fn wire_buffer_reader_test() {
+        use std::io::Read;
+
+        let data = vec![1, 2, 3, 4, 5];
+        let buffer = WireBuffer::from_vec(data.clone());
+        let mut reader = buffer.reader();
+
+        // Read partial data
+        let mut partial_output = vec![0u8; 3];
+        let partial_bytes_read = reader.read(&mut partial_output).unwrap();
+        assert_eq!(partial_bytes_read, 3);
+        assert_eq!(partial_output, &data[0..3]);
+
+        // Read remaining data
+        let mut remaining_output = vec![0u8; 5];
+        let remaining_bytes_read = reader.read(&mut remaining_output).unwrap();
+        assert_eq!(remaining_bytes_read, 2);
+        assert_eq!(&remaining_output[0..2], &data[3..5]);
+
+        // Read again should return 0 (EOF)
+        let mut output = vec![0u8; 10];
+        let bytes_read = reader.read(&mut output).unwrap();
+        assert_eq!(bytes_read, 0);
     }
 }
