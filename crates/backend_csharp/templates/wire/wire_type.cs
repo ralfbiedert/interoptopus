@@ -22,6 +22,7 @@ public partial struct {{ wire_name }}
 
 public partial struct {{ wire_name }}
 {
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static {{ wire_name }} From({{ inner_type }} value)
     {
         var size = CalculateSize(value);
@@ -40,12 +41,14 @@ public partial struct {{ wire_name }}
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public {{ inner_type }} Unwire()
     {
         using var reader = Buffer.Reader();
         {{ deserialize_body | indent(prefix = "        ") }}
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     static int CalculateSize({{ inner_type }} value)
     {
         {{ size_body | indent(prefix = "        ") }}
