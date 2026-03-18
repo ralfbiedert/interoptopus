@@ -1,9 +1,10 @@
 //! Serialize complex objects into flat byte buffers and transfer them over FFI.
 //!
-//! Not every Rust type is `repr(C)`. Types like `String`, `Vec<T>`, `HashMap<K, V>`,
-//! and arbitrary user structs containing them cannot be passed directly through an FFI
-//! boundary. `Wire<T>` solves this by serializing the value into a flat byte buffer on
-//! one side of the boundary and deserializing it on the other.
+//! Types like `String`, `Vec<T>`, `HashMap<K, V>`, and structs containing them cannot be
+//! passed directly over an FFI boundary. Their in-memory form is a small header (pointer,
+//! length, capacity) into a Rust-managed heap allocation — the foreign side cannot read,
+//! resize, or free that memory. `Wire<T>` solves this by serializing the value into a flat
+//! byte buffer on one side and deserializing it on the other.
 //!
 //! # Examples
 //!
@@ -105,6 +106,29 @@
 //! }
 //! ```
 //!
+//! # Wire vs. Protobuf
+//!
+//! The natural alternative to `Wire<T>` for passing complex 'variably-sized' types over FFI is
+//! [Protocol Buffers](https://protobuf.dev/). Protobuf works, but it comes with significant
+//! friction: you need to maintain `.proto` schema files alongside your Rust types, install and
+//! run an external code generator as part of your build, integrate that generator into both the Rust
+//! and the foreign-language project, and keep all three in sync whenever a type changes.
+//! The result is a more complex project setup with more moving parts — and you still have to
+//! wire the generated types into your FFI layer by hand.
+//!
+//! `Wire<T>` eliminates all of that. Types are defined once in Rust with `#[ffi]`, and both
+//! the serialization logic and the foreign-language deserialization code are generated
+//! automatically as part of the normal interoptopus build. There are no `.proto` files, no
+//! external tools, and no schema drift.
+//!
+//! Beyond ergonomics, `Wire<T>` is in most cases also faster. Because both sides share the
+//! exact same compiled type layout, there is no field-tag overhead, no varint encoding, and
+//! no dynamic dispatch — just a straight sequential read/write of the exact bytes needed.
+//! In our benchmarks, `Wire<T>` usually outperformed Protobuf by roughly 20–200%
+//! depending on the payload shape.
+//!
+//! ![wire-vs-protobuf](https://media.githubusercontent.com/media/ralfbiedert/interoptopus/static/2026-03-protobuf/gfx/wire_vs_protobuf_complex.png)
+//!
 //! # Under the Hood
 //!
 //! A [`Wire<T>`] is essentially a serialized buffer that is safe to pass through
@@ -154,7 +178,7 @@ mod buffer;
 
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use buffer::WireBuffer;
 use std::marker::PhantomData;
