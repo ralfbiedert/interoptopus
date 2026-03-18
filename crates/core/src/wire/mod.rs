@@ -7,31 +7,27 @@
 //!
 //! # How it works
 //!
-//! A [`Wire<T>`] is a thin `repr(C)` wrapper around a [`WireBuffer`] — a pointer + length + capacity
-//! triplet that is safe to pass through `extern "C"` function signatures.
+//! A [`Wire<T>`] is essentially a serialized buffer that is safe to pass through
+//! FFI boundaries.
 //!
 //! ### Rust -> Foreign
 //!
-//! 1. **Serialize** — create a [`Wire::with_size`] (allocates) or
-//!    [`Wire::new_with_buffer`] (borrows caller-supplied memory), then call
-//!    [`Wire::serialize`] to write the value into the buffer.
-//! 2. **Transfer** — return the `Wire<T>` from an `extern "C"` function. Because
-//!    `Wire<T>` is `repr(C)`, it crosses the FFI boundary as a plain struct copy.
+//! 1. **Serialize** — call [`Wire::from`] serializes a value into a new owned buffer.
+//! 2. **Transfer** — return the `Wire<T>` from an `#[ffi]` function.
 //! 3. **Deserialize** — on the foreign side (e.g., C#), read the buffer bytes and
 //!    reconstruct the managed type.
 //! 4. **Free** — call `interoptopus_wire_destroy` (emitted by `builtins_wire!`) to
-//!    drop the Rust-allocated buffer. Borrowed buffers (capacity == 0) are a no-op.
+//!    drop the Rust-allocated buffer.
 //!
 //! ### Foreign -> Rust
 //!
 //! 1. **Allocate & pin** — on the foreign side, allocate a byte buffer (e.g., C#
 //!    `stackalloc`) and pin it so the GC will not move it.
-//! 2. **Serialize** — write the managed object into that buffer using the generated
-//!    `WireOf*` helper.
-//! 3. **Transfer** — pass the `Wire<T>` (with `capacity == 0`, marking it borrowed)
-//!    into an `extern "C"` function.
-//! 4. **Deserialize** — on the Rust side, call [`Wire::try_unwire()`] to get the real `T`.
-//! 5. **Free** — the foreign side unpins / drops its own buffer.
+//! 2. **Serialize** — write the managed object into that buffer using generated
+//!    foreign helpers.
+//! 3. **Transfer** — pass the `Wire<T>` into an `#[ffi]` function.
+//! 4. **Deserialize** — on the Rust side, call [`Wire::unwire`] or [`Wire::try_unwire`] to get the real `T`.
+//! 5. **Free** — the foreign side unpins / drops its own buffer after the call returns.
 //!
 //! # Example
 //!
