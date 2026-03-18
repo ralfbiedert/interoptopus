@@ -9,7 +9,7 @@
 //!
 //! ### Accepting a complex argument
 //!
-//! ```rust,ignore
+//! ```
 //! use interoptopus::ffi;
 //! use interoptopus::wire::Wire;
 //! use std::collections::HashMap;
@@ -23,7 +23,7 @@
 //!
 //! ### Returning a complex value
 //!
-//! ```rust,ignore
+//! ```
 //! use interoptopus::ffi;
 //! use interoptopus::wire::Wire;
 //!
@@ -39,7 +39,7 @@
 //! `Wire<T>`. The proc macro generates matching serialization code on both
 //! sides.
 //!
-//! ```rust,ignore
+//! ```
 //! use interoptopus::ffi;
 //! use interoptopus::wire::Wire;
 //!
@@ -61,13 +61,13 @@
 //! `Wire<T>` handles arbitrarily nested structures, including `Vec`, `HashMap`,
 //! and `Option` at any depth:
 //!
-//! ```rust,ignore
+//! ```
 //! use interoptopus::ffi;
 //! use interoptopus::wire::Wire;
 //! use std::collections::HashMap;
 //!
 //! #[ffi]
-//! pub struct Inner { pub value: u32 }
+//! pub struct Inner { pub score: u32 }
 //!
 //! #[ffi]
 //! pub struct Outer {
@@ -77,7 +77,7 @@
 //! #[ffi]
 //! pub fn process(mut data: Wire<Outer>) -> u32 {
 //!     let data = data.unwire();
-//!     data.items.values().flatten().map(|i| i.value).sum()
+//!     data.items.values().flatten().map(|i| i.score).sum()
 //! }
 //! ```
 //!
@@ -86,9 +86,16 @@
 //! Every crate that uses `Wire<T>` must call [`builtins_wire!`](crate::builtins_wire)
 //! in its inventory so the create/destroy helpers are available to the foreign side:
 //!
-//! ```rust,ignore
+//! ```
+//! use interoptopus::ffi;
+//! use interoptopus::wire::Wire;
 //! use interoptopus::{builtins_wire, function};
 //! use interoptopus::inventory::RustInventory;
+//!
+//! #[ffi]
+//! pub fn greeting() -> Wire<String> {
+//!     Wire::from("hello".to_string())
+//! }
 //!
 //! pub fn ffi_inventory() -> RustInventory {
 //!     RustInventory::new()
@@ -134,14 +141,15 @@
 //! | `String` | `u32` byte-length (LE), then UTF-8 bytes |
 //! | `Vec<T>` | `u32` element count (LE), then each element serialized in order |
 //! | `HashMap<K,V>` | `u32` entry count (LE), then each key followed by value |
-//! | `Option<T>` | 1 byte tag (`0x00` = None, `0x01` = Some), then value bytes if Some |
 //! | `(A, B, …)` | Each element serialized in order |
 //! | User structs | Each field serialized in declaration order |
 //!
 //! The wire format is not self-describing, both sides must agree on the exact type
-//! layout. The `#[ffi]` proc macro generates matching serialization code on both
-//! the Rust side ([`WireIO`]) and the foreign side.
+//! layout.
 //!
+//! **Note:** This section describes an internal implementation detail that may change
+//! between versions without notice. Do not rely on it for persistent storage or
+//! cross-version compatibility.
 mod buffer;
 
 use crate::bad_wire;
