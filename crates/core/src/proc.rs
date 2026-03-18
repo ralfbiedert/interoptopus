@@ -52,6 +52,10 @@
 /// | `module = "name"` / `module = common` | Assign to a named or common module. |
 /// | `debug` | Print the generated code to stderr during compilation. |
 ///
+/// The generated function uses `extern "C-unwind"` calling convention. If a panic
+/// reaches the FFI boundary it will unwind into the caller. In C# this surfaces
+/// as a `System.Runtime.InteropServices.SEHException`.
+///
 /// # Constants
 ///
 /// Annotating a `const` item registers it as an FFI constant and derives [`ConstantInfo`].
@@ -118,6 +122,7 @@
 #[cfg(feature = "derive")]
 pub use interoptopus_proc::ffi;
 
+
 /// Derives the [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime) trait for a service struct
 /// by forwarding to one of its fields.
 ///
@@ -156,6 +161,7 @@ pub use interoptopus_proc::ffi;
 /// ```
 #[cfg(feature = "derive")]
 pub use interoptopus_proc::AsyncRuntime;
+
 
 /// Strips module paths from a fully-qualified Rust type name, preserving generic structure.
 ///

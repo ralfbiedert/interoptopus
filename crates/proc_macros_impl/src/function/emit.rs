@@ -34,7 +34,7 @@ impl FunctionModel {
         quote_spanned! { self.name.span() =>
             #(#preserved_attrs)*
             #[unsafe(export_name = #export_name)]
-            #vis #unsafety extern "C" fn #name #generics(#inputs) #output #where_clause #block
+            #vis #unsafety extern "C-unwind" fn #name #generics(#inputs) #output #where_clause #block
         }
     }
 

@@ -15,7 +15,7 @@
 //! 1. **Serialize** — [`Wire::from`] (or [`Wire::try_from`]) serializes the value into a new Rust-allocated buffer.
 //! 2. **Transfer** — the `Wire<T>` is returned from an `#[ffi]` function; as a `repr(C)` struct it crosses the FFI boundary by value.
 //! 3. **Deserialize** — the foreign side (e.g., C#) reads the buffer bytes and reconstructs the managed type.
-//! 4. **Free** — the foreign side calls `Dispose()` on the wire object, which invokes `interoptopus_wire_destroy`
+//! 4. **Free** — the foreign side calls `Dispose()` or similar on the wire object, which invokes `interoptopus_wire_destroy`
 //!    (emitted by `builtins_wire!`) to drop the Rust-allocated buffer.
 //!
 //! ### Foreign -> Rust
@@ -25,8 +25,7 @@
 //! 2. **Serialize** — the value is serialized into that Rust-allocated buffer.
 //! 3. **Transfer** — the `Wire<T>` is passed into an `#[ffi]` function. Rust receives ownership.
 //! 4. **Deserialize** — [`Wire::unwire`] or [`Wire::try_unwire`] reads `T` from the buffer.
-//! 5. **Free** — Rust drops the `Wire<T>` when the function returns, freeing the buffer. The foreign side
-//!    must NOT call `Dispose()` after passing a wire into Rust.
+//! 5. **Free** — Rust drops the `Wire<T>` when the function returns, freeing the buffer.
 //!
 //! # Example
 //!
