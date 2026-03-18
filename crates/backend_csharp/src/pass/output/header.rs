@@ -5,8 +5,12 @@ use crate::pass::{meta, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
+/// Configuration for the header output pass.
 #[derive(Debug, Clone)]
 pub struct Config {
+    /// If `true` (default), includes the interoptopus crate version in the
+    /// `Builder:` line of the generated file header. Set to `false` to produce
+    /// headers that don't change across crate version bumps.
     pub emit_version: bool,
 }
 
