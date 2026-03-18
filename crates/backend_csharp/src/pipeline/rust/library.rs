@@ -35,7 +35,6 @@ pub struct RustLibraryConfig {
     pub model_type_overload_pointer: model::types::overload::pointer::Config,
     pub model_type_overload_delegate: model::types::overload::delegate::Config,
     pub model_type_overload_all: model::types::overload::all::Config,
-    pub model_emission: model::emission::Config,
     pub model_type_all: model::types::all::Config,
     pub model_type_util: model::types::util::Config,
     pub model_fn_all: model::fns::all::Config,
@@ -116,7 +115,6 @@ pub struct ModelPasses {
     pub type_overload_pointer: model::types::overload::pointer::Pass,
     pub type_overload_delegate: model::types::overload::delegate::Pass,
     pub type_overload_all: model::types::overload::all::Pass,
-    pub emission: model::emission::Pass,
     pub type_all: model::types::all::Pass,
     pub type_util: model::types::util::Pass,
     pub fns_all: model::fns::all::Pass,
@@ -266,7 +264,6 @@ impl RustLibrary {
                 type_overload_pointer: model::types::overload::pointer::Pass::new(config.model_type_overload_pointer),
                 type_overload_delegate: model::types::overload::delegate::Pass::new(config.model_type_overload_delegate),
                 type_overload_all: model::types::overload::all::Pass::new(config.model_type_overload_all),
-                emission: model::emission::Pass::new(config.model_emission),
                 type_all: model::types::all::Pass::new(config.model_type_all),
                 type_util: model::types::util::Pass::new(config.model_type_util),
                 fns_all: model::fns::all::Pass::new(config.model_fn_all),
@@ -386,10 +383,9 @@ impl RustLibrary {
             r.run(m.type_names.process(&mut pass_meta, &m.id_maps, &m.type_kinds, &self.inventory.types))?;
             r.run(m.type_overload_pointer.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_all, &mut m.type_overload_all))?;
             r.run(m.type_overload_delegate.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_all, &mut m.type_overload_all))?;
-            r.run(m.emission.process(&mut pass_meta, &m.type_kinds, &m.id_maps, &self.inventory.types, &self.inventory.functions))?;
-            r.run(m.type_all.process(&mut pass_meta, &m.type_kinds, &m.type_names, &m.emission))?;
+            r.run(m.type_all.process(&mut pass_meta, &m.type_kinds, &m.type_names, &m.id_maps, &self.inventory.types))?;
             r.run(m.type_util.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_all))?;
-            r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &m.emission, &mut m.fns_all, &self.inventory.functions))?;
+            r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &mut m.fns_all, &self.inventory.functions))?;
             r.run(m.fn_overload_simple.process(&mut pass_meta, &mut m.fns_all, &m.type_all, &m.type_overload_all))?;
             r.run(m.fn_overload_body.process(&mut pass_meta, &mut m.fns_all, &mut m.type_kinds, &mut m.type_names, &mut m.type_all, &m.type_overload_all))?;
             r.run(m.type_async_types.process(&mut pass_meta, &m.fns_all))?;

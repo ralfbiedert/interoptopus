@@ -6,6 +6,7 @@
 
 use crate::lang::FunctionId;
 use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
+use crate::lang::meta::Emission;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
@@ -30,7 +31,6 @@ impl Pass {
         &mut self,
         pass_meta: &mut crate::pass::PassMeta,
         id_map: &model::id_map::Pass,
-        emissions: &model::emission::Pass,
         all: &mut model::fns::all::Pass,
         rs_functions: &Functions,
     ) -> ModelResult {
@@ -68,8 +68,7 @@ impl Pass {
             }
 
             let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
-            let emission = try_resolve!(emissions.get_fn(cs_id), pass_meta, self.info, crate::pass::MissingItem::CsFunction(cs_id));
-            let cs_function = Function { emission: emission.clone(), name: rust_fn.name.clone(), signature: cs_signature, kind: FunctionKind::Original };
+            let cs_function = Function { emission: rust_fn.emission.clone(), name: rust_fn.name.clone(), signature: cs_signature, kind: FunctionKind::Original };
 
             all.register(cs_id, cs_function.clone());
             self.functions.insert(cs_id, cs_function);

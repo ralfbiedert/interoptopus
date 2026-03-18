@@ -1,4 +1,3 @@
-pub mod emission;
 pub mod fns;
 pub mod id_map;
 pub mod pattern;
