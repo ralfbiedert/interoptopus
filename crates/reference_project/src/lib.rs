@@ -35,7 +35,6 @@ pub mod services {
     pub mod dependent;
     pub mod ignored;
     pub mod multiple_ctors;
-    pub mod on_panic;
     pub mod result;
     pub mod slice;
     pub mod string;
@@ -204,7 +203,6 @@ pub fn inventory() -> RustInventory {
         .register(service!(services::dependent::ServiceMain))
         .register(service!(services::dependent::ServiceDependent))
         .register(service!(services::result::ServiceResult))
-        .register(service!(services::on_panic::ServiceOnPanic))
         .register(service!(services::callback::ServiceCallbacks))
         .register(service!(services::ignored::ServiceIgnoringMethods))
         .register(service!(services::multiple_ctors::ServiceMultipleCtors))
