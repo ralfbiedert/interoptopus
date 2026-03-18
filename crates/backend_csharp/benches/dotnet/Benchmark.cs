@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -15,8 +16,64 @@ static partial class Benchmark {
     private static unsafe partial uint protobuf_deeply_nested_1(byte* data, nuint len);
 
     const int Iterations = 100_000;
-    const int N = 5;
-    const int S = 10000;
+
+    static (long wireNs, long protoAllocNs, long protoPreallocNs) RunWireVsProtobuf(int n, int s)
+    {
+        var deeply_nested = new My.Company.DeeplyNestedWire1 {
+            name = new string('x', s),
+            values = Enumerable.Range(0, n).ToDictionary(
+                i => (uint)i,
+                i => new My.Company.DeeplyNestedWire2 {
+                    values = Enumerable.Range(0, n).Select(j => new My.Company.DeeplyNestedWire3 {
+                        x = Enumerable.Range(0, n).ToDictionary(k => (uint)k, k => new My.Company.DeeplyNestedWire4 { a = (uint)k }),
+                        y = new string('y', s)
+                    }).ToList()
+                }
+            )
+        };
+
+        var proto_nested = new ProtobufBench.DeeplyNestedWire1 { Name = new string('x', s) };
+        foreach (var i in Enumerable.Range(0, n)) {
+            var wire2 = new ProtobufBench.DeeplyNestedWire2();
+            foreach (var j in Enumerable.Range(0, n)) {
+                var wire3 = new ProtobufBench.DeeplyNestedWire3 { Y = new string('y', s) };
+                foreach (var k in Enumerable.Range(0, n)) {
+                    wire3.X.Add((uint)k, new ProtobufBench.DeeplyNestedWire4 { A = (uint)k });
+                }
+                wire2.Values.Add(wire3);
+            }
+            proto_nested.Values.Add((uint)i, wire2);
+        }
+
+        var proto_buffer = new byte[proto_nested.CalculateSize()];
+
+        var wireResult = MeasureResult.Measure(Iterations, () => Interop.wire_deeply_nested_1(deeply_nested.Wire()));
+
+        var protoAllocResult = MeasureResult.Measure(Iterations, () => {
+            var bytes = proto_nested.ToByteArray();
+            unsafe {
+                fixed (byte* ptr = bytes) {
+                    protobuf_deeply_nested_1(ptr, (nuint)bytes.Length);
+                }
+            }
+        });
+
+        var protoPreallocResult = MeasureResult.Measure(Iterations, () => {
+            var span = new Span<byte>(proto_buffer);
+            proto_nested.WriteTo(span);
+            unsafe {
+                fixed (byte* ptr = proto_buffer) {
+                    protobuf_deeply_nested_1(ptr, (nuint)proto_buffer.Length);
+                }
+            }
+        });
+
+        return (
+            (long)wireResult.MicroPer1000(),
+            (long)protoAllocResult.MicroPer1000(),
+            (long)protoPreallocResult.MicroPer1000()
+        );
+    }
 
     static void Main(string[] args)
     {
@@ -25,7 +82,6 @@ static partial class Benchmark {
         MeasureResult result;
         var writer = new MarkdownTableWriter();
 
-        long x = 0;
         var short_vec = SliceVec3f32.From(new Vec3f32[10]);
         var short_byte = SliceByte.From(new byte[10]);
         var short_byte_mut = SliceMutByte.From(new byte[10]);
@@ -34,31 +90,6 @@ static partial class Benchmark {
         var callback_huge_prealloc = new CallbackHugeVecSlice(x => x[0]);
         var serviceAsync = ServiceAsyncBasic.Create();
         var hello_world = "hello world".Utf8();
-        var deeply_nested = new My.Company.DeeplyNestedWire1 {
-            name = new string('x', S),
-            values = Enumerable.Range(0, N).ToDictionary(
-                i => (uint)i,
-                i => new My.Company.DeeplyNestedWire2 {
-                    values = Enumerable.Range(0, N).Select(j => new My.Company.DeeplyNestedWire3 {
-                        x = Enumerable.Range(0, N).ToDictionary(k => (uint)k, k => new My.Company.DeeplyNestedWire4 { a = (uint)k }),
-                        y = new string('y', S)
-                    }).ToList()
-                }
-            )
-        };
-
-        var proto_nested = new ProtobufBench.DeeplyNestedWire1 { Name = new string('x', S) };
-        foreach (var i in Enumerable.Range(0, N)) {
-            var wire2 = new ProtobufBench.DeeplyNestedWire2();
-            foreach (var j in Enumerable.Range(0, N)) {
-                var wire3 = new ProtobufBench.DeeplyNestedWire3 { Y = new string('y', S) };
-                foreach (var k in Enumerable.Range(0, N)) {
-                    wire3.X.Add((uint)k, new ProtobufBench.DeeplyNestedWire4 { A = (uint)k });
-                }
-                wire2.Values.Add(wire3);
-            }
-            proto_nested.Values.Add((uint)i, wire2);
-        }
 
         MeasureResult.Calibrate(Iterations, () => {});
 
@@ -134,33 +165,29 @@ static partial class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.wire_accept_string_1(WireOfString.From("hello world")));
         writer.Add("wire_accept_string_1()", result);
 
-        result = MeasureResult.Measure(Iterations, () => Interop.wire_deeply_nested_1(deeply_nested.Wire()));
-        writer.Add("wire_deeply_nested_1(deeply_nested.Wire())", result);
-
-        // Pre-allocate buffer for protobuf serialization (avoid alloc per iteration)
-        var proto_buffer = new byte[proto_nested.CalculateSize()];
-
-        result = MeasureResult.Measure(Iterations, () => {
-            var bytes = proto_nested.ToByteArray();
-            unsafe {
-                fixed (byte* ptr = bytes) {
-                    protobuf_deeply_nested_1(ptr, (nuint)bytes.Length);
-                }
-            }
-        });
-        writer.Add("protobuf_deeply_nested_1(ToByteArray())", result);
-
-        result = MeasureResult.Measure(Iterations, () => {
-            var span = new Span<byte>(proto_buffer);
-            proto_nested.WriteTo(span);
-            unsafe {
-                fixed (byte* ptr = proto_buffer) {
-                    protobuf_deeply_nested_1(ptr, (nuint)proto_buffer.Length);
-                }
-            }
-        });
-        writer.Add("protobuf_deeply_nested_1(prealloc)", result);
-
         writer.Write("RESULTS.md");
+
+        // Wire vs Protobuf parametric comparison
+        int[] ns = { 1, 3, 5, 10 };
+        int[] ss = { 1, 100, 1000, 10000 };
+
+        Console.WriteLine("\nWire vs Protobuf comparison:");
+        Console.WriteLine("N,S,wire_ns,proto_alloc_ns,proto_prealloc_ns");
+
+        using var csv = File.CreateText("wire_vs_protobuf.csv");
+        csv.WriteLine("N,S,wire_ns,proto_alloc_ns,proto_prealloc_ns");
+
+        foreach (var n in ns) {
+            foreach (var s in ss) {
+                Console.Write($"  N={n}, S={s} ... ");
+                var (wireNs, protoAllocNs, protoPreallocNs) = RunWireVsProtobuf(n, s);
+                var line = $"{n},{s},{wireNs},{protoAllocNs},{protoPreallocNs}";
+                Console.WriteLine($"wire={wireNs}, proto_alloc={protoAllocNs}, proto_prealloc={protoPreallocNs}");
+                csv.WriteLine(line);
+                csv.Flush();
+            }
+        }
+
+        Console.WriteLine("\nResults written to wire_vs_protobuf.csv");
     }
 }
