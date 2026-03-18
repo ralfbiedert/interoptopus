@@ -6,6 +6,7 @@
 //! that validates the hash at load time. If no such function exists, the pass produces
 //! an empty string and the template simply omits the block.
 
+use crate::lang::FunctionId;
 use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, meta, model, output};
@@ -37,22 +38,26 @@ impl Pass {
         let templates = output_master.templates();
 
         // Find the API guard function: one whose return type is ApiVersion
-        let guard_fn_name = fns_all.originals().find_map(|(_, function)| {
+        let guard: Option<(FunctionId, String)> = fns_all.originals().find_map(|(&id, function)| {
             let rval_ty = types.get(function.signature.rval)?;
             if matches!(&rval_ty.kind, TypeKind::TypePattern(TypePattern::ApiVersion)) {
-                Some(function.name.clone())
+                Some((id, function.name.clone()))
             } else {
                 None
             }
         });
 
         for file in output_master.outputs_of(FileType::Csharp) {
-            let content = if let Some(ref fn_name) = guard_fn_name {
-                let mut context = Context::new();
-                context.insert("fn_name", fn_name);
-                context.insert("hash_hex", meta_info.api_hash());
+            let content = if let Some((fn_id, ref fn_name)) = guard {
+                if !output_master.fn_belongs_to(fn_id, file) {
+                    String::new()
+                } else {
+                    let mut context = Context::new();
+                    context.insert("fn_name", fn_name);
+                    context.insert("hash_hex", meta_info.api_hash());
 
-                templates.render("fns/api_guard.cs", &context)?.trim().to_string()
+                    templates.render("fns/api_guard.cs", &context)?.trim().to_string()
+                }
             } else {
                 String::new()
             };

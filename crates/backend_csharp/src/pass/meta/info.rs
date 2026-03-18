@@ -22,12 +22,10 @@ impl Pass {
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, inventory: &RustInventory) -> ModelResult {
-        if self.api_hash.is_empty() {
-            self.api_hash = ApiHash::from(inventory).hash_hex().to_string();
-            Ok(Outcome::Changed)
-        } else {
-            Ok(Outcome::Unchanged)
-        }
+        self.api_hash = ApiHash::from(inventory).hash_hex().to_string();
+
+        // Sweet little lie, but we're running early and often, so this won't matter.
+        Ok(Outcome::Unchanged)
     }
 
     #[must_use]
