@@ -12,22 +12,21 @@
 //!
 //! ### Rust -> Foreign
 //!
-//! 1. **Serialize** — call [`Wire::from`] serializes a value into a new owned buffer.
-//! 2. **Transfer** — return the `Wire<T>` from an `#[ffi]` function.
-//! 3. **Deserialize** — on the foreign side (e.g., C#), read the buffer bytes and
-//!    reconstruct the managed type.
-//! 4. **Free** — call `interoptopus_wire_destroy` (emitted by `builtins_wire!`) to
-//!    drop the Rust-allocated buffer.
+//! 1. **Serialize** — [`Wire::from`] (or [`Wire::try_from`]) serializes the value into a new Rust-allocated buffer.
+//! 2. **Transfer** — the `Wire<T>` is returned from an `#[ffi]` function; as a `repr(C)` struct it crosses the FFI boundary by value.
+//! 3. **Deserialize** — the foreign side (e.g., C#) reads the buffer bytes and reconstructs the managed type.
+//! 4. **Free** — the foreign side calls `Dispose()` on the wire object, which invokes `interoptopus_wire_destroy`
+//!    (emitted by `builtins_wire!`) to drop the Rust-allocated buffer.
 //!
 //! ### Foreign -> Rust
 //!
-//! 1. **Allocate & pin** — on the foreign side, allocate a byte buffer (e.g., C#
-//!    `stackalloc`) and pin it so the GC will not move it.
-//! 2. **Serialize** — write the managed object into that buffer using generated
-//!    foreign helpers.
-//! 3. **Transfer** — pass the `Wire<T>` into an `#[ffi]` function.
-//! 4. **Deserialize** — on the Rust side, call [`Wire::unwire`] or [`Wire::try_unwire`] to get the real `T`.
-//! 5. **Free** — the foreign side unpins / drops its own buffer after the call returns.
+//! 1. **Allocate** — the generated `WireOf*.From(value)` helper calls `interoptopus_wire_create` (emitted by
+//!    `builtins_wire!`) so that Rust allocates the buffer; the foreign side never allocates directly.
+//! 2. **Serialize** — the value is serialized into that Rust-allocated buffer.
+//! 3. **Transfer** — the `Wire<T>` is passed into an `#[ffi]` function. Rust receives ownership.
+//! 4. **Deserialize** — [`Wire::unwire`] or [`Wire::try_unwire`] reads `T` from the buffer.
+//! 5. **Free** — Rust drops the `Wire<T>` when the function returns, freeing the buffer. The foreign side
+//!    must NOT call `Dispose()` after passing a wire into Rust.
 //!
 //! # Example
 //!
@@ -182,6 +181,22 @@ impl<T: WireIO> WireIO for Wire<'_, T> {
 macro_rules! builtins_wire {
     () => {{
         #[$crate::ffi]
+        pub fn interoptopus_wire_create(size: i32, out_len: &mut i32, out_capacity: &mut i32) -> *mut u8 {
+            if size <= 0 {
+                *out_len = 0;
+                *out_capacity = 0;
+                return ::std::ptr::null_mut();
+            }
+            let size = usize::try_from(size).expect("Invalid Wire buffer size");
+            let mut vec: Vec<u8> = vec![0u8; size];
+            let data = vec.as_mut_ptr();
+            *out_len = i32::try_from(vec.len()).expect("Too large Wire buffer");
+            *out_capacity = i32::try_from(vec.capacity()).expect("Too large Wire buffer");
+            ::std::mem::forget(vec);
+            data
+        }
+
+        #[$crate::ffi]
         pub fn interoptopus_wire_destroy(data: *mut u8, len: i32, capacity: i32) {
             if capacity <= 0 {
                 return;
@@ -190,6 +205,7 @@ macro_rules! builtins_wire {
         }
 
         |x: &mut $crate::inventory::RustInventory| {
+            <interoptopus_wire_create as $crate::lang::function::FunctionInfo>::register(x);
             <interoptopus_wire_destroy as $crate::lang::function::FunctionInfo>::register(x);
         }
     }};

@@ -4,11 +4,12 @@
 //! `len` (bytes written), and a `capacity`. The `capacity` field doubles as an ownership
 //! discriminant:
 //!
-//! - **`capacity > 0`** — the buffer owns a Rust `Vec<u8>` allocation. Dropping it on the
-//!   Rust side reconstructs and frees the Vec. When returned over FFI, the foreign side
-//!   must call `interoptopus_wire_destroy` instead.
-//! - **`capacity == 0`** — the buffer borrows memory from the caller (e.g., a C# pinned
-//!   `stackalloc` region). Dropping it is a no-op.
+//! - **`capacity > 0`** — the buffer owns a Rust `Vec<u8>` allocation (created via
+//!   `interoptopus_wire_create` or [`WireBuffer::with_size`]). Dropping it on the Rust side
+//!   reconstructs and frees the Vec. When returned to a foreign caller, that caller must
+//!   invoke `interoptopus_wire_destroy` when done.
+//! - **`capacity == 0`** — the buffer is empty or borrows externally-managed memory.
+//!   Dropping it is a no-op.
 
 use std::io::{Read, Write};
 use std::marker::PhantomData;
@@ -67,11 +68,7 @@ impl<'a> WireBuffer<'a> {
         self.len == 0
     }
 
-    /// Check if this buffer owns its data (Rust-allocated).
-    ///
-    /// Only positive capacity indicates Rust ownership. Negative capacity
-    /// signals foreign-allocated memory (e.g., C# `Marshal.AllocHGlobal`),
-    /// and zero means borrowed.
+    /// Returns `true` if this buffer owns its data (Rust-allocated, `capacity > 0`).
     #[must_use]
     pub const fn is_owned(&self) -> bool {
         self.capacity > 0

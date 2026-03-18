@@ -32,6 +32,7 @@ impl Pass {
             let content = if output_master.type_belongs_to(csharp::UTIL_WIRE_BUFFER, file) {
                 if let Some(h) = pattern_wire.helpers() {
                     let mut context = Context::new();
+                    context.insert("create_entry_point", &h.create_entry_point);
                     context.insert("destroy_entry_point", &h.destroy_entry_point);
                     templates.render("pattern/wire_buffer.cs", &context)?.trim().to_string()
                 } else {

@@ -11,14 +11,11 @@ public partial struct WireBuffer
 {
     public WireBuffer() { }
 
-    /// Allocate a C#-owned buffer of the given size.
+    /// Allocate a Rust-owned buffer of the given size via interoptopus_wire_create.
     public static unsafe WireBuffer Allocate(int size)
     {
-        var buf = new WireBuffer();
-        buf.data = Marshal.AllocHGlobal(size);
-        buf.len = size;
-        buf.capacity = -size;
-        return buf;
+        var ptr = WireInterop.interoptopus_wire_create(size, out var outLen, out var outCapacity);
+        return new WireBuffer { data = ptr, len = outLen, capacity = outCapacity };
     }
 
     /// Get a BinaryWriter over this buffer.
@@ -34,16 +31,14 @@ public partial struct WireBuffer
     }
 
     /// Free the buffer. Rust-allocated buffers (capacity > 0) are freed via
-    /// interoptopus_wire_destroy; C#-allocated buffers (capacity < 0) via
-    /// Marshal.FreeHGlobal. Borrowed buffers (capacity == 0) are not freed.
+    /// interoptopus_wire_destroy. Borrowed or empty buffers (capacity == 0) are no-ops.
+    /// Do NOT call this after passing a wire into a Rust function — Rust owns it then.
     public void Dispose()
     {
         if (data != IntPtr.Zero)
         {
             if (capacity > 0)
                 WireInterop.interoptopus_wire_destroy(data, len, capacity);
-            else if (capacity < 0)
-                Marshal.FreeHGlobal(data);
             data = IntPtr.Zero;
             len = 0;
             capacity = 0;
@@ -56,9 +51,7 @@ public partial struct WireBuffer
         var _unmanaged = new Unmanaged();
         _unmanaged.data = data;
         _unmanaged.len = len;
-        // C#-owned buffers (capacity < 0) appear as borrowed (capacity = 0)
-        // to Rust so it won't try to free them. C# retains ownership.
-        _unmanaged.capacity = capacity > 0 ? capacity : 0;
+        _unmanaged.capacity = capacity;
         return _unmanaged;
     }
 
@@ -128,6 +121,10 @@ public partial struct WireBuffer
 }
 
 public partial class WireInterop {
+    [LibraryImport(Interop.NativeLib, EntryPoint = "{{ create_entry_point }}")]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    public static unsafe partial IntPtr interoptopus_wire_create(int size, out int out_len, out int out_capacity);
+
     [LibraryImport(Interop.NativeLib, EntryPoint = "{{ destroy_entry_point }}")]
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static partial void interoptopus_wire_destroy(IntPtr data, int len, int capacity);
