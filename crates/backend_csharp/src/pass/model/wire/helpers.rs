@@ -1,20 +1,21 @@
 //! Discovers the `interoptopus_wire_create` and `interoptopus_wire_destroy` helper
 //! functions emitted by `builtins_wire!` for the `WireBuffer` pattern type.
 //!
-//! This pass scans the Rust inventory for those functions and stores their entry-point
-//! names so that the `wire_buffer` output pass can emit the nested `WireInterop` imports.
+//! This pass scans the Rust inventory for those functions and stores their
+//! `FunctionId`s so that the `wire_buffer` output pass can look up the
+//! entry-point names and emit the nested `WireInterop` imports.
 
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo};
-use interoptopus::inventory::Functions;
+use interoptopus::inventory::{FunctionId, Functions};
 
 #[derive(Default)]
 pub struct Config {}
 
 #[derive(Clone, Debug)]
 pub struct WireHelpers {
-    pub create_entry_point: String,
-    pub destroy_entry_point: String,
+    pub create_fn: FunctionId,
+    pub destroy_fn: FunctionId,
 }
 
 pub struct Pass {
@@ -36,18 +37,18 @@ impl Pass {
         let mut create = None;
         let mut destroy = None;
 
-        for rust_fn in rs_functions.values() {
+        for (fn_id, rust_fn) in rs_functions {
             if rust_fn.name.starts_with("interoptopus_wire_create") {
-                create = Some(rust_fn.name.clone());
+                create = Some(*fn_id);
             } else if rust_fn.name.starts_with("interoptopus_wire_destroy") {
-                destroy = Some(rust_fn.name.clone());
+                destroy = Some(*fn_id);
             }
         }
 
         let mut outcome = Unchanged;
 
         if let (Some(c), Some(d)) = (create, destroy) {
-            self.helpers = Some(WireHelpers { create_entry_point: c, destroy_entry_point: d });
+            self.helpers = Some(WireHelpers { create_fn: c, destroy_fn: d });
             outcome.changed();
         }
 

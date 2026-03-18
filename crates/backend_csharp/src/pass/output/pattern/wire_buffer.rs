@@ -8,6 +8,7 @@
 use crate::lang::types::csharp;
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, model, output};
+use interoptopus::inventory::Functions;
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -25,15 +26,18 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, rendered: HashMap::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::master::Pass, wire_helpers: &model::wire::helpers::Pass) -> OutputResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::master::Pass, wire_helpers: &model::wire::helpers::Pass, rs_functions: &Functions) -> OutputResult {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(FileType::Csharp) {
             let content = if output_master.type_belongs_to(csharp::UTIL_WIRE_BUFFER, file) {
                 if let Some(h) = wire_helpers.helpers() {
+                    let create_name = &rs_functions[&h.create_fn].name;
+                    let destroy_name = &rs_functions[&h.destroy_fn].name;
+
                     let mut context = Context::new();
-                    context.insert("create_entry_point", &h.create_entry_point);
-                    context.insert("destroy_entry_point", &h.destroy_entry_point);
+                    context.insert("create_entry_point", create_name);
+                    context.insert("destroy_entry_point", destroy_name);
                     templates.render("pattern/wire_buffer.cs", &context)?.trim().to_string()
                 } else {
                     String::new()
