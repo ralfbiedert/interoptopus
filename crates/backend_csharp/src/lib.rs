@@ -15,6 +15,8 @@ pub mod config;
 mod error;
 mod macros;
 mod pipeline;
+#[cfg(feature = "dotnet")]
+pub mod plugins;
 
 pub use error::Error;
 pub use pipeline::{RustLibrary, RustLibraryBuilder, RustLibraryConfig};

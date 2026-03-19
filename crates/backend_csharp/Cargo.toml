@@ -8,18 +8,23 @@ repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
 
+[features]
+dotnet = ["dep:netcorehost", "dep:tempfile"]
+
 [dependencies]
 interoptopus.workspace = true
 interoptopus_backends.workspace = true
+netcorehost = { version = "0.17", optional = true }
+tempfile = { version = "3", optional = true }
 
 [build-dependencies]
 interoptopus_backends.workspace = true
 
 [dev-dependencies]
 interoptopus = { workspace = true, features = ["serde"] }
+interoptopus_csharp = { path = ".", features = ["dotnet"] }
 reference_project.workspace = true
 insta.workspace = true
-netcorehost = "0.17"
 
 [lints]
 workspace = true

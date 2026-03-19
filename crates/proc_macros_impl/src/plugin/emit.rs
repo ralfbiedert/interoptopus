@@ -7,11 +7,13 @@ impl PluginModel {
     pub fn emit(&self) -> TokenStream {
         let plugin_struct = self.emit_plugin_struct();
         let plugin_impl = self.emit_plugin_impl();
+        let plugin_info_impl = self.emit_plugin_info_impl();
         let services = self.services.iter().map(|s| self.emit_service(s));
 
         quote! {
             #plugin_struct
             #plugin_impl
+            #plugin_info_impl
             #(#services)*
         }
     }
@@ -46,6 +48,89 @@ impl PluginModel {
         quote! {
             impl #name {
                 #(#methods)*
+            }
+        }
+    }
+
+    fn emit_plugin_info_impl(&self) -> TokenStream {
+        let name = &self.name;
+        let name_str = name.to_string();
+
+        let fn_registrations = self.functions.iter().map(|f| {
+            let fn_name = &f.name;
+            let fn_name_str = fn_name.to_string();
+
+            let type_registrations = f.params.iter().map(|p| {
+                let ty = &p.ty;
+                quote! {
+                    <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+                }
+            });
+
+            let ret_registration = f.ret.as_ref().map(|ty| {
+                quote! {
+                    <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+                }
+            });
+
+            let arguments = f.params.iter().map(|p| {
+                let pname_str = p.name.to_string();
+                let pty = &p.ty;
+                quote! {
+                    ::interoptopus::lang::function::Argument::new(
+                        #pname_str,
+                        <#pty as ::interoptopus::lang::types::TypeInfo>::id(),
+                    )
+                }
+            });
+
+            let rval = match &f.ret {
+                Some(ty) => quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::id() },
+                None => quote! { <() as ::interoptopus::lang::types::TypeInfo>::id() },
+            };
+
+            quote! {
+                {
+                    #(#type_registrations)*
+                    #ret_registration
+
+                    let id = ::interoptopus::inventory::FunctionId::from_id(
+                        ::interoptopus::inventory::Id::new(
+                            ::interoptopus::inventory::hash_str(#fn_name_str)
+                        )
+                    );
+
+                    let function = ::interoptopus::lang::function::Function {
+                        name: #fn_name_str.to_string(),
+                        visibility: ::interoptopus::lang::meta::Visibility::Public,
+                        docs: ::interoptopus::lang::meta::Docs::default(),
+                        emission: ::interoptopus::lang::meta::Emission::FileEmission(
+                            ::interoptopus::lang::meta::FileEmission::Default,
+                        ),
+                        signature: ::interoptopus::lang::function::Signature {
+                            arguments: vec![#(#arguments),*],
+                            rval: #rval,
+                        },
+                    };
+
+                    inventory.register_function(id, function);
+                }
+            }
+        });
+
+        quote! {
+            impl ::interoptopus::lang::plugin::PluginInfo for #name {
+                fn id() -> ::interoptopus::inventory::PluginId {
+                    ::interoptopus::inventory::PluginId::from_id(
+                        ::interoptopus::inventory::Id::new(
+                            ::interoptopus::inventory::hash_str(#name_str)
+                        )
+                    )
+                }
+
+                fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
+                    #(#fn_registrations)*
+                }
             }
         }
     }
