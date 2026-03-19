@@ -10,9 +10,11 @@ public class Plugin : IPlugin
 }
 
 // User-written class with state
-public partial class Foo
+public class Foo : IFoo<Foo>
 {
     private int _accumulator;
+
+    public static Foo Create() => new Foo();
 
     public Foo()
     {

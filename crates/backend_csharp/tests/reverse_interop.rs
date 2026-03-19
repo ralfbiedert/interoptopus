@@ -13,7 +13,7 @@ interoptopus::plugin!(MyPlugin {
     fn do_math(x: i64, y: i64) -> i64;
 
     impl Foo {
-        fn new() -> Self;
+        fn create() -> Self;
         fn bar(&self, x: u32);
     }
 });
@@ -79,21 +79,16 @@ fn can_load_foo_instance() {
         unsafe { std::mem::transmute::<extern "system" fn(), *const u8>(f) }
     };
 
-    let new_fn: unsafe extern "C" fn() -> isize = unsafe { std::mem::transmute(load_symbol("foo_new")) };
+    let create_fn: unsafe extern "C" fn() -> isize = unsafe { std::mem::transmute(load_symbol("foo_create")) };
     let bar_fn: unsafe extern "C" fn(isize, i32) = unsafe { std::mem::transmute(load_symbol("foo_bar")) };
     let get_acc_fn: unsafe extern "C" fn(isize) -> i32 = unsafe { std::mem::transmute(load_symbol("foo_get_accumulator")) };
     let drop_fn: unsafe extern "C" fn(isize) = unsafe { std::mem::transmute(load_symbol("foo_drop")) };
 
     // Create an instance
-    let handle = unsafe { new_fn() };
+    let handle = unsafe { create_fn() };
     assert_ne!(handle, 0, "foo_new returned null");
 
-    let foo = FooHandle {
-        handle,
-        bar_fn,
-        get_accumulator_fn: get_acc_fn,
-        drop_fn,
-    };
+    let foo = FooHandle { handle, bar_fn, get_accumulator_fn: get_acc_fn, drop_fn };
 
     // Call methods
     assert_eq!(foo.get_accumulator(), 0);
