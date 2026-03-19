@@ -1,4 +1,5 @@
-use interoptopus::plugin;
+#![allow(unused)]
+
 use netcorehost::pdcstr;
 use netcorehost::pdcstring::PdCString;
 use std::path::PathBuf;
@@ -7,7 +8,7 @@ fn plugin_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/plugins/dotnet_plugin/bin/Debug/net9.0")
 }
 
-plugin!(MyPlugin {
+interoptopus::plugin!(MyPlugin {
 
     fn do_math(x: u32, y: u32);
 
@@ -16,31 +17,6 @@ plugin!(MyPlugin {
         fn bar(&self, x: u32);
     }
 });
-
-struct MyPlugin {}
-
-impl MyPlugin {
-    fn do_math(&self, x: u32, y: u32) {
-        todo!()
-    }
-}
-
-struct A;
-struct B;
-
-struct Foo<T = B> {
-    _t: std::marker::PhantomData<T>,
-}
-
-impl Foo<A> {
-    pub fn from(my_plugin: &MyPlugin) -> Foo<B> {
-        todo!()
-    }
-}
-
-impl Foo<B> {
-    pub fn bar(&self, x: u32) {}
-}
 
 #[test]
 fn can_load_and_call_add() {

@@ -130,6 +130,10 @@ new_id!(
     #[doc(hidden)]
     ServiceId
 );
+new_id!(
+    #[doc(hidden)]
+    PluginId
+);
 
 #[doc(hidden)]
 #[must_use]

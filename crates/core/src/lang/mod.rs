@@ -7,5 +7,6 @@
 pub mod constant;
 pub mod function;
 pub mod meta;
+pub mod plugin;
 pub mod service;
 pub mod types;
