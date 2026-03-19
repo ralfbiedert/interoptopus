@@ -45,7 +45,7 @@ fn result_types_have_distinct_names() -> Result<(), Box<dyn std::error::Error>> 
         assert_eq!(result_names.len(), unique.len(), "Result type names are not unique: {result_names:?}");
     });
 
-    test_ffi!(plugin, [service!(ServiceA), service!(ServiceB)])?;
+    test_model!(plugin, [service!(ServiceA), service!(ServiceB)])?;
 
     Ok(())
 }

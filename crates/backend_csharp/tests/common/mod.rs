@@ -3,7 +3,7 @@
 /// ```ignore
 /// test_csharp!(plugin, [function!(my_function), service!(MyService)]);
 /// ```
-macro_rules! test_ffi {
+macro_rules! test_model {
     ($plugin:expr, [$($item:expr),* $(,)?]) => {{
         let mut inventory = ::interoptopus::inventory::RustInventory::new();
         $(let _ = inventory.register($item);)*
@@ -12,6 +12,45 @@ macro_rules! test_ffi {
             .build()
             .register_plugin($plugin)
             .process()
+    }};
+}
+
+/// Performs an 'output' test.
+///
+/// Parameter `$file` is the output file name to snapshot. Must match one of
+///   - `"Interop.cs"` — items with `FileEmission::Default` or `FileEmission::CustomModule(_)`
+///   - `"Interop.Common.cs"` — items with `FileEmission::Common`
+///
+/// The rest are inventory registration expressions (e.g., `function!(my_fn)`, `service!(MyService)`)
+/// that populate the `RustInventory`.
+///
+/// # Example
+///
+/// ```ignore
+/// test_output!("Interop.cs", [service!(MyService), function!(my_fn)]);
+/// ```
+macro_rules! test_output {
+    ($file:expr, [$($item:expr),* $(,)?]) => {{
+        use interoptopus_csharp::dispatch::Dispatch;
+        use interoptopus_csharp::output::Target;
+        use interoptopus::lang::meta::FileEmission;
+
+        let mut inventory = ::interoptopus::inventory::RustInventory::new();
+        $(let _ = inventory.register($item);)*
+        let inventory = inventory.validate();
+        let multibuf = ::interoptopus_csharp::RustLibrary::builder(inventory)
+            .dispatch(Dispatch::custom(|x, _| match x.emission {
+                FileEmission::Common => Target::new("Interop.Common.cs", "My.Company.Common"),
+                FileEmission::Default | FileEmission::CustomModule(_) => Target::new("Interop.cs", "My.Company"),
+            }))
+            .build()
+            .process()
+            .unwrap();
+
+        // In these tests we are only
+        let output = multibuf.buffer($file).unwrap();
+
+        insta::assert_snapshot!(output);
     }};
 }
 

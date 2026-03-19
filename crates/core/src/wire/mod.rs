@@ -129,6 +129,10 @@
 //!
 //! ![wire-vs-protobuf](https://media.githubusercontent.com/media/ralfbiedert/interoptopus/static/2026-03-protobuf/gfx/wire_vs_protobuf_complex.png)
 //!
+//! Note, in the benchmarks above, Protobuf was given a slight advantage over `Wire<T>` by not having to
+//! FFI allocate. This made Protobuf's performance look slightly better, but would make it unsuitable for
+//! `async` use.
+//!
 //! # Under the Hood
 //!
 //! A [`Wire<T>`] is essentially a serialized buffer that is safe to pass through
@@ -178,7 +182,7 @@ mod buffer;
 
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use buffer::WireBuffer;
 use std::marker::PhantomData;

@@ -18,7 +18,6 @@ interoptopus_backends.workspace = true
 [dev-dependencies]
 interoptopus = { workspace = true, features = ["serde"] }
 reference_project.workspace = true
-serde_json.workspace = true
 insta.workspace = true
 
 [lints]

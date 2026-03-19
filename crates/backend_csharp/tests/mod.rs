@@ -1,12 +1,13 @@
 #[macro_use]
 mod common;
+mod output;
 
 mod reference_project {
-    use interoptopus_csharp::RustLibrary;
     use interoptopus_csharp::config::HeaderConfig;
     use interoptopus_csharp::dispatch::Dispatch;
     use interoptopus_csharp::lang::meta::FileEmission;
     use interoptopus_csharp::output::Target;
+    use interoptopus_csharp::RustLibrary;
 
     #[test]
     fn interop() -> Result<(), Box<dyn std::error::Error>> {

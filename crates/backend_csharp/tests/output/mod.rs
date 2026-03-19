@@ -1,8 +1,10 @@
+mod foo;
+
 use interoptopus::inventory::RustInventory;
-use interoptopus_csharp::RustLibrary;
 use interoptopus_csharp::dispatch::Dispatch;
 use interoptopus_csharp::lang::meta::FileEmission;
 use interoptopus_csharp::output::Target;
+use interoptopus_csharp::RustLibrary;
 use std::error::Error;
 
 #[test]
