@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 #[macro_use]
 mod common;
 mod output;
