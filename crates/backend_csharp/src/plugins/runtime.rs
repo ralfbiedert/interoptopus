@@ -86,8 +86,8 @@ impl Loader for DotNetRuntime {
             .ok_or_else(|| PluginLoadError::LoadFailed("invalid DLL path".to_string()))?
             .to_string();
 
-        // Convention: symbols live in `{Assembly}.PluginExports` class
-        let type_name = format!("{assembly_name}.PluginExports, {assembly_name}");
+        // Convention: symbols live in `{Assembly}.Interop` class
+        let type_name = format!("{assembly_name}.Interop, {assembly_name}");
 
         T::load_from(|symbol_name| {
             let type_pdc = PdCString::from_os_str(type_name.as_ref() as &std::ffi::OsStr).expect("type name contains null bytes");
