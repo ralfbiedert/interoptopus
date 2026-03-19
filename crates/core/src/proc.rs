@@ -105,7 +105,7 @@
 ///
 /// | Attribute | Description |
 /// |-----------|-------------|
-/// | `prefix = "name"` | Override the snake_case prefix used for generated FFI function names. |
+/// | `prefix = "name"` | Override the `snake_case` prefix used for generated FFI function names. |
 /// | `export = unique` | Generate unique export names for all emitted methods to avoid symbol clashes.  |
 /// | `debug` | Print the generated code to stderr during compilation. |
 ///
@@ -131,7 +131,6 @@
 /// [`ConstantInfo`]: crate::lang::rust::ConstantInfo
 #[cfg(feature = "derive")]
 pub use interoptopus_proc::ffi;
-
 
 /// Derives the [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime) trait for a service struct
 /// by forwarding to one of its fields.
@@ -171,7 +170,6 @@ pub use interoptopus_proc::ffi;
 /// ```
 #[cfg(feature = "derive")]
 pub use interoptopus_proc::AsyncRuntime;
-
 
 /// Strips module paths from a fully-qualified Rust type name, preserving generic structure.
 ///
