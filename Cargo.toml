@@ -9,7 +9,7 @@ members = [
     "crates/proc_macros_impl",
     "crates/reference_project",
     "examples/hello_world",
-    # "examples/real_project_layout/*",
+    "examples/real_project_layout/*",
 ]
 
 resolver = "3"

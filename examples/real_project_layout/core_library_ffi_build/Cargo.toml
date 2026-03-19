@@ -14,5 +14,4 @@ core_library_ffi = { path = "../core_library_ffi" }
 
 [build-dependencies]
 core_library_ffi = { path = "../core_library_ffi" }
-interoptopus.workspace = true
 interoptopus_csharp.workspace = true

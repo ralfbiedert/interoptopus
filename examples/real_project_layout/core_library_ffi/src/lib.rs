@@ -1,42 +1,25 @@
-// use interoptopus::ffi::CStrPtr;
-use interoptopus::inventory::Inventory;
-use interoptopus::lang::types::WireIO;
-use interoptopus::wire::Wire;
-use interoptopus::{ffi, function, pattern};
+use interoptopus::ffi;
+use interoptopus::inventory::RustInventory;
+use interoptopus::{function, service};
 
 pub mod engine;
 pub mod error;
 
+/// Starts the game server. Returns 1 on success, 0 if the name is empty.
 #[ffi]
-pub struct Something {
-    field: u16,
-    name: String,
-}
-
-#[ffi]
-pub struct Return {
-    field: u32,
-}
-
-// As in `engine`, we create matching functions that are better suited for an FFI boundary.
-#[ffi]
-pub fn start_server(mut server_name: Wire<Something>) -> Wire<Return> {
-    let server_name = server_name.unwire().unwrap();
-    let result = if server_name.name.is_empty() {
-        Return { field: 0 }
+pub fn start_server(server_name: ffi::CStrPtr) -> u32 {
+    let name = server_name.as_str().unwrap_or("");
+    if name.is_empty() {
+        0
     } else {
-        core_library::start_server(server_name.name.to_string());
-        Return { field: 1 }
-    };
-    let mut out = Wire::with_size(result.live_size());
-    out.serialize(&result).unwrap();
-    out
+        core_library::start_server(name.to_string());
+        1
+    }
 }
 
-pub fn ffi_inventory() -> Inventory {
-    Inventory::builder()
+pub fn ffi_inventory() -> RustInventory {
+    RustInventory::new()
         .register(function!(start_server))
-        .register(pattern!(engine::GameEngine))
+        .register(service!(engine::GameEngine))
         .validate()
-        .build()
 }

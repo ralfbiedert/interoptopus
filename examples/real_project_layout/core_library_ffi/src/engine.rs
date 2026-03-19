@@ -1,6 +1,6 @@
 use crate::error::Error;
-use interoptopus::pattern::result::{Result, result_to_ffi};
-use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
+use interoptopus::ffi;
+use interoptopus::pattern::result::result_to_ffi;
 
 // As a rule of thumb, in your FFI crate you shouldn't expose "native Rust" types, as often
 // their signatures and fields diverge. Instead, re-define each Rust type and method you want
@@ -8,44 +8,40 @@ use interoptopus::{ffi, ffi_service, ffi_service_method, ffi_type};
 //
 // This might seem like more upfront work (it is), but it gives you much cleaner code, and the
 // ability to have APIs that do exactly what they should (instead of dealing with inconsistencies
-// that are unidiomatic on either the Rust of FFI side).
-#[ffi_type(opaque)]
+// that are unidiomatic on either the Rust or FFI side).
+#[ffi(service)]
 pub struct GameEngine {
     engine: core_library::engine::GameEngine,
 }
 
-// FFI-compatible implementation of our service.
-#[ffi_service]
+#[ffi]
 impl GameEngine {
-    pub fn new() -> Result<Self, Error> {
+    pub fn create() -> ffi::Result<Self, Error> {
         let engine = core_library::engine::GameEngine::new();
-        Result::Ok(Self { engine })
+        ffi::Ok(Self { engine })
     }
 
     pub fn place_object(&mut self, name: ffi::CStrPtr, position: Vec2) -> ffi::Result<(), Error> {
         result_to_ffi(|| {
-            let name = name.as_str()?;
-            let position = position.into_native();
-            self.engine.place_object(name, position);
+            let name = name.as_str().map_err(|_| Error::Fail)?;
+            self.engine.place_object(name, position.into_native());
             Ok(())
         })
     }
 
-    #[ffi_service_method(on_panic = "return_default")]
     pub fn num_objects(&self) -> u32 {
         self.engine.num_objects()
     }
 }
 
-// Our FFI `Vec2` type.
-#[ffi_type]
+/// Our FFI `Vec2` type.
+#[ffi]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
 }
 
 impl Vec2 {
-    // Helper method to deal with the conversion.
     fn into_native(self) -> core_library::engine::Vec2 {
         core_library::engine::Vec2 { x: self.x, y: self.y }
     }
