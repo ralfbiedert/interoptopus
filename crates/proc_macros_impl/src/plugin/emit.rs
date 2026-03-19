@@ -8,20 +8,37 @@ impl PluginModel {
         let plugin_struct = self.emit_plugin_struct();
         let plugin_impl = self.emit_plugin_impl();
         let plugin_info_impl = self.emit_plugin_info_impl();
+        let plugin_trait_impl = self.emit_plugin_trait_impl();
         let services = self.services.iter().map(|s| self.emit_service(s));
 
         quote! {
             #plugin_struct
             #plugin_impl
             #plugin_info_impl
+            #plugin_trait_impl
             #(#services)*
         }
     }
 
     fn emit_plugin_struct(&self) -> TokenStream {
         let name = &self.name;
+
+        let fields = self.functions.iter().map(|f| {
+            let field_name = &f.name;
+            let param_tys = f.params.iter().map(|p| &p.ty);
+            let ret = match &f.ret {
+                Some(ty) => quote! { -> #ty },
+                None => quote! {},
+            };
+            quote! {
+                #field_name: unsafe extern "C" fn(#(#param_tys),*) #ret
+            }
+        });
+
         quote! {
-            struct #name {}
+            struct #name {
+                #(#fields,)*
+            }
         }
     }
 
@@ -34,13 +51,14 @@ impl PluginModel {
                 let pty = &p.ty;
                 quote! { #pname: #pty }
             });
+            let arg_names = f.params.iter().map(|p| &p.name);
             let ret = match &f.ret {
                 Some(ty) => quote! { -> #ty },
                 None => quote! {},
             };
             quote! {
-                fn #fn_name(&self, #(#params),*) #ret {
-                    todo!()
+                pub fn #fn_name(&self, #(#params),*) #ret {
+                    unsafe { (self.#fn_name)(#(#arg_names),*) }
                 }
             }
         });
@@ -48,6 +66,43 @@ impl PluginModel {
         quote! {
             impl #name {
                 #(#methods)*
+            }
+        }
+    }
+
+    fn emit_plugin_trait_impl(&self) -> TokenStream {
+        let name = &self.name;
+
+        let field_loads = self.functions.iter().map(|f| {
+            let field_name = &f.name;
+            let symbol_str = field_name.to_string();
+            let param_tys = f.params.iter().map(|p| &p.ty);
+            let ret = match &f.ret {
+                Some(ty) => quote! { -> #ty },
+                None => quote! {},
+            };
+            quote! {
+                #field_name: {
+                    let ptr = loader(#symbol_str);
+                    if ptr.is_null() {
+                        return Err(::interoptopus::lang::plugin::PluginLoadError::SymbolNotFound(
+                            #symbol_str.to_string()
+                        ));
+                    }
+                    unsafe {
+                        ::std::mem::transmute::<*const u8, unsafe extern "C" fn(#(#param_tys),*) #ret>(ptr)
+                    }
+                }
+            }
+        });
+
+        quote! {
+            impl ::interoptopus::lang::plugin::Plugin for #name {
+                fn load_from(loader: impl Fn(&str) -> *const u8) -> Result<Self, ::interoptopus::lang::plugin::PluginLoadError> {
+                    Ok(Self {
+                        #(#field_loads,)*
+                    })
+                }
             }
         }
     }

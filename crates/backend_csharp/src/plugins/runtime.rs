@@ -1,6 +1,9 @@
+use interoptopus::lang::plugin::{Loader, Plugin, PluginLoadError};
 use netcorehost::hostfxr::{HostfxrContext, InitializedForRuntimeConfig};
 use netcorehost::nethost;
+use netcorehost::pdcstring::PdCString;
 use std::fmt;
+use std::path::Path;
 use std::sync::Arc;
 
 const DEFAULT_RUNTIME_CONFIG: &str = r#"{
@@ -49,12 +52,9 @@ impl DotNetRuntime {
 
         let fxr = nethost::load_hostfxr().map_err(DotNetError::HostfxrLoad)?;
 
-        let config_pdc = netcorehost::pdcstring::PdCString::from_os_str(config_path.as_os_str())
-            .expect("temp path contains null bytes");
+        let config_pdc = PdCString::from_os_str(config_path.as_os_str()).expect("temp path contains null bytes");
 
-        let context = fxr
-            .initialize_for_runtime_config(config_pdc)
-            .map_err(DotNetError::RuntimeInit)?;
+        let context = fxr.initialize_for_runtime_config(config_pdc).map_err(DotNetError::RuntimeInit)?;
 
         Ok(Self {
             context: Arc::new(context),
@@ -65,5 +65,41 @@ impl DotNetRuntime {
     /// Returns a reference to the underlying runtime context.
     pub fn context(&self) -> &HostfxrContext<InitializedForRuntimeConfig> {
         &self.context
+    }
+}
+
+impl Loader for DotNetRuntime {
+    fn load_plugin<T: Plugin>(&self, path: &str) -> Result<T, PluginLoadError> {
+        let dll_path = Path::new(path);
+
+        let dll_pdc = PdCString::from_os_str(dll_path.as_os_str()).expect("dll path contains null bytes");
+
+        let delegate_loader = self
+            .context
+            .get_delegate_loader_for_assembly(dll_pdc)
+            .map_err(|e| PluginLoadError::LoadFailed(e.to_string()))?;
+
+        // Derive the assembly name from the DLL file stem (e.g., "Plugin.dll" -> "Plugin")
+        let assembly_name = dll_path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .ok_or_else(|| PluginLoadError::LoadFailed("invalid DLL path".to_string()))?
+            .to_string();
+
+        // Convention: symbols live in `{Assembly}.PluginExports` class
+        let type_name = format!("{assembly_name}.PluginExports, {assembly_name}");
+
+        T::load_from(|symbol_name| {
+            let type_pdc = PdCString::from_os_str(type_name.as_ref() as &std::ffi::OsStr).expect("type name contains null bytes");
+            let method_pdc = PdCString::from_os_str(symbol_name.as_ref() as &std::ffi::OsStr).expect("symbol name contains null bytes");
+
+            match delegate_loader.get_function_with_unmanaged_callers_only::<extern "system" fn()>(&type_pdc, &method_pdc) {
+                Ok(managed_fn) => {
+                    let f: extern "system" fn() = *managed_fn;
+                    unsafe { std::mem::transmute::<extern "system" fn(), *const u8>(f) }
+                }
+                Err(_) => std::ptr::null(),
+            }
+        })
     }
 }
