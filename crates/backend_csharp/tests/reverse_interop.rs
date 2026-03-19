@@ -1,3 +1,4 @@
+use interoptopus::plugin;
 use netcorehost::pdcstr;
 use netcorehost::pdcstring::PdCString;
 use std::path::PathBuf;
@@ -12,9 +13,34 @@ plugin!(MyPlugin {
 
     impl Foo {
         fn new() -> Self;
-        fn bar(ILogger: &ILogger);
+        fn bar(&self, x: u32);
     }
 });
+
+struct MyPlugin {}
+
+impl MyPlugin {
+    fn do_math(&self, x: u32, y: u32) {
+        todo!()
+    }
+}
+
+struct A;
+struct B;
+
+struct Foo<T = B> {
+    _t: std::marker::PhantomData<T>,
+}
+
+impl Foo<A> {
+    pub fn from(my_plugin: &MyPlugin) -> Foo<B> {
+        todo!()
+    }
+}
+
+impl Foo<B> {
+    pub fn bar(&self, x: u32) {}
+}
 
 #[test]
 fn can_load_and_call_add() {

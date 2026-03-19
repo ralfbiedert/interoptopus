@@ -12,6 +12,8 @@ mod service;
 mod skip;
 mod types;
 
+mod plugin;
+
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Item, parse2};
@@ -50,4 +52,9 @@ pub fn derive_async_runtime(item: TokenStream) -> TokenStream {
     };
 
     handle_result(runtime::derive_async_runtime(item))
+}
+
+#[must_use]
+pub fn plugin(input: TokenStream) -> TokenStream {
+    plugin::plugin(input)
 }

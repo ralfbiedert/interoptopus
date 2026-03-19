@@ -16,3 +16,9 @@ pub fn ffi(attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn derive_async_runtime(item: TokenStream) -> TokenStream {
     interoptopus_proc_impl::derive_async_runtime(item.into()).into()
 }
+
+/// Declares a plugin interface for reverse interop (loading foreign plugins from Rust).
+#[proc_macro]
+pub fn plugin(input: TokenStream) -> TokenStream {
+    interoptopus_proc_impl::plugin(input.into()).into()
+}

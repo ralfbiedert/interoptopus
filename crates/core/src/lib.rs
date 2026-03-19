@@ -14,7 +14,7 @@ pub mod wire;
 pub mod proc;
 
 #[cfg(feature = "derive")]
-pub use proc::{AsyncRuntime, ffi};
+pub use proc::{ffi, plugin, AsyncRuntime};
 
 #[cfg(feature = "tokio")]
 pub mod rt;
