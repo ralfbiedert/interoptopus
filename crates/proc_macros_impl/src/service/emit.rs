@@ -1,6 +1,6 @@
 use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
 use proc_macro2::TokenStream;
-use quote::{ToTokens, format_ident, quote_spanned};
+use quote::{ToTokens, format_ident, quote, quote_spanned};
 use syn::spanned::Spanned;
 use syn::{Error, Generics, Lifetime, ReturnType, Type};
 
@@ -27,6 +27,17 @@ impl ServiceModel {
 
         quote_spanned! { self.service_name.span() =>
             #(#functions)*
+        }
+    }
+
+    /// Returns the `#[::interoptopus::ffi]` or `#[::interoptopus::ffi(export = "...")]`
+    /// attribute for a generated FFI function, depending on the service's `export` setting.
+    fn emit_ffi_attr(&self, function_name: &syn::Ident) -> TokenStream {
+        let fn_name_str = function_name.to_string();
+        if let Some(export_name) = self.generate_export_name(&fn_name_str) {
+            quote! { #[::interoptopus::ffi(export = #export_name)] }
+        } else {
+            quote! { #[::interoptopus::ffi] }
         }
     }
 
@@ -230,9 +241,11 @@ impl ServiceModel {
             }
         };
 
+        let ffi_attr = self.emit_ffi_attr(&function_name);
+
         quote_spanned! { ctor.name.span() =>
             #docs
-            #[::interoptopus::ffi]
+            #ffi_attr
             unsafe fn #function_name #generics(#params) -> <::interoptopus::ffi::Result<(), #error_type> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> {
                 let result = #service_call(#param_names);
                 match result {
@@ -300,10 +313,12 @@ impl ServiceModel {
             const { ::interoptopus::lang::types::assert_send_sync::<#error_type>() }
         };
 
+        let ffi_attr = self.emit_ffi_attr(&function_name);
+
         quote_spanned! { ctor.name.span() =>
             #docs
             #[allow(clippy::used_underscore_items)]
-            #[::interoptopus::ffi]
+            #ffi_attr
             unsafe fn #function_name #generics(
                 #async_params
             ) {
@@ -351,9 +366,11 @@ impl ServiceModel {
             quote_spanned! { self.service_name.span() => let _ = ::std::boxed::Box::from_raw(instance as *mut #service_type); }
         };
 
+        let ffi_attr = self.emit_ffi_attr(&function_name);
+
         quote_spanned! { self.service_name.span() =>
             #[allow(clippy::ptr_cast_constness)]
-            #[::interoptopus::ffi]
+            #ffi_attr
             fn #function_name #generics(instance: *const #service_type) {
                 if !instance.is_null() {
                     unsafe {
@@ -400,9 +417,11 @@ impl ServiceModel {
         let return_type = self.emit_return_type_processed(&method.output, &enhanced_generics);
         let where_clause = &enhanced_generics.where_clause;
 
+        let ffi_attr = self.emit_ffi_attr(function_name);
+
         quote_spanned! { method.name.span() =>
             #docs
-            #[::interoptopus::ffi]
+            #ffi_attr
             unsafe fn #function_name #enhanced_generics(instance: *const #service_type, #params) #return_type #where_clause {
                 unsafe {
                     let instance_ref = &*instance;
@@ -423,9 +442,11 @@ impl ServiceModel {
         let return_type = self.emit_return_type_processed(&method.output, &enhanced_generics);
         let where_clause = &enhanced_generics.where_clause;
 
+        let ffi_attr = self.emit_ffi_attr(function_name);
+
         quote_spanned! { method.name.span() =>
             #docs
-            #[::interoptopus::ffi]
+            #ffi_attr
             unsafe fn #function_name #enhanced_generics(instance: *mut #service_type, #params) #return_type #where_clause {
                 unsafe {
                     let instance_ref = &mut *instance;
@@ -468,10 +489,12 @@ impl ServiceModel {
             }
         };
 
+        let ffi_attr = self.emit_ffi_attr(function_name);
+
         quote_spanned! { method.name.span() =>
             #docs
             #[allow(clippy::used_underscore_items, clippy::forget_non_drop)]
-            #[::interoptopus::ffi]
+            #ffi_attr
             unsafe fn #function_name #enhanced_generics(
                 #async_params
             ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> #where_clause {

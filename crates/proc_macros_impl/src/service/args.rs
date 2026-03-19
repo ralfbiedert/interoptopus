@@ -1,9 +1,15 @@
-use syn::{Ident, Token, parse::Parse, punctuated::Punctuated};
+use syn::{Expr, Ident, Token, parse::Parse, punctuated::Punctuated};
+
+#[derive(Debug, Clone)]
+pub enum ServiceExportKind {
+    Unique,
+}
 
 #[derive(Debug, Clone, Default)]
 pub struct FfiServiceArgs {
     pub debug: bool,
     pub prefix: Option<String>,
+    pub export: Option<ServiceExportKind>,
 }
 
 impl Parse for FfiServiceArgs {
@@ -20,6 +26,7 @@ impl Parse for FfiServiceArgs {
             match arg {
                 FfiServiceArg::Debug => args.debug = true,
                 FfiServiceArg::Prefix(prefix) => args.prefix = Some(prefix),
+                FfiServiceArg::Export(kind) => args.export = Some(kind),
             }
         }
 
@@ -31,6 +38,7 @@ impl Parse for FfiServiceArgs {
 enum FfiServiceArg {
     Debug,
     Prefix(String),
+    Export(ServiceExportKind),
 }
 
 impl Parse for FfiServiceArg {
@@ -50,6 +58,21 @@ impl Parse for FfiServiceArg {
                     }
                 } else {
                     Err(syn::Error::new_spanned(expr, "Expected string literal"))
+                }
+            }
+            "export" => {
+                input.parse::<Token![=]>()?;
+                let expr: Expr = input.parse()?;
+
+                match expr {
+                    Expr::Path(path) => {
+                        if path.path.is_ident("unique") {
+                            Ok(Self::Export(ServiceExportKind::Unique))
+                        } else {
+                            Err(syn::Error::new_spanned(path, "Expected 'unique'"))
+                        }
+                    }
+                    _ => Err(syn::Error::new_spanned(expr, "Expected 'unique'")),
                 }
             }
             _ => Err(syn::Error::new_spanned(ident, "Unknown attribute")),

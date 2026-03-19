@@ -1,7 +1,8 @@
 use crate::docs::extract_docs;
-use crate::service::args::FfiServiceArgs;
+use crate::service::args::{FfiServiceArgs, ServiceExportKind};
 use crate::skip::has_ffi_skip_attribute;
 use proc_macro2::Span;
+use quote::ToTokens;
 use syn::spanned::Spanned;
 use syn::{FnArg, Generics, Ident, ImplItem, ItemImpl, Pat, PathSegment, ReturnType, Type, Visibility};
 
@@ -207,6 +208,57 @@ impl ServiceModel {
             }
 
             result
+        }
+    }
+
+    /// Computes a deterministic hash for this service impl block, incorporating
+    /// the service name and all constructor/method signatures.
+    fn compute_service_hash(&self) -> u64 {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+
+        let mut hasher = DefaultHasher::new();
+
+        self.service_name.to_string().hash(&mut hasher);
+
+        for ctor in &self.constructors {
+            ctor.name.to_string().hash(&mut hasher);
+            for param in &ctor.inputs {
+                param.ty.to_token_stream().to_string().hash(&mut hasher);
+            }
+            match &ctor.output {
+                ReturnType::Default => "()".hash(&mut hasher),
+                ReturnType::Type(_, ty) => ty.to_token_stream().to_string().hash(&mut hasher),
+            }
+        }
+
+        for method in &self.methods {
+            method.name.to_string().hash(&mut hasher);
+            for param in &method.inputs {
+                param.ty.to_token_stream().to_string().hash(&mut hasher);
+            }
+            match &method.output {
+                ReturnType::Default => "()".hash(&mut hasher),
+                ReturnType::Type(_, ty) => ty.to_token_stream().to_string().hash(&mut hasher),
+            }
+        }
+
+        for param in &self.generics.params {
+            param.to_token_stream().to_string().hash(&mut hasher);
+        }
+
+        hasher.finish()
+    }
+
+    /// Returns the export name for a generated FFI function, or `None` if no
+    /// `export` attribute was set on the service.
+    pub fn generate_export_name(&self, base_function_name: &str) -> Option<String> {
+        match &self.args.export {
+            Some(ServiceExportKind::Unique) => {
+                let hash = self.compute_service_hash();
+                Some(format!("{}_{}", base_function_name, hash % 100000))
+            }
+            None => None,
         }
     }
 }
