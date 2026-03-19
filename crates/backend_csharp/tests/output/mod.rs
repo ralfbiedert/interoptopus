@@ -1,4 +1,8 @@
-mod foo;
+mod functions;
+mod patterns;
+mod services;
+mod types;
+mod wire;
 
 use interoptopus::inventory::RustInventory;
 use interoptopus_csharp::dispatch::Dispatch;

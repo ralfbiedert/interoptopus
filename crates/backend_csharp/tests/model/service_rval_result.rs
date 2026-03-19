@@ -15,14 +15,14 @@ pub struct ServiceA {}
 #[ffi(service)]
 pub struct ServiceB {}
 
-#[ffi]
+#[ffi(export = unique)]
 impl ServiceA {
     pub fn create() -> ffi::Result<Self, Error> {
         ffi::Ok(Self {})
     }
 }
 
-#[ffi]
+#[ffi(export = unique)]
 impl ServiceB {
     pub fn create() -> ffi::Result<Self, Error> {
         ffi::Ok(Self {})
