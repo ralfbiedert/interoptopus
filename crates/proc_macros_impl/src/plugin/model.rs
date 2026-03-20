@@ -2,10 +2,22 @@ use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::{Ident, Token, Type, braced, token};
 
-/// Top-level plugin declaration: `MyPlugin { ... }`.
+/// Top-level plugin declaration: `Plugin { fn ...; impl Foo { ... } }`.
 pub struct PluginInput {
     pub name: Ident,
     pub _brace: token::Brace,
+    pub items: Vec<PluginItem>,
+}
+
+/// An item inside a plugin block: either a bare function or a service impl block.
+pub enum PluginItem {
+    Function(PluginMethod),
+    Service(ServiceBlock),
+}
+
+/// An `impl Foo { fn create() -> Self; fn bar(&self, x: i32); }` block.
+pub struct ServiceBlock {
+    pub name: Ident,
     pub methods: Vec<PluginMethod>,
 }
 
@@ -26,18 +38,44 @@ pub struct PluginParam {
 /// The fully resolved model ready for emission.
 pub struct PluginModel {
     pub name: Ident,
-    pub methods: Vec<PluginMethod>,
+    pub functions: Vec<PluginMethod>,
+    pub services: Vec<ServiceBlock>,
 }
 
 impl PluginModel {
     pub fn from_input(input: PluginInput) -> syn::Result<Self> {
-        Ok(Self { name: input.name, methods: input.methods })
+        let mut functions = Vec::new();
+        let mut services = Vec::new();
+
+        for item in input.items {
+            match item {
+                PluginItem::Function(m) => functions.push(m),
+                PluginItem::Service(s) => services.push(s),
+            }
+        }
+
+        Ok(Self { name: input.name, functions, services })
+    }
+}
+
+impl ServiceBlock {
+    pub fn prefix(&self) -> String {
+        self.name.to_string().to_lowercase()
     }
 
-    /// A service plugin has `&self` methods (instance methods on a GCHandle-backed object).
-    /// A function plugin has only plain functions.
-    pub fn is_service(&self) -> bool {
-        self.methods.iter().any(|m| m.has_self)
+    pub fn ctors(&self) -> Vec<&PluginMethod> {
+        self.methods.iter().filter(|m| !m.has_self && is_self_return(&m.ret)).collect()
+    }
+
+    pub fn instance_methods(&self) -> Vec<&PluginMethod> {
+        self.methods.iter().filter(|m| m.has_self).collect()
+    }
+}
+
+pub fn is_self_return(ret: &Option<Type>) -> bool {
+    match ret {
+        Some(Type::Path(p)) => p.path.is_ident("Self"),
+        _ => false,
     }
 }
 
@@ -48,13 +86,39 @@ impl Parse for PluginInput {
         let name: Ident = input.parse()?;
         let content;
         let brace = braced!(content in input);
-        let mut methods = Vec::new();
+        let mut items = Vec::new();
 
+        while !content.is_empty() {
+            items.push(content.parse()?);
+        }
+
+        Ok(Self { name, _brace: brace, items })
+    }
+}
+
+impl Parse for PluginItem {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        if input.peek(Token![impl]) {
+            Ok(PluginItem::Service(input.parse()?))
+        } else {
+            Ok(PluginItem::Function(input.parse()?))
+        }
+    }
+}
+
+impl Parse for ServiceBlock {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        input.parse::<Token![impl]>()?;
+        let name: Ident = input.parse()?;
+        let content;
+        braced!(content in input);
+
+        let mut methods = Vec::new();
         while !content.is_empty() {
             methods.push(content.parse()?);
         }
 
-        Ok(Self { name, _brace: brace, methods })
+        Ok(Self { name, methods })
     }
 }
 

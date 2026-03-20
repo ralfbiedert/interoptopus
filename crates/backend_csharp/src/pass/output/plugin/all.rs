@@ -22,8 +22,7 @@ impl Pass {
 
     pub fn process(
         &mut self,
-        plugin_name: &str,
-        namespace: &str,
+        _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::master::Pass,
         output: &mut Multibuf,
     ) -> OutputResult {
@@ -32,8 +31,7 @@ impl Pass {
         for file in output_master.outputs_of(FileType::Csharp) {
             let mut context = Context::new();
 
-            context.insert("plugin_name", plugin_name);
-            context.insert("namespace", namespace);
+            context.insert("namespace", file.target.namespace());
 
             let rendered = templates.render("plugin/all.cs", &context)?;
             output.add_buffer(file.target.file_name(), rendered);

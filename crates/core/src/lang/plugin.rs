@@ -1,10 +1,21 @@
-use crate::inventory::{Inventory, PluginId};
+use crate::inventory::{ForeignInventory, Inventory, PluginId};
 
 pub trait PluginInfo {
     /// The unique identifier for this plugin.
     fn id() -> PluginId;
+
+    // fn plugin() -> PluginXXX;
+
     /// Registers this plugin (and all referenced types) with the given inventory.
     fn register(inventory: &mut impl Inventory);
+
+    /// Returns a [`ForeignInventory`] populated with all types, functions, and
+    /// services declared by this plugin.
+    fn inventory() -> ForeignInventory {
+        let mut inventory = ForeignInventory::new();
+        Self::register(&mut inventory);
+        inventory
+    }
 }
 
 /// A loaded plugin instance with resolved function pointers.

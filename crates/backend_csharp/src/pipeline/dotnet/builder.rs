@@ -1,4 +1,5 @@
 use super::library::{DotnetLibrary, DotnetLibraryConfig};
+use crate::dispatch::Dispatch;
 use interoptopus::inventory::ForeignInventory;
 
 /// Builder for configuring and constructing a [`DotnetLibrary`].
@@ -13,17 +14,10 @@ impl DotnetLibraryBuilder {
         Self { inventory, ..Self::default() }
     }
 
-    /// Sets the plugin name used in the generated file and class names.
+    /// Sets the dispatch strategy that routes items to output files.
     #[must_use]
-    pub fn plugin_name(mut self, name: impl AsRef<str>) -> Self {
-        self.config.plugin_name = name.as_ref().to_string();
-        self
-    }
-
-    /// Sets the C# namespace for the generated code.
-    #[must_use]
-    pub fn namespace(mut self, namespace: impl AsRef<str>) -> Self {
-        self.config.namespace = namespace.as_ref().to_string();
+    pub fn dispatch(mut self, dispatch: Dispatch) -> Self {
+        self.config.output_master.dispatch = dispatch;
         self
     }
 

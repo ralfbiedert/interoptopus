@@ -6,8 +6,6 @@ use interoptopus_backends::output::Multibuf;
 
 /// Configuration for the .NET codegen pipeline.
 pub struct DotnetLibraryConfig {
-    pub plugin_name: String,
-    pub namespace: String,
     pub model_id_maps: model::id_map::Config,
     pub model_type_kinds: model::types::kind::Config,
     pub model_type_map_primitives: model::types::kind::primitives::Config,
@@ -34,8 +32,6 @@ pub struct DotnetLibraryConfig {
 impl Default for DotnetLibraryConfig {
     fn default() -> Self {
         Self {
-            plugin_name: String::new(),
-            namespace: String::from("My.Company"),
             model_id_maps: Default::default(),
             model_type_kinds: Default::default(),
             model_type_map_primitives: Default::default(),
@@ -143,7 +139,7 @@ impl DotnetLibrary {
             },
             output_master: output::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses { plugin_all: output::plugin::all::Pass::new(config.output_plugin_all) },
-            config: DotnetLibraryConfig { plugin_name: config.plugin_name, namespace: config.namespace, ..Default::default() },
+            config: DotnetLibraryConfig { ..Default::default() },
             output: Multibuf::default(),
         }
     }
@@ -186,7 +182,7 @@ impl DotnetLibrary {
         // Output passes
         self.output_master.process(&mut pass_meta, &m.type_all, &m.fns_all)?;
 
-        o.plugin_all.process(&self.config.plugin_name, &self.config.namespace, &self.output_master, &mut self.output)?;
+        o.plugin_all.process(&mut pass_meta, &self.output_master, &mut self.output)?;
 
         Ok(self.output)
     }

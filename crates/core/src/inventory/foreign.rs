@@ -1,4 +1,4 @@
-use crate::inventory::{Constants, ConstantId, Functions, FunctionId, Inventory, Services, ServiceId, Types, TypeId};
+use crate::inventory::{ConstantId, Constants, FunctionId, Functions, Inventory, ServiceId, Services, TypeId, Types};
 use crate::lang::constant::Constant;
 use crate::lang::function::Function;
 use crate::lang::service::Service;

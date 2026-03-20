@@ -1,4 +1,4 @@
-// Auto-generated plugin interop for {{ plugin_name }}
+// Auto-generated plugin interop
 using System.Runtime.InteropServices;
 
 namespace {{ namespace }};
