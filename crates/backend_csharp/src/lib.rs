@@ -19,4 +19,4 @@ mod pipeline;
 pub mod plugins;
 
 pub use error::Error;
-pub use pipeline::{RustLibrary, RustLibraryBuilder, RustLibraryConfig};
+pub use pipeline::{DotnetLibrary, DotnetLibraryBuilder, DotnetLibraryConfig, RustLibrary, RustLibraryBuilder, RustLibraryConfig};

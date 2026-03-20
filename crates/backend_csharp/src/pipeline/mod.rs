@@ -1,8 +1,10 @@
 mod csharp;
+mod dotnet;
 mod rust;
 
 use crate::Error;
 use crate::pass::{ModelResult, Outcome};
+pub use dotnet::{DotnetLibrary, DotnetLibraryBuilder, DotnetLibraryConfig, IntermediateOutputPasses as DotnetOutputPasses, ModelPasses as DotnetModelPasses};
 pub use rust::{IntermediateOutputPasses, ModelPasses, RustLibrary, RustLibraryBuilder, RustLibraryConfig};
 
 pub struct PassRunner {

@@ -18,10 +18,13 @@ pub trait Plugin: Sized {
     fn load_from(loader: impl Fn(&str) -> *const u8) -> Result<Self, PluginLoadError>;
 }
 
-/// A runtime that can load plugins from assemblies/shared libraries.
+/// A symbol loader bound to a specific assembly/shared library.
+///
+/// Created by a runtime (e.g., `DotNetRuntime::dll_loader`) after loading
+/// an assembly. Resolves symbols and instantiates plugins.
 pub trait Loader {
-    /// Loads a plugin from the given path (e.g., a `.dll` or `.so` file).
-    fn load_plugin<T: Plugin>(&self, path: &str) -> Result<T, PluginLoadError>;
+    /// Loads a plugin by resolving its symbols from the bound assembly.
+    fn load_plugin<T: Plugin>(&self) -> Result<T, PluginLoadError>;
 }
 
 /// Errors that can occur when loading a plugin.

@@ -1,5 +1,5 @@
 use interoptopus::lang::plugin::{Loader, Plugin, PluginLoadError};
-use netcorehost::hostfxr::{HostfxrContext, InitializedForRuntimeConfig};
+use netcorehost::hostfxr::{AssemblyDelegateLoader, HostfxrContext, InitializedForRuntimeConfig};
 use netcorehost::nethost;
 use netcorehost::pdcstring::PdCString;
 use std::fmt;
@@ -20,6 +20,15 @@ const DEFAULT_RUNTIME_CONFIG: &str = r#"{
 pub struct DotNetRuntime {
     context: Arc<HostfxrContext<InitializedForRuntimeConfig>>,
     _temp_dir: tempfile::TempDir,
+}
+
+/// A symbol loader bound to a specific .NET assembly.
+///
+/// Created via [`DotNetRuntime::dll_loader`]. Implements [`Loader`] so it can
+/// be passed to plugin constructors (e.g., `MathPlugin::new(&loader)`).
+pub struct DllLoader {
+    delegate_loader: AssemblyDelegateLoader,
+    type_name: String,
 }
 
 /// Errors that can occur when working with the .NET runtime.
@@ -62,14 +71,8 @@ impl DotNetRuntime {
         })
     }
 
-    /// Returns a reference to the underlying runtime context.
-    pub fn context(&self) -> &HostfxrContext<InitializedForRuntimeConfig> {
-        &self.context
-    }
-}
-
-impl Loader for DotNetRuntime {
-    fn load_plugin<T: Plugin>(&self, path: &str) -> Result<T, PluginLoadError> {
+    /// Creates a [`DllLoader`] bound to the given assembly.
+    pub fn dll_loader(&self, path: &str) -> Result<DllLoader, PluginLoadError> {
         let dll_path = Path::new(path);
 
         let dll_pdc = PdCString::from_os_str(dll_path.as_os_str()).expect("dll path contains null bytes");
@@ -79,7 +82,6 @@ impl Loader for DotNetRuntime {
             .get_delegate_loader_for_assembly(dll_pdc)
             .map_err(|e| PluginLoadError::LoadFailed(e.to_string()))?;
 
-        // Derive the assembly name from the DLL file stem (e.g., "Plugin.dll" -> "Plugin")
         let assembly_name = dll_path
             .file_stem()
             .and_then(|s| s.to_str())
@@ -89,11 +91,22 @@ impl Loader for DotNetRuntime {
         // Convention: symbols live in `{Assembly}.Interop` class
         let type_name = format!("{assembly_name}.Interop, {assembly_name}");
 
+        Ok(DllLoader { delegate_loader, type_name })
+    }
+
+    /// Returns a reference to the underlying runtime context.
+    pub fn context(&self) -> &HostfxrContext<InitializedForRuntimeConfig> {
+        &self.context
+    }
+}
+
+impl Loader for DllLoader {
+    fn load_plugin<T: Plugin>(&self) -> Result<T, PluginLoadError> {
         T::load_from(|symbol_name| {
-            let type_pdc = PdCString::from_os_str(type_name.as_ref() as &std::ffi::OsStr).expect("type name contains null bytes");
+            let type_pdc = PdCString::from_os_str(self.type_name.as_ref() as &std::ffi::OsStr).expect("type name contains null bytes");
             let method_pdc = PdCString::from_os_str(symbol_name.as_ref() as &std::ffi::OsStr).expect("symbol name contains null bytes");
 
-            match delegate_loader.get_function_with_unmanaged_callers_only::<extern "system" fn()>(&type_pdc, &method_pdc) {
+            match self.delegate_loader.get_function_with_unmanaged_callers_only::<extern "system" fn()>(&type_pdc, &method_pdc) {
                 Ok(managed_fn) => {
                     let f: extern "system" fn() = *managed_fn;
                     unsafe { std::mem::transmute::<extern "system" fn(), *const u8>(f) }
