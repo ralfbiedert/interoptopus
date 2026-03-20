@@ -10,6 +10,7 @@ version.workspace = true
 
 [features]
 dotnet = ["dep:netcorehost", "dep:tempfile"]
+unstable-plugins = ["dotnet", "interoptopus/unstable-plugins"]
 
 [dependencies]
 interoptopus.workspace = true
@@ -22,7 +23,7 @@ interoptopus_backends.workspace = true
 
 [dev-dependencies]
 interoptopus = { workspace = true, features = ["serde"] }
-interoptopus_csharp = { path = ".", features = ["dotnet"] }
+interoptopus_csharp = { path = ".", features = ["unstable-plugins"] }
 reference_project.workspace = true
 insta.workspace = true
 

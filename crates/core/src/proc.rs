@@ -172,7 +172,7 @@ pub use interoptopus_proc::ffi;
 pub use interoptopus_proc::AsyncRuntime;
 
 /// Declares a plugin interface for reverse interop (loading foreign plugins from Rust).
-#[cfg(feature = "derive")]
+#[cfg(all(feature = "derive", feature = "unstable-plugins"))]
 pub use interoptopus_proc::plugin;
 
 /// Strips module paths from a fully-qualified Rust type name, preserving generic structure.

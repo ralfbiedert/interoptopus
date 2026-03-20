@@ -17,6 +17,7 @@ workspace = true
 [features]
 default = ["derive"]
 derive = ["dep:interoptopus_proc"]
+unstable-plugins = []
 
 [dependencies]
 interoptopus_proc = { workspace = true, optional = true }

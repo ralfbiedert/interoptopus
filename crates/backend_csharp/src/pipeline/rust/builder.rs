@@ -1,8 +1,9 @@
 use crate::config::HeaderConfig;
 use crate::dispatch::Dispatch;
-use crate::{RustLibrary, RustLibraryConfig};
+use crate::RustLibrary;
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::template::TemplateEngine;
+use crate::pipeline::RustLibraryConfig;
 
 /// Builder for configuring and constructing a [`RustLibrary`].
 #[derive(Default)]

@@ -10,7 +10,7 @@ macro_rules! test_model {
         let inventory = inventory.validate();
         ::interoptopus_csharp::RustLibrary::builder(inventory)
             .build()
-            .register_plugin($plugin)
+            .register_extension($plugin)
             .process()
     }};
 }
@@ -67,11 +67,11 @@ macro_rules! debug_plugin {
     (|$inventory:ident, $models:ident| $body:expr) => {{
         struct __DebugPlugin;
 
-        impl ::interoptopus_csharp::plugin::RustLibraryPlugin for __DebugPlugin {
+        impl ::interoptopus_csharp::extensions::RustCodegenExtension for __DebugPlugin {
             fn post_model_all(
                 &mut self,
                 $inventory: &::interoptopus::inventory::RustInventory,
-                $models: ::interoptopus_csharp::plugin::PostModelPass,
+                $models: ::interoptopus_csharp::extensions::PostModelPass,
             ) -> Result<(), ::interoptopus_csharp::Error> {
                 $body;
                 Ok(())

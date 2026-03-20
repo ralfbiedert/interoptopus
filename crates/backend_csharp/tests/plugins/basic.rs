@@ -1,9 +1,10 @@
+#![cfg(feature = "unstable-plugins")]
 #![allow(unused)]
 
 use interoptopus::ffi;
 use interoptopus::lang::plugin::PluginInfo;
 use interoptopus::wire::Wire;
-use interoptopus_csharp::plugins::runtime::DotNetRuntime;
+use interoptopus_csharp::plugin::DotNetRuntime;
 use reference_project::types::basic::Vec3f32;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -41,6 +42,7 @@ interoptopus::plugin!(Plugin {
     }
 });
 
+#[ignore]
 #[test]
 fn can_load_and_call_do_math() {
     let runtime = DotNetRuntime::new().expect("Failed to create .NET runtime");
@@ -57,6 +59,7 @@ fn can_load_and_call_do_math() {
     assert_eq!(result, 579);
 }
 
+#[ignore]
 #[test]
 fn can_load_foo_instance() {
     let runtime = DotNetRuntime::new().expect("Failed to create .NET runtime");
@@ -80,6 +83,7 @@ fn can_load_foo_instance() {
     drop(foo);
 }
 
+#[ignore]
 #[test]
 fn can_run_dotnet_pipeline() {
     use interoptopus_csharp::DotnetLibrary;

@@ -7,7 +7,7 @@ use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
 
-/// Mutable references to model passes, provided to plugins after each model cycle.
+/// Mutable references to model passes, provided to extensions after each model cycle.
 #[derive(Debug)]
 pub struct PostModelPass<'a> {
     /// The Rust→C# ID mappings.
@@ -24,16 +24,16 @@ impl<'a> PostModelPass<'a> {
     }
 }
 
-/// References to output passes, provided to plugins after output rendering.
+/// References to output passes, provided to extensions after output rendering.
 #[derive(Copy, Clone, Default)]
 pub struct PostOutputPass<'a> {
     _todo: PhantomData<&'a ()>,
 }
 
-/// Trait for plugins that hook into the C# code generation pipeline.
+/// Trait for extensions that hook into the C# code generation pipeline.
 ///
 /// Implement any subset of the methods to customize behavior at different stages.
-pub trait RustLibraryPlugin {
+pub trait RustCodegenExtension {
     /// Called once before any passes run. Can modify the inventory.
     fn init(&mut self, inventory: &mut RustInventory) {}
 

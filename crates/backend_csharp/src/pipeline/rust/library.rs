@@ -4,7 +4,7 @@ use crate::pass::model;
 use crate::pass::output;
 use crate::pass::{OutputResult, PassMeta};
 use crate::pipeline::{RustLibraryBuilder, loop_model_passes_until_done};
-use crate::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
+use crate::extensions::{PostModelPass, PostOutputPass, RustCodegenExtension};
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
@@ -178,7 +178,7 @@ pub struct IntermediateOutputPasses {
 /// The main entry point for C# code generation.
 ///
 /// Holds the full multi-pass pipeline: inventory, model passes, output passes, and
-/// plugins. Call [`process`](RustLibrary::process) to run the pipeline and produce
+/// extensions. Call [`process`](RustLibrary::process) to run the pipeline and produce
 /// a [`Multibuf`] containing the generated `.cs` files.
 ///
 /// # Example
@@ -222,7 +222,7 @@ pub struct RustLibrary {
     output: Multibuf,
 
     // Plugins
-    plugins: Vec<Box<dyn RustLibraryPlugin>>,
+    extensions: Vec<Box<dyn RustCodegenExtension>>,
 }
 
 impl RustLibrary {
@@ -326,27 +326,27 @@ impl RustLibrary {
             },
             output_final: output::rust::all::Pass::new(config.output_final),
             output: Multibuf::default(),
-            plugins: vec![],
+            extensions: vec![],
         }
     }
 
-    /// Registers a plugin that can hook into model and output passes.
+    /// Registers an extension that can hook into model and output passes.
     #[must_use]
-    pub fn register_plugin(mut self, plugin: impl RustLibraryPlugin + 'static) -> Self {
-        self.plugins.push(Box::new(plugin));
+    pub fn register_extension(mut self, extension: impl RustCodegenExtension + 'static) -> Self {
+        self.extensions.push(Box::new(extension));
         self
     }
 
-    fn plugin_init_pass(&mut self) {
-        for plugin in &mut self.plugins {
-            plugin.init(&mut self.inventory);
+    fn extension_init_pass(&mut self) {
+        for ext in &mut self.extensions {
+            ext.init(&mut self.inventory);
         }
     }
 
-    fn plugin_post_output_pass(&mut self) -> OutputResult {
+    fn extension_post_output_pass(&mut self) -> OutputResult {
         let post_output = PostOutputPass::default();
-        for plugin in &mut self.plugins {
-            plugin.post_output(&mut self.output, post_output)?;
+        for ext in &mut self.extensions {
+            ext.post_output(&mut self.output, post_output)?;
         }
         Ok(())
     }
@@ -355,7 +355,7 @@ impl RustLibrary {
     #[rustfmt::skip]
     /// Runs the full code generation pipeline and returns the generated output buffers.
     pub fn process(mut self) -> Result<Multibuf, Error> {
-        self.plugin_init_pass();
+        self.extension_init_pass();
         let mut pass_meta = PassMeta::default();
 
         let m = &mut self.model_passes;
@@ -400,18 +400,18 @@ impl RustLibrary {
             r.run(m.service_method_names.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
             r.run(m.service_method_overload.process(&mut pass_meta, &mut m.service_all, &m.fns_all, &m.type_all))?;
 
-            for plugin in &mut self.plugins {
+            for ext in &mut self.extensions {
                 let post_model = PostModelPass::from_model(m);
-                r.run(plugin.post_model_cycle(&self.inventory, post_model))?;
+                r.run(ext.post_model_cycle(&self.inventory, post_model))?;
             }
             Ok(())
         })?;
 
         pass_meta.lost_found.print();
 
-        for plugin in &mut self.plugins {
+        for ext in &mut self.extensions {
             let post_model = PostModelPass::from_model(m);
-            plugin.post_model_all(&self.inventory, post_model)?;
+            ext.post_model_all(&self.inventory, post_model)?;
         }
 
         // Output passes
@@ -456,7 +456,7 @@ impl RustLibrary {
         o.wires.process(&mut pass_meta, &self.output_master, &o.wire_types, &o.wire_helper_classes)?;
         o.util.process(&mut pass_meta, &self.output_master)?;
         o.using.process(&mut pass_meta, &self.output_master)?;
-        self.plugin_post_output_pass()?;
+        self.extension_post_output_pass()?;
 
         // Final output pass(es)
         self.output_final.process(&mut pass_meta, &self.meta_info, &mut self.output, &self.output_master, &self.output_passes)?;

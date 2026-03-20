@@ -3,20 +3,20 @@ use interoptopus_backends::output::Multibuf;
 use interoptopus_csharp::RustLibrary;
 use interoptopus_csharp::pass::Outcome::Unchanged;
 use interoptopus_csharp::pass::{ModelResult, OutputResult};
-use interoptopus_csharp::plugin::{PostModelPass, PostOutputPass, RustLibraryPlugin};
+use interoptopus_csharp::extensions::{PostModelPass, PostOutputPass, RustCodegenExtension};
 use std::error::Error;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 #[derive(Default)]
 #[allow(clippy::struct_field_names)]
-pub struct MyPlugin {
+pub struct MyExtension {
     init_called: Arc<AtomicBool>,
     post_model_called: Arc<AtomicBool>,
     post_output_called: Arc<AtomicBool>,
 }
 
-impl RustLibraryPlugin for MyPlugin {
+impl RustCodegenExtension for MyExtension {
     fn init(&mut self, _: &mut RustInventory) {
         self.init_called.store(true, Ordering::Relaxed);
     }
@@ -42,9 +42,9 @@ fn can_register() -> Result<(), Box<dyn Error>> {
     let init_called = Arc::new(AtomicBool::new(false));
     let post_model_called = Arc::new(AtomicBool::new(false));
     let post_output_called = Arc::new(AtomicBool::new(false));
-    let plugin = MyPlugin { init_called: init_called.clone(), post_model_called: post_model_called.clone(), post_output_called: post_output_called.clone() };
+    let ext = MyExtension { init_called: init_called.clone(), post_model_called: post_model_called.clone(), post_output_called: post_output_called.clone() };
 
-    let _ = RustLibrary::new(inventory).register_plugin(plugin).process()?;
+    let _ = RustLibrary::new(inventory).register_extension(ext).process()?;
 
     assert!(init_called.load(Ordering::Relaxed));
     assert!(post_model_called.load(Ordering::Relaxed));
