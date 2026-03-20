@@ -112,6 +112,7 @@ impl FunctionModel {
             Some(crate::function::args::ExportKind::Custom(name)) => name.clone(),
             Some(crate::function::args::ExportKind::Unique) => {
                 // Generate a deterministic unique suffix based on function signature
+                // and call-site location to avoid collisions across crates.
                 let base_name = self.name.to_string();
                 let hash = {
                     use std::collections::hash_map::DefaultHasher;

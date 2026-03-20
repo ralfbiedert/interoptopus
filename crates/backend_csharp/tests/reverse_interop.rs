@@ -5,6 +5,7 @@ use interoptopus::lang::plugin::PluginInfo;
 use interoptopus::wire::Wire;
 use interoptopus_csharp::plugins::runtime::DotNetRuntime;
 use reference_project::types::basic::Vec3f32;
+use std::collections::HashMap;
 use std::path::PathBuf;
 
 fn plugin_dir() -> PathBuf {
@@ -34,6 +35,7 @@ interoptopus::plugin!(Plugin {
         fn bar(&self, x: i32);
         fn get_accumulator(&self) -> i32;
         fn wire(&self, x: Wire<String>) -> Wire<String>;
+        fn wire2(&self, x: Wire<HashMap<String, String>>) -> Wire<HashMap<String, String>>;
         // TODO: fn call(&self, x: &u32, cb: CallBack);
         // async fn call_async(&self, x: Wire<String>);
     }
@@ -68,6 +70,11 @@ fn can_load_foo_instance() {
     assert_eq!(foo.get_accumulator(), 0);
     foo.bar(10);
     foo.bar(32);
+    let string = foo.wire(Wire::from("HELLO UPPERCASEE".to_string())).unwire();
+    dbg!(string);
+    let hashmap = HashMap::from([("foo".to_string(), "bar".to_string())]);
+    let hashmap_wire = foo.wire2(Wire::from(hashmap)).unwire();
+    dbg!(hashmap_wire);
     assert_eq!(foo.get_accumulator(), 42);
 
     drop(foo);

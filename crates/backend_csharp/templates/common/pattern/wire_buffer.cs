@@ -11,10 +11,14 @@ public partial struct WireBuffer
 {
     public WireBuffer() { }
 
-    /// Allocate a Rust-owned buffer of the given size via interoptopus_wire_create.
+    /// Allocate a Rust-owned buffer of the given size.
     public static unsafe WireBuffer Allocate(int size)
     {
+{% if plugin_mode %}
+        var ptr = Trampolines.WireCreate(size, out var outLen, out var outCapacity);
+{% else %}
         var ptr = WireInterop.interoptopus_wire_create(size, out var outLen, out var outCapacity);
+{% endif %}
         return new WireBuffer { data = ptr, len = outLen, capacity = outCapacity };
     }
 
@@ -30,15 +34,20 @@ public partial struct WireBuffer
         return new BinaryReader(new UnmanagedMemoryStream((byte*)data, len));
     }
 
-    /// Free the buffer. Rust-allocated buffers (capacity > 0) are freed via
-    /// interoptopus_wire_destroy. Borrowed or empty buffers (capacity == 0) are no-ops.
+    /// Free the buffer. Rust-allocated buffers (capacity > 0) are freed via the
+    /// destroy helper. Borrowed or empty buffers (capacity == 0) are no-ops.
     /// Do NOT call this after passing a wire into a Rust function — Rust owns it then.
     public void Dispose()
     {
         if (data != IntPtr.Zero)
         {
+{% if plugin_mode %}
+            if (capacity > 0)
+                Trampolines.WireDestroy(data, len, capacity);
+{% else %}
             if (capacity > 0)
                 WireInterop.interoptopus_wire_destroy(data, len, capacity);
+{% endif %}
             data = IntPtr.Zero;
             len = 0;
             capacity = 0;
@@ -120,6 +129,7 @@ public partial struct WireBuffer
     }
 }
 
+{% if not plugin_mode %}
 public partial class WireInterop {
     [LibraryImport(Interop.NativeLib, EntryPoint = "{{ create_entry_point }}")]
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -129,3 +139,4 @@ public partial class WireInterop {
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static partial void interoptopus_wire_destroy(IntPtr data, int len, int capacity);
 }
+{% endif %}

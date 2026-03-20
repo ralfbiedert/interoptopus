@@ -46,8 +46,16 @@ public class Foo : IFoo<Foo>
         return _accumulator;
     }
 
-    public string Wire(string x)
+    public WireOfString Wire(WireOfString x)
     {
-        throw new NotImplementedException();
+        var xx = x.Unwire().ToLower();
+        return WireOfString.From(xx);
+    }
+
+    public WireOfHashMapStringString Wire2(WireOfHashMapStringString x)
+    {
+        var xx = x.Unwire();
+        xx["hello"] = "world";
+        return WireOfHashMapStringString.From(xx);
     }
 }

@@ -182,7 +182,7 @@ mod buffer;
 
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use buffer::WireBuffer;
 use std::marker::PhantomData;
@@ -292,6 +292,38 @@ impl<T: WireIO> WireIO for Wire<T> {
     }
 }
 
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __wire_create_body {
+    ($size:ident, $out_len:ident, $out_capacity:ident) => {{
+        if $size <= 0 {
+            *$out_len = 0;
+            *$out_capacity = 0;
+            return ::std::ptr::null_mut();
+        }
+        let size = usize::try_from($size).expect("Invalid Wire buffer size");
+        let mut vec: Vec<u8> = vec![0u8; size];
+        let data = vec.as_mut_ptr();
+        *$out_len = i32::try_from(vec.len()).expect("Too large Wire buffer");
+        *$out_capacity = i32::try_from(vec.capacity()).expect("Too large Wire buffer");
+        ::std::mem::forget(vec);
+        data
+    }};
+}
+
+/// Body of `interoptopus_wire_destroy`. Shared by [`builtins_wire!`] and
+/// [`register_wire_trampolines!`].
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __wire_destroy_body {
+    ($data:ident, $len:ident, $capacity:ident) => {{
+        if $capacity <= 0 {
+            return;
+        }
+        let _ = unsafe { Vec::from_raw_parts($data, usize::try_from($len).expect("Invalid vec length"), usize::try_from($capacity).expect("Invalid vec capacity")) };
+    }};
+}
+
 /// Emits and registers helpers for [`Wire<T>`](crate::wire::Wire).
 ///
 /// Backends (e.g., C#) use these functions internally so that foreign code can
@@ -317,36 +349,54 @@ impl<T: WireIO> WireIO for Wire<T> {
 /// This macro generates the following FFI functions:
 /// - `interoptopus_wire_create` — allocates a wire buffer of a given size.
 /// - `interoptopus_wire_destroy` — drops a wire buffer, freeing its memory.
+/// Body of `interoptopus_wire_create`. Shared by [`builtins_wire!`] and
+/// [`register_wire_trampolines!`].
 #[macro_export]
 macro_rules! builtins_wire {
     () => {{
-        #[$crate::ffi]
+        #[$crate::ffi(export = unique)]
         pub fn interoptopus_wire_create(size: i32, out_len: &mut i32, out_capacity: &mut i32) -> *mut u8 {
-            if size <= 0 {
-                *out_len = 0;
-                *out_capacity = 0;
-                return ::std::ptr::null_mut();
-            }
-            let size = usize::try_from(size).expect("Invalid Wire buffer size");
-            let mut vec: Vec<u8> = vec![0u8; size];
-            let data = vec.as_mut_ptr();
-            *out_len = i32::try_from(vec.len()).expect("Too large Wire buffer");
-            *out_capacity = i32::try_from(vec.capacity()).expect("Too large Wire buffer");
-            ::std::mem::forget(vec);
-            data
+            $crate::__wire_create_body!(size, out_len, out_capacity)
         }
 
-        #[$crate::ffi]
+        #[$crate::ffi(export = unique)]
         pub fn interoptopus_wire_destroy(data: *mut u8, len: i32, capacity: i32) {
-            if capacity <= 0 {
-                return;
-            }
-            let _ = unsafe { Vec::from_raw_parts(data, usize::try_from(len).expect("Invalid vec length"), usize::try_from(capacity).expect("Invalid vec capacity")) };
+            $crate::__wire_destroy_body!(data, len, capacity)
         }
 
         |x: &mut $crate::inventory::RustInventory| {
             <interoptopus_wire_create as $crate::lang::function::FunctionInfo>::register(x);
             <interoptopus_wire_destroy as $crate::lang::function::FunctionInfo>::register(x);
         }
+    }};
+}
+
+/// Registers wire buffer trampolines with a foreign plugin.
+///
+/// Defines local `extern "C"` functions (no exported symbols) that share
+/// the same body logic as [`builtins_wire!`], then passes their pointers
+/// to the given register callback.
+///
+/// # Example
+///
+/// ```rust,ignore
+/// interoptopus::register_wire_trampolines!(|id, ptr| {
+///     (plugin.register_trampoline)(id, ptr);
+/// });
+/// ```
+#[doc(hidden)]
+#[macro_export]
+macro_rules! register_wire_trampolines {
+    ($register_fn:expr) => {{
+        extern "C" fn __wire_create(size: i32, out_len: &mut i32, out_capacity: &mut i32) -> *mut u8 {
+            $crate::__wire_create_body!(size, out_len, out_capacity)
+        }
+        extern "C" fn __wire_destroy(data: *mut u8, len: i32, capacity: i32) {
+            $crate::__wire_destroy_body!(data, len, capacity)
+        }
+
+        let __register: &mut dyn FnMut(i64, *const u8) = &mut $register_fn;
+        __register($crate::trampoline::TRAMPOLINE_WIRE_CREATE, __wire_create as *const u8);
+        __register($crate::trampoline::TRAMPOLINE_WIRE_DESTROY, __wire_destroy as *const u8);
     }};
 }

@@ -11,14 +11,8 @@
 //! }
 //! ```
 //!
-//! Wire<T> parameters and return values use their managed inner type (e.g.,
-//! `string` for `Wire<String>`) rather than the FFI `WireBuffer`.
-
-use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::output::{FileType, Output};
-use crate::pass::output::rust::wire::WireCodeGen;
 use crate::pass::{OutputResult, PassInfo, model, output};
-use interoptopus::inventory::Types as RsTypes;
 use interoptopus_backends::casing::service_method_name;
 use std::collections::HashMap;
 
@@ -43,11 +37,7 @@ impl Pass {
         services: &model::common::service::all::Pass,
         fns_all: &model::common::fns::all::Pass,
         types: &model::common::types::all::Pass,
-        id_maps: &model::common::id_map::Pass,
-        rs_types: &RsTypes,
     ) -> OutputResult {
-        let codegen = WireCodeGen { rs_types };
-
         for file in output_master.outputs_of(FileType::Csharp) {
             let mut all_interfaces = Vec::new();
 
@@ -63,13 +53,14 @@ impl Pass {
                     let Some(func) = fns_all.get(fn_id) else { continue };
                     let method_name = service_method_name(type_name, &func.name);
 
+                    // Ctor args exclude the return (Self), and the return type is TSelf
                     let args: Vec<String> = func
                         .signature
                         .arguments
                         .iter()
                         .filter_map(|arg| {
-                            let ty_name = managed_type_name(arg.ty, types, id_maps, &codegen);
-                            Some(format!("{ty_name} {}", arg.name))
+                            let ty = types.get(arg.ty).map(|t| &t.name)?;
+                            Some(format!("{} {}", ty, arg.name))
                         })
                         .collect();
                     let args_str = args.join(", ");
@@ -81,21 +72,24 @@ impl Pass {
                 for &fn_id in &svc.methods {
                     let Some(func) = fns_all.get(fn_id) else { continue };
                     let method_name = service_method_name(type_name, &func.name);
-                    let rval_name = managed_type_name(func.signature.rval, types, id_maps, &codegen);
+                    let rval_name = types.get(func.signature.rval).map(|t| t.name.as_str()).unwrap_or("void");
 
+                    // The inventory does not include `self` in the arguments, so use all args
                     let args: Vec<String> = func
                         .signature
                         .arguments
                         .iter()
                         .filter_map(|arg| {
-                            let ty_name = managed_type_name(arg.ty, types, id_maps, &codegen);
-                            Some(format!("{ty_name} {}", arg.name))
+                            let ty = types.get(arg.ty).map(|t| &t.name)?;
+                            Some(format!("{} {}", ty, arg.name))
                         })
                         .collect();
                     let args_str = args.join(", ");
 
                     members.push(format!("    {rval_name} {method_name}({args_str});"));
                 }
+
+                // Destructor is not part of the interface — it's handled by the trampoline
 
                 let body = members.join("\n");
                 let rendered = format!(
@@ -115,32 +109,4 @@ impl Pass {
     pub fn interfaces_for(&self, output: &Output) -> Option<&[String]> {
         self.interfaces.get(output).map(Vec::as_slice)
     }
-}
-
-/// Returns the managed C# type name for a type ID.
-///
-/// For Wire<T> types, returns the inner managed type (e.g., `string` for Wire<String>).
-/// For all other types, returns the regular C# name.
-fn managed_type_name(
-    cs_ty: crate::lang::TypeId,
-    types: &model::common::types::all::Pass,
-    id_maps: &model::common::id_map::Pass,
-    codegen: &WireCodeGen<'_>,
-) -> String {
-    let Some(ty) = types.get(cs_ty) else {
-        return "void".to_string();
-    };
-
-    if let TypeKind::TypePattern(TypePattern::Wire(_inner_cs_ty)) = &ty.kind {
-        // Find the Rust Wire type → get its inner type → resolve managed name.
-        for (rs_id, rs_ty) in codegen.rs_types {
-            if id_maps.ty(*rs_id) == Some(cs_ty) {
-                if let interoptopus::lang::types::TypeKind::TypePattern(interoptopus::lang::types::TypePattern::Wire(inner_rs)) = &rs_ty.kind {
-                    return codegen.cs_type_name(*inner_rs);
-                }
-            }
-        }
-    }
-
-    ty.name.clone()
 }

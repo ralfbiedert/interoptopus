@@ -4,6 +4,10 @@
 //! provide certain runtime functions (like wire buffer allocation) to the
 //! plugin. These are registered via a `register_trampoline(id, fn_ptr)` call,
 //! where `id` is one of the constants defined here.
+//!
+//! Use the [`register_wire_trampolines!`](crate::register_wire_trampolines)
+//! macro to register the wire buffer trampolines. It invokes `builtins_wire!`
+//! internally so the function implementations are shared.
 
 /// Trampoline ID for `interoptopus_wire_create`.
 ///

@@ -133,37 +133,10 @@ impl PluginModel {
 
                 /// Registers Rust runtime trampolines (wire alloc/free) with the foreign plugin.
                 fn register_trampolines(&self) {
-                    // Wire buffer create
-                    extern "C" fn _wire_create(size: i32, out_len: *mut i32, out_capacity: *mut i32) -> *mut u8 {
-                        if size <= 0 {
-                            unsafe { *out_len = 0; *out_capacity = 0; }
-                            return ::std::ptr::null_mut();
-                        }
-                        let size = usize::try_from(size).expect("Invalid Wire buffer size");
-                        let mut vec: Vec<u8> = vec![0u8; size];
-                        let data = vec.as_mut_ptr();
-                        unsafe {
-                            *out_len = i32::try_from(vec.len()).expect("Too large Wire buffer");
-                            *out_capacity = i32::try_from(vec.capacity()).expect("Too large Wire buffer");
-                        }
-                        ::std::mem::forget(vec);
-                        data
-                    }
-
-                    // Wire buffer destroy
-                    extern "C" fn _wire_destroy(data: *mut u8, len: i32, capacity: i32) {
-                        if capacity <= 0 { return; }
-                        let _ = unsafe {
-                            Vec::from_raw_parts(
-                                data,
-                                usize::try_from(len).expect("Invalid vec length"),
-                                usize::try_from(capacity).expect("Invalid vec capacity"),
-                            )
-                        };
-                    }
-
-                    (self.register_trampoline)(::interoptopus::trampoline::TRAMPOLINE_WIRE_CREATE, _wire_create as *const u8);
-                    (self.register_trampoline)(::interoptopus::trampoline::TRAMPOLINE_WIRE_DESTROY, _wire_destroy as *const u8);
+                    let register = self.register_trampoline;
+                    ::interoptopus::register_wire_trampolines!(|id, ptr| {
+                        (register)(id, ptr);
+                    });
                 }
 
                 #(#bare_methods)*

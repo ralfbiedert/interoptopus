@@ -8,14 +8,9 @@
 //! }
 //! ```
 //!
-//! Wire<T> parameters and return values use their managed inner type.
-
 use crate::lang::plugin::TrampolineKind;
-use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::output::{FileType, Output};
-use crate::pass::output::rust::wire::WireCodeGen;
 use crate::pass::{OutputResult, PassInfo, model, output};
-use interoptopus::inventory::Types as RsTypes;
 use interoptopus_backends::casing::rust_to_pascal;
 use std::collections::HashMap;
 
@@ -40,11 +35,7 @@ impl Pass {
         trampoline_model: &model::dotnet::trampoline::Pass,
         fns_all: &model::common::fns::all::Pass,
         types: &model::common::types::all::Pass,
-        id_maps: &model::common::id_map::Pass,
-        rs_types: &RsTypes,
     ) -> OutputResult {
-        let codegen = WireCodeGen { rs_types };
-
         for file in output_master.outputs_of(FileType::Csharp) {
             let mut members = Vec::new();
 
@@ -55,7 +46,7 @@ impl Pass {
 
                 let Some(func) = fns_all.get(entry.fn_id) else { continue };
 
-                let rval_name = managed_type_name(func.signature.rval, types, id_maps, &codegen);
+                let rval_name = types.get(func.signature.rval).map(|t| t.name.as_str()).unwrap_or("void");
                 let pascal_name = rust_to_pascal(&func.name);
 
                 let args: Vec<String> = func
@@ -63,8 +54,8 @@ impl Pass {
                     .arguments
                     .iter()
                     .filter_map(|arg| {
-                        let ty_name = managed_type_name(arg.ty, types, id_maps, &codegen);
-                        Some(format!("{ty_name} {}", arg.name))
+                        let ty_name = types.get(arg.ty).map(|t| &t.name)?;
+                        Some(format!("{} {}", ty_name, arg.name))
                     })
                     .collect();
                 let args_str = args.join(", ");
@@ -90,29 +81,4 @@ impl Pass {
     pub fn interface_for(&self, output: &Output) -> Option<&str> {
         self.interfaces.get(output).map(String::as_str)
     }
-}
-
-/// Returns the managed C# type name for a type ID.
-/// For Wire<T>, returns the inner managed type (e.g., `string`).
-fn managed_type_name(
-    cs_ty: crate::lang::TypeId,
-    types: &model::common::types::all::Pass,
-    id_maps: &model::common::id_map::Pass,
-    codegen: &WireCodeGen<'_>,
-) -> String {
-    let Some(ty) = types.get(cs_ty) else {
-        return "void".to_string();
-    };
-
-    if let TypeKind::TypePattern(TypePattern::Wire(_)) = &ty.kind {
-        for (rs_id, rs_ty) in codegen.rs_types {
-            if id_maps.ty(*rs_id) == Some(cs_ty) {
-                if let interoptopus::lang::types::TypeKind::TypePattern(interoptopus::lang::types::TypePattern::Wire(inner_rs)) = &rs_ty.kind {
-                    return codegen.cs_type_name(*inner_rs);
-                }
-            }
-        }
-    }
-
-    ty.name.clone()
 }
