@@ -4,7 +4,7 @@ use interoptopus_csharp::template::templates;
 #[test]
 fn load_templates() {
     let templates = templates();
-    let file_header = templates.get("header.cs").unwrap();
+    let file_header = templates.get("rust/header.cs").unwrap();
     assert!(file_header.contains("auto-generated"));
 }
 
@@ -20,7 +20,7 @@ fn render_templates() {
     context.insert("INTEROPTOPUS_VERSION", "EEE");
     context.insert("emit_version", &true);
 
-    let rendered = templates.render("header.cs", &context).unwrap();
+    let rendered = templates.render("rust/header.cs", &context).unwrap();
 
     assert!(rendered.contains("AAA"));
     assert!(rendered.contains("BBB"));

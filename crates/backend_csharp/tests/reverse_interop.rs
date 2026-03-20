@@ -20,6 +20,8 @@ interoptopus::plugin!(Plugin {
     impl Foo {
         fn create() -> Self;
         fn bar(&self, x: i32);
+        // fn call(&self, x: &u32, cb: CallBack);
+        // async fn call_async(&self, x: Wire<String>);
         fn get_accumulator(&self) -> i32;
     }
 });
@@ -55,10 +57,7 @@ fn can_load_foo_instance() {
 fn can_run_dotnet_pipeline() {
     use interoptopus_csharp::DotnetLibrary;
 
-    let output = DotnetLibrary::builder(Plugin::inventory())
-        .build()
-        .process()
-        .expect("pipeline failed");
+    let output = DotnetLibrary::builder(Plugin::inventory()).build().process().expect("pipeline failed");
 
     output.write_buffers_to(".").expect("write failed");
 }

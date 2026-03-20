@@ -11,11 +11,11 @@ use std::marker::PhantomData;
 #[derive(Debug)]
 pub struct PostModelPass<'a> {
     /// The Rust→C# ID mappings.
-    pub id_map: &'a mut model::id_map::Pass,
+    pub id_map: &'a mut model::common::id_map::Pass,
     /// All resolved C# types.
-    pub types: &'a mut model::types::all::Pass,
+    pub types: &'a mut model::common::types::all::Pass,
     /// All resolved C# functions.
-    pub fns: &'a mut model::fns::all::Pass,
+    pub fns: &'a mut model::common::fns::all::Pass,
 }
 
 impl<'a> PostModelPass<'a> {

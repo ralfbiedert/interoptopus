@@ -1,0 +1,65 @@
+//! Renders the `WireBuffer` utility type for serialized `Wire<T>` transfers.
+//!
+//! The `WireBuffer` is a composite struct matching the Rust `WireBuffer`
+//! layout (`IntPtr` + int + int). It provides managed/unmanaged conversion
+//! and a marshaller, following the same pattern as other composite types.
+//! Only emitted when `builtins_wire!()` is registered.
+
+use crate::lang::types::csharp;
+use crate::output::{FileType, Output};
+use crate::pass::{OutputResult, PassInfo, model, output};
+use interoptopus::inventory::Functions;
+use interoptopus_backends::template::Context;
+use std::collections::HashMap;
+
+#[derive(Default)]
+pub struct Config {}
+
+pub struct Pass {
+    info: PassInfo,
+    rendered: HashMap<Output, String>,
+}
+
+impl Pass {
+    #[must_use]
+    pub fn new(_: Config) -> Self {
+        Self { info: PassInfo { name: file!() }, rendered: HashMap::default() }
+    }
+
+    pub fn process(
+        &mut self,
+        _pass_meta: &mut crate::pass::PassMeta,
+        output_master: &output::common::master::Pass,
+        wire_helpers: &model::rust::wire::helpers::Pass,
+        rs_functions: &Functions,
+    ) -> OutputResult {
+        let templates = output_master.templates();
+
+        for file in output_master.outputs_of(FileType::Csharp) {
+            let content = if output_master.type_belongs_to(csharp::UTIL_WIRE_BUFFER, file) {
+                if let Some(h) = wire_helpers.helpers() {
+                    let create_name = &rs_functions[&h.create_fn].name;
+                    let destroy_name = &rs_functions[&h.destroy_fn].name;
+
+                    let mut context = Context::new();
+                    context.insert("create_entry_point", create_name);
+                    context.insert("destroy_entry_point", destroy_name);
+                    templates.render("rust/pattern/wire_buffer.cs", &context)?.trim().to_string()
+                } else {
+                    String::new()
+                }
+            } else {
+                String::new()
+            };
+
+            self.rendered.insert(file.clone(), content);
+        }
+
+        Ok(())
+    }
+
+    #[must_use]
+    pub fn wire_buffer_for(&self, output: &Output) -> Option<&str> {
+        self.rendered.get(output).map(|s| &**s)
+    }
+}

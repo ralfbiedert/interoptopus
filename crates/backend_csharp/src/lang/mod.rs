@@ -6,6 +6,7 @@ pub mod functions;
 mod id;
 pub mod meta;
 pub mod pattern;
+pub mod plugin;
 pub mod service;
 pub mod types;
 
