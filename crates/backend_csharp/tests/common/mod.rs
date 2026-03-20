@@ -32,9 +32,9 @@ macro_rules! test_model {
 macro_rules! test_output {
     ($file:expr, [$($item:expr),* $(,)?]) => {{
         use interoptopus_csharp::dispatch::Dispatch;
+        use interoptopus_csharp::config::HeaderConfig;
         use interoptopus_csharp::output::Target;
         use interoptopus::lang::meta::FileEmission;
-
         let mut inventory = ::interoptopus::inventory::RustInventory::new();
         $(let _ = inventory.register($item);)*
         let inventory = inventory.validate();
@@ -43,6 +43,7 @@ macro_rules! test_output {
                 FileEmission::Common => Target::new("Interop.Common.cs", "My.Company.Common"),
                 FileEmission::Default | FileEmission::CustomModule(_) => Target::new("Interop.cs", "My.Company"),
             }))
+            .header_config(HeaderConfig { emit_version: false })
             .build()
             .process()
             .unwrap();
