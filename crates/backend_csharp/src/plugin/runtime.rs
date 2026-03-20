@@ -65,10 +65,7 @@ impl DotNetRuntime {
 
         let context = fxr.initialize_for_runtime_config(config_pdc).map_err(DotNetError::RuntimeInit)?;
 
-        Ok(Self {
-            context: Arc::new(context),
-            _temp_dir: temp_dir,
-        })
+        Ok(Self { context: Arc::new(context), _temp_dir: temp_dir })
     }
 
     /// Creates a [`DllLoader`] bound to the given assembly.
@@ -121,7 +118,10 @@ impl Loader for DllLoader {
             let type_pdc = PdCString::from_os_str(self.type_name.as_ref() as &std::ffi::OsStr).expect("type name contains null bytes");
             let method_pdc = PdCString::from_os_str(symbol_name.as_ref() as &std::ffi::OsStr).expect("symbol name contains null bytes");
 
-            match self.delegate_loader.get_function_with_unmanaged_callers_only::<extern "system" fn()>(&type_pdc, &method_pdc) {
+            match self
+                .delegate_loader
+                .get_function_with_unmanaged_callers_only::<extern "system" fn()>(&type_pdc, &method_pdc)
+            {
                 Ok(managed_fn) => {
                     let f: extern "system" fn() = *managed_fn;
                     unsafe { std::mem::transmute::<extern "system" fn(), *const u8>(f) }

@@ -215,7 +215,11 @@ fn all_families_ready(args: &[Argument], types: &model::common::types::all::Pass
     })
 }
 
-fn build_arg_transforms(args: &[Argument], types: &model::common::types::all::Pass, type_overloads: &model::rust::types::overload::all::Pass) -> (Vec<Argument>, Vec<ArgTransform>) {
+fn build_arg_transforms(
+    args: &[Argument],
+    types: &model::common::types::all::Pass,
+    type_overloads: &model::rust::types::overload::all::Pass,
+) -> (Vec<Argument>, Vec<ArgTransform>) {
     let mut overload_args = Vec::new();
     let mut transforms = Vec::new();
 

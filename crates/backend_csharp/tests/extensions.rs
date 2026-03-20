@@ -1,9 +1,9 @@
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_csharp::RustLibrary;
+use interoptopus_csharp::extensions::{PostModelPass, PostOutputPass, RustCodegenExtension};
 use interoptopus_csharp::pass::Outcome::Unchanged;
 use interoptopus_csharp::pass::{ModelResult, OutputResult};
-use interoptopus_csharp::extensions::{PostModelPass, PostOutputPass, RustCodegenExtension};
 use std::error::Error;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};

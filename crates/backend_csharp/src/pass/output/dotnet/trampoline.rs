@@ -77,9 +77,7 @@ impl Pass {
                     TrampolineKind::Raw => {
                         let pascal_name = rust_to_pascal(ffi_name);
                         let forward = forward_args.join(", ");
-                        format!(
-                            "    [UnmanagedCallersOnly]\n    public static {rval_type} {ffi_name}({args_str}) => Plugin.{pascal_name}({forward});"
-                        )
+                        format!("    [UnmanagedCallersOnly]\n    public static {rval_type} {ffi_name}({args_str}) => Plugin.{pascal_name}({forward});")
                     }
                     TrampolineKind::ServiceCtor { service_id } => {
                         let Some(svc) = svc_lookup.get(service_id) else { continue };

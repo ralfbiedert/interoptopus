@@ -96,31 +96,38 @@ impl PluginModel {
             let prefix = s.prefix();
             let svc_name = &s.name;
 
-            s.ctors().into_iter().map(move |c| {
-                let method_name = prefixed_ident(&prefix, &c.name);
-                let ctor_field = prefixed_ident(&prefix, &c.name);
-                let params = typed_params(&c.params);
-                let arg_names: Vec<_> = c.params.iter().map(|p| &p.name).collect();
+            s.ctors()
+                .into_iter()
+                .map(move |c| {
+                    let method_name = prefixed_ident(&prefix, &c.name);
+                    let ctor_field = prefixed_ident(&prefix, &c.name);
+                    let params = typed_params(&c.params);
+                    let arg_names: Vec<_> = c.params.iter().map(|p| &p.name).collect();
 
-                // Copy method + drop fn pointers into the service struct
-                let method_copies = s.instance_methods().iter().map(|m| {
-                    let field = prefixed_ident(&prefix, &m.name);
-                    quote! { #field: self.#field }
-                }).collect::<Vec<_>>();
+                    // Copy method + drop fn pointers into the service struct
+                    let method_copies = s
+                        .instance_methods()
+                        .iter()
+                        .map(|m| {
+                            let field = prefixed_ident(&prefix, &m.name);
+                            quote! { #field: self.#field }
+                        })
+                        .collect::<Vec<_>>();
 
-                let drop_field = format_ident!("{}_drop", prefix);
+                    let drop_field = format_ident!("{}_drop", prefix);
 
-                quote! {
-                    pub fn #method_name(&self, #(#params),*) -> #svc_name {
-                        let handle = (self.#ctor_field)(#(#arg_names),*);
-                        #svc_name {
-                            handle,
-                            #(#method_copies,)*
-                            #drop_field: self.#drop_field,
+                    quote! {
+                        pub fn #method_name(&self, #(#params),*) -> #svc_name {
+                            let handle = (self.#ctor_field)(#(#arg_names),*);
+                            #svc_name {
+                                handle,
+                                #(#method_copies,)*
+                                #drop_field: self.#drop_field,
+                            }
                         }
                     }
-                }
-            }).collect::<Vec<_>>()
+                })
+                .collect::<Vec<_>>()
         });
 
         quote! {
@@ -187,11 +194,7 @@ impl PluginModel {
         });
 
         let register_trampoline_field = format_ident!("register_trampoline");
-        let register_trampoline_load = emit_load_field(
-            &register_trampoline_field,
-            "register_trampoline",
-            quote! { extern "C" fn(i64, *const u8) },
-        );
+        let register_trampoline_load = emit_load_field(&register_trampoline_field, "register_trampoline", quote! { extern "C" fn(i64, *const u8) });
 
         quote! {
             impl ::interoptopus::lang::plugin::Plugin for #name {
@@ -214,13 +217,12 @@ impl PluginModel {
         let name = &self.name;
         let name_str = name.to_string();
 
-        let bare_registrations = self.functions.iter().map(|f| {
-            emit_function_registration(&f.name.to_string(), &f.params, &f.ret, None)
-        });
+        let bare_registrations = self
+            .functions
+            .iter()
+            .map(|f| emit_function_registration(&f.name.to_string(), &f.params, &f.ret, None));
 
-        let service_registrations = self.services.iter().map(|s| {
-            emit_service_registration(s)
-        });
+        let service_registrations = self.services.iter().map(|s| emit_service_registration(s));
 
         quote! {
             impl ::interoptopus::lang::plugin::PluginInfo for #name {
@@ -340,13 +342,15 @@ fn emit_service_registration(s: &ServiceBlock) -> TokenStream {
     let method_fn_names: Vec<String> = methods.iter().map(|m| format!("{}_{}", prefix, m.name)).collect();
     let destructor_fn_name = format!("{}_drop", prefix);
 
-    let ctor_registrations = ctors.iter().zip(ctor_fn_names.iter()).map(|(ctor, fn_name)| {
-        emit_function_registration(fn_name, &ctor.params, &ctor.ret, Some(&type_id_expr))
-    });
+    let ctor_registrations = ctors
+        .iter()
+        .zip(ctor_fn_names.iter())
+        .map(|(ctor, fn_name)| emit_function_registration(fn_name, &ctor.params, &ctor.ret, Some(&type_id_expr)));
 
-    let method_registrations = methods.iter().zip(method_fn_names.iter()).map(|(method, fn_name)| {
-        emit_function_registration(fn_name, &method.params, &method.ret, Some(&type_id_expr))
-    });
+    let method_registrations = methods
+        .iter()
+        .zip(method_fn_names.iter())
+        .map(|(method, fn_name)| emit_function_registration(fn_name, &method.params, &method.ret, Some(&type_id_expr)));
 
     let destructor_registration = emit_function_registration(&destructor_fn_name, &[], &None, None);
 
@@ -392,11 +396,14 @@ fn ret_tokens(ret: &Option<Type>) -> TokenStream {
 }
 
 fn typed_params(params: &[PluginParam]) -> Vec<TokenStream> {
-    params.iter().map(|p| {
-        let pname = &p.name;
-        let pty = &p.ty;
-        quote! { #pname: #pty }
-    }).collect()
+    params
+        .iter()
+        .map(|p| {
+            let pname = &p.name;
+            let pty = &p.ty;
+            quote! { #pname: #pty }
+        })
+        .collect()
 }
 
 fn prefixed_ident(prefix: &str, name: &Ident) -> Ident {
@@ -429,12 +436,7 @@ fn function_id_expr(fn_name: &str) -> TokenStream {
 }
 
 /// Emits code to register a single function with the inventory.
-fn emit_function_registration(
-    fn_name_str: &str,
-    params: &[PluginParam],
-    ret: &Option<Type>,
-    self_type_id: Option<&TokenStream>,
-) -> TokenStream {
+fn emit_function_registration(fn_name_str: &str, params: &[PluginParam], ret: &Option<Type>, self_type_id: Option<&TokenStream>) -> TokenStream {
     let type_registrations = params.iter().map(|p| {
         let ty = &p.ty;
         quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory); }

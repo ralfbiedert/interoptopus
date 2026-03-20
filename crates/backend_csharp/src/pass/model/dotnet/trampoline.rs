@@ -11,10 +11,10 @@
 //!   argument and dispatch to the corresponding interface method.
 //! - **Service destructors** free the `GCHandle`.
 
-use crate::lang::plugin::{TrampolineEntry, TrampolineKind};
 use crate::lang::FunctionId;
+use crate::lang::plugin::{TrampolineEntry, TrampolineKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashMap;
 
 enum ServiceFnRole {

@@ -1,6 +1,6 @@
-use crate::pass::{model, output, PassMeta};
-use crate::pipeline::loop_model_passes_until_done;
 use crate::Error;
+use crate::pass::{PassMeta, model, output};
+use crate::pipeline::loop_model_passes_until_done;
 use interoptopus::inventory::ForeignInventory;
 use interoptopus_backends::output::Multibuf;
 

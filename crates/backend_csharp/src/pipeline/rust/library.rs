@@ -1,10 +1,10 @@
 use crate::Error;
+use crate::extensions::{PostModelPass, PostOutputPass, RustCodegenExtension};
 use crate::pass::meta;
 use crate::pass::model;
 use crate::pass::output;
 use crate::pass::{OutputResult, PassMeta};
 use crate::pipeline::{RustLibraryBuilder, loop_model_passes_until_done};
-use crate::extensions::{PostModelPass, PostOutputPass, RustCodegenExtension};
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;

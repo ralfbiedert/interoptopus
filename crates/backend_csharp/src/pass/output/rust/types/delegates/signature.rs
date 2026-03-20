@@ -24,7 +24,12 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, delegates: HashMap::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::common::master::Pass, types: &model::common::types::all::Pass) -> OutputResult {
+    pub fn process(
+        &mut self,
+        _pass_meta: &mut crate::pass::PassMeta,
+        output_master: &output::common::master::Pass,
+        types: &model::common::types::all::Pass,
+    ) -> OutputResult {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(FileType::Csharp) {

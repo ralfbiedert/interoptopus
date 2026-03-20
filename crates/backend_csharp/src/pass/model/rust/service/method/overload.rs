@@ -105,7 +105,11 @@ fn rebuild_with_overloads(fn_ids: &[FunctionId], fns_all: &model::common::fns::a
 /// Checks if two function signatures are equivalent after stripping the self-arg
 /// (first argument). This is used to detect overloads that would produce duplicate
 /// service methods in C#.
-fn service_args_equivalent(base_args: &[crate::lang::functions::Argument], overload_args: &[crate::lang::functions::Argument], types: &model::common::types::all::Pass) -> bool {
+fn service_args_equivalent(
+    base_args: &[crate::lang::functions::Argument],
+    overload_args: &[crate::lang::functions::Argument],
+    types: &model::common::types::all::Pass,
+) -> bool {
     let base_rest = if base_args.len() > 1 { &base_args[1..] } else { &[] };
     let overload_rest = if overload_args.len() > 1 { &overload_args[1..] } else { &[] };
 

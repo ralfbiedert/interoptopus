@@ -29,7 +29,12 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, custom_to_managed: HashMap::default(), custom_to_unmanaged: HashMap::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::common::master::Pass, types: &model::common::types::all::Pass) -> OutputResult {
+    pub fn process(
+        &mut self,
+        _pass_meta: &mut crate::pass::PassMeta,
+        output_master: &output::common::master::Pass,
+        types: &model::common::types::all::Pass,
+    ) -> OutputResult {
         let templates = output_master.templates();
 
         for (type_id, ty) in types.iter() {

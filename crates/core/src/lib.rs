@@ -15,7 +15,7 @@ pub mod wire;
 pub mod proc;
 
 #[cfg(feature = "derive")]
-pub use proc::{ffi, AsyncRuntime};
+pub use proc::{AsyncRuntime, ffi};
 
 #[cfg(all(feature = "derive", feature = "unstable-plugins"))]
 pub use proc::plugin;

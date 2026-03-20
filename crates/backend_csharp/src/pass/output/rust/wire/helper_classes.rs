@@ -81,7 +81,12 @@ impl Pass {
 
 /// Resolves the C# type name for a field. Tries the C# type model first,
 /// falls back to the Rust-based wire codegen for `WireOnly` types.
-fn resolve_field_type_name(cs_ty: crate::lang::TypeId, types: &model::common::types::all::Pass, id_map: &model::common::id_map::Pass, codegen: &WireCodeGen<'_>) -> String {
+fn resolve_field_type_name(
+    cs_ty: crate::lang::TypeId,
+    types: &model::common::types::all::Pass,
+    id_map: &model::common::id_map::Pass,
+    codegen: &WireCodeGen<'_>,
+) -> String {
     // Try C# type model first.
     if let Some(t) = types.get(cs_ty) {
         return t.name.clone();

@@ -92,9 +92,7 @@ impl Pass {
                 // Destructor is not part of the interface — it's handled by the trampoline
 
                 let body = members.join("\n");
-                let rendered = format!(
-                    "public interface {interface_name}<TSelf> where TSelf : {interface_name}<TSelf>\n{{\n{body}\n}}"
-                );
+                let rendered = format!("public interface {interface_name}<TSelf> where TSelf : {interface_name}<TSelf>\n{{\n{body}\n}}");
 
                 all_interfaces.push(rendered);
             }

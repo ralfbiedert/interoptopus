@@ -77,10 +77,7 @@ impl Pass {
 }
 
 fn has_wire_types(rs_types: &RsTypes) -> bool {
-    rs_types.values().any(|ty| {
-        matches!(
-            &ty.kind,
-            interoptopus::lang::types::TypeKind::TypePattern(interoptopus::lang::types::TypePattern::Wire(_))
-        )
-    })
+    rs_types
+        .values()
+        .any(|ty| matches!(&ty.kind, interoptopus::lang::types::TypeKind::TypePattern(interoptopus::lang::types::TypePattern::Wire(_))))
 }
