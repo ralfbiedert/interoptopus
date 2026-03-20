@@ -349,8 +349,9 @@ macro_rules! __wire_destroy_body {
 /// This macro generates the following FFI functions:
 /// - `interoptopus_wire_create` — allocates a wire buffer of a given size.
 /// - `interoptopus_wire_destroy` — drops a wire buffer, freeing its memory.
-/// Body of `interoptopus_wire_create`. Shared by [`builtins_wire!`] and
-/// [`register_wire_trampolines!`].
+///
+/// Body of `interoptopus_wire_create`. Shared by `builtins_wire!` and
+/// `register_wire_trampolines!`.
 #[macro_export]
 macro_rules! builtins_wire {
     () => {{

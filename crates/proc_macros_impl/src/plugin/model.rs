@@ -11,7 +11,7 @@ pub struct PluginInput {
 
 /// An item inside a plugin block: either a bare function or a service impl block.
 pub enum PluginItem {
-    Function(PluginMethod),
+    Function(Box<PluginMethod>),
     Service(ServiceBlock),
 }
 
@@ -43,18 +43,18 @@ pub struct PluginModel {
 }
 
 impl PluginModel {
-    pub fn from_input(input: PluginInput) -> syn::Result<Self> {
+    pub fn from_input(input: PluginInput) -> Self {
         let mut functions = Vec::new();
         let mut services = Vec::new();
 
         for item in input.items {
             match item {
-                PluginItem::Function(m) => functions.push(m),
+                PluginItem::Function(m) => functions.push(*m),
                 PluginItem::Service(s) => services.push(s),
             }
         }
 
-        Ok(Self { name: input.name, functions, services })
+        Self { name: input.name, functions, services }
     }
 }
 
@@ -64,7 +64,7 @@ impl ServiceBlock {
     }
 
     pub fn ctors(&self) -> Vec<&PluginMethod> {
-        self.methods.iter().filter(|m| !m.has_self && is_self_return(&m.ret)).collect()
+        self.methods.iter().filter(|m| !m.has_self && is_self_return(m.ret.as_ref())).collect()
     }
 
     pub fn instance_methods(&self) -> Vec<&PluginMethod> {
@@ -72,7 +72,7 @@ impl ServiceBlock {
     }
 }
 
-pub fn is_self_return(ret: &Option<Type>) -> bool {
+pub fn is_self_return(ret: Option<&Type>) -> bool {
     match ret {
         Some(Type::Path(p)) => p.path.is_ident("Self"),
         _ => false,
@@ -99,9 +99,9 @@ impl Parse for PluginInput {
 impl Parse for PluginItem {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         if input.peek(Token![impl]) {
-            Ok(PluginItem::Service(input.parse()?))
+            Ok(Self::Service(input.parse()?))
         } else {
-            Ok(PluginItem::Function(input.parse()?))
+            Ok(Self::Function(Box::new(input.parse()?)))
         }
     }
 }

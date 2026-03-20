@@ -10,9 +10,9 @@ impl PluginModel {
         let plugin_impl = self.emit_plugin_impl();
         let plugin_trait = self.emit_plugin_trait();
         let plugin_info = self.emit_plugin_info();
-        let service_structs = self.services.iter().map(|s| emit_service_struct(s));
-        let service_impls = self.services.iter().map(|s| emit_service_impl(s));
-        let service_drops = self.services.iter().map(|s| emit_service_drop(s));
+        let service_structs = self.services.iter().map(emit_service_struct);
+        let service_impls = self.services.iter().map(emit_service_impl);
+        let service_drops = self.services.iter().map(emit_service_drop);
 
         quote! {
             #plugin_struct
@@ -35,7 +35,7 @@ impl PluginModel {
         let bare_fields = self.functions.iter().map(|f| {
             let field_name = &f.name;
             let param_tys = f.params.iter().map(|p| &p.ty);
-            let ret = ret_tokens(&f.ret);
+            let ret = ret_tokens(f.ret.as_ref());
             quote! { #field_name: extern "C" fn(#(#param_tys),*) #ret }
         });
 
@@ -54,7 +54,7 @@ impl PluginModel {
             for m in s.instance_methods() {
                 let field = prefixed_ident(&prefix, &m.name);
                 let param_tys: Vec<_> = m.params.iter().map(|p| &p.ty).collect();
-                let ret = ret_tokens(&m.ret);
+                let ret = ret_tokens(m.ret.as_ref());
                 fields.push(quote! { #field: extern "C" fn(isize, #(#param_tys),*) #ret });
             }
 
@@ -84,7 +84,7 @@ impl PluginModel {
             let fn_name = &f.name;
             let params = typed_params(&f.params);
             let arg_names: Vec<_> = f.params.iter().map(|p| &p.name).collect();
-            let ret = ret_tokens(&f.ret);
+            let ret = ret_tokens(f.ret.as_ref());
             quote! {
                 pub fn #fn_name(&self, #(#params),*) #ret {
                     (self.#fn_name)(#(#arg_names),*)
@@ -163,7 +163,7 @@ impl PluginModel {
             let field_name = &f.name;
             let symbol = field_name.to_string();
             let param_tys = f.params.iter().map(|p| &p.ty);
-            let ret = ret_tokens(&f.ret);
+            let ret = ret_tokens(f.ret.as_ref());
             emit_load_field(field_name, &symbol, quote! { extern "C" fn(#(#param_tys),*) #ret })
         });
 
@@ -182,12 +182,12 @@ impl PluginModel {
                 let field = prefixed_ident(&prefix, &m.name);
                 let symbol = format!("{}_{}", prefix, m.name);
                 let param_tys: Vec<_> = m.params.iter().map(|p| &p.ty).collect();
-                let ret = ret_tokens(&m.ret);
+                let ret = ret_tokens(m.ret.as_ref());
                 loads.push(emit_load_field(&field, &symbol, quote! { extern "C" fn(isize, #(#param_tys),*) #ret }));
             }
 
             let drop_field = format_ident!("{}_drop", prefix);
-            let drop_symbol = format!("{}_drop", prefix);
+            let drop_symbol = format!("{prefix}_drop");
             loads.push(emit_load_field(&drop_field, &drop_symbol, quote! { extern "C" fn(isize) }));
 
             loads
@@ -220,9 +220,9 @@ impl PluginModel {
         let bare_registrations = self
             .functions
             .iter()
-            .map(|f| emit_function_registration(&f.name.to_string(), &f.params, &f.ret, None));
+            .map(|f| emit_function_registration(&f.name.to_string(), &f.params, f.ret.as_ref(), None));
 
-        let service_registrations = self.services.iter().map(|s| emit_service_registration(s));
+        let service_registrations = self.services.iter().map(emit_service_registration);
 
         quote! {
             impl ::interoptopus::lang::plugin::PluginInfo for #name {
@@ -255,7 +255,7 @@ fn emit_service_struct(s: &ServiceBlock) -> TokenStream {
     let method_fields = inst_methods.iter().map(|m| {
         let field = prefixed_ident(&prefix, &m.name);
         let param_tys: Vec<_> = m.params.iter().map(|p| &p.ty).collect();
-        let ret = ret_tokens(&m.ret);
+        let ret = ret_tokens(m.ret.as_ref());
         quote! { #field: extern "C" fn(isize, #(#param_tys),*) #ret }
     });
 
@@ -280,7 +280,7 @@ fn emit_service_impl(s: &ServiceBlock) -> TokenStream {
         let field = prefixed_ident(&prefix, &m.name);
         let params = typed_params(&m.params);
         let arg_names: Vec<_> = m.params.iter().map(|p| &p.name).collect();
-        let ret = ret_tokens(&m.ret);
+        let ret = ret_tokens(m.ret.as_ref());
         quote! {
             pub fn #method_name(&self, #(#params),*) #ret {
                 (self.#field)(self.handle, #(#arg_names),*)
@@ -340,19 +340,19 @@ fn emit_service_registration(s: &ServiceBlock) -> TokenStream {
 
     let ctor_fn_names: Vec<String> = ctors.iter().map(|c| format!("{}_{}", prefix, c.name)).collect();
     let method_fn_names: Vec<String> = methods.iter().map(|m| format!("{}_{}", prefix, m.name)).collect();
-    let destructor_fn_name = format!("{}_drop", prefix);
+    let destructor_fn_name = format!("{prefix}_drop");
 
     let ctor_registrations = ctors
         .iter()
         .zip(ctor_fn_names.iter())
-        .map(|(ctor, fn_name)| emit_function_registration(fn_name, &ctor.params, &ctor.ret, Some(&type_id_expr)));
+        .map(|(ctor, fn_name)| emit_function_registration(fn_name, &ctor.params, ctor.ret.as_ref(), Some(&type_id_expr)));
 
     let method_registrations = methods
         .iter()
         .zip(method_fn_names.iter())
-        .map(|(method, fn_name)| emit_function_registration(fn_name, &method.params, &method.ret, Some(&type_id_expr)));
+        .map(|(method, fn_name)| emit_function_registration(fn_name, &method.params, method.ret.as_ref(), Some(&type_id_expr)));
 
-    let destructor_registration = emit_function_registration(&destructor_fn_name, &[], &None, None);
+    let destructor_registration = emit_function_registration(&destructor_fn_name, &[], None, None);
 
     let ctor_id_exprs = ctor_fn_names.iter().map(|n| function_id_expr(n));
     let method_id_exprs = method_fn_names.iter().map(|n| function_id_expr(n));
@@ -388,7 +388,7 @@ fn emit_service_registration(s: &ServiceBlock) -> TokenStream {
 // Helpers
 // ---------------------------------------------------------------------------
 
-fn ret_tokens(ret: &Option<Type>) -> TokenStream {
+fn ret_tokens(ret: Option<&Type>) -> TokenStream {
     match ret {
         Some(ty) => quote! { -> #ty },
         None => quote! {},
@@ -436,14 +436,14 @@ fn function_id_expr(fn_name: &str) -> TokenStream {
 }
 
 /// Emits code to register a single function with the inventory.
-fn emit_function_registration(fn_name_str: &str, params: &[PluginParam], ret: &Option<Type>, self_type_id: Option<&TokenStream>) -> TokenStream {
+fn emit_function_registration(fn_name_str: &str, params: &[PluginParam], ret: Option<&Type>, self_type_id: Option<&TokenStream>) -> TokenStream {
     let type_registrations = params.iter().map(|p| {
         let ty = &p.ty;
         quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory); }
     });
 
     let ret_registration = match ret {
-        Some(ty) if !is_self_return(&Some(ty.clone())) => Some(quote! {
+        Some(ty) if !is_self_return(Some(ty)) => Some(quote! {
             <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         }),
         Some(_) => None, // Self return — type already registered via register_type
@@ -469,11 +469,10 @@ fn emit_function_registration(fn_name_str: &str, params: &[PluginParam], ret: &O
         } else {
             quote! { <() as ::interoptopus::lang::types::TypeInfo>::id() }
         }
+    } else if let Some(ty) = ret {
+        quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::id() }
     } else {
-        match ret {
-            Some(ty) => quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::id() },
-            None => quote! { <() as ::interoptopus::lang::types::TypeInfo>::id() },
-        }
+        quote! { <() as ::interoptopus::lang::types::TypeInfo>::id() }
     };
 
     quote! {

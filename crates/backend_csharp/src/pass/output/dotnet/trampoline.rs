@@ -4,7 +4,7 @@
 //! `Plugin.Method(args…)`. Service ctors/methods/destructors use `GCHandle` for
 //! lifetime management.
 //!
-//! Wire<T> parameters and return values use the Wire type name (e.g. `WireOfString`)
+//! `Wire<T>` parameters and return values use the Wire type name (e.g. `WireOfString`)
 //! in both the interface and the trampoline. The plugin implementor is responsible
 //! for calling `.Unwire()` / `.From()` as needed.
 

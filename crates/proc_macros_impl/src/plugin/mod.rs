@@ -14,6 +14,6 @@ pub fn plugin(input: TokenStream) -> TokenStream {
 }
 
 fn parse_and_emit(input: TokenStream) -> syn::Result<TokenStream> {
-    let model = PluginModel::from_input(parse2(input)?)?;
+    let model = PluginModel::from_input(parse2(input)?);
     Ok(model.emit())
 }
