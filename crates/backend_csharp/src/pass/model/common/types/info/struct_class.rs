@@ -1,7 +1,6 @@
-//! Determines whether a type should implement `IDisposable` in C#.
+//! Determines whether a C# type should be emitted as `struct` or `class`.
 //!
-//! A type is disposable if its `ManagedConversion` is `Into`, meaning it
-//! transfers ownership and holds native resources that must be released.
+//! Types with `ManagedConversion::AsIs` or `To` become structs; `Into` types become classes.
 
 use crate::lang::TypeId;
 use crate::lang::types::ManagedConversion;
@@ -14,25 +13,25 @@ pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    disposable: HashMap<TypeId, bool>,
+    is_struct: HashMap<TypeId, bool>,
 }
 
 impl Pass {
     #[must_use]
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, disposable: HashMap::default() }
+        Self { info: PassInfo { name: file!() }, is_struct: HashMap::default() }
     }
 
     pub fn process(
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
-        managed_conversion: &model::rust::types::info::managed_conversion::Pass,
+        managed_conversion: &model::common::types::info::managed_conversion::Pass,
         types: &model::common::types::all::Pass,
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
         for (type_id, _) in types.iter() {
-            if self.disposable.contains_key(type_id) {
+            if self.is_struct.contains_key(type_id) {
                 continue;
             }
 
@@ -40,8 +39,7 @@ impl Pass {
                 continue;
             };
 
-            let is_disposable = matches!(mc, ManagedConversion::Into);
-            self.disposable.insert(*type_id, is_disposable);
+            self.is_struct.insert(*type_id, matches!(mc, ManagedConversion::AsIs | ManagedConversion::To));
             outcome.changed();
         }
 
@@ -49,7 +47,12 @@ impl Pass {
     }
 
     #[must_use]
-    pub fn is_disposable(&self, ty: TypeId) -> Option<bool> {
-        self.disposable.get(&ty).copied()
+    pub fn is_struct(&self, ty: TypeId) -> bool {
+        self.is_struct.get(&ty).copied().unwrap_or(false)
+    }
+
+    #[must_use]
+    pub fn is_class(&self, ty: TypeId) -> bool {
+        !self.is_struct(ty)
     }
 }

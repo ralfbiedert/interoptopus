@@ -25,8 +25,8 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
-        enum_ty: &output::rust::types::enums::definition::Pass,
-        enum_body: &output::rust::types::enums::body::Pass,
+        enum_ty: &output::common::types::enums::definition::Pass,
+        enum_body: &output::common::types::enums::body::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 

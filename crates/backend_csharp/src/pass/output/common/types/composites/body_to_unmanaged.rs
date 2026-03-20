@@ -1,4 +1,7 @@
-//! Renders the `AsUnmanaged` method for each composite using the `body_as_unmanaged.cs` template.
+//! Renders the `ToUnmanaged`/`IntoUnmanaged` method for each composite using the
+//! `body_to_unmanaged.cs` template.
+//!
+//! Shared between the Rust and .NET pipelines.
 
 use crate::lang::TypeId;
 use crate::lang::types::kind::TypeKind;
@@ -11,13 +14,13 @@ pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    body_as_unmanaged: HashMap<TypeId, String>,
+    body_to_unmanaged: HashMap<TypeId, String>,
 }
 
 impl Pass {
     #[must_use]
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, body_as_unmanaged: HashMap::default() }
+        Self { info: PassInfo { name: file!() }, body_to_unmanaged: HashMap::default() }
     }
 
     pub fn process(
@@ -25,9 +28,9 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
-        managed: &output::rust::conversion::unmanaged_conversion::Pass,
-        field_conversions: &output::rust::conversion::fields::Pass,
-        nullable: &model::rust::types::info::nullable::Pass,
+        managed: &output::common::conversion::unmanaged_conversion::Pass,
+        field_conversions: &output::common::conversion::fields::Pass,
+        nullable: &model::common::types::info::nullable::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -35,14 +38,15 @@ impl Pass {
             let TypeKind::Composite(composite) = &ty.kind else { continue };
 
             let name = &ty.name;
+            let to_unmanaged = managed.to_unmanaged_name(*type_id);
 
             let fields: Vec<HashMap<&str, String>> = composite
                 .fields
                 .iter()
                 .map(|f| {
-                    let suffix = managed.as_unmanaged_suffix(f.ty);
+                    let suffix = managed.to_unmanaged_suffix(f.ty);
                     let is_nullable = nullable.is_nullable(f.ty).unwrap_or(false);
-                    let as_unmanaged = if is_nullable && !suffix.is_empty() {
+                    let to_unmanaged = if is_nullable && !suffix.is_empty() {
                         format!("?{suffix} ?? default")
                     } else {
                         suffix.to_string()
@@ -50,7 +54,7 @@ impl Pass {
 
                     let mut m = HashMap::new();
                     m.insert("name", f.name.clone());
-                    m.insert("as_unmanaged", as_unmanaged);
+                    m.insert("to_unmanaged", to_unmanaged);
                     if let Some(custom) = field_conversions.custom_to_unmanaged(*type_id, &f.name) {
                         m.insert("custom_to_unmanaged", custom.to_string());
                     }
@@ -60,10 +64,11 @@ impl Pass {
 
             let mut context = Context::new();
             context.insert("name", name);
+            context.insert("to_unmanaged", to_unmanaged);
             context.insert("fields", &fields);
 
-            let rendered = templates.render("rust/types/composite/body_as_unmanaged.cs", &context)?;
-            self.body_as_unmanaged.insert(*type_id, rendered);
+            let rendered = templates.render("rust/types/composite/body_to_unmanaged.cs", &context)?;
+            self.body_to_unmanaged.insert(*type_id, rendered);
         }
 
         Ok(())
@@ -71,6 +76,6 @@ impl Pass {
 
     #[must_use]
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
-        self.body_as_unmanaged.get(&type_id)
+        self.body_to_unmanaged.get(&type_id)
     }
 }

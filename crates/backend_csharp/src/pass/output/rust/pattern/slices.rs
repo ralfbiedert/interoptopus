@@ -32,8 +32,8 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
-        managed_conversion: &model::rust::types::info::managed_conversion::Pass,
-        unmanaged_names: &output::rust::conversion::unmanaged_names::Pass,
+        managed_conversion: &model::common::types::info::managed_conversion::Pass,
+        unmanaged_names: &output::common::conversion::unmanaged_names::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 

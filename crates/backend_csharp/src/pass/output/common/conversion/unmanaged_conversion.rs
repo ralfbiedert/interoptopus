@@ -22,7 +22,7 @@ impl Pass {
     pub fn process(
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
-        managed_conversion: &model::rust::types::info::managed_conversion::Pass,
+        managed_conversion: &model::common::types::info::managed_conversion::Pass,
         types: &model::common::types::all::Pass,
     ) -> OutputResult {
         for (type_id, _) in types.iter() {

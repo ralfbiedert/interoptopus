@@ -1,4 +1,7 @@
 //! Renders composite type definitions using the `definition.cs` template.
+//!
+//! Shared between the Rust and .NET pipelines. Each composite gets a `partial struct`
+//! (or `partial class`) declaration listing its managed-side public fields.
 
 use crate::lang::TypeId;
 use crate::lang::types::kind::TypeKind;
@@ -25,7 +28,7 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
-        struct_class: &model::rust::types::info::struct_class::Pass,
+        struct_class: &model::common::types::info::struct_class::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -33,8 +36,7 @@ impl Pass {
             let TypeKind::Composite(composite) = &ty.kind else { continue };
 
             let name = &ty.name;
-            let ty = *type_id;
-            let struct_or_class = if struct_class.is_struct(ty) { "struct" } else { "class" };
+            let struct_or_class = if struct_class.is_struct(*type_id) { "struct" } else { "class" };
 
             let fields: Vec<HashMap<&str, String>> = composite
                 .fields

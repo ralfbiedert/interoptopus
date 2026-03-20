@@ -1,4 +1,7 @@
 //! Wraps composite type definitions through the `all.cs` template, grouped per output file.
+//!
+//! Shared between the Rust and .NET pipelines. Combines the definition and body
+//! renders for each composite into a single block, then groups them by output file.
 
 use crate::lang::types::kind::TypeKind;
 use crate::output::{FileType, Output};
@@ -25,8 +28,8 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
-        composite_ty: &output::rust::types::composites::definition::Pass,
-        composite_body: &output::rust::types::composites::body::Pass,
+        composite_ty: &output::common::types::composites::definition::Pass,
+        composite_body: &output::common::types::composites::body::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 

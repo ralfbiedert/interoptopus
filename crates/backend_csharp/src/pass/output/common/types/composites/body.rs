@@ -1,4 +1,6 @@
 //! Renders composite body definitions using the `body.cs` template.
+//!
+//! Shared between the Rust and .NET pipelines.
 
 use crate::lang::TypeId;
 use crate::lang::types::kind::TypeKind;
@@ -25,12 +27,12 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
-        struct_class: &model::rust::types::info::struct_class::Pass,
-        disposable: &model::rust::types::info::disposable::Pass,
-        managed: &output::rust::conversion::unmanaged_conversion::Pass,
-        composite_body_unmanaged: &output::rust::types::composites::body_unmanaged::Pass,
-        composite_body_to_unmanaged: &output::rust::types::composites::body_to_unmanaged::Pass,
-        composite_body_as_unmanaged: &output::rust::types::composites::body_as_unmanaged::Pass,
+        struct_class: &model::common::types::info::struct_class::Pass,
+        disposable: &model::common::types::info::disposable::Pass,
+        managed: &output::common::conversion::unmanaged_conversion::Pass,
+        composite_body_unmanaged: &output::common::types::composites::body_unmanaged::Pass,
+        composite_body_to_unmanaged: &output::common::types::composites::body_to_unmanaged::Pass,
+        composite_body_as_unmanaged: &output::common::types::composites::body_as_unmanaged::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 

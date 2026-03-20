@@ -23,7 +23,7 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         types: &model::common::types::all::Pass,
-        managed_conversion: &model::rust::types::info::managed_conversion::Pass,
+        managed_conversion: &model::common::types::info::managed_conversion::Pass,
     ) -> OutputResult {
         for (type_id, ty) in types.iter() {
             let managed_name = &ty.name;

@@ -34,8 +34,10 @@ impl Pass {
             let plugin_interface = intermediary.plugin_interface.interface_for(file).unwrap_or("");
             let service_interfaces = intermediary.service_interface.interfaces_for(file).unwrap_or(&[]);
             let trampolines = intermediary.trampoline.trampolines_for(file).unwrap_or(&[]);
+            let composites = intermediary.composites.composites_for(file).unwrap_or(&[]);
 
             context.insert("namespace", file.target.namespace());
+            context.insert("composites", &composites);
             context.insert("plugin_interface", plugin_interface);
             context.insert("service_interfaces", &service_interfaces);
             context.insert("trampolines", &trampolines);

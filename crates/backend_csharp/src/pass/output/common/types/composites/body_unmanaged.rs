@@ -1,4 +1,6 @@
 //! Renders the `Unmanaged` struct for each composite using the `body_unmanaged.cs` template.
+//!
+//! Shared between the Rust and .NET pipelines.
 
 use crate::lang::TypeId;
 use crate::lang::types::kind::TypeKind;
@@ -26,9 +28,9 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
-        managed: &output::rust::conversion::unmanaged_conversion::Pass,
-        unmanaged_names: &output::rust::conversion::unmanaged_names::Pass,
-        field_conversions: &output::rust::conversion::fields::Pass,
+        managed: &output::common::conversion::unmanaged_conversion::Pass,
+        unmanaged_names: &output::common::conversion::unmanaged_names::Pass,
+        field_conversions: &output::common::conversion::fields::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 

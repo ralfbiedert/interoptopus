@@ -1,7 +1,14 @@
 // Auto-generated plugin interop
+
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace {{ namespace }};
+{% for composite in composites %}
+
+{{ composite }}
+{% endfor %}
 {% if plugin_interface %}
 
 {{ plugin_interface }}

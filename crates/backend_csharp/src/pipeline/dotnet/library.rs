@@ -22,14 +22,27 @@ pub struct DotnetLibraryConfig {
     pub model_type_map_struct: model::common::types::kind::r#struct::Config,
     pub model_type_names: model::common::types::names::Config,
     pub model_type_all: model::common::types::all::Config,
+    pub model_type_managed_conversion: model::common::types::info::managed_conversion::Config,
+    pub model_type_struct_class: model::common::types::info::struct_class::Config,
+    pub model_type_disposable: model::common::types::info::disposable::Config,
+    pub model_type_nullable: model::common::types::info::nullable::Config,
     pub model_fn_all: model::common::fns::all::Config,
     pub model_fn_originals: model::common::fns::originals::Config,
     pub model_service_map: model::common::service::all::Config,
     pub model_trampoline: model::dotnet::trampoline::Config,
     pub output_master: output::common::master::Config,
+    pub output_unmanaged_conversion: output::common::conversion::unmanaged_conversion::Config,
+    pub output_unmanaged_names: output::common::conversion::unmanaged_names::Config,
+    pub output_conversion_fields: output::common::conversion::fields::Config,
     pub output_trampoline: output::dotnet::trampoline::Config,
     pub output_plugin_interface: output::dotnet::interface::plugin::Config,
     pub output_service_interface: output::dotnet::interface::service::Config,
+    pub output_composite_ty: output::common::types::composites::definition::Config,
+    pub output_composite_body_unmanaged: output::common::types::composites::body_unmanaged::Config,
+    pub output_composite_body_to_unmanaged: output::common::types::composites::body_to_unmanaged::Config,
+    pub output_composite_body_as_unmanaged: output::common::types::composites::body_as_unmanaged::Config,
+    pub output_composite_body: output::common::types::composites::body::Config,
+    pub output_composite: output::common::types::composites::all::Config,
     pub output_final: output::dotnet::all::Config,
 }
 
@@ -52,14 +65,27 @@ impl Default for DotnetLibraryConfig {
             model_type_map_struct: Default::default(),
             model_type_names: Default::default(),
             model_type_all: Default::default(),
+            model_type_managed_conversion: Default::default(),
+            model_type_struct_class: Default::default(),
+            model_type_disposable: Default::default(),
+            model_type_nullable: Default::default(),
             model_fn_all: Default::default(),
             model_fn_originals: Default::default(),
             model_service_map: Default::default(),
             model_trampoline: Default::default(),
             output_master: Default::default(),
+            output_unmanaged_conversion: Default::default(),
+            output_unmanaged_names: Default::default(),
+            output_conversion_fields: Default::default(),
             output_trampoline: Default::default(),
             output_plugin_interface: Default::default(),
             output_service_interface: Default::default(),
+            output_composite_ty: Default::default(),
+            output_composite_body_unmanaged: Default::default(),
+            output_composite_body_to_unmanaged: Default::default(),
+            output_composite_body_as_unmanaged: Default::default(),
+            output_composite_body: Default::default(),
+            output_composite: Default::default(),
             output_final: Default::default(),
         }
     }
@@ -85,6 +111,10 @@ pub struct ModelPasses {
     pub type_map_struct: model::common::types::kind::r#struct::Pass,
     pub type_names: model::common::types::names::Pass,
     pub type_all: model::common::types::all::Pass,
+    pub type_managed_conversion: model::common::types::info::managed_conversion::Pass,
+    pub type_struct_class: model::common::types::info::struct_class::Pass,
+    pub type_disposable: model::common::types::info::disposable::Pass,
+    pub type_nullable: model::common::types::info::nullable::Pass,
     pub fns_all: model::common::fns::all::Pass,
     pub fn_originals: model::common::fns::originals::Pass,
     pub service_all: model::common::service::all::Pass,
@@ -93,9 +123,18 @@ pub struct ModelPasses {
 
 /// Intermediate output passes for the dotnet pipeline.
 pub struct IntermediateOutputPasses {
+    pub unmanaged_conversion: output::common::conversion::unmanaged_conversion::Pass,
+    pub unmanaged_names: output::common::conversion::unmanaged_names::Pass,
+    pub conversion_fields: output::common::conversion::fields::Pass,
     pub trampoline: output::dotnet::trampoline::Pass,
     pub plugin_interface: output::dotnet::interface::plugin::Pass,
     pub service_interface: output::dotnet::interface::service::Pass,
+    pub composite_ty: output::common::types::composites::definition::Pass,
+    pub composite_body_unmanaged: output::common::types::composites::body_unmanaged::Pass,
+    pub composite_body_to_unmanaged: output::common::types::composites::body_to_unmanaged::Pass,
+    pub composite_body_as_unmanaged: output::common::types::composites::body_as_unmanaged::Pass,
+    pub composite_body: output::common::types::composites::body::Pass,
+    pub composites: output::common::types::composites::all::Pass,
 }
 
 /// Code generation pipeline for .NET plugins (reverse interop).
@@ -144,6 +183,10 @@ impl DotnetLibrary {
                 type_map_struct: model::common::types::kind::r#struct::Pass::new(config.model_type_map_struct),
                 type_names: model::common::types::names::Pass::new(config.model_type_names),
                 type_all: model::common::types::all::Pass::new(config.model_type_all),
+                type_managed_conversion: model::common::types::info::managed_conversion::Pass::new(config.model_type_managed_conversion),
+                type_struct_class: model::common::types::info::struct_class::Pass::new(config.model_type_struct_class),
+                type_disposable: model::common::types::info::disposable::Pass::new(config.model_type_disposable),
+                type_nullable: model::common::types::info::nullable::Pass::new(config.model_type_nullable),
                 fns_all: model::common::fns::all::Pass::new(config.model_fn_all),
                 fn_originals: model::common::fns::originals::Pass::new(config.model_fn_originals),
                 service_all: model::common::service::all::Pass::new(config.model_service_map),
@@ -151,9 +194,18 @@ impl DotnetLibrary {
             },
             output_master: output::common::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
+                unmanaged_conversion: output::common::conversion::unmanaged_conversion::Pass::new(config.output_unmanaged_conversion),
+                unmanaged_names: output::common::conversion::unmanaged_names::Pass::new(config.output_unmanaged_names),
+                conversion_fields: output::common::conversion::fields::Pass::new(config.output_conversion_fields),
                 trampoline: output::dotnet::trampoline::Pass::new(config.output_trampoline),
                 plugin_interface: output::dotnet::interface::plugin::Pass::new(config.output_plugin_interface),
                 service_interface: output::dotnet::interface::service::Pass::new(config.output_service_interface),
+                composite_ty: output::common::types::composites::definition::Pass::new(config.output_composite_ty),
+                composite_body_unmanaged: output::common::types::composites::body_unmanaged::Pass::new(config.output_composite_body_unmanaged),
+                composite_body_to_unmanaged: output::common::types::composites::body_to_unmanaged::Pass::new(config.output_composite_body_to_unmanaged),
+                composite_body_as_unmanaged: output::common::types::composites::body_as_unmanaged::Pass::new(config.output_composite_body_as_unmanaged),
+                composite_body: output::common::types::composites::body::Pass::new(config.output_composite_body),
+                composites: output::common::types::composites::all::Pass::new(config.output_composite),
             },
             output_final: output::dotnet::all::Pass::new(config.output_final),
             output: Multibuf::default(),
@@ -187,6 +239,10 @@ impl DotnetLibrary {
             r.run(m.type_map_struct.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &m.type_map_struct_fields, &self.inventory.types))?;
             r.run(m.type_names.process(&mut pass_meta, &m.id_maps, &m.type_kinds, &self.inventory.types))?;
             r.run(m.type_all.process(&mut pass_meta, &m.type_kinds, &m.type_names, &m.id_maps, &self.inventory.types))?;
+            r.run(m.type_managed_conversion.process(&mut pass_meta, &m.type_all))?;
+            r.run(m.type_struct_class.process(&mut pass_meta, &m.type_managed_conversion, &m.type_all))?;
+            r.run(m.type_disposable.process(&mut pass_meta, &m.type_managed_conversion, &m.type_all))?;
+            r.run(m.type_nullable.process(&mut pass_meta, &m.type_all))?;
             r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &mut m.fns_all, &self.inventory.functions))?;
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
             r.run(m.trampoline.process(&mut pass_meta, &m.fns_all, &m.service_all))?;
@@ -198,6 +254,15 @@ impl DotnetLibrary {
 
         // Output passes
         self.output_master.process(&mut pass_meta, &m.type_all, &m.fns_all)?;
+        o.unmanaged_conversion.process(&mut pass_meta, &m.type_managed_conversion, &m.type_all)?;
+        o.unmanaged_names.process(&mut pass_meta, &m.type_all, &m.type_managed_conversion)?;
+        o.conversion_fields.process(&mut pass_meta, &self.output_master, &m.type_all)?;
+        o.composite_ty.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class)?;
+        o.composite_body_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.unmanaged_names, &o.conversion_fields)?;
+        o.composite_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields, &m.type_nullable)?;
+        o.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields, &m.type_nullable)?;
+        o.composite_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.unmanaged_conversion, &o.composite_body_unmanaged, &o.composite_body_to_unmanaged, &o.composite_body_as_unmanaged)?;
+        o.composites.process(&mut pass_meta, &self.output_master, &m.type_all, &o.composite_ty, &o.composite_body)?;
         o.trampoline.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &m.service_all)?;
         o.plugin_interface.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all)?;
         o.service_interface.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all)?;

@@ -1,4 +1,4 @@
-//! Renders the `AsUnmanaged` method for each enum using the `body_as_unmanaged.cs` template.
+//! Renders the `Unmanaged` struct for each enum using the `enum_body_unmanaged.cs` template.
 
 use crate::lang::TypeId;
 use crate::lang::types::kind::{TypeKind, TypePattern};
@@ -11,13 +11,13 @@ pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    body_as_unmanaged: HashMap<TypeId, String>,
+    enum_body_unmanaged: HashMap<TypeId, String>,
 }
 
 impl Pass {
     #[must_use]
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, body_as_unmanaged: HashMap::default() }
+        Self { info: PassInfo { name: file!() }, enum_body_unmanaged: HashMap::default() }
     }
 
     pub fn process(
@@ -25,7 +25,7 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
-        managed: &output::rust::conversion::unmanaged_conversion::Pass,
+        managed: &output::common::conversion::unmanaged_conversion::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -45,22 +45,25 @@ impl Pass {
                 .iter()
                 .filter_map(|v| {
                     let variant_ty = v.ty?;
-                    let as_unmanaged = managed.as_unmanaged_suffix(variant_ty).to_string();
+                    let to_managed = managed.to_managed_suffix(variant_ty).to_string();
 
                     let mut m = HashMap::new();
                     m.insert("name", v.name.clone());
                     m.insert("id", v.tag.to_string());
-                    m.insert("as_unmanaged", as_unmanaged);
+                    m.insert("to_managed", to_managed);
                     Some(m)
                 })
                 .collect();
 
+            let to_managed_method = managed.to_managed_name(*type_id);
+
             let mut context = Context::new();
             context.insert("name", name);
+            context.insert("to_managed_method", to_managed_method);
             context.insert("variants", &variants);
 
-            let rendered = templates.render("rust/types/enums/body_as_unmanaged.cs", &context)?;
-            self.body_as_unmanaged.insert(*type_id, rendered);
+            let rendered = templates.render("rust/types/enums/body_unmanaged.cs", &context)?;
+            self.enum_body_unmanaged.insert(*type_id, rendered);
         }
 
         Ok(())
@@ -68,6 +71,6 @@ impl Pass {
 
     #[must_use]
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
-        self.body_as_unmanaged.get(&type_id)
+        self.enum_body_unmanaged.get(&type_id)
     }
 }

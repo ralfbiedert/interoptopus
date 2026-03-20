@@ -32,7 +32,7 @@ impl Pass {
         output_master: &output::common::master::Pass,
         async_types: &model::rust::types::info::async_types::Pass,
         types: &model::common::types::all::Pass,
-        managed_conversion: &model::rust::types::info::managed_conversion::Pass,
+        managed_conversion: &model::common::types::info::managed_conversion::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
