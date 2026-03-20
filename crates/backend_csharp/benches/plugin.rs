@@ -1,5 +1,7 @@
+use interoptopus::ffi;
 use interoptopus::wire::Wire;
 use interoptopus_csharp::plugin::DotNetRuntime;
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
@@ -13,12 +15,23 @@ fn dll_path() -> PathBuf {
     path
 }
 
+#[derive(Clone, Copy)]
+#[ffi]
+pub struct Big16 {
+    pub f00: u32, pub f01: u32, pub f02: u32, pub f03: u32,
+    pub f04: u32, pub f05: u32, pub f06: u32, pub f07: u32,
+    pub f08: u32, pub f09: u32, pub f10: u32, pub f11: u32,
+    pub f12: u32, pub f13: u32, pub f14: u32, pub f15: u32,
+}
+
 interoptopus::plugin!(BenchPlugin {
     fn primitive_void();
     fn primitive_u32(x: u32) -> u32;
     impl Foo {
         fn create() -> Self;
         fn wire(&self, x: Wire<String>) -> Wire<String>;
+        fn wire2(&self, x: Wire<HashMap<String, String>>) -> Wire<HashMap<String, String>>;
+        fn big16(&self, x: Big16) -> Big16;
     }
 });
 
@@ -84,6 +97,29 @@ fn main() {
     let ns = ns_per_call(t, baseline, ITERATIONS);
     println!("foo.wire(Wire::from(\"hello world\")).unwire(): {ns:.0}");
     entries.push(Entry { name: r#"foo.wire(Wire::from("hello world")).unwire()"#.to_string(), ns });
+
+    let map16: HashMap<String, String> = (0..16)
+        .map(|i| (format!("{:016}", i), format!("{:016}", i)))
+        .collect();
+    let t = measure(ITERATIONS, || {
+        let _ = foo.wire2(Wire::from(map16.clone())).unwire();
+    });
+    let ns = ns_per_call(t, baseline, ITERATIONS);
+    println!("foo.wire2(Wire::from(map16x16)).unwire(): {ns:.0}");
+    entries.push(Entry { name: "foo.wire2(Wire::from(16x{16char,16char})).unwire()".to_string(), ns });
+
+    let big16 = Big16 {
+        f00: 0, f01: 1, f02: 2, f03: 3,
+        f04: 4, f05: 5, f06: 6, f07: 7,
+        f08: 8, f09: 9, f10: 10, f11: 11,
+        f12: 12, f13: 13, f14: 14, f15: 15,
+    };
+    let t = measure(ITERATIONS, || {
+        let _ = foo.big16(big16);
+    });
+    let ns = ns_per_call(t, baseline, ITERATIONS);
+    println!("foo.big16(big16): {ns:.0}");
+    entries.push(Entry { name: "foo.big16(Big16 { 16x u32 })".to_string(), ns });
 
     // Write markdown results
     let mut md = String::new();
