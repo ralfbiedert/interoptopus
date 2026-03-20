@@ -1,3 +1,4 @@
+//! Reverse interop plugin definitions.
 use crate::inventory::{ForeignInventory, Inventory, PluginId};
 
 pub trait PluginInfo {
