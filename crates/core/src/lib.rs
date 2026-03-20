@@ -8,6 +8,8 @@ pub mod ffi;
 pub mod inventory;
 pub mod lang;
 pub mod pattern;
+#[cfg(feature = "unstable-plugins")]
+#[doc(hidden)]
 pub mod trampoline;
 pub mod wire;
 
