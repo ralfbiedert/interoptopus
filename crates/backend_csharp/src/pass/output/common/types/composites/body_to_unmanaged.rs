@@ -67,7 +67,7 @@ impl Pass {
             context.insert("to_unmanaged", to_unmanaged);
             context.insert("fields", &fields);
 
-            let rendered = templates.render("rust/types/composite/body_to_unmanaged.cs", &context)?;
+            let rendered = templates.render("common/types/composite/body_to_unmanaged.cs", &context)?;
             self.body_to_unmanaged.insert(*type_id, rendered);
         }
 

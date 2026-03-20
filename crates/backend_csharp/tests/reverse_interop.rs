@@ -31,9 +31,9 @@ interoptopus::plugin!(Plugin {
     impl Foo {
         fn create() -> Self;
         fn bar(&self, x: i32);
+        fn get_accumulator(&self) -> i32;
         // fn call(&self, x: &u32, cb: CallBack);
         // async fn call_async(&self, x: Wire<String>);
-        fn get_accumulator(&self) -> i32;
     }
 });
 

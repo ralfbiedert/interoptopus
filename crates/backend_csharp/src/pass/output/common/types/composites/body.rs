@@ -78,7 +78,7 @@ impl Pass {
             context.insert("marshaller_to_unmanaged", marshaller_to_unmanaged);
             context.insert("marshaller_to_managed", marshaller_to_managed);
 
-            let rendered = templates.render("rust/types/composite/body.cs", &context)?;
+            let rendered = templates.render("common/types/composite/body.cs", &context)?;
             self.composite_body.insert(*type_id, rendered);
         }
 

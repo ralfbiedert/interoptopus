@@ -59,7 +59,7 @@ impl Pass {
                 context.insert("composite_definition", composite_definition);
                 context.insert("composite_body", body);
 
-                let rendered = templates.render("rust/types/composite/all.cs", &context)?;
+                let rendered = templates.render("common/types/composite/all.cs", &context)?;
                 rendered_composites.push(rendered);
             }
 

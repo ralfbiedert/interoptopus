@@ -36,7 +36,7 @@ impl PluginModel {
             let field_name = &f.name;
             let param_tys = f.params.iter().map(|p| &p.ty);
             let ret = ret_tokens(&f.ret);
-            quote! { #field_name: unsafe extern "C" fn(#(#param_tys),*) #ret }
+            quote! { #field_name: extern "C" fn(#(#param_tys),*) #ret }
         });
 
         let service_fields = self.services.iter().flat_map(|s| {
@@ -47,7 +47,7 @@ impl PluginModel {
             for c in s.ctors() {
                 let field = prefixed_ident(&prefix, &c.name);
                 let param_tys: Vec<_> = c.params.iter().map(|p| &p.ty).collect();
-                fields.push(quote! { #field: unsafe extern "C" fn(#(#param_tys),*) -> isize });
+                fields.push(quote! { #field: extern "C" fn(#(#param_tys),*) -> isize });
             }
 
             // Method fields (with isize handle as first param)
@@ -55,12 +55,12 @@ impl PluginModel {
                 let field = prefixed_ident(&prefix, &m.name);
                 let param_tys: Vec<_> = m.params.iter().map(|p| &p.ty).collect();
                 let ret = ret_tokens(&m.ret);
-                fields.push(quote! { #field: unsafe extern "C" fn(isize, #(#param_tys),*) #ret });
+                fields.push(quote! { #field: extern "C" fn(isize, #(#param_tys),*) #ret });
             }
 
             // Drop field
             let drop_field = format_ident!("{}_drop", prefix);
-            fields.push(quote! { #drop_field: unsafe extern "C" fn(isize) });
+            fields.push(quote! { #drop_field: extern "C" fn(isize) });
 
             fields
         });
@@ -82,7 +82,7 @@ impl PluginModel {
             let ret = ret_tokens(&f.ret);
             quote! {
                 pub fn #fn_name(&self, #(#params),*) #ret {
-                    unsafe { (self.#fn_name)(#(#arg_names),*) }
+                    (self.#fn_name)(#(#arg_names),*)
                 }
             }
         });
@@ -107,7 +107,7 @@ impl PluginModel {
 
                 quote! {
                     pub fn #method_name(&self, #(#params),*) -> #svc_name {
-                        let handle = unsafe { (self.#ctor_field)(#(#arg_names),*) };
+                        let handle = (self.#ctor_field)(#(#arg_names),*);
                         #svc_name {
                             handle,
                             #(#method_copies,)*
@@ -142,7 +142,7 @@ impl PluginModel {
             let symbol = field_name.to_string();
             let param_tys = f.params.iter().map(|p| &p.ty);
             let ret = ret_tokens(&f.ret);
-            emit_load_field(field_name, &symbol, quote! { unsafe extern "C" fn(#(#param_tys),*) #ret })
+            emit_load_field(field_name, &symbol, quote! { extern "C" fn(#(#param_tys),*) #ret })
         });
 
         let service_loads = self.services.iter().flat_map(|s| {
@@ -153,7 +153,7 @@ impl PluginModel {
                 let field = prefixed_ident(&prefix, &c.name);
                 let symbol = format!("{}_{}", prefix, c.name);
                 let param_tys: Vec<_> = c.params.iter().map(|p| &p.ty).collect();
-                loads.push(emit_load_field(&field, &symbol, quote! { unsafe extern "C" fn(#(#param_tys),*) -> isize }));
+                loads.push(emit_load_field(&field, &symbol, quote! { extern "C" fn(#(#param_tys),*) -> isize }));
             }
 
             for m in s.instance_methods() {
@@ -161,12 +161,12 @@ impl PluginModel {
                 let symbol = format!("{}_{}", prefix, m.name);
                 let param_tys: Vec<_> = m.params.iter().map(|p| &p.ty).collect();
                 let ret = ret_tokens(&m.ret);
-                loads.push(emit_load_field(&field, &symbol, quote! { unsafe extern "C" fn(isize, #(#param_tys),*) #ret }));
+                loads.push(emit_load_field(&field, &symbol, quote! { extern "C" fn(isize, #(#param_tys),*) #ret }));
             }
 
             let drop_field = format_ident!("{}_drop", prefix);
             let drop_symbol = format!("{}_drop", prefix);
-            loads.push(emit_load_field(&drop_field, &drop_symbol, quote! { unsafe extern "C" fn(isize) }));
+            loads.push(emit_load_field(&drop_field, &drop_symbol, quote! { extern "C" fn(isize) }));
 
             loads
         });
@@ -231,7 +231,7 @@ fn emit_service_struct(s: &ServiceBlock) -> TokenStream {
         let field = prefixed_ident(&prefix, &m.name);
         let param_tys: Vec<_> = m.params.iter().map(|p| &p.ty).collect();
         let ret = ret_tokens(&m.ret);
-        quote! { #field: unsafe extern "C" fn(isize, #(#param_tys),*) #ret }
+        quote! { #field: extern "C" fn(isize, #(#param_tys),*) #ret }
     });
 
     let drop_field = format_ident!("{}_drop", prefix);
@@ -240,7 +240,7 @@ fn emit_service_struct(s: &ServiceBlock) -> TokenStream {
         struct #name {
             handle: isize,
             #(#method_fields,)*
-            #drop_field: unsafe extern "C" fn(isize),
+            #drop_field: extern "C" fn(isize),
         }
     }
 }
@@ -258,7 +258,7 @@ fn emit_service_impl(s: &ServiceBlock) -> TokenStream {
         let ret = ret_tokens(&m.ret);
         quote! {
             pub fn #method_name(&self, #(#params),*) #ret {
-                unsafe { (self.#field)(self.handle, #(#arg_names),*) }
+                (self.#field)(self.handle, #(#arg_names),*)
             }
         }
     });
@@ -277,7 +277,7 @@ fn emit_service_drop(s: &ServiceBlock) -> TokenStream {
     quote! {
         impl Drop for #name {
             fn drop(&mut self) {
-                unsafe { (self.#drop_field)(self.handle) }
+                (self.#drop_field)(self.handle)
             }
         }
     }

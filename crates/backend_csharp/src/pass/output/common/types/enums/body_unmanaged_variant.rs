@@ -53,7 +53,7 @@ impl Pass {
                 context.insert("variant", &variant.name);
                 context.insert("unmanaged_name", variant_type);
 
-                let rendered = templates.render("rust/types/enums/body_unmanaged_variant.cs", &context)?;
+                let rendered = templates.render("common/types/enums/body_unmanaged_variant.cs", &context)?;
                 rendered_variants.push(rendered);
             }
 

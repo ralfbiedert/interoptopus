@@ -52,7 +52,7 @@ impl Pass {
             let mut context = Context::new();
             context.insert("variants", &variants);
 
-            let rendered = templates.render("rust/types/enums/body_exception_for_variant.cs", &context)?;
+            let rendered = templates.render("common/types/enums/body_exception_for_variant.cs", &context)?;
             self.body_exception_for_variant.insert(*type_id, rendered);
         }
 

@@ -55,7 +55,7 @@ impl Pass {
             context.insert("name", name);
             context.insert("variants", &variants);
 
-            let rendered = templates.render("rust/types/enums/body_ctors.cs", &context)?;
+            let rendered = templates.render("common/types/enums/body_ctors.cs", &context)?;
             self.body_ctors.insert(*type_id, rendered);
         }
 

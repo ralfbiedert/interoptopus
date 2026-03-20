@@ -47,7 +47,7 @@ impl Pass {
             let mut context = Context::new();
             context.insert("variants", &variants);
 
-            let rendered = templates.render("rust/types/enums/body_tostring.cs", &context)?;
+            let rendered = templates.render("common/types/enums/body_tostring.cs", &context)?;
             self.body_tostring.insert(*type_id, rendered);
         }
 

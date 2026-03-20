@@ -55,7 +55,7 @@ impl Pass {
             context.insert("struct_or_class", struct_or_class);
             context.insert("fields", &fields);
 
-            let rendered = templates.render("rust/types/composite/definition.cs", &context)?;
+            let rendered = templates.render("common/types/composite/definition.cs", &context)?;
             self.composite_ty.insert(*type_id, rendered);
         }
 

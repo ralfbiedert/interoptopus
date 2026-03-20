@@ -52,10 +52,10 @@ impl Pass {
 
                     let key = FieldKey { parent: *type_id, field_name: f.name.clone() };
 
-                    if let Ok(rendered) = templates.render("rust/conversion/array_to_managed.cs", &ctx) {
+                    if let Ok(rendered) = templates.render("common/conversion/array_to_managed.cs", &ctx) {
                         self.custom_to_managed.insert(key.clone(), rendered);
                     }
-                    if let Ok(rendered) = templates.render("rust/conversion/array_to_unmanaged.cs", &ctx) {
+                    if let Ok(rendered) = templates.render("common/conversion/array_to_unmanaged.cs", &ctx) {
                         self.custom_to_unmanaged.insert(key, rendered);
                     }
                 }

@@ -58,7 +58,7 @@ impl Pass {
                 context.insert("enum_definition", enum_definition);
                 context.insert("enum_body", body);
 
-                let rendered = templates.render("rust/types/enums/all.cs", &context)?;
+                let rendered = templates.render("common/types/enums/all.cs", &context)?;
                 rendered_enums.push(rendered);
             }
 

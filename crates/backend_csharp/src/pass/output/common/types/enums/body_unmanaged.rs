@@ -62,7 +62,7 @@ impl Pass {
             context.insert("to_managed_method", to_managed_method);
             context.insert("variants", &variants);
 
-            let rendered = templates.render("rust/types/enums/body_unmanaged.cs", &context)?;
+            let rendered = templates.render("common/types/enums/body_unmanaged.cs", &context)?;
             self.enum_body_unmanaged.insert(*type_id, rendered);
         }
 

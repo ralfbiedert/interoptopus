@@ -79,7 +79,7 @@ impl Pass {
             context.insert("fields", &fields);
             context.insert("is_packed", &is_packed);
 
-            let rendered = templates.render("rust/types/composite/body_unmanaged.cs", &context)?;
+            let rendered = templates.render("common/types/composite/body_unmanaged.cs", &context)?;
             self.composite_body_unmanaged.insert(*type_id, rendered);
         }
 

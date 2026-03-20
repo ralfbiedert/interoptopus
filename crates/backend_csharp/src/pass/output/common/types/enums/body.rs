@@ -101,7 +101,7 @@ impl Pass {
             context.insert("marshaller_to_unmanaged", marshaller_to_unmanaged);
             context.insert("marshaller_to_managed", marshaller_to_managed);
 
-            let rendered = templates.render("rust/types/enums/body.cs", &context)?;
+            let rendered = templates.render("common/types/enums/body.cs", &context)?;
             self.enum_body.insert(*type_id, rendered);
         }
 
