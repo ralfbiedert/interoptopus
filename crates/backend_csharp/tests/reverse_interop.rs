@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+use interoptopus::ffi;
 use interoptopus::lang::plugin::PluginInfo;
 use interoptopus_csharp::plugins::runtime::DotNetRuntime;
 use reference_project::types::basic::Vec3f32;
@@ -15,9 +16,17 @@ fn dll_path() -> PathBuf {
     path
 }
 
+#[derive(Debug)]
+#[ffi]
+pub enum ErrorABC {
+    A,
+    B,
+    C,
+}
+
 interoptopus::plugin!(Plugin {
     fn do_math(x: i64, y: i64) -> i64;
-    fn sum_all(x: i64, y: i64, z: u32) -> Vec3f32;
+    fn sum_all(x: i64, y: i64, z: u32) -> ffi::Result<Vec3f32, ErrorABC>;
 
     impl Foo {
         fn create() -> Self;

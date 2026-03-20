@@ -9,6 +9,14 @@ namespace {{ namespace }};
 
 {{ composite }}
 {% endfor %}
+{% for enum in enums %}
+
+{{ enum }}
+{% endfor %}
+{% if util %}
+
+{{ util }}
+{% endif %}
 {% if plugin_interface %}
 
 {{ plugin_interface }}

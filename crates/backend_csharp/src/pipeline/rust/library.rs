@@ -87,7 +87,7 @@ pub struct RustLibraryConfig {
     pub output_wire_helper_classes: output::rust::wire::helper_classes::Config,
     pub output_wires: output::rust::wire::all::Config,
     pub output_header: output::rust::header::Config,
-    pub output_util: output::rust::types::util::Config,
+    pub output_util: output::common::types::util::Config,
     pub output_using: output::rust::r#using::Config,
     pub output_final: output::rust::all::Config,
     _hidden: PhantomData<()>,
@@ -171,7 +171,7 @@ pub struct IntermediateOutputPasses {
     pub wire_types: output::rust::wire::wire_type::Pass,
     pub wire_helper_classes: output::rust::wire::helper_classes::Pass,
     pub wires: output::rust::wire::all::Pass,
-    pub util: output::rust::types::util::Pass,
+    pub util: output::common::types::util::Pass,
     pub using: output::rust::r#using::Pass,
 }
 
@@ -321,7 +321,7 @@ impl RustLibrary {
                 wire_types: output::rust::wire::wire_type::Pass::new(config.output_wire_types),
                 wire_helper_classes: output::rust::wire::helper_classes::Pass::new(config.output_wire_helper_classes),
                 wires: output::rust::wire::all::Pass::new(config.output_wires),
-                util: output::rust::types::util::Pass::new(config.output_util),
+                util: output::common::types::util::Pass::new(config.output_util),
                 using: output::rust::r#using::Pass::new(config.output_using),
             },
             output_final: output::rust::all::Pass::new(config.output_final),

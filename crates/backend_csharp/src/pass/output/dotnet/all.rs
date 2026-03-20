@@ -35,9 +35,13 @@ impl Pass {
             let service_interfaces = intermediary.service_interface.interfaces_for(file).unwrap_or(&[]);
             let trampolines = intermediary.trampoline.trampolines_for(file).unwrap_or(&[]);
             let composites = intermediary.composites.composites_for(file).unwrap_or(&[]);
+            let enums = intermediary.enums.enums_for(file).unwrap_or(&[]);
+            let util = intermediary.util.utils_for(file).unwrap_or("");
 
             context.insert("namespace", file.target.namespace());
             context.insert("composites", &composites);
+            context.insert("enums", &enums);
+            context.insert("util", &util);
             context.insert("plugin_interface", plugin_interface);
             context.insert("service_interfaces", &service_interfaces);
             context.insert("trampolines", &trampolines);

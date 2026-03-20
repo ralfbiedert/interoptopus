@@ -10,14 +10,17 @@ public class Plugin : IPlugin
         return a + b;
     }
 
-    public static Vec3f32 SumAll(long x, long y, uint z)
+    public static ResultVec3f32ErrorABC SumAll(long x, long y, uint z)
     {
-        return new Vec3f32
+
+        var vec = new Vec3f32
         {
             x = (float)x,
             y = (float)y,
             z = (float)z,
         };
+
+        return ResultVec3f32ErrorABC.Ok(vec);
     }
 }
 

@@ -43,6 +43,17 @@ pub struct DotnetLibraryConfig {
     pub output_composite_body_as_unmanaged: output::common::types::composites::body_as_unmanaged::Config,
     pub output_composite_body: output::common::types::composites::body::Config,
     pub output_composite: output::common::types::composites::all::Config,
+    pub output_enum_ty: output::common::types::enums::definition::Config,
+    pub output_enum_body_unmanaged_variant: output::common::types::enums::body_unmanaged_variant::Config,
+    pub output_enum_body_unmanaged: output::common::types::enums::body_unmanaged::Config,
+    pub output_enum_body_to_unmanaged: output::common::types::enums::body_to_unmanaged::Config,
+    pub output_enum_body_as_unmanaged: output::common::types::enums::body_as_unmanaged::Config,
+    pub output_enum_body_ctors: output::common::types::enums::body_ctors::Config,
+    pub output_enum_body_exception_for_variant: output::common::types::enums::body_exception_for_variant::Config,
+    pub output_enum_body_tostring: output::common::types::enums::body_tostring::Config,
+    pub output_enum_body: output::common::types::enums::body::Config,
+    pub output_enum: output::common::types::enums::all::Config,
+    pub output_util: output::common::types::util::Config,
     pub output_final: output::dotnet::all::Config,
 }
 
@@ -86,6 +97,17 @@ impl Default for DotnetLibraryConfig {
             output_composite_body_as_unmanaged: Default::default(),
             output_composite_body: Default::default(),
             output_composite: Default::default(),
+            output_enum_ty: Default::default(),
+            output_enum_body_unmanaged_variant: Default::default(),
+            output_enum_body_unmanaged: Default::default(),
+            output_enum_body_to_unmanaged: Default::default(),
+            output_enum_body_as_unmanaged: Default::default(),
+            output_enum_body_ctors: Default::default(),
+            output_enum_body_exception_for_variant: Default::default(),
+            output_enum_body_tostring: Default::default(),
+            output_enum_body: Default::default(),
+            output_enum: Default::default(),
+            output_util: Default::default(),
             output_final: Default::default(),
         }
     }
@@ -135,6 +157,17 @@ pub struct IntermediateOutputPasses {
     pub composite_body_as_unmanaged: output::common::types::composites::body_as_unmanaged::Pass,
     pub composite_body: output::common::types::composites::body::Pass,
     pub composites: output::common::types::composites::all::Pass,
+    pub enum_ty: output::common::types::enums::definition::Pass,
+    pub enum_body_unmanaged_variant: output::common::types::enums::body_unmanaged_variant::Pass,
+    pub enum_body_unmanaged: output::common::types::enums::body_unmanaged::Pass,
+    pub enum_body_to_unmanaged: output::common::types::enums::body_to_unmanaged::Pass,
+    pub enum_body_as_unmanaged: output::common::types::enums::body_as_unmanaged::Pass,
+    pub enum_body_ctors: output::common::types::enums::body_ctors::Pass,
+    pub enum_body_exception_for_variant: output::common::types::enums::body_exception_for_variant::Pass,
+    pub enum_body_tostring: output::common::types::enums::body_tostring::Pass,
+    pub enum_body: output::common::types::enums::body::Pass,
+    pub enums: output::common::types::enums::all::Pass,
+    pub util: output::common::types::util::Pass,
 }
 
 /// Code generation pipeline for .NET plugins (reverse interop).
@@ -206,6 +239,17 @@ impl DotnetLibrary {
                 composite_body_as_unmanaged: output::common::types::composites::body_as_unmanaged::Pass::new(config.output_composite_body_as_unmanaged),
                 composite_body: output::common::types::composites::body::Pass::new(config.output_composite_body),
                 composites: output::common::types::composites::all::Pass::new(config.output_composite),
+                enum_ty: output::common::types::enums::definition::Pass::new(config.output_enum_ty),
+                enum_body_unmanaged_variant: output::common::types::enums::body_unmanaged_variant::Pass::new(config.output_enum_body_unmanaged_variant),
+                enum_body_unmanaged: output::common::types::enums::body_unmanaged::Pass::new(config.output_enum_body_unmanaged),
+                enum_body_to_unmanaged: output::common::types::enums::body_to_unmanaged::Pass::new(config.output_enum_body_to_unmanaged),
+                enum_body_as_unmanaged: output::common::types::enums::body_as_unmanaged::Pass::new(config.output_enum_body_as_unmanaged),
+                enum_body_ctors: output::common::types::enums::body_ctors::Pass::new(config.output_enum_body_ctors),
+                enum_body_exception_for_variant: output::common::types::enums::body_exception_for_variant::Pass::new(config.output_enum_body_exception_for_variant),
+                enum_body_tostring: output::common::types::enums::body_tostring::Pass::new(config.output_enum_body_tostring),
+                enum_body: output::common::types::enums::body::Pass::new(config.output_enum_body),
+                enums: output::common::types::enums::all::Pass::new(config.output_enum),
+                util: output::common::types::util::Pass::new(config.output_util),
             },
             output_final: output::dotnet::all::Pass::new(config.output_final),
             output: Multibuf::default(),
@@ -263,6 +307,17 @@ impl DotnetLibrary {
         o.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields, &m.type_nullable)?;
         o.composite_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.unmanaged_conversion, &o.composite_body_unmanaged, &o.composite_body_to_unmanaged, &o.composite_body_as_unmanaged)?;
         o.composites.process(&mut pass_meta, &self.output_master, &m.type_all, &o.composite_ty, &o.composite_body)?;
+        o.enum_ty.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class)?;
+        o.enum_body_unmanaged_variant.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names)?;
+        o.enum_body_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion)?;
+        o.enum_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion)?;
+        o.enum_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion)?;
+        o.enum_body_ctors.process(&mut pass_meta, &self.output_master, &m.type_all)?;
+        o.enum_body_exception_for_variant.process(&mut pass_meta, &self.output_master, &m.type_all)?;
+        o.enum_body_tostring.process(&mut pass_meta, &self.output_master, &m.type_all)?;
+        o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_exception_for_variant, &o.enum_body_tostring, &o.unmanaged_conversion)?;
+        o.enums.process(&mut pass_meta, &self.output_master, &m.type_all, &o.enum_ty, &o.enum_body)?;
+        o.util.process(&mut pass_meta, &self.output_master)?;
         o.trampoline.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &m.service_all)?;
         o.plugin_interface.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all)?;
         o.service_interface.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all)?;
