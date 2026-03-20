@@ -29,6 +29,7 @@ pub struct DotnetLibraryConfig {
     pub model_fn_all: model::common::fns::all::Config,
     pub model_fn_originals: model::common::fns::originals::Config,
     pub model_service_map: model::common::service::all::Config,
+    pub model_type_util: model::common::types::util::Config,
     pub model_trampoline: model::dotnet::trampoline::Config,
     pub output_master: output::common::master::Config,
     pub output_unmanaged_conversion: output::common::conversion::unmanaged_conversion::Config,
@@ -83,6 +84,7 @@ impl Default for DotnetLibraryConfig {
             model_fn_all: Default::default(),
             model_fn_originals: Default::default(),
             model_service_map: Default::default(),
+            model_type_util: Default::default(),
             model_trampoline: Default::default(),
             output_master: Default::default(),
             output_unmanaged_conversion: Default::default(),
@@ -140,6 +142,7 @@ pub struct ModelPasses {
     pub fns_all: model::common::fns::all::Pass,
     pub fn_originals: model::common::fns::originals::Pass,
     pub service_all: model::common::service::all::Pass,
+    pub type_util: model::common::types::util::Pass,
     pub trampoline: model::dotnet::trampoline::Pass,
 }
 
@@ -223,6 +226,7 @@ impl DotnetLibrary {
                 fns_all: model::common::fns::all::Pass::new(config.model_fn_all),
                 fn_originals: model::common::fns::originals::Pass::new(config.model_fn_originals),
                 service_all: model::common::service::all::Pass::new(config.model_service_map),
+                type_util: model::common::types::util::Pass::new(config.model_type_util),
                 trampoline: model::dotnet::trampoline::Pass::new(config.model_trampoline),
             },
             output_master: output::common::master::Pass::new(config.output_master),
@@ -287,6 +291,7 @@ impl DotnetLibrary {
             r.run(m.type_struct_class.process(&mut pass_meta, &m.type_managed_conversion, &m.type_all))?;
             r.run(m.type_disposable.process(&mut pass_meta, &m.type_managed_conversion, &m.type_all))?;
             r.run(m.type_nullable.process(&mut pass_meta, &m.type_all))?;
+            r.run(m.type_util.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_all))?;
             r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &mut m.fns_all, &self.inventory.functions))?;
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
             r.run(m.trampoline.process(&mut pass_meta, &m.fns_all, &m.service_all))?;
