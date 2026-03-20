@@ -8,6 +8,11 @@ repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
 
+[[bench]]
+name = "plugin"
+harness = false
+required-features = ["unstable-plugins"]
+
 [features]
 dotnet = ["dep:netcorehost", "dep:tempfile"]
 unstable-plugins = ["dotnet", "interoptopus/unstable-plugins"]
