@@ -72,7 +72,23 @@ impl DotNetRuntime {
     }
 
     /// Creates a [`DllLoader`] bound to the given assembly.
+    ///
+    /// By default, symbols are resolved from `{Assembly}.Interop` in the assembly.
+    /// Use [`dll_loader_with_namespace`](Self::dll_loader_with_namespace) to
+    /// specify a custom namespace.
     pub fn dll_loader(&self, path: &str) -> Result<DllLoader, PluginLoadError> {
+        let assembly_name = Path::new(path)
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .ok_or_else(|| PluginLoadError::LoadFailed("invalid DLL path".to_string()))?
+            .to_string();
+
+        self.dll_loader_with_namespace(path, &assembly_name)
+    }
+
+    /// Creates a [`DllLoader`] bound to the given assembly, looking up
+    /// `[UnmanagedCallersOnly]` methods in `{namespace}.Interop`.
+    pub fn dll_loader_with_namespace(&self, path: &str, namespace: &str) -> Result<DllLoader, PluginLoadError> {
         let dll_path = Path::new(path);
 
         let dll_pdc = PdCString::from_os_str(dll_path.as_os_str()).expect("dll path contains null bytes");
@@ -88,8 +104,7 @@ impl DotNetRuntime {
             .ok_or_else(|| PluginLoadError::LoadFailed("invalid DLL path".to_string()))?
             .to_string();
 
-        // Convention: symbols live in `{Assembly}.Interop` class
-        let type_name = format!("{assembly_name}.Interop, {assembly_name}");
+        let type_name = format!("{namespace}.Interop, {assembly_name}");
 
         Ok(DllLoader { delegate_loader, type_name })
     }

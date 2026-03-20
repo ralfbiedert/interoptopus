@@ -9,6 +9,16 @@ public class Plugin : IPlugin
     {
         return a + b;
     }
+
+    public static Vec3f32 SumAll(long x, long y, uint z)
+    {
+        return new Vec3f32
+        {
+            x = (float)x,
+            y = (float)y,
+            z = (float)z,
+        };
+    }
 }
 
 // User-written class with state

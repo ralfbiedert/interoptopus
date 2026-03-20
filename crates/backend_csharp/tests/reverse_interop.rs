@@ -2,6 +2,7 @@
 
 use interoptopus::lang::plugin::PluginInfo;
 use interoptopus_csharp::plugins::runtime::DotNetRuntime;
+use reference_project::types::basic::Vec3f32;
 use std::path::PathBuf;
 
 fn plugin_dir() -> PathBuf {
@@ -16,6 +17,7 @@ fn dll_path() -> PathBuf {
 
 interoptopus::plugin!(Plugin {
     fn do_math(x: i64, y: i64) -> i64;
+    fn sum_all(x: i64, y: i64, z: u32) -> Vec3f32;
 
     impl Foo {
         fn create() -> Self;
@@ -29,9 +31,14 @@ interoptopus::plugin!(Plugin {
 #[test]
 fn can_load_and_call_do_math() {
     let runtime = DotNetRuntime::new().expect("Failed to create .NET runtime");
-    let loader = runtime.dll_loader(dll_path().to_str().unwrap()).expect("Failed to load DLL");
+    let loader = runtime
+        .dll_loader_with_namespace(dll_path().to_str().unwrap(), "My.Company")
+        .expect("Failed to load DLL");
 
     let plugin = Plugin::new(&loader).expect("Failed to load MathPlugin");
+
+    let vec = plugin.sum_all(123, 456, 789);
+    dbg!(vec);
 
     let result = plugin.do_math(123, 456);
     assert_eq!(result, 579);
@@ -40,7 +47,9 @@ fn can_load_and_call_do_math() {
 #[test]
 fn can_load_foo_instance() {
     let runtime = DotNetRuntime::new().expect("Failed to create .NET runtime");
-    let loader = runtime.dll_loader(dll_path().to_str().unwrap()).expect("Failed to load DLL");
+    let loader = runtime
+        .dll_loader_with_namespace(dll_path().to_str().unwrap(), "My.Company")
+        .expect("Failed to load DLL");
 
     let plugin = Plugin::new(&loader).expect("Failed to load MathPlugin");
     let foo = plugin.foo_create();
