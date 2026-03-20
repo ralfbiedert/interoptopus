@@ -25,8 +25,12 @@ pub struct DotnetLibraryConfig {
     pub model_fn_all: model::common::fns::all::Config,
     pub model_fn_originals: model::common::fns::originals::Config,
     pub model_service_map: model::common::service::all::Config,
+    pub model_trampoline: model::dotnet::trampoline::Config,
     pub output_master: output::common::master::Config,
-    pub output_plugin_all: output::dotnet::all::Config,
+    pub output_trampoline: output::dotnet::trampoline::Config,
+    pub output_plugin_interface: output::dotnet::interface::plugin::Config,
+    pub output_service_interface: output::dotnet::interface::service::Config,
+    pub output_final: output::dotnet::all::Config,
 }
 
 impl Default for DotnetLibraryConfig {
@@ -51,8 +55,12 @@ impl Default for DotnetLibraryConfig {
             model_fn_all: Default::default(),
             model_fn_originals: Default::default(),
             model_service_map: Default::default(),
+            model_trampoline: Default::default(),
             output_master: Default::default(),
-            output_plugin_all: Default::default(),
+            output_trampoline: Default::default(),
+            output_plugin_interface: Default::default(),
+            output_service_interface: Default::default(),
+            output_final: Default::default(),
         }
     }
 }
@@ -80,11 +88,14 @@ pub struct ModelPasses {
     pub fns_all: model::common::fns::all::Pass,
     pub fn_originals: model::common::fns::originals::Pass,
     pub service_all: model::common::service::all::Pass,
+    pub trampoline: model::dotnet::trampoline::Pass,
 }
 
 /// Intermediate output passes for the dotnet pipeline.
 pub struct IntermediateOutputPasses {
-    pub plugin_all: output::dotnet::all::Pass,
+    pub trampoline: output::dotnet::trampoline::Pass,
+    pub plugin_interface: output::dotnet::interface::plugin::Pass,
+    pub service_interface: output::dotnet::interface::service::Pass,
 }
 
 /// Code generation pipeline for .NET plugins (reverse interop).
@@ -94,10 +105,10 @@ pub struct IntermediateOutputPasses {
 /// assembly rather than *to* one.
 pub struct DotnetLibrary {
     inventory: ForeignInventory,
-    config: DotnetLibraryConfig,
     model_passes: ModelPasses,
     output_master: output::common::master::Pass,
     output_passes: IntermediateOutputPasses,
+    output_final: output::dotnet::all::Pass,
     output: Multibuf,
 }
 
@@ -136,10 +147,15 @@ impl DotnetLibrary {
                 fns_all: model::common::fns::all::Pass::new(config.model_fn_all),
                 fn_originals: model::common::fns::originals::Pass::new(config.model_fn_originals),
                 service_all: model::common::service::all::Pass::new(config.model_service_map),
+                trampoline: model::dotnet::trampoline::Pass::new(config.model_trampoline),
             },
             output_master: output::common::master::Pass::new(config.output_master),
-            output_passes: IntermediateOutputPasses { plugin_all: output::dotnet::all::Pass::new(config.output_plugin_all) },
-            config: DotnetLibraryConfig { ..Default::default() },
+            output_passes: IntermediateOutputPasses {
+                trampoline: output::dotnet::trampoline::Pass::new(config.output_trampoline),
+                plugin_interface: output::dotnet::interface::plugin::Pass::new(config.output_plugin_interface),
+                service_interface: output::dotnet::interface::service::Pass::new(config.output_service_interface),
+            },
+            output_final: output::dotnet::all::Pass::new(config.output_final),
             output: Multibuf::default(),
         }
     }
@@ -173,6 +189,7 @@ impl DotnetLibrary {
             r.run(m.type_all.process(&mut pass_meta, &m.type_kinds, &m.type_names, &m.id_maps, &self.inventory.types))?;
             r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &mut m.fns_all, &self.inventory.functions))?;
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
+            r.run(m.trampoline.process(&mut pass_meta, &m.fns_all, &m.service_all))?;
 
             Ok(())
         })?;
@@ -181,8 +198,12 @@ impl DotnetLibrary {
 
         // Output passes
         self.output_master.process(&mut pass_meta, &m.type_all, &m.fns_all)?;
+        o.trampoline.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &m.service_all)?;
+        o.plugin_interface.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all)?;
+        o.service_interface.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all)?;
 
-        o.plugin_all.process(&mut pass_meta, &self.output_master, &mut self.output)?;
+        // Final output pass
+        self.output_final.process(&mut pass_meta, &self.output_master, &self.output_passes, &mut self.output)?;
 
         Ok(self.output)
     }

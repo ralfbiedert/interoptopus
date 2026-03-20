@@ -1,28 +1,19 @@
 use crate::lang::{FunctionId, ServiceId};
 
-pub enum TrampolineTarget {
-    Raw(FunctionId),
-    Service(ServiceId),
+#[derive(Debug, Clone)]
+pub enum TrampolineKind {
+    /// Forward to `Plugin.MethodName(args…)`.
+    Raw,
+    /// Allocate via `T.Create()`, wrap in `GCHandle`.
+    ServiceCtor { service_id: ServiceId },
+    /// Unwrap `GCHandle`, dispatch `obj.Method(args…)`.
+    ServiceMethod { service_id: ServiceId },
+    /// Free the `GCHandle`.
+    ServiceDestructor { service_id: ServiceId },
 }
 
-pub struct Trampoline {
-    pub targets: Vec<TrampolineTarget>,
+#[derive(Debug, Clone)]
+pub struct TrampolineEntry {
+    pub fn_id: FunctionId,
+    pub kind: TrampolineKind,
 }
-
-//
-// // All the functions from the inventory
-// // - must know where to dispatch to
-// //     - raw -> Plugin.Foo()
-// //     - class -> Foo + Method
-// public static class Interop { }
-//
-// // all functions
-// public interface IPlugin { }
-//
-// public interface IFoo<TSelf> where TSelf : IFoo<TSelf>
-// {
-//     static abstract TSelf Create();
-//     void Bar(int x);
-//     int GetAccumulator();
-// }
-//

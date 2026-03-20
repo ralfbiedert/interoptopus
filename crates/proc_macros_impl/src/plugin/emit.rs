@@ -421,7 +421,10 @@ fn emit_function_registration(
         Some(ty) if !is_self_return(&Some(ty.clone())) => Some(quote! {
             <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory);
         }),
-        _ => None,
+        Some(_) => None, // Self return — type already registered via register_type
+        None => Some(quote! {
+            <() as ::interoptopus::lang::types::TypeInfo>::register(inventory);
+        }),
     };
 
     let arguments = params.iter().map(|p| {

@@ -1,4 +1,6 @@
-namespace Plugin;
+using My.Company;
+
+namespace My.Company;
 
 // User implementation
 public class Plugin : IPlugin
