@@ -1,0 +1,121 @@
+///FFI buffer for Wire data transfer
+public partial struct WireBuffer
+{
+    public IntPtr data;
+    public int len;
+    public int capacity;
+}
+
+[NativeMarshalling(typeof(MarshallerMeta))]
+public partial struct WireBuffer
+{
+    public WireBuffer() { }
+
+    /// Allocate a Rust-owned buffer of the given size via the registered trampoline.
+    public static unsafe WireBuffer Allocate(int size)
+    {
+        var ptr = Trampolines.WireCreate(size, out var outLen, out var outCapacity);
+        return new WireBuffer { data = ptr, len = outLen, capacity = outCapacity };
+    }
+
+    /// Get a BinaryWriter over this buffer.
+    public unsafe BinaryWriter Writer()
+    {
+        return new BinaryWriter(new UnmanagedMemoryStream((byte*)data, len, len, FileAccess.Write));
+    }
+
+    /// Get a BinaryReader over this buffer.
+    public unsafe BinaryReader Reader()
+    {
+        return new BinaryReader(new UnmanagedMemoryStream((byte*)data, len));
+    }
+
+    /// Free the buffer. Rust-allocated buffers (capacity > 0) are freed via
+    /// the registered trampoline. Borrowed or empty buffers (capacity == 0) are no-ops.
+    /// Do NOT call this after passing a wire into a Rust function — Rust owns it then.
+    public void Dispose()
+    {
+        if (data != IntPtr.Zero)
+        {
+            if (capacity > 0)
+                Trampolines.WireDestroy(data, len, capacity);
+            data = IntPtr.Zero;
+            len = 0;
+            capacity = 0;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    internal unsafe Unmanaged ToUnmanaged()
+    {
+        var _unmanaged = new Unmanaged();
+        _unmanaged.data = data;
+        _unmanaged.len = len;
+        _unmanaged.capacity = capacity;
+        return _unmanaged;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    internal unsafe Unmanaged AsUnmanaged()
+    {
+        var _unmanaged = new Unmanaged();
+        _unmanaged.data = data;
+        _unmanaged.len = len;
+        _unmanaged.capacity = capacity;
+        return _unmanaged;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe struct Unmanaged
+    {
+        public IntPtr data;
+        public int len;
+        public int capacity;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal unsafe WireBuffer ToManaged()
+        {
+            var _managed = new WireBuffer();
+            _managed.data = data;
+            _managed.len = len;
+            _managed.capacity = capacity;
+            return _managed;
+        }
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    public override string ToString()
+    {
+        return "WireBuffer { ... }";
+    }
+
+    [CustomMarshaller(typeof(WireBuffer), MarshalMode.Default, typeof(Marshaller))]
+    private struct MarshallerMeta { }
+    public ref struct Marshaller
+    {
+        private WireBuffer _managed;
+        private Unmanaged _unmanaged;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Marshaller(WireBuffer managed) { _managed = managed; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void FromManaged(WireBuffer managed) { _managed = managed; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public WireBuffer ToManaged() { return _unmanaged.ToManaged(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Free() {}
+    }
+}

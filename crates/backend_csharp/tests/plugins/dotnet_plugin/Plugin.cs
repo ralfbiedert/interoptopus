@@ -45,4 +45,9 @@ public class Foo : IFoo<Foo>
     {
         return _accumulator;
     }
+
+    public string Wire(string x)
+    {
+        throw new NotImplementedException();
+    }
 }

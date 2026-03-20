@@ -65,7 +65,12 @@ impl PluginModel {
             fields
         });
 
-        quote! { struct #name { #(#bare_fields,)* #(#service_fields,)* } }
+        // Trampoline registration function pointer
+        let register_trampoline_field = quote! {
+            register_trampoline: extern "C" fn(i64, *const u8)
+        };
+
+        quote! { struct #name { #(#bare_fields,)* #(#service_fields,)* #register_trampoline_field, } }
     }
 
     // -----------------------------------------------------------------------
@@ -121,7 +126,44 @@ impl PluginModel {
         quote! {
             impl #name {
                 pub fn new(loader: &impl ::interoptopus::lang::plugin::Loader) -> Result<Self, ::interoptopus::lang::plugin::PluginLoadError> {
-                    loader.load_plugin()
+                    let plugin: Self = loader.load_plugin()?;
+                    plugin.register_trampolines();
+                    Ok(plugin)
+                }
+
+                /// Registers Rust runtime trampolines (wire alloc/free) with the foreign plugin.
+                fn register_trampolines(&self) {
+                    // Wire buffer create
+                    extern "C" fn _wire_create(size: i32, out_len: *mut i32, out_capacity: *mut i32) -> *mut u8 {
+                        if size <= 0 {
+                            unsafe { *out_len = 0; *out_capacity = 0; }
+                            return ::std::ptr::null_mut();
+                        }
+                        let size = usize::try_from(size).expect("Invalid Wire buffer size");
+                        let mut vec: Vec<u8> = vec![0u8; size];
+                        let data = vec.as_mut_ptr();
+                        unsafe {
+                            *out_len = i32::try_from(vec.len()).expect("Too large Wire buffer");
+                            *out_capacity = i32::try_from(vec.capacity()).expect("Too large Wire buffer");
+                        }
+                        ::std::mem::forget(vec);
+                        data
+                    }
+
+                    // Wire buffer destroy
+                    extern "C" fn _wire_destroy(data: *mut u8, len: i32, capacity: i32) {
+                        if capacity <= 0 { return; }
+                        let _ = unsafe {
+                            Vec::from_raw_parts(
+                                data,
+                                usize::try_from(len).expect("Invalid vec length"),
+                                usize::try_from(capacity).expect("Invalid vec capacity"),
+                            )
+                        };
+                    }
+
+                    (self.register_trampoline)(::interoptopus::trampoline::TRAMPOLINE_WIRE_CREATE, _wire_create as *const u8);
+                    (self.register_trampoline)(::interoptopus::trampoline::TRAMPOLINE_WIRE_DESTROY, _wire_destroy as *const u8);
                 }
 
                 #(#bare_methods)*
@@ -171,12 +213,20 @@ impl PluginModel {
             loads
         });
 
+        let register_trampoline_field = format_ident!("register_trampoline");
+        let register_trampoline_load = emit_load_field(
+            &register_trampoline_field,
+            "register_trampoline",
+            quote! { extern "C" fn(i64, *const u8) },
+        );
+
         quote! {
             impl ::interoptopus::lang::plugin::Plugin for #name {
                 fn load_from(loader: impl Fn(&str) -> *const u8) -> Result<Self, ::interoptopus::lang::plugin::PluginLoadError> {
                     Ok(Self {
                         #(#bare_loads,)*
                         #(#service_loads,)*
+                        #register_trampoline_load,
                     })
                 }
             }

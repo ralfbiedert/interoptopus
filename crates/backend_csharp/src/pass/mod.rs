@@ -9,6 +9,22 @@ pub mod meta;
 pub mod model;
 pub mod output;
 
+/// Whether generated code targets a Rust native library or a foreign plugin.
+///
+/// In `Rust` mode the generated C# code uses `[LibraryImport]` to call into
+/// Rust functions (e.g., `WireInterop.interoptopus_wire_create`). In `Plugin`
+/// mode those functions are not available via DLL import; instead the Rust host
+/// registers them at load time through `Trampolines.RegisterTrampoline`.
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
+pub enum OperationMode {
+    /// Standard mode — C# calls a Rust native library via P/Invoke.
+    #[default]
+    Rust,
+    /// Reverse-interop mode — Rust loads a foreign plugin and registers
+    /// runtime trampolines (wire alloc/free, etc.) into the plugin.
+    Plugin,
+}
+
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Outcome {
     Unchanged,

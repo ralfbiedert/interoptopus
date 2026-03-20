@@ -17,6 +17,18 @@ namespace {{ namespace }};
 
 {{ util }}
 {% endif %}
+{% if trampolines_class %}
+
+{{ trampolines_class }}
+{% endif %}
+{% if wire_buffer %}
+
+{{ wire_buffer }}
+{% endif %}
+{% for wire in wires %}
+
+{{ wire }}
+{% endfor %}
 {% if plugin_interface %}
 
 {{ plugin_interface }}

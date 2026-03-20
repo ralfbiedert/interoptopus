@@ -2,6 +2,7 @@
 
 use interoptopus::ffi;
 use interoptopus::lang::plugin::PluginInfo;
+use interoptopus::wire::Wire;
 use interoptopus_csharp::plugins::runtime::DotNetRuntime;
 use reference_project::types::basic::Vec3f32;
 use std::path::PathBuf;
@@ -33,7 +34,7 @@ interoptopus::plugin!(Plugin {
         fn bar(&self, x: i32);
         fn get_accumulator(&self) -> i32;
         fn wire(&self, x: Wire<String>) -> Wire<String>;
-        // fn call(&self, x: &u32, cb: CallBack);
+        // TODO: fn call(&self, x: &u32, cb: CallBack);
         // async fn call_async(&self, x: Wire<String>);
     }
 });

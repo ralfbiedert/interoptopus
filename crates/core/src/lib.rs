@@ -8,6 +8,7 @@ pub mod ffi;
 pub mod inventory;
 pub mod lang;
 pub mod pattern;
+pub mod trampoline;
 pub mod wire;
 
 #[doc(hidden)]

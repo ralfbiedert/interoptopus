@@ -37,11 +37,17 @@ impl Pass {
             let composites = intermediary.composites.composites_for(file).unwrap_or(&[]);
             let enums = intermediary.enums.enums_for(file).unwrap_or(&[]);
             let util = intermediary.util.utils_for(file).unwrap_or("");
+            let trampolines_class = intermediary.trampolines.trampolines_for(file).unwrap_or("");
+            let wire_buffer = intermediary.wire_buffer.wire_buffer_for(file).unwrap_or("");
+            let wires = intermediary.wires.wires_for(file).unwrap_or(&[]);
 
             context.insert("namespace", file.target.namespace());
             context.insert("composites", &composites);
             context.insert("enums", &enums);
             context.insert("util", &util);
+            context.insert("trampolines_class", trampolines_class);
+            context.insert("wire_buffer", wire_buffer);
+            context.insert("wires", &wires);
             context.insert("plugin_interface", plugin_interface);
             context.insert("service_interfaces", &service_interfaces);
             context.insert("trampolines", &trampolines);

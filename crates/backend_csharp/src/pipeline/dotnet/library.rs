@@ -31,11 +31,17 @@ pub struct DotnetLibraryConfig {
     pub model_service_map: model::common::service::all::Config,
     pub model_type_util: model::common::types::util::Config,
     pub model_trampoline: model::dotnet::trampoline::Config,
+    pub model_wire_nested: model::rust::wire::nested::Config,
     pub output_master: output::common::master::Config,
     pub output_unmanaged_conversion: output::common::conversion::unmanaged_conversion::Config,
     pub output_unmanaged_names: output::common::conversion::unmanaged_names::Config,
     pub output_conversion_fields: output::common::conversion::fields::Config,
     pub output_trampoline: output::dotnet::trampoline::Config,
+    pub output_trampolines: output::dotnet::trampolines::Config,
+    pub output_wire_buffer: output::dotnet::wire_buffer::Config,
+    pub output_wire_types: output::rust::wire::wire_type::Config,
+    pub output_wire_helper_classes: output::rust::wire::helper_classes::Config,
+    pub output_wires: output::rust::wire::all::Config,
     pub output_plugin_interface: output::dotnet::interface::plugin::Config,
     pub output_service_interface: output::dotnet::interface::service::Config,
     pub output_composite_ty: output::common::types::composites::definition::Config,
@@ -86,11 +92,17 @@ impl Default for DotnetLibraryConfig {
             model_service_map: Default::default(),
             model_type_util: Default::default(),
             model_trampoline: Default::default(),
+            model_wire_nested: Default::default(),
             output_master: Default::default(),
             output_unmanaged_conversion: Default::default(),
             output_unmanaged_names: Default::default(),
             output_conversion_fields: Default::default(),
             output_trampoline: Default::default(),
+            output_trampolines: Default::default(),
+            output_wire_buffer: Default::default(),
+            output_wire_types: Default::default(),
+            output_wire_helper_classes: Default::default(),
+            output_wires: Default::default(),
             output_plugin_interface: Default::default(),
             output_service_interface: Default::default(),
             output_composite_ty: Default::default(),
@@ -144,6 +156,7 @@ pub struct ModelPasses {
     pub service_all: model::common::service::all::Pass,
     pub type_util: model::common::types::util::Pass,
     pub trampoline: model::dotnet::trampoline::Pass,
+    pub wire_nested: model::rust::wire::nested::Pass,
 }
 
 /// Intermediate output passes for the dotnet pipeline.
@@ -152,6 +165,11 @@ pub struct IntermediateOutputPasses {
     pub unmanaged_names: output::common::conversion::unmanaged_names::Pass,
     pub conversion_fields: output::common::conversion::fields::Pass,
     pub trampoline: output::dotnet::trampoline::Pass,
+    pub trampolines: output::dotnet::trampolines::Pass,
+    pub wire_buffer: output::dotnet::wire_buffer::Pass,
+    pub wire_types: output::rust::wire::wire_type::Pass,
+    pub wire_helper_classes: output::rust::wire::helper_classes::Pass,
+    pub wires: output::rust::wire::all::Pass,
     pub plugin_interface: output::dotnet::interface::plugin::Pass,
     pub service_interface: output::dotnet::interface::service::Pass,
     pub composite_ty: output::common::types::composites::definition::Pass,
@@ -228,6 +246,7 @@ impl DotnetLibrary {
                 service_all: model::common::service::all::Pass::new(config.model_service_map),
                 type_util: model::common::types::util::Pass::new(config.model_type_util),
                 trampoline: model::dotnet::trampoline::Pass::new(config.model_trampoline),
+                wire_nested: model::rust::wire::nested::Pass::new(config.model_wire_nested),
             },
             output_master: output::common::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
@@ -235,6 +254,11 @@ impl DotnetLibrary {
                 unmanaged_names: output::common::conversion::unmanaged_names::Pass::new(config.output_unmanaged_names),
                 conversion_fields: output::common::conversion::fields::Pass::new(config.output_conversion_fields),
                 trampoline: output::dotnet::trampoline::Pass::new(config.output_trampoline),
+                trampolines: output::dotnet::trampolines::Pass::new(config.output_trampolines),
+                wire_buffer: output::dotnet::wire_buffer::Pass::new(config.output_wire_buffer),
+                wire_types: output::rust::wire::wire_type::Pass::new(config.output_wire_types),
+                wire_helper_classes: output::rust::wire::helper_classes::Pass::new(config.output_wire_helper_classes),
+                wires: output::rust::wire::all::Pass::new(config.output_wires),
                 plugin_interface: output::dotnet::interface::plugin::Pass::new(config.output_plugin_interface),
                 service_interface: output::dotnet::interface::service::Pass::new(config.output_service_interface),
                 composite_ty: output::common::types::composites::definition::Pass::new(config.output_composite_ty),
@@ -294,6 +318,7 @@ impl DotnetLibrary {
             r.run(m.type_util.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_all))?;
             r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &mut m.fns_all, &self.inventory.functions))?;
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
+            r.run(m.wire_nested.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &mut m.type_names, &self.inventory.types))?;
             r.run(m.trampoline.process(&mut pass_meta, &m.fns_all, &m.service_all))?;
 
             Ok(())
@@ -323,9 +348,14 @@ impl DotnetLibrary {
         o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_exception_for_variant, &o.enum_body_tostring, &o.unmanaged_conversion)?;
         o.enums.process(&mut pass_meta, &self.output_master, &m.type_all, &o.enum_ty, &o.enum_body)?;
         o.util.process(&mut pass_meta, &self.output_master)?;
+        o.trampolines.process(&mut pass_meta, &self.output_master)?;
+        o.wire_buffer.process(&mut pass_meta, &self.output_master, &self.inventory.types)?;
+        o.wire_types.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
+        o.wire_helper_classes.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
+        o.wires.process(&mut pass_meta, &self.output_master, &o.wire_types, &o.wire_helper_classes)?;
         o.trampoline.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &m.service_all)?;
-        o.plugin_interface.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all)?;
-        o.service_interface.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all)?;
+        o.plugin_interface.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &m.id_maps, &self.inventory.types)?;
+        o.service_interface.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.id_maps, &self.inventory.types)?;
 
         // Final output pass
         self.output_final.process(&mut pass_meta, &self.output_master, &self.output_passes, &mut self.output)?;
