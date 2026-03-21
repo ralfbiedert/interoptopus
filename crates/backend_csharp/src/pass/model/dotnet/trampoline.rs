@@ -68,7 +68,10 @@ impl Pass {
 
         let mut entries = Vec::new();
 
-        for (&fn_id, _func) in fns_all.originals() {
+        let mut originals: Vec<_> = fns_all.originals().collect();
+        originals.sort_by(|(_, a), (_, b)| a.name.cmp(&b.name));
+
+        for (&fn_id, _func) in originals {
             let kind = match service_fn_roles.get(&fn_id) {
                 Some((svc_id, ServiceFnRole::Ctor)) => TrampolineKind::ServiceCtor { service_id: *svc_id },
                 Some((svc_id, ServiceFnRole::Method)) => TrampolineKind::ServiceMethod { service_id: *svc_id },

@@ -41,7 +41,10 @@ impl Pass {
         for file in output_master.outputs_of(FileType::Csharp) {
             let mut all_interfaces = Vec::new();
 
-            for (_svc_id, svc) in services.iter() {
+            let mut sorted_services: Vec<_> = services.iter().collect();
+            sorted_services.sort_by_key(|(_, svc)| types.get(svc.ty).map(|t| t.name.as_str()).unwrap_or(""));
+
+            for (_svc_id, svc) in sorted_services {
                 let Some(type_info) = types.get(svc.ty) else { continue };
                 let type_name = &type_info.name;
                 let interface_name = format!("I{type_name}");
