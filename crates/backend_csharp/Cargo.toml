@@ -26,6 +26,7 @@ interoptopus = { workspace = true, features = ["serde"] }
 interoptopus_csharp = { path = ".", features = ["unstable-plugins"] }
 reference_project.workspace = true
 insta.workspace = true
+tokio.workspace = true
 
 [lints]
 workspace = true

@@ -72,7 +72,6 @@ use crate::lang::types::{SerializationError, TypeInfo, TypeKind, WireIO};
 use std::ffi::c_void;
 use std::future::Future;
 use std::io::{Read, Write};
-use std::marker::PhantomData;
 use std::ops::Deref;
 use std::pin::Pin;
 use std::ptr::null;

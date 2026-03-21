@@ -1,4 +1,4 @@
-use interoptopus::pattern::asynk::{AsyncCallback, AsyncCallbackFuture};
+use interoptopus::pattern::asynk::AsyncCallback;
 
 interoptopus::plugin!(ServiceBasic {
     impl ServiceA {
@@ -13,9 +13,12 @@ interoptopus::plugin!(ServiceBasic {
 });
 
 interoptopus::plugin!(ServiceAsync {
+    async fn raw1(&self) -> u32;
+
     impl AsyncBasic {
         fn create() -> Self;
         fn raw(&self, x: u32, cb: AsyncCallback<u32>);
+        async fn raw2(&self) -> u32;
     }
 });
 

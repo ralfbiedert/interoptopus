@@ -21,9 +21,10 @@ pub struct ServiceBlock {
     pub methods: Vec<PluginMethod>,
 }
 
-/// A method inside a plugin block. Supports `&self` and `-> Self`.
+/// A method inside a plugin block. Supports `&self`, `-> Self`, and `async fn`.
 pub struct PluginMethod {
     pub name: Ident,
+    pub is_async: bool,
     pub has_self: bool,
     pub params: Vec<PluginParam>,
     pub ret: Option<Type>,
@@ -124,6 +125,10 @@ impl Parse for ServiceBlock {
 
 impl Parse for PluginMethod {
     fn parse(input: ParseStream) -> syn::Result<Self> {
+        let is_async = input.peek(Token![async]);
+        if is_async {
+            input.parse::<Token![async]>()?;
+        }
         input.parse::<Token![fn]>()?;
         let name: Ident = input.parse()?;
 
@@ -143,7 +148,7 @@ impl Parse for PluginMethod {
         let ret = parse_return_type(input)?;
         input.parse::<Token![;]>()?;
 
-        Ok(Self { name, has_self, params, ret })
+        Ok(Self { name, is_async, has_self, params, ret })
     }
 }
 
