@@ -36,24 +36,23 @@ reference_project = { path = "crates/reference_project" }
 
 
 # External
-netcorehost = { version = "0.20", features = ["nethost-download", "net9_0"] }
-tempfile = "3"
 anyhow = "1.0.98"
 derive_builder = "0.20.2"
 heck = "0.5.0"
 include_dir = { version = "0.7.4", features = ["glob"] }
+insta = "1.43.2"
+netcorehost = { version = "0.20", features = ["nethost-download", "net9_0"] }
 prettyplease = "0.2.35"
 proc-macro2 = "1.0.95"
 quote = "1.0.40"
-rustc-hash = { version = "2.1", default-features = false }
 serde = "1.0.219"
 serde_json = "1.0.145"
 syn = "2.0.104"
 tar = "0.4.44"
+tempfile = "3"
 tera = "1"
 tokio = "1.48.0"
 trybuild = "1.0.111"
-insta = "1.43.2"
 
 [workspace.lints.clippy]
 correctness = { level = "deny", priority = -1 }

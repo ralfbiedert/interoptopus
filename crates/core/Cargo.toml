@@ -25,7 +25,6 @@ serde = { workspace = true, features = ["derive"], optional = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "io-std"], optional = true }
 
 [dev-dependencies]
-rustc-hash.workspace = true
 trybuild.workspace = true
 
 [package.metadata.docs.rs]
