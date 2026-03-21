@@ -124,7 +124,7 @@ impl Loader for DllLoader {
             {
                 Ok(managed_fn) => {
                     let f: extern "system" fn() = *managed_fn;
-                    unsafe { std::mem::transmute::<extern "system" fn(), *const u8>(f) }
+                    unsafe { std::mem::transmute::<_, *const u8>(f) }
                 }
                 Err(_) => std::ptr::null(),
             }

@@ -3,8 +3,8 @@
 use interoptopus_backends::output::Multibuf;
 use std::path::{Path, PathBuf};
 
-mod basic;
 mod complex;
+mod functions;
 mod pattern;
 mod service;
 mod wire;

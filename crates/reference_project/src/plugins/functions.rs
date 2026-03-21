@@ -11,3 +11,7 @@ interoptopus::plugin!(Primitives {
     fn primitive_f32(x: f32) -> f32;
     fn primitive_f64(x: f64) -> f64;
 });
+
+interoptopus::plugin!(Behavior {
+    fn panic();
+});
