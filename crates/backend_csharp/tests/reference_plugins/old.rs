@@ -90,5 +90,5 @@ fn can_run_dotnet_pipeline() {
 
     let output = DotnetLibrary::builder(Plugin::inventory()).build().process().expect("pipeline failed");
 
-    output.write_buffers_to("tests/plugins/dotnet_plugin").expect("write failed");
+    output.write_buffers_to("tests/reference_plugins/dotnet_plugin").expect("write failed");
 }

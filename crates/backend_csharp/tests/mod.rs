@@ -3,7 +3,7 @@
 #[macro_use]
 mod common;
 mod output;
-mod plugins;
+mod reference_plugins;
 
 mod reference_project {
     use interoptopus_csharp::RustLibrary;

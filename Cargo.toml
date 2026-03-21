@@ -36,6 +36,8 @@ reference_project = { path = "crates/reference_project" }
 
 
 # External
+netcorehost = { version = "0.20", features = ["nethost-download", "net9_0"] }
+tempfile = "3"
 anyhow = "1.0.98"
 derive_builder = "0.20.2"
 heck = "0.5.0"

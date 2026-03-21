@@ -8,6 +8,13 @@ alias doc := docs
 build verbose="":
     cargo build --all-features {{ verbose }}
 
+# Builds the .NET plugin (reverse interop) plugins.
+build-dotnet-plugins: (_build-dotnet-plugin "basic")
+
+_build-dotnet-plugin name:
+    dotnet build crates/backend_csharp/tests/reference_plugins/{{name}}.dll/{{name}}.csproj
+    cp crates/backend_csharp/tests/reference_plugins/{{name}}.dll/bin/Debug/net10.0/{{name}}.dll crates/backend_csharp/tests/reference_plugins/_plugins
+
 # Run unit tests, check semantic correctness.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
 test verbose="" package="":

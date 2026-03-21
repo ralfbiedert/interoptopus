@@ -8,10 +8,11 @@ use std::sync::Arc;
 
 const DEFAULT_RUNTIME_CONFIG: &str = r#"{
   "runtimeOptions": {
-    "tfm": "net9.0",
+    "tfm": "net10.0",
+    "rollForward": "LatestMajor",                                                                                                                                                                                                                                        
     "framework": {
       "name": "Microsoft.NETCore.App",
-      "version": "9.0.0"
+      "version": "10.0.0"
     }
   }
 }"#;
@@ -85,10 +86,8 @@ impl DotNetRuntime {
 
     /// Creates a [`DllLoader`] bound to the given assembly, looking up
     /// `[UnmanagedCallersOnly]` methods in `{namespace}.Interop`.
-    pub fn dll_loader_with_namespace(&self, path: &str, namespace: &str) -> Result<DllLoader, PluginLoadError> {
-        let dll_path = Path::new(path);
-
-        let dll_pdc = PdCString::from_os_str(dll_path.as_os_str()).expect("dll path contains null bytes");
+    pub fn dll_loader_with_namespace(&self, dll_path: impl AsRef<Path>, namespace: &str) -> Result<DllLoader, PluginLoadError> {
+        let dll_pdc = PdCString::from_os_str(dll_path.as_ref().as_os_str()).expect("dll path contains null bytes");
 
         let delegate_loader = self
             .context
@@ -96,6 +95,7 @@ impl DotNetRuntime {
             .map_err(|e| PluginLoadError::LoadFailed(e.to_string()))?;
 
         let assembly_name = dll_path
+            .as_ref()
             .file_stem()
             .and_then(|s| s.to_str())
             .ok_or_else(|| PluginLoadError::LoadFailed("invalid DLL path".to_string()))?

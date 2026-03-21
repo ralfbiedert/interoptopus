@@ -70,7 +70,7 @@ impl PluginModel {
             register_trampoline: extern "C" fn(i64, *const u8)
         };
 
-        quote! { struct #name { #(#bare_fields,)* #(#service_fields,)* #register_trampoline_field, } }
+        quote! { pub struct #name { #(#bare_fields,)* #(#service_fields,)* #register_trampoline_field, } }
     }
 
     // -----------------------------------------------------------------------
