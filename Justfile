@@ -8,7 +8,7 @@ alias doc := docs
 build verbose="":
     cargo build --all-features {{ verbose }}
 
-# Builds the .NET plugin (reverse interop) plugins.
+# Builds the .NET (reverse interop) plugins. Separate step, as .NET output is not reproducible.  
 build-dotnet-plugins: (_build-dotnet-plugin "basic") (_build-dotnet-plugin "complex") (_build-dotnet-plugin "pattern")  (_build-dotnet-plugin "service") (_build-dotnet-plugin "wire")
 
 _build-dotnet-plugin name:
