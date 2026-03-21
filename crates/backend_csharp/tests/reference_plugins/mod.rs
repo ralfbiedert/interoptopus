@@ -5,7 +5,6 @@ use std::path::{Path, PathBuf};
 
 mod basic;
 mod complex;
-mod old;
 mod pattern;
 mod service;
 mod wire;

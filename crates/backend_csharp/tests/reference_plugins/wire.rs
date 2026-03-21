@@ -23,5 +23,8 @@ fn load_plugin() -> Result<(), Box<dyn Error>> {
     assert_eq!(result.get("foo").map(String::as_str), Some("bar"));
     assert_eq!(result.get("hello").map(String::as_str), Some("world"));
 
+    let result = plugin.wire_string(Wire::from("{}".to_string())).unwire();
+    dbg!(result);
+
     Ok(())
 }
