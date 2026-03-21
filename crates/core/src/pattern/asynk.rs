@@ -72,9 +72,12 @@ use crate::lang::types::{SerializationError, TypeInfo, TypeKind, WireIO};
 use std::ffi::c_void;
 use std::future::Future;
 use std::io::{Read, Write};
+use std::marker::PhantomData;
 use std::ops::Deref;
+use std::pin::Pin;
 use std::ptr::null;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
+use std::task::{Context, Poll, Waker};
 
 /// When used as the last parameter, makes a function `async`.
 #[doc(hidden)]
@@ -92,6 +95,11 @@ impl<T: TypeInfo> AsyncCallback<T> {
     ///   Creates a new instance of the callback using  `extern "C" fn`
     pub fn new(func: extern "C" fn(&T, *const c_void)) -> Self {
         Self(Some(func), null())
+    }
+
+    /// Creates a callback with an explicit context pointer (e.g., a leaked `Arc` for use with [`AsyncCallbackFuture`]).
+    pub fn with_context(func: extern "C" fn(&T, *const c_void), context: *const c_void) -> Self {
+        Self(Some(func), context)
     }
 
     /// Will call function if it exists, panic otherwise.
@@ -178,6 +186,67 @@ impl<T: WireIO> WireIO for AsyncCallback<T> {
 
     fn live_size(&self) -> usize {
         bad_wire!()
+    }
+}
+
+/// Internal payload used by `AsyncCallbackFuture`.
+struct FutureState<T> {
+    result: Option<T>,
+    waker: Option<Waker>,
+}
+
+extern "C" fn async_callback_complete<T: Clone + Send + 'static>(value: &T, context: *const c_void) {
+    // Safety: `context` is always an `Arc<Mutex<FutureState<T>>>` created in
+    // `AsyncCallbackFuture::new` via `Arc::into_raw`. We reclaim ownership here —
+    // this matches the one extra strong count deposited by `into_raw`.
+    let state = unsafe { Arc::from_raw(context.cast::<Mutex<FutureState<T>>>()) };
+    let mut lock = state.lock().unwrap();
+    lock.result = Some(value.clone());
+    if let Some(waker) = lock.waker.take() {
+        waker.wake();
+    }
+}
+
+/// A [`Future`] that resolves when its paired [`AsyncCallback<T>`] is invoked.
+///
+/// Use [`AsyncCallbackFuture::new`] to produce a matched `(future, callback)` pair.
+/// Pass the callback to any FFI function accepting [`AsyncCallback<T>`], then
+/// `.await` the future to receive the result.
+///
+/// # Lifetimes / cancellation
+///
+/// If the future is dropped before the callback fires, the shared state is kept
+/// alive by the leaked Arc ref in the callback's context pointer and is freed
+/// when the callback eventually fires. If the native side never calls the
+/// callback the Arc leaks — this is the same contract as the underlying FFI.
+pub struct AsyncCallbackFuture<T> {
+    state: Arc<Mutex<FutureState<T>>>,
+}
+
+impl<T: Clone + Send + 'static + TypeInfo> AsyncCallbackFuture<T> {
+    /// Creates a `(future, callback)` pair.
+    pub fn new() -> (Self, AsyncCallback<T>) {
+        let state = Arc::new(Mutex::new(FutureState { result: None, waker: None }));
+
+        // Crate async callback with state stored and one extra strong count on the context pointer.
+        let raw = Arc::into_raw(Arc::clone(&state)).cast::<c_void>();
+        let cb = AsyncCallback::with_context(async_callback_complete::<T>, raw);
+
+        (Self { state }, cb)
+    }
+}
+
+impl<T: Clone + Send + 'static> Future for AsyncCallbackFuture<T> {
+    type Output = T;
+
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<T> {
+        let mut lock = self.state.lock().unwrap();
+        if let Some(result) = lock.result.take() {
+            Poll::Ready(result)
+        } else {
+            lock.waker = Some(cx.waker().clone());
+            Poll::Pending
+        }
     }
 }
 
