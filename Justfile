@@ -9,7 +9,7 @@ build verbose="":
     cargo build --all-features {{ verbose }}
 
 # Builds the .NET plugin (reverse interop) plugins.
-build-dotnet-plugins: (_build-dotnet-plugin "basic") (_build-dotnet-plugin "complex") (_build-dotnet-plugin "pattern")  (_build-dotnet-plugin "service")
+build-dotnet-plugins: (_build-dotnet-plugin "basic") (_build-dotnet-plugin "complex") (_build-dotnet-plugin "pattern")  (_build-dotnet-plugin "service") (_build-dotnet-plugin "wire")
 
 _build-dotnet-plugin name:
     dotnet build crates/backend_csharp/tests/reference_plugins/{{name}}.dll/{{name}}.csproj -v q 

@@ -8,6 +8,7 @@ mod complex;
 mod old;
 mod pattern;
 mod service;
+mod wire;
 
 /// Generates interop files for `$plugin` into the `$name` folder and snapshot-tests the output.
 #[macro_export]
