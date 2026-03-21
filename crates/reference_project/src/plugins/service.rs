@@ -1,7 +1,3 @@
-use crate::patterns::result::Error;
-use crate::types::basic::Vec3f32;
-use interoptopus::ffi;
-
 interoptopus::plugin!(Service {
     impl ServiceA {
         fn create() -> Self;
