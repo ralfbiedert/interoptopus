@@ -40,6 +40,7 @@ pub mod services {
     pub mod string;
 }
 
+pub mod plugins;
 pub mod types;
 pub mod wire;
 
