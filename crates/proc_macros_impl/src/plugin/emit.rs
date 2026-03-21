@@ -262,7 +262,7 @@ fn emit_service_struct(s: &ServiceBlock) -> TokenStream {
     let drop_field = format_ident!("{}_drop", prefix);
 
     quote! {
-        struct #name {
+        pub struct #name {
             handle: isize,
             #(#method_fields,)*
             #drop_field: extern "C" fn(isize),

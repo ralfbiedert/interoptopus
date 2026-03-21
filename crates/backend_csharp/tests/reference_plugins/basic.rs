@@ -1,11 +1,19 @@
-use crate::define_check_and_load_plugin;
-use reference_project::plugins::basic::Primitives;
+use crate::{define_plugin, load_plugin};
+use interoptopus::plugin;
+use reference_project::plugins::primitive::Primitives;
 use std::error::Error;
 
+#[test]
+fn define_plugin() -> Result<(), Box<dyn Error>> {
+    define_plugin!(Primitives, "basic.dll");
+    Ok(())
+}
+
+// Test ignored since we can't rely on a working .NET runtime being available on CI
 #[ignore]
 #[test]
-fn basic() -> Result<(), Box<dyn Error>> {
-    let plugin = define_check_and_load_plugin!(Primitives, "basic.dll");
+fn load_plugin() -> Result<(), Box<dyn Error>> {
+    let plugin = load_plugin!(Primitives, "basic.dll");
 
     plugin.primitive_void();
     assert_eq!(plugin.primitive_u8(1), 2);
