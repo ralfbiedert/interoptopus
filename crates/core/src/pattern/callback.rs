@@ -65,37 +65,6 @@
 //! To fix this, you can replace `pub type CallbackSlice = ...` with a `callback!` call
 //! which should generate a helper type that works.
 //!
-//! # How to return callbacks from functions
-//!
-//! Due to another Rust limitation this won't work, despite the `From<>` conversion
-//! "being implemented".
-//!
-//! ```rust,ignore
-//! use interoptopus::{ffi_function, callback};
-//!
-//! callback!(SumFunction(x: i32, y: i32) -> i32);
-//!
-//! #[ffi_function]
-//! #[no_mangle]
-//! pub extern "C" fn return_sum_function() -> SumFunction {
-//!     my_sum_function.into() // Compile error, mismatch between `function item type` and `function pointer type`
-//! }
-//!
-//! extern "C" fn my_sum_function(x: i32, y: i32) -> i32 { x + y }
-//! ```
-//!
-//! Instead, you will have to return function pointers like so:
-//!
-//! ```rust
-//! # use interoptopus::{ffi, callback};
-//! # callback!(SumFunction(x: i32, y: i32) -> i32);
-//! # extern "C" fn my_sum_function(x: i32, y: i32, _: *const std::ffi::c_void) -> i32 { x + y }
-//! #
-//! #[ffi]
-//! pub fn return_sum_function() -> SumFunction {
-//!     SumFunction(Some(my_sum_function), std::ptr::null())
-//! }
-//! ```
 
 /// Defines a callback type, akin to a `fn f(T) -> R` wrapped in an [`Option`](std::option).
 ///
@@ -128,11 +97,7 @@
 ///
 /// callback!(MyCallback() -> u8);
 ///
-/// extern "C" fn my_rust_callback(_: *const std::ffi::c_void) -> u8 {
-///     42
-/// }
-///
-/// let callback = MyCallback::new(my_rust_callback);
+/// let callback = MyCallback::from_fn(|| 42);
 /// assert_eq!(42, callback.call());
 /// ```
 #[macro_export]
