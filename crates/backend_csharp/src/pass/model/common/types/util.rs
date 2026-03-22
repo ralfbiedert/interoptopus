@@ -3,7 +3,7 @@
 
 use crate::lang::meta::{Emission, FileEmission};
 use crate::lang::types::csharp;
-use crate::lang::types::kind::{TypeKind, Util};
+use crate::lang::types::kind::{TypeKind, TypePattern, Util};
 use crate::lang::types::{Decorators, Type};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
@@ -32,6 +32,13 @@ impl Pass {
         if self.done {
             return Ok(Unchanged);
         }
+
+        // Bool is always synthesized — Primitive::Bool has Emission::Builtin so the
+        // inventory-based lookup would never give it FileEmission::Common.
+        let bool_kind = TypeKind::TypePattern(TypePattern::Bool);
+        kinds.set(csharp::BOOL, bool_kind.clone());
+        names.set(csharp::BOOL, "Bool".to_string());
+        types.set(csharp::BOOL, Type { emission: Emission::FileEmission(FileEmission::Common), name: "Bool".to_string(), kind: bool_kind, decorators: Decorators::default() });
 
         let utils = [
             (csharp::UTIL_INTEROP_EXCEPTION, "InteropException", Util::InteropException),

@@ -15,6 +15,12 @@ public class Plugin : IPlugin
         });
     }
 
+    public static NestedArray NestedArray(NestedArray nested)
+    {
+        nested.field_array[1] = 2;
+        return nested;
+    }
+
     public static Vec3f32 Vec3f32(Vec3f32 nested)
     {
         (nested.x, nested.y) = (nested.y, nested.x);

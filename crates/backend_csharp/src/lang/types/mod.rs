@@ -8,7 +8,8 @@ pub use overload::{DelegateFamily, OverloadFamily, PointerFamily};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ManagedConversion {
-    /// Primitive types that convert via language built-ins
+    /// Primitive types that convert via language built-ins, and blittable types that require no
+    /// marshalling logic.
     AsIs,
     /// Conversion via `To...` methods, indicating no ownership transfer (Rust type is `Copy`).
     To,

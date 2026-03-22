@@ -42,7 +42,7 @@ impl Pass {
                 .any(|(type_id, ty)| output_master.type_belongs_to(*type_id, file) && matches!(&ty.kind, TypeKind::TypePattern(TypePattern::Bool)));
 
             let content = if file_has_bool {
-                templates.render("rust/pattern/bool.cs", &Context::new())?.trim().to_string()
+                templates.render("common/pattern/bool.cs", &Context::new())?.trim().to_string()
             } else {
                 String::new()
             };

@@ -5,6 +5,10 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
 namespace {{ namespace }};
+{% if pattern_bools %}
+
+{{ pattern_bools }}
+{% endif %}
 {% for delegate in delegates %}
 
 {{ delegate }}

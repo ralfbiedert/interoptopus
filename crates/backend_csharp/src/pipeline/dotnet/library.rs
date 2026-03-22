@@ -39,6 +39,7 @@ pub struct DotnetLibraryConfig {
     pub output_conversion_fields: output::common::conversion::fields::Config,
     pub output_trampoline: output::dotnet::trampoline::Config,
     pub output_trampolines: output::dotnet::trampolines::Config,
+    pub output_pattern_bools: output::common::pattern::bools::Config,
     pub output_wire_buffer: output::common::pattern::wire_buffer::Config,
     pub output_wire_types: output::common::wire::wire_type::Config,
     pub output_wire_helper_classes: output::common::wire::helper_classes::Config,
@@ -103,6 +104,7 @@ impl Default for DotnetLibraryConfig {
             output_conversion_fields: Default::default(),
             output_trampoline: Default::default(),
             output_trampolines: Default::default(),
+            output_pattern_bools: Default::default(),
             output_wire_buffer: Default::default(),
             output_wire_types: Default::default(),
             output_wire_helper_classes: Default::default(),
@@ -173,6 +175,7 @@ pub struct IntermediateOutputPasses {
     pub conversion_fields: output::common::conversion::fields::Pass,
     pub trampoline: output::dotnet::trampoline::Pass,
     pub trampolines: output::dotnet::trampolines::Pass,
+    pub pattern_bools: output::common::pattern::bools::Pass,
     pub wire_buffer: output::common::pattern::wire_buffer::Pass,
     pub wire_types: output::common::wire::wire_type::Pass,
     pub wire_helper_classes: output::common::wire::helper_classes::Pass,
@@ -265,6 +268,7 @@ impl DotnetLibrary {
                 conversion_fields: output::common::conversion::fields::Pass::new(config.output_conversion_fields),
                 trampoline: output::dotnet::trampoline::Pass::new(config.output_trampoline),
                 trampolines: output::dotnet::trampolines::Pass::new(config.output_trampolines),
+                pattern_bools: output::common::pattern::bools::Pass::new(config.output_pattern_bools),
                 wire_buffer: output::common::pattern::wire_buffer::Pass::new(config.output_wire_buffer),
                 wire_types: output::common::wire::wire_type::Pass::new(config.output_wire_types),
                 wire_helper_classes: output::common::wire::helper_classes::Pass::new(config.output_wire_helper_classes),
@@ -364,6 +368,7 @@ impl DotnetLibrary {
         o.delegates_class.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
         o.delegates_signature.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.trampolines.process(&mut pass_meta, &self.output_master)?;
+        o.pattern_bools.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.wire_buffer.process(&mut pass_meta, &self.output_master, &m.wire_helpers, &self.inventory.functions, &self.inventory.types)?;
         o.wire_types.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
         o.wire_helper_classes.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
