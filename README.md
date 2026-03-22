@@ -125,11 +125,11 @@ Rust app, but need to rely on legacy .NET libraries.
 | `plugin.primitive_u32(42)`                             | 4         |
 | `plugin.wire_hashmap_string({"foo": "bar"}).unwire()`  | 951       |
 | `plugin.wire_hashmap_string(16 x {_16: _16}).unwire()` | 5268      |
-| `plugin.async service.add_one(1).await`                | 1097      |
+| `plugin.add_one(1).await`                              | 1097      |
 
 
 In essence, plain calls are near-zero overhead. Wire-based (JSON) transfers scale with payload size.
-Async plugin calls add ~1–2 µs due to task scheduling on both sides.
+Async plugin calls add ~1 µs due to task scheduling on both sides.
 
 
 ## Feature Flags
