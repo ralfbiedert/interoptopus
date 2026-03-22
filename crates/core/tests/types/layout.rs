@@ -158,7 +158,7 @@ fn named_callback() {
     assert_eq!(mem::align_of::<LayoutCallback>(), PTR_SIZE);
 
     // from_closure(): all three fields non-null
-    let cb = LayoutCallback::from_closure(|x| x + 1);
+    let cb = LayoutCallback::from_fn(|x| x + 1);
     unsafe {
         let callback_ptr = *std::ptr::addr_of!(cb.callback).cast::<*const u8>();
         assert!(!callback_ptr.is_null(), "callback must be non-null");

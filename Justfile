@@ -29,6 +29,17 @@ test-dotnet:
     cargo test --test mod reference_project::interop
     dotnet test crates/backend_csharp/tests/reference_project/reference_project_tests.csproj
 
+# Runs the ignored plugin-loading tests (requires .NET runtime and built DLLs from build-dotnet-plugins).
+test-dotnet-plugins: build-dotnet-plugins
+    cargo test --test mod --features unstable-plugins -- --include-ignored \
+        reference_plugins::complex::load_plugin \
+        reference_plugins::functions::load_plugin_functions_primitive \
+        reference_plugins::functions::load_plugin_functions_behavior \
+        reference_plugins::pattern::load_plugin \
+        reference_plugins::service::load_plugin_service_basic \
+        reference_plugins::service::load_plugin_service_async \
+        reference_plugins::wire::load_plugin
+
 # Runs .NET benchmarks.
 bench-dotnet:
     # Make sure the DLL + Interop files exist
