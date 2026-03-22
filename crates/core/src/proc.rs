@@ -171,7 +171,71 @@ pub use interoptopus_proc::ffi;
 #[cfg(feature = "derive")]
 pub use interoptopus_proc::AsyncRuntime;
 
-/// Declares a plugin interface for reverse interop (loading foreign plugins from Rust).
+/// Declares a plugin interface for reverse interop, e.g., loading a C# DLL from Rust.
+///
+/// Whereas normal interoptopus use exports Rust code to other languages, `plugin!` works in the
+/// opposite direction: it lets Rust *call into* a foreign library (e.g. a C# `.dll`) by generating
+/// a typed Rust struct whose methods dispatch through FFI function pointers loaded at runtime.
+///
+/// # Syntax
+///
+/// Plugins are defined with a special syntax that can declare direct functions and instantiatable
+/// services:
+///
+/// ```rust
+/// use interoptopus::ffi;
+/// use interoptopus::lang::meta::Visibility::Public;
+/// use interoptopus::lang::types::TypeKind::Enum;
+/// use interoptopus::wire::Wire;
+///
+/// # #[ffi]
+/// # #[derive(Clone)]
+/// # enum Error { A }
+/// #
+/// interoptopus::plugin!(MyPlugin {
+///     // Direct synchronous and async functions
+///     fn add_one(x: u32) -> u32;
+///     async fn process(data: Wire<String>);
+///
+///     // Service blocks: a constructor returning Self plus instance methods
+///     impl Processor {
+///         fn create(name: Wire<String>) -> Self;
+///         fn run(&self, x: f32) -> f32;
+///         async fn run_async(&self) -> ffi::Result<u8, Error>;
+///     }
+/// });
+/// ```
+///
+/// For the example above, the macro generates a `MyPlugin` struct with the following methods:
+///
+/// ```rust,ignore
+/// // Direct functions — call straight through to the loaded FFI symbol:
+/// plugin.add_one(1)                          
+/// plugin.process(Wire::from("hi")).await
+///
+/// // Service constructor — symbol name is the lowercased type name + "_create":
+/// let proc: Processor = plugin.processor_create(Wire::from("my-proc"));
+///
+/// // Instance methods on the returned Processor value:
+/// proc.run(1.5)
+/// proc.run_async().await
+/// ```
+///
+/// # Loading a plugin
+///
+/// To instantiate a plugin a backend-specific loader is needed. For example,
+/// the `interoptopus_csharp` crate provides `DotNetRuntime` and `DllLoader` for
+/// loading `.NET` assemblies:
+///
+/// ```rust,ignore
+/// let loader = DotNetRuntime::new()?
+///     .set_exception_handler(|msg| eprintln!("plugin error: {msg}"))
+///     .dll_loader_with_namespace("path/to/my_plugin.dll", "My.Company")?;
+///
+/// let plugin = MyPlugin::new(&loader)?;
+/// ```
+///
+/// Note, this example is illustrative, the actual API is subject to change.
 #[cfg(all(feature = "derive", feature = "unstable-plugins"))]
 pub use interoptopus_proc::plugin;
 
