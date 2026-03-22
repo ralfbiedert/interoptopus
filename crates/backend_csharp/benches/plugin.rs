@@ -1,39 +1,21 @@
-use interoptopus::ffi;
 use interoptopus::wire::Wire;
 use interoptopus_csharp::plugin::DotNetRuntime;
+use reference_project::plugins::functions::Primitives;
+use reference_project::plugins::service::ServiceBasic;
+use reference_project::plugins::wire::Wired;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
-fn plugin_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/plugins/dotnet_plugin/bin/Release/net10.0")
+fn plugins_dir() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/reference_plugins/_plugins")
 }
 
-fn dll_path() -> PathBuf {
-    let path = plugin_dir().join("Plugin.dll");
-    assert!(path.exists(), "Plugin DLL not found at {path:?}. Run `dotnet build` in tests/plugins/dotnet_plugin/ first.");
+fn dll_path(name: &str) -> PathBuf {
+    let path = plugins_dir().join(name);
+    assert!(path.exists(), "Plugin DLL not found at {path:?}. Run `just build-dotnet-plugins` first.");
     path
 }
-
-#[derive(Clone, Copy)]
-#[ffi]
-pub struct Big16 {
-    pub f00: u32, pub f01: u32, pub f02: u32, pub f03: u32,
-    pub f04: u32, pub f05: u32, pub f06: u32, pub f07: u32,
-    pub f08: u32, pub f09: u32, pub f10: u32, pub f11: u32,
-    pub f12: u32, pub f13: u32, pub f14: u32, pub f15: u32,
-}
-
-interoptopus::plugin!(BenchPlugin {
-    fn primitive_void();
-    fn primitive_u32(x: u32) -> u32;
-    impl Foo {
-        fn create() -> Self;
-        fn wire(&self, x: Wire<String>) -> Wire<String>;
-        fn wire2(&self, x: Wire<HashMap<String, String>>) -> Wire<HashMap<String, String>>;
-        fn big16(&self, x: Big16) -> Big16;
-    }
-});
 
 const ITERATIONS: u32 = 100_000;
 
@@ -69,57 +51,58 @@ fn main() {
     println!("Running plugin benchmarks (Rust → .NET) ...");
 
     let runtime = DotNetRuntime::new().expect("Failed to create .NET runtime");
-    let loader = runtime
-        .dll_loader_with_namespace(dll_path().to_str().unwrap(), "My.Company")
-        .expect("Failed to load plugin DLL");
-    let plugin = BenchPlugin::new(&loader).expect("Failed to load plugin");
+
+    let primitives_loader = runtime
+        .dll_loader_with_namespace(dll_path("functions_primitive.dll"), "My.Company")
+        .expect("Failed to load functions_primitive.dll");
+    let primitives = Primitives::new(&primitives_loader).expect("Failed to load Primitives plugin");
+
+    let wire_loader = runtime
+        .dll_loader_with_namespace(dll_path("wire.dll"), "My.Company")
+        .expect("Failed to load wire.dll");
+    let wired = Wired::new(&wire_loader).expect("Failed to load Wired plugin");
+
+    let service_loader = runtime
+        .dll_loader_with_namespace(dll_path("service_basic.dll"), "My.Company")
+        .expect("Failed to load service_basic.dll");
+    let service = ServiceBasic::new(&service_loader).expect("Failed to load ServiceBasic plugin");
 
     let baseline = calibrate();
     let mut entries: Vec<Entry> = Vec::new();
 
-    let t = measure(ITERATIONS, || plugin.primitive_void());
+    let t = measure(ITERATIONS, || primitives.primitive_void());
     let ns = ns_per_call(t, baseline, ITERATIONS);
     println!("primitive_void(): {ns:.0}");
     entries.push(Entry { name: "primitive_void()".to_string(), ns });
 
-    let t = measure(ITERATIONS, || {
-        let _ = plugin.primitive_u32(42);
-    });
+    let t = measure(ITERATIONS, || { let _ = primitives.primitive_u32(42); });
     let ns = ns_per_call(t, baseline, ITERATIONS);
     println!("primitive_u32(42): {ns:.0}");
     entries.push(Entry { name: "primitive_u32(42)".to_string(), ns });
 
-    let foo = plugin.foo_create();
-    let hello = "hello world".to_string();
+    let svc = service.servicea_create();
+    let t = measure(ITERATIONS, || { let _ = svc.call(5); });
+    let ns = ns_per_call(t, baseline, ITERATIONS);
+    println!("svc.call(5): {ns:.0}");
+    entries.push(Entry { name: "svc.call(5)".to_string(), ns });
+
+    let json_input = "{}".to_string();
     let t = measure(ITERATIONS, || {
-        let _ = foo.wire(Wire::from(hello.clone())).unwire();
+        let _ = wired.wire_string(Wire::from(json_input.clone())).unwire();
     });
     let ns = ns_per_call(t, baseline, ITERATIONS);
-    println!("foo.wire(Wire::from(\"hello world\")).unwire(): {ns:.0}");
-    entries.push(Entry { name: r#"foo.wire(Wire::from("hello world")).unwire()"#.to_string(), ns });
+    println!("wire_string(Wire::from(\"{{}}\")).unwire(): {ns:.0}");
+    entries.push(Entry { name: r#"wire_string(Wire::from("{}")).unwire()"#.to_string(), ns });
 
     let map16: HashMap<String, String> = (0..16)
         .map(|i| (format!("{:016}", i), format!("{:016}", i)))
         .collect();
     let t = measure(ITERATIONS, || {
-        let _ = foo.wire2(Wire::from(map16.clone())).unwire();
+        let _ = wired.wire_hashmap_string(Wire::from(map16.clone())).unwire();
     });
     let ns = ns_per_call(t, baseline, ITERATIONS);
-    println!("foo.wire2(Wire::from(map16x16)).unwire(): {ns:.0}");
-    entries.push(Entry { name: "foo.wire2(Wire::from(16x{16char,16char})).unwire()".to_string(), ns });
-
-    let big16 = Big16 {
-        f00: 0, f01: 1, f02: 2, f03: 3,
-        f04: 4, f05: 5, f06: 6, f07: 7,
-        f08: 8, f09: 9, f10: 10, f11: 11,
-        f12: 12, f13: 13, f14: 14, f15: 15,
-    };
-    let t = measure(ITERATIONS, || {
-        let _ = foo.big16(big16);
-    });
-    let ns = ns_per_call(t, baseline, ITERATIONS);
-    println!("foo.big16(big16): {ns:.0}");
-    entries.push(Entry { name: "foo.big16(Big16 { 16x u32 })".to_string(), ns });
+    println!("wire_hashmap_string(Wire::from(16x{{16char,16char}})).unwire(): {ns:.0}");
+    entries.push(Entry { name: "wire_hashmap_string(Wire::from(16x{16char,16char})).unwire()".to_string(), ns });
 
     // Write markdown results
     let mut md = String::new();
