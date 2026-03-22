@@ -132,10 +132,10 @@ public partial class {{ name }} : IDisposable
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged IntoUnmanaged() { return _managed.IntoUnmanaged(); }
+        public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public {{ name }} IntoManaged() { return _unmanaged.IntoManaged(); }
+        public {{ name }} ToManaged() { return _unmanaged.IntoManaged(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Free() {}
