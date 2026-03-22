@@ -43,7 +43,6 @@ fn load_plugin_functions_behavior() -> Result<(), Box<dyn Error>> {
 
     let loader = DotNetRuntime::new()?
         .set_exception_handler(move |x| {
-            println!("{x}");
             exception_called_clone.store(true, Ordering::SeqCst);
         })
         .dll_loader_with_namespace(super::plugin_path_for("functions_behavior.dll"), "My.Company")?;
