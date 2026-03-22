@@ -250,7 +250,10 @@ impl PluginModel {
 
         let bare_registrations = self.functions.iter().map(|f| {
             let (ret, cb_ty) = if f.is_async {
-                let cb = f.ret.as_ref().map(|ty| quote! { ::interoptopus::pattern::asynk::AsyncCallback<#ty> });
+                let cb = Some(match &f.ret {
+                    Some(ty) => quote! { ::interoptopus::pattern::asynk::AsyncCallback<#ty> },
+                    None => quote! { ::interoptopus::pattern::asynk::AsyncCallback<()> },
+                });
                 (None, cb)
             } else {
                 (f.ret.as_ref(), None)
@@ -400,7 +403,10 @@ fn emit_service_registration(s: &ServiceBlock) -> TokenStream {
 
     let method_registrations = methods.iter().zip(method_fn_names.iter()).map(|(method, fn_name)| {
         let (ret, cb_ty) = if method.is_async {
-            let cb = method.ret.as_ref().map(|ty| quote! { ::interoptopus::pattern::asynk::AsyncCallback<#ty> });
+            let cb = Some(match &method.ret {
+                Some(ty) => quote! { ::interoptopus::pattern::asynk::AsyncCallback<#ty> },
+                None => quote! { ::interoptopus::pattern::asynk::AsyncCallback<()> },
+            });
             (None, cb)
         } else {
             (method.ret.as_ref(), None)

@@ -200,6 +200,7 @@ extern "C" fn async_callback_complete<T: Clone + Send + 'static>(value: &T, cont
     // this matches the one extra strong count deposited by `into_raw`.
     let state = unsafe { Arc::from_raw(context.cast::<Mutex<FutureState<T>>>()) };
     let mut lock = state.lock().unwrap();
+    // TODO: This should become a `std::ptr::read`, and `&T` in signature a `*const T` instead.
     lock.result = Some(value.clone());
     if let Some(waker) = lock.waker.take() {
         waker.wake();

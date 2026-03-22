@@ -41,7 +41,7 @@ pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
 }
 
 #[repr(u32)]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Result<T, E> {
     Ok(T),
     Err(E),

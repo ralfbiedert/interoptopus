@@ -64,7 +64,14 @@ public partial class {{ wire_name }} : IDisposable
         Buffer = default;
         return rval;
     }
-
+    
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    internal Unmanaged AsUnmanaged()
+    {
+        var rval = new Unmanaged { Buffer = Buffer };
+        return rval;
+    }
+    
     [CustomMarshaller(typeof({{ wire_name }}), MarshalMode.Default, typeof(Marshaller))]
     private struct MarshallerMeta { }
 

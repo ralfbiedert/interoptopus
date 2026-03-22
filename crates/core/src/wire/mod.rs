@@ -292,6 +292,12 @@ impl<T: WireIO> WireIO for Wire<T> {
     }
 }
 
+impl<T: ?Sized> Clone for Wire<T> {
+    fn clone(&self) -> Self {
+        Self { buf: self.buf.clone(), _phantom: PhantomData }
+    }
+}
+
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __wire_create_body {

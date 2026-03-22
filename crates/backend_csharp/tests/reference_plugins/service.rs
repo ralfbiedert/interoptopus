@@ -28,10 +28,14 @@ fn load_plugin_service_basic() -> Result<(), Box<dyn Error>> {
 async fn load_plugin_service_async() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(ServiceAsync, "service_async.dll");
 
-    let svc = plugin.asyncbasic_create();
-    let basic = plugin.asyncbasic_create();
+    plugin.call_void().await;
+    let i = plugin.add_one(1).await;
+    assert_eq!(i, 2);
 
-    basic.raw2().await;
+    let svc = plugin.asyncbasic_create();
+    svc.call_void().await;
+    let i = svc.add_one(1).await;
+    assert_eq!(i, 2);
 
     Ok(())
 }

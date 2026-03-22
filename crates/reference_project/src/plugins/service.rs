@@ -1,35 +1,26 @@
-use interoptopus::pattern::asynk::AsyncCallback;
+use crate::patterns::result::Error;
+use interoptopus::ffi;
+use interoptopus::wire::Wire;
+use std::collections::HashMap;
 
 interoptopus::plugin!(ServiceBasic {
     impl ServiceA {
         fn create() -> Self;
         fn call(&self, x: u32) -> u32;
-        // fn get_accumulator(&self) -> i32;
-        // fn wire(&self, x: Wire<String>) -> Wire<String>;
-        // fn wire2(&self, x: Wire<HashMap<String, String>>) -> Wire<HashMap<String, String>>;
-        // // TODO: fn call(&self, x: &u32, cb: CallBack);
-        // // async fn call_async(&self, x: Wire<String>);
     }
 });
 
 interoptopus::plugin!(ServiceAsync {
-    async fn raw1(&self) -> u32;
+    async fn call_void();
+    async fn add_one(x: u32) -> u32;
+    async fn wire_1(x: Wire<HashMap<String, String>>) -> Wire<HashMap<String, String>>;
+    async fn wire_2(x: Wire<HashMap<String, String>>) -> ffi::Result<Wire<HashMap<String, String>>, Error>;
 
     impl AsyncBasic {
         fn create() -> Self;
-        fn raw(&self, x: u32, cb: AsyncCallback<u32>);
-        async fn raw2(&self) -> u32;
+        async fn call_void(&self);
+        async fn add_one(&self, x: u32) -> u32;
+        async fn wire_1(&self, x: Wire<HashMap<String, String>>) -> Wire<HashMap<String, String>>;
+        async fn wire_2(&self, x: Wire<HashMap<String, String>>) -> ffi::Result<Wire<HashMap<String, String>>, Error>;
     }
 });
-
-// impl AsyncBasic {
-//     pub fn raw(&self, x: u32, cb: AsyncCallback<u32>) {
-//         (self.asyncbasic_raw)(self.handle, x, cb)
-//     }
-//
-//     pub fn raw2(&self, x: u32) -> impl Future<Output = u32> {
-//         let (future, cb) = AsyncCallbackFuture::new();
-//         self.raw(x, cb);
-//         future
-//     }
-// }

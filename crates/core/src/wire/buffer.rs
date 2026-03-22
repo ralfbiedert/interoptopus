@@ -138,6 +138,12 @@ impl std::io::Read for WireBufferReader<'_> {
     }
 }
 
+impl Clone for WireBuffer {
+    fn clone(&self) -> Self {
+        Self::from_vec(self.as_slice().to_vec())
+    }
+}
+
 impl Drop for WireBuffer {
     fn drop(&mut self) {
         // Free owned buffers. When a Wire<T> is returned over FFI, the value is moved
