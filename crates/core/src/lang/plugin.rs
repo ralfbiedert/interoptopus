@@ -12,6 +12,7 @@ pub trait PluginInfo {
 
     /// Returns a [`ForeignInventory`] populated with all types, functions, and
     /// services declared by this plugin.
+    #[must_use]
     fn inventory() -> ForeignInventory {
         let mut inventory = ForeignInventory::new();
         Self::register(&mut inventory);

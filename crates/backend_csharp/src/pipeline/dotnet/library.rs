@@ -5,6 +5,7 @@ use interoptopus::inventory::ForeignInventory;
 use interoptopus_backends::output::Multibuf;
 
 /// Configuration for the .NET codegen pipeline.
+#[derive(Default)]
 pub struct DotnetLibraryConfig {
     pub model_id_maps: model::common::id_map::Config,
     pub model_type_kinds: model::common::types::kind::Config,
@@ -66,73 +67,6 @@ pub struct DotnetLibraryConfig {
     pub output_enum: output::common::types::enums::all::Config,
     pub output_util: output::common::types::util::Config,
     pub output_final: output::dotnet::all::Config,
-}
-
-impl Default for DotnetLibraryConfig {
-    fn default() -> Self {
-        Self {
-            model_id_maps: Default::default(),
-            model_type_kinds: Default::default(),
-            model_type_map_primitives: Default::default(),
-            model_type_map_array: Default::default(),
-            model_type_map_delegate: Default::default(),
-            model_type_map_pointer: Default::default(),
-            model_type_map_service: Default::default(),
-            model_type_map_patterns: Default::default(),
-            model_type_fallback: Default::default(),
-            model_type_map_enum_variants: Default::default(),
-            model_type_map_enum: Default::default(),
-            model_type_map_opaque: Default::default(),
-            model_type_map_struct_fields: Default::default(),
-            model_type_map_struct: Default::default(),
-            model_type_names: Default::default(),
-            model_type_all: Default::default(),
-            model_type_managed_conversion: Default::default(),
-            model_type_struct_class: Default::default(),
-            model_type_disposable: Default::default(),
-            model_type_nullable: Default::default(),
-            model_fn_all: Default::default(),
-            model_fn_originals: Default::default(),
-            model_service_map: Default::default(),
-            model_type_util: Default::default(),
-            model_trampoline: Default::default(),
-            model_wire_helpers: Default::default(),
-            model_wire_nested: Default::default(),
-            output_master: Default::default(),
-            output_unmanaged_conversion: Default::default(),
-            output_unmanaged_names: Default::default(),
-            output_conversion_fields: Default::default(),
-            output_trampoline: Default::default(),
-            output_trampolines: Default::default(),
-            output_pattern_bools: Default::default(),
-            output_wire_buffer: Default::default(),
-            output_wire_types: Default::default(),
-            output_wire_helper_classes: Default::default(),
-            output_wires: Default::default(),
-            output_plugin_interface: Default::default(),
-            output_service_interface: Default::default(),
-            output_delegates_class: Default::default(),
-            output_delegates_signature: Default::default(),
-            output_composite_ty: Default::default(),
-            output_composite_body_unmanaged: Default::default(),
-            output_composite_body_to_unmanaged: Default::default(),
-            output_composite_body_as_unmanaged: Default::default(),
-            output_composite_body: Default::default(),
-            output_composite: Default::default(),
-            output_enum_ty: Default::default(),
-            output_enum_body_unmanaged_variant: Default::default(),
-            output_enum_body_unmanaged: Default::default(),
-            output_enum_body_to_unmanaged: Default::default(),
-            output_enum_body_as_unmanaged: Default::default(),
-            output_enum_body_ctors: Default::default(),
-            output_enum_body_exception_for_variant: Default::default(),
-            output_enum_body_tostring: Default::default(),
-            output_enum_body: Default::default(),
-            output_enum: Default::default(),
-            output_util: Default::default(),
-            output_final: Default::default(),
-        }
-    }
 }
 
 /// Model passes for the dotnet pipeline.

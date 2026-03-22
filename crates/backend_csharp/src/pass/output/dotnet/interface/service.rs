@@ -12,8 +12,8 @@
 //! ```
 //!
 use crate::output::{FileType, Output};
-use crate::pass::{OutputResult, PassInfo, model, output};
 use crate::pass::output::dotnet::interface::plugin::{async_callback_inner, task_type_name};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::casing::service_method_name;
 use std::collections::HashMap;
 
@@ -43,7 +43,7 @@ impl Pass {
             let mut all_interfaces = Vec::new();
 
             let mut sorted_services: Vec<_> = services.iter().collect();
-            sorted_services.sort_by_key(|(_, svc)| types.get(svc.ty).map(|t| t.name.as_str()).unwrap_or(""));
+            sorted_services.sort_by_key(|(_, svc)| types.get(svc.ty).map_or("", |t| t.name.as_str()));
 
             for (_svc_id, svc) in sorted_services {
                 let Some(type_info) = types.get(svc.ty) else { continue };
@@ -81,11 +81,15 @@ impl Pass {
                     let rval_name = if let Some(inner_id) = async_inner {
                         task_type_name(inner_id, types)
                     } else {
-                        types.get(func.signature.rval).map(|t| t.name.clone()).unwrap_or_else(|| "void".to_string())
+                        types.get(func.signature.rval).map_or_else(|| "void".to_string(), |t| t.name.clone())
                     };
 
                     // For async methods omit the trailing AsyncCallback parameter.
-                    let arg_count = if async_inner.is_some() { func.signature.arguments.len().saturating_sub(1) } else { func.signature.arguments.len() };
+                    let arg_count = if async_inner.is_some() {
+                        func.signature.arguments.len().saturating_sub(1)
+                    } else {
+                        func.signature.arguments.len()
+                    };
                     let args: Vec<String> = func
                         .signature
                         .arguments

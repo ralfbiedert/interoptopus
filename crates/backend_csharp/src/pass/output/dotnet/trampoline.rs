@@ -9,14 +9,14 @@
 //! for calling `.Unwire()` / `.From()` as needed.
 
 use crate::lang::ServiceId;
+use crate::lang::TypeId;
+use crate::lang::functions::Function;
 use crate::lang::plugin::TrampolineKind;
 use crate::lang::service::Service;
 use crate::lang::types::kind::Primitive;
 use crate::lang::types::kind::{TypeKind, TypePattern};
-use crate::lang::TypeId;
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, model, output};
-use crate::lang::functions::Function;
 use interoptopus_backends::casing::{rust_to_pascal, service_method_name};
 use std::collections::HashMap;
 
@@ -62,7 +62,7 @@ impl Pass {
                 let Some(func) = fns_all.get(entry.fn_id) else { continue };
 
                 let ffi_name = &func.name;
-                let rval_type = types.get(func.signature.rval).map(|t| t.name.as_str()).unwrap_or("void");
+                let rval_type = types.get(func.signature.rval).map_or("void", |t| t.name.as_str());
 
                 let method = match &entry.kind {
                     TrampolineKind::Raw => {
@@ -89,7 +89,7 @@ impl Pass {
                     }
                     TrampolineKind::ServiceCtor { service_id } => {
                         let Some(svc) = svc_lookup.get(service_id) else { continue };
-                        let type_name = types.get(svc.ty).map(|t| t.name.as_str()).unwrap_or("");
+                        let type_name = types.get(svc.ty).map_or("", |t| t.name.as_str());
                         let method_name = service_method_name(type_name, ffi_name);
                         let (args_str, forward_str) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
                         let inner = format!(
@@ -101,7 +101,7 @@ impl Pass {
                     }
                     TrampolineKind::ServiceMethod { service_id } => {
                         let Some(svc) = svc_lookup.get(service_id) else { continue };
-                        let type_name = types.get(svc.ty).map(|t| t.name.as_str()).unwrap_or("");
+                        let type_name = types.get(svc.ty).map_or("", |t| t.name.as_str());
                         let method_name = service_method_name(type_name, ffi_name);
                         let async_inner = async_callback_inner(func, types);
 
@@ -194,12 +194,8 @@ fn unmanaged_args(
 }
 
 /// Returns the unmanaged return type name, or `rval_type` unchanged for `AsIs`/void.
-fn rval_unmanaged_name<'a>(
-    func: &Function,
-    rval_type: &'a str,
-    unmanaged_names: &'a output::common::conversion::unmanaged_names::Pass,
-) -> &'a str {
-    unmanaged_names.name(func.signature.rval).map(String::as_str).unwrap_or(rval_type)
+fn rval_unmanaged_name<'a>(func: &Function, rval_type: &'a str, unmanaged_names: &'a output::common::conversion::unmanaged_names::Pass) -> &'a str {
+    unmanaged_names.name(func.signature.rval).map_or(rval_type, String::as_str)
 }
 
 /// Returns `(args_str, forward_str)` for an async `[UnmanagedCallersOnly]` signature.
@@ -290,7 +286,11 @@ fn try_catch_inner(inner: &str, has_return: bool) -> String {
 }
 
 /// Returns the `.ContinueWith(...)` expression that invokes `cb.UnsafeComplete` after the task.
-fn async_continuation(inner_id: TypeId, types: &model::common::types::all::Pass, unmanaged_conversion: &output::common::conversion::unmanaged_conversion::Pass) -> String {
+fn async_continuation(
+    inner_id: TypeId,
+    types: &model::common::types::all::Pass,
+    unmanaged_conversion: &output::common::conversion::unmanaged_conversion::Pass,
+) -> String {
     let is_void = matches!(types.get(inner_id).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
     if is_void {
         "ContinueWith(_ => cb.UnsafeComplete())".to_string()

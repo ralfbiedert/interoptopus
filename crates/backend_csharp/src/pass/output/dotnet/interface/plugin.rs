@@ -8,10 +8,10 @@
 //! }
 //! ```
 //!
-use crate::lang::plugin::TrampolineKind;
-use crate::lang::types::kind::{TypeKind, TypePattern};
-use crate::lang::types::kind::Primitive;
 use crate::lang::TypeId;
+use crate::lang::plugin::TrampolineKind;
+use crate::lang::types::kind::Primitive;
+use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::casing::rust_to_pascal;
@@ -55,11 +55,15 @@ impl Pass {
                 let rval_name = if let Some(inner_id) = async_inner {
                     task_type_name(inner_id, types)
                 } else {
-                    types.get(func.signature.rval).map(|t| t.name.clone()).unwrap_or_else(|| "void".to_string())
+                    types.get(func.signature.rval).map_or_else(|| "void".to_string(), |t| t.name.clone())
                 };
 
                 // For async methods omit the trailing AsyncCallback parameter.
-                let arg_count = if async_inner.is_some() { func.signature.arguments.len().saturating_sub(1) } else { func.signature.arguments.len() };
+                let arg_count = if async_inner.is_some() {
+                    func.signature.arguments.len().saturating_sub(1)
+                } else {
+                    func.signature.arguments.len()
+                };
                 let args: Vec<String> = func
                     .signature
                     .arguments
@@ -111,7 +115,7 @@ pub(super) fn task_type_name(inner_id: TypeId, types: &model::common::types::all
     if is_void {
         "Task".to_string()
     } else {
-        let name = types.get(inner_id).map(|t| t.name.as_str()).unwrap_or("void");
+        let name = types.get(inner_id).map_or("void", |t| t.name.as_str());
         format!("Task<{name}>")
     }
 }

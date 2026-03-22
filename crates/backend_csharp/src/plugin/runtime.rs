@@ -26,9 +26,9 @@ const DEFAULT_RUNTIME_CONFIG: &str = r#"{
 static UNCAUGHT_EXCEPTION_HANDLER: RwLock<Option<Arc<dyn Fn(String) + Send + Sync>>> = RwLock::new(None);
 
 extern "C" fn uncaught_exception_callback(message: *const u8, len: i32) {
-    let guard = UNCAUGHT_EXCEPTION_HANDLER.read().unwrap_or_else(|e| e.into_inner());
+    let guard = UNCAUGHT_EXCEPTION_HANDLER.read().unwrap_or_else(std::sync::PoisonError::into_inner);
     if let Some(handler) = guard.as_ref() {
-        let bytes = unsafe { std::slice::from_raw_parts(message, len as usize) };
+        let bytes = unsafe { std::slice::from_raw_parts(message, len.unsigned_abs() as usize) };
         let msg = String::from_utf8_lossy(bytes).into_owned();
         handler(msg);
     }
@@ -85,7 +85,9 @@ impl DotNetRuntime {
 
         let context = fxr.initialize_for_runtime_config(config_pdc).map_err(DotNetError::RuntimeInit)?;
 
-        Ok(Self { context: Arc::new(context), _temp_dir: temp_dir, exception_handler: None })
+        #[allow(clippy::arc_with_non_send_sync)]
+        let context = Arc::new(context);
+        Ok(Self { context, _temp_dir: temp_dir, exception_handler: None })
     }
 
     /// Sets a handler that is called whenever the plugin reports an uncaught exception.
@@ -136,6 +138,7 @@ impl DotNetRuntime {
     }
 
     /// Returns a reference to the underlying runtime context.
+    #[must_use]
     pub fn context(&self) -> &HostfxrContext<InitializedForRuntimeConfig> {
         &self.context
     }
@@ -145,10 +148,13 @@ impl DllLoader {
     fn load_symbol(&self, symbol: &str) -> *const u8 {
         let type_pdc = PdCString::from_os_str(self.type_name.as_ref() as &std::ffi::OsStr).expect("type name contains null bytes");
         let method_pdc = PdCString::from_os_str(symbol.as_ref() as &std::ffi::OsStr).expect("symbol name contains null bytes");
-        match self.delegate_loader.get_function_with_unmanaged_callers_only::<extern "system" fn()>(&type_pdc, &method_pdc) {
+        match self
+            .delegate_loader
+            .get_function_with_unmanaged_callers_only::<extern "system" fn()>(&type_pdc, &method_pdc)
+        {
             Ok(managed_fn) => {
                 let f: extern "system" fn() = *managed_fn;
-                unsafe { std::mem::transmute::<_, *const u8>(f) }
+                f as *const u8
             }
             Err(_) => std::ptr::null(),
         }
@@ -159,7 +165,7 @@ impl Loader for DllLoader {
     fn load_plugin<T: Plugin>(&self) -> Result<T, PluginLoadError> {
         // If an exception handler was provided, install it in the global slot before loading.
         if let Some(handler) = &self.exception_handler {
-            let mut guard = UNCAUGHT_EXCEPTION_HANDLER.write().unwrap_or_else(|e| e.into_inner());
+            let mut guard = UNCAUGHT_EXCEPTION_HANDLER.write().unwrap_or_else(std::sync::PoisonError::into_inner);
             *guard = Some(Arc::clone(handler));
         }
 

@@ -90,6 +90,7 @@ impl Pass {
         Ok(outcome)
     }
 
+    #[must_use]
     pub fn entries(&self) -> &[TrampolineEntry] {
         &self.entries
     }

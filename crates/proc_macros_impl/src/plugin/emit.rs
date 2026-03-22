@@ -36,9 +36,10 @@ impl PluginModel {
             let field_name = &f.name;
             let param_tys: Vec<_> = f.params.iter().map(|p| &p.ty).collect();
             if f.is_async {
-                let cb_ret = match &f.ret {
-                    Some(ty) => quote! { #ty },
-                    None => quote! { () },
+                let cb_ret = if let Some(ty) = &f.ret {
+                    quote! { #ty }
+                } else {
+                    quote! { () }
                 };
                 quote! { #field_name: extern "C" fn(#(#param_tys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) }
             } else {
@@ -93,9 +94,10 @@ impl PluginModel {
             let params = typed_params(&f.params);
             let arg_names: Vec<_> = f.params.iter().map(|p| &p.name).collect();
             if f.is_async {
-                let ret_ty = match &f.ret {
-                    Some(ty) => quote! { #ty },
-                    None => quote! { () },
+                let ret_ty = if let Some(ty) = &f.ret {
+                    quote! { #ty }
+                } else {
+                    quote! { () }
                 };
                 quote! {
                     pub fn #fn_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> {
@@ -186,9 +188,10 @@ impl PluginModel {
             let symbol = field_name.to_string();
             let param_tys: Vec<_> = f.params.iter().map(|p| &p.ty).collect();
             let fn_ty = if f.is_async {
-                let cb_ret = match &f.ret {
-                    Some(ty) => quote! { #ty },
-                    None => quote! { () },
+                let cb_ret = if let Some(ty) = &f.ret {
+                    quote! { #ty }
+                } else {
+                    quote! { () }
                 };
                 quote! { extern "C" fn(#(#param_tys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) }
             } else {
@@ -250,9 +253,10 @@ impl PluginModel {
 
         let bare_registrations = self.functions.iter().map(|f| {
             let (ret, cb_ty) = if f.is_async {
-                let cb = Some(match &f.ret {
-                    Some(ty) => quote! { ::interoptopus::pattern::asynk::AsyncCallback<#ty> },
-                    None => quote! { ::interoptopus::pattern::asynk::AsyncCallback<()> },
+                let cb = Some(if let Some(ty) = &f.ret {
+                    quote! { ::interoptopus::pattern::asynk::AsyncCallback<#ty> }
+                } else {
+                    quote! { ::interoptopus::pattern::asynk::AsyncCallback<()> }
                 });
                 (None, cb)
             } else {
@@ -321,9 +325,10 @@ fn emit_service_impl(s: &ServiceBlock) -> TokenStream {
         let arg_names: Vec<_> = m.params.iter().map(|p| &p.name).collect();
 
         if m.is_async {
-            let ret_ty = match &m.ret {
-                Some(ty) => quote! { #ty },
-                None => quote! { () },
+            let ret_ty = if let Some(ty) = &m.ret {
+                quote! { #ty }
+            } else {
+                quote! { () }
             };
             quote! {
                 pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> {
@@ -403,9 +408,10 @@ fn emit_service_registration(s: &ServiceBlock) -> TokenStream {
 
     let method_registrations = methods.iter().zip(method_fn_names.iter()).map(|(method, fn_name)| {
         let (ret, cb_ty) = if method.is_async {
-            let cb = Some(match &method.ret {
-                Some(ty) => quote! { ::interoptopus::pattern::asynk::AsyncCallback<#ty> },
-                None => quote! { ::interoptopus::pattern::asynk::AsyncCallback<()> },
+            let cb = Some(if let Some(ty) = &method.ret {
+                quote! { ::interoptopus::pattern::asynk::AsyncCallback<#ty> }
+            } else {
+                quote! { ::interoptopus::pattern::asynk::AsyncCallback<()> }
             });
             (None, cb)
         } else {
@@ -478,9 +484,10 @@ fn prefixed_ident(prefix: &str, name: &Ident) -> Ident {
 /// and the FFI return is `()`.  For sync methods the declared params and return are used as-is.
 fn ffi_method_field_ty(param_tys: &[&Type], ret: Option<&Type>, is_async: bool) -> TokenStream {
     if is_async {
-        let cb_ret = match ret {
-            Some(ty) => quote! { #ty },
-            None => quote! { () },
+        let cb_ret = if let Some(ty) = ret {
+            quote! { #ty }
+        } else {
+            quote! { () }
         };
         quote! { extern "C" fn(isize, #(#param_tys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) }
     } else {
@@ -517,7 +524,13 @@ fn function_id_expr(fn_name: &str) -> TokenStream {
 /// Emits code to register a single function with the inventory.
 ///
 /// `async_callback_ty` — when `Some`, appends an `AsyncCallback<T>` argument and uses `()` as rval.
-fn emit_function_registration(fn_name_str: &str, params: &[PluginParam], ret: Option<&Type>, self_type_id: Option<&TokenStream>, async_callback_ty: Option<TokenStream>) -> TokenStream {
+fn emit_function_registration(
+    fn_name_str: &str,
+    params: &[PluginParam],
+    ret: Option<&Type>,
+    self_type_id: Option<&TokenStream>,
+    async_callback_ty: Option<TokenStream>,
+) -> TokenStream {
     let type_registrations = params.iter().map(|p| {
         let ty = &p.ty;
         quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory); }

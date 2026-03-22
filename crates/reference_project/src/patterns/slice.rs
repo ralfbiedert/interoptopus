@@ -7,9 +7,9 @@ use interoptopus::{callback, ffi};
 static HUGE_VEC_SLICE: [Vec3f32; 100_000] = [Vec3f32 { x: 0.0, y: 0.0, z: 0.0 }; 100_000];
 
 callback!(CallbackHugeVecSlice(slice: Slice<Vec3f32>) -> Vec3f32);
-callback!(CallbackSliceMut(slice: SliceMut<'_, u8>) -> ());
+callback!(CallbackSliceMut(slice: SliceMut<'_, u8>));
 callback!(CallbackU8(value: u8) -> u8);
-callback!(CallbackCharArray2(value: CharArray) -> ());
+callback!(CallbackCharArray2(value: CharArray));
 callback!(CallbackFFISlice(slice: ffi::Slice<u8>) -> u8);
 
 #[ffi]

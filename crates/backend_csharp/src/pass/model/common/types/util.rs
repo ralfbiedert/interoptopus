@@ -38,7 +38,10 @@ impl Pass {
         let bool_kind = TypeKind::TypePattern(TypePattern::Bool);
         kinds.set(csharp::BOOL, bool_kind.clone());
         names.set(csharp::BOOL, "Bool".to_string());
-        types.set(csharp::BOOL, Type { emission: Emission::FileEmission(FileEmission::Common), name: "Bool".to_string(), kind: bool_kind, decorators: Decorators::default() });
+        types.set(
+            csharp::BOOL,
+            Type { emission: Emission::FileEmission(FileEmission::Common), name: "Bool".to_string(), kind: bool_kind, decorators: Decorators::default() },
+        );
 
         let utils = [
             (csharp::UTIL_INTEROP_EXCEPTION, "InteropException", Util::InteropException),

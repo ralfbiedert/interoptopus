@@ -32,8 +32,8 @@ impl Pass {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(FileType::Csharp) {
-            let context = Context::new();
-            let content = templates.render("dotnet/trampolines.cs", &context)?.trim().to_string();
+            let ctx = Context::new();
+            let content = templates.render("dotnet/trampolines.cs", &ctx)?.trim().to_string();
             self.rendered.insert(file.clone(), content);
         }
 
