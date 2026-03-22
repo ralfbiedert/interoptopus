@@ -157,17 +157,17 @@ impl Pass {
                     if has_into { ManagedConversion::Into } else { ManagedConversion::To }
                 }
 
-                // Helpers are always move
+                // For most of these it shouldn't matter as they don't pass FFI boundaries,
+                // but we mark helpers as always move (Into) to make them most restrictive.
+                //
+                // TODO: Maybe these enums needs an `NotApplicable`, or this returns an
+                //       `Option<ManagedConversion>` instead. Also, maybe the core TypeInfo
+                //       should have a Copy / Move marker this is primarily based on for all other
+                //       types.
                 TypeKind::AsyncHelper(_) | TypeKind::Wire(_) => ManagedConversion::Into,
-
-                // Task types are only used as async overload return types
-                TypeKind::Task(_) => ManagedConversion::AsIs,
-
-                // Util types are backend-generated; no managed conversion needed
-                TypeKind::Util(_) => ManagedConversion::AsIs,
-
-                // WireOnly types exist only for wire serialization; no direct managed conversion
-                TypeKind::WireOnly(_) => ManagedConversion::AsIs,
+                TypeKind::Task(_) => ManagedConversion::Into,
+                TypeKind::Util(_) => ManagedConversion::Into,
+                TypeKind::WireOnly(_) => ManagedConversion::Into,
             };
 
             self.managed_conversion.insert(*cs_id, conversion);

@@ -55,7 +55,7 @@ public partial struct WireBuffer
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    internal unsafe Unmanaged ToUnmanaged()
+    internal unsafe Unmanaged IntoUnmanaged()
     {
         var _unmanaged = new Unmanaged();
         _unmanaged.data = data;
@@ -82,7 +82,7 @@ public partial struct WireBuffer
         public int capacity;
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        internal unsafe WireBuffer ToManaged()
+        internal unsafe WireBuffer IntoManaged()
         {
             var _managed = new WireBuffer();
             _managed.data = data;
@@ -119,10 +119,10 @@ public partial struct WireBuffer
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+        public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public WireBuffer ToManaged() { return _unmanaged.ToManaged(); }
+        public WireBuffer ToManaged() { return _unmanaged.IntoManaged(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Free() {}
