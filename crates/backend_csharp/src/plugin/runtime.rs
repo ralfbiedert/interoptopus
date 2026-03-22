@@ -1,16 +1,16 @@
 use interoptopus::lang::plugin::{Loader, Plugin, PluginLoadError};
-use interoptopus::trampoline::TRAMPOLINE_UNCAUGHT_EXCEPTION;
+use interoptopus::trampoline::{TRAMPOLINE_UNCAUGHT_EXCEPTION, TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX};
 use netcorehost::hostfxr::{AssemblyDelegateLoader, HostfxrContext, InitializedForRuntimeConfig};
 use netcorehost::nethost;
 use netcorehost::pdcstring::PdCString;
 use std::fmt;
 use std::path::Path;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 
 const DEFAULT_RUNTIME_CONFIG: &str = r#"{
   "runtimeOptions": {
     "tfm": "net10.0",
-    "rollForward": "LatestMajor",                                                                                                                                                                                                                                        
+    "rollForward": "LatestMajor",
     "framework": {
       "name": "Microsoft.NETCore.App",
       "version": "10.0.0"
@@ -18,20 +18,26 @@ const DEFAULT_RUNTIME_CONFIG: &str = r#"{
   }
 }"#;
 
-/// Process-global handler for uncaught plugin exceptions.
-///
-/// Updated by [`DotNetRuntime::set_exception_handler`] before a plugin is loaded.
-/// Called from the `extern "C"` trampoline below, which is registered with
-/// the managed side via `register_trampoline`.
-static UNCAUGHT_EXCEPTION_HANDLER: RwLock<Option<Arc<dyn Fn(String) + Send + Sync>>> = RwLock::new(None);
+/// Concrete Sized wrapper so we can store the trait-object handler behind a thin pointer.
+struct HandlerShim {
+    handler: Arc<dyn Fn(String) + Send + Sync>,
+}
 
-extern "C" fn uncaught_exception_callback(message: *const u8, len: i32) {
-    let guard = UNCAUGHT_EXCEPTION_HANDLER.read().unwrap_or_else(std::sync::PoisonError::into_inner);
-    if let Some(handler) = guard.as_ref() {
-        let bytes = unsafe { std::slice::from_raw_parts(message, len.unsigned_abs() as usize) };
-        let msg = String::from_utf8_lossy(bytes).into_owned();
-        handler(msg);
-    }
+/// Callback registered with the managed plugin for uncaught exceptions.
+///
+/// `ctx` is a `*mut HandlerShim` produced by [`Box::into_raw`] in
+/// [`DllLoader::load_plugin`] and intentionally leaked.
+unsafe extern "C" fn uncaught_exception_callback(ctx: *const u8, message: *const u8, len: i32) {
+    // SAFETY: ctx was produced by Box::into_raw(Box::new(HandlerShim { ... })) in
+    // load_plugin and intentionally leaked, so the pointer is valid and properly
+    // aligned for the lifetime of the process. Only this callback ever reads it.
+    let shim = unsafe { &*ctx.cast::<HandlerShim>() };
+    // SAFETY: message is a UTF-8 byte slice of length len provided by the managed
+    // side inside a `fixed` block, so it is valid and pinned for the duration of
+    // this call. len is non-negative (unsigned_abs guarantees that).
+    let bytes = unsafe { std::slice::from_raw_parts(message, len.unsigned_abs() as usize) };
+    let msg = String::from_utf8_lossy(bytes).into_owned();
+    (shim.handler)(msg);
 }
 
 /// A loaded .NET runtime that can be used to load plugin assemblies.
@@ -80,9 +86,7 @@ impl DotNetRuntime {
         std::fs::write(&config_path, DEFAULT_RUNTIME_CONFIG).map_err(DotNetError::Io)?;
 
         let fxr = nethost::load_hostfxr().map_err(DotNetError::HostfxrLoad)?;
-
         let config_pdc = PdCString::from_os_str(config_path.as_os_str()).expect("temp path contains null bytes");
-
         let context = fxr.initialize_for_runtime_config(config_pdc).map_err(DotNetError::RuntimeInit)?;
 
         #[allow(clippy::arc_with_non_send_sync)]
@@ -163,21 +167,16 @@ impl DllLoader {
 
 impl Loader for DllLoader {
     fn load_plugin<T: Plugin>(&self) -> Result<T, PluginLoadError> {
-        // If an exception handler was provided, install it in the global slot before loading.
-        if let Some(handler) = &self.exception_handler {
-            let mut guard = UNCAUGHT_EXCEPTION_HANDLER.write().unwrap_or_else(std::sync::PoisonError::into_inner);
-            *guard = Some(Arc::clone(handler));
-        }
-
         let plugin = T::load_from(|symbol_name| self.load_symbol(symbol_name))?;
 
-        // Register the uncaught-exception callback with the managed side.
-        if self.exception_handler.is_some() {
-            let register_ptr = self.load_symbol("register_trampoline");
-            if !register_ptr.is_null() {
-                let register_fn: extern "C" fn(i64, *const u8) = unsafe { std::mem::transmute(register_ptr) };
-                register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION, uncaught_exception_callback as *const u8);
-            }
+        // Register the uncaught-exception callback and its context pointer with the
+        // managed side. The context is a heap-allocated Arc clone that the callback
+        // reads on every invocation — no global state involved.
+        if let Some(handler) = &self.exception_handler {
+            let register_fn = plugin.register_trampoline_fn();
+            let ctx = Box::into_raw(Box::new(HandlerShim { handler: Arc::clone(handler) })) as *const u8;
+            register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION, uncaught_exception_callback as *const u8);
+            register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX, ctx);
         }
 
         Ok(plugin)

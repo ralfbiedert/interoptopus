@@ -42,7 +42,7 @@ fn load_plugin_functions_behavior() -> Result<(), Box<dyn Error>> {
     let exception_called_clone = Arc::clone(&exception_called);
 
     let loader = DotNetRuntime::new()?
-        .set_exception_handler(move |x| {
+        .set_exception_handler(move |_| {
             exception_called_clone.store(true, Ordering::SeqCst);
         })
         .dll_loader_with_namespace(super::plugin_path_for("functions_behavior.dll"), "My.Company")?;

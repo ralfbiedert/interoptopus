@@ -8,13 +8,13 @@ alias doc := docs
 build verbose="":
     cargo build --all-features {{ verbose }}
 
-# Builds the .NET (reverse interop) plugins. Separate step, as .NET output is not reproducible.  
-build-dotnet-plugins: (_bdp "functions_primitive") (_bdp "functions_behavior") (_bdp "complex") (_bdp "pattern")  (_bdp "service_basic") (_bdp "service_async") (_bdp "wire")
+# Builds the .NET (reverse interop) plugins. Separate step, as .NET output is not reproducible.
+build-dotnet-plugins: (_bdp "functions_primitive") (_bdp "functions_behavior") (_bdp "complex") (_bdp "pattern") (_bdp "service_basic") (_bdp "service_async") (_bdp "wire")
 
-# Helper to build a .NET plugin. 
+# Helper to build a .NET plugin.
 _bdp name:
-    dotnet build crates/backend_csharp/tests/reference_plugins/{{name}}.dll/{{name}}.csproj -v q 
-    cp crates/backend_csharp/tests/reference_plugins/{{name}}.dll/bin/Debug/net10.0/{{name}}.dll crates/backend_csharp/tests/reference_plugins/_plugins
+    dotnet build -c Release crates/backend_csharp/tests/reference_plugins/{{ name }}.dll/{{ name }}.csproj -v q 
+    cp crates/backend_csharp/tests/reference_plugins/{{ name }}.dll/bin/Release/net10.0/{{ name }}.dll crates/backend_csharp/tests/reference_plugins/_plugins
 
 # Run unit tests, check semantic correctness.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
@@ -30,7 +30,7 @@ test-dotnet:
     dotnet test crates/backend_csharp/tests/reference_project/reference_project_tests.csproj
 
 # Runs the ignored plugin-loading tests (requires .NET runtime and built DLLs from build-dotnet-plugins).
-test-dotnet-plugins: build-dotnet-plugins
+test-dotnet-plugins:
     cargo test --test mod --features unstable-plugins -- --include-ignored \
         reference_plugins::complex::load_plugin \
         reference_plugins::functions::load_plugin_functions_primitive \
@@ -56,7 +56,7 @@ lint:
 
 # Runs all tests CI would perform before merging a PR.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
-ci verbose="": (build verbose) (test verbose) test-dotnet lint
+ci verbose="": (build verbose) (test verbose) test-dotnet test-dotnet-plugins lint
 
 # Install all required tools, needs `binstall`, see https://github.com/cargo-bins/cargo-binstall
 binstall-deps force="":

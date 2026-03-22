@@ -1,6 +1,5 @@
 #![cfg(feature = "unstable-plugins")]
 
-use interoptopus_backends::output::Multibuf;
 use std::path::{Path, PathBuf};
 
 mod complex;
@@ -26,9 +25,7 @@ macro_rules! define_plugin {
 #[macro_export]
 macro_rules! load_plugin {
     ($plugin:ty, $name:expr) => {{
-        let loader = ::interoptopus_csharp::plugin::DotNetRuntime::new()?
-            .set_exception_handler(|x| println!("{x}"))
-            .dll_loader_with_namespace(super::plugin_path_for($name), "My.Company")?;
+        let loader = ::interoptopus_csharp::plugin::DotNetRuntime::new()?.dll_loader_with_namespace(super::plugin_path_for($name), "My.Company")?;
         <$plugin>::new(&loader)?
     }};
 }

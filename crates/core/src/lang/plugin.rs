@@ -1,6 +1,12 @@
 //! Reverse interop plugin definitions.
 use crate::inventory::{ForeignInventory, Inventory, PluginId};
 
+/// Signature of the `register_trampoline` function exported by every plugin assembly.
+///
+/// The first argument is the well-known trampoline ID (see [`crate::trampoline`]);
+/// the second is the function or data pointer to register.
+pub type RegisterTrampolineFn = extern "C" fn(i64, *const u8);
+
 pub trait PluginInfo {
     /// The unique identifier for this plugin.
     fn id() -> PluginId;
@@ -29,6 +35,12 @@ pub trait Plugin: Sized {
     /// The `loader` closure takes a symbol name and returns a pointer to the
     /// loaded function, or null if the symbol was not found.
     fn load_from(loader: impl Fn(&str) -> *const u8) -> Result<Self, PluginLoadError>;
+
+    /// Returns the `register_trampoline` function pointer loaded during [`load_from`](Self::load_from).
+    ///
+    /// Used by the host to register runtime callbacks (e.g. the uncaught-exception handler)
+    /// without needing a second symbol lookup.
+    fn register_trampoline_fn(&self) -> RegisterTrampolineFn;
 }
 
 /// A symbol loader bound to a specific assembly/shared library.

@@ -76,7 +76,7 @@ impl PluginModel {
 
         // Trampoline registration function pointer
         let register_trampoline_field = quote! {
-            register_trampoline: extern "C" fn(i64, *const u8)
+            register_trampoline: ::interoptopus::lang::plugin::RegisterTrampolineFn
         };
 
         quote! { pub struct #name { #(#bare_fields,)* #(#service_fields,)* #register_trampoline_field, } }
@@ -228,7 +228,7 @@ impl PluginModel {
         });
 
         let register_trampoline_field = format_ident!("register_trampoline");
-        let register_trampoline_load = emit_load_field(&register_trampoline_field, "register_trampoline", quote! { extern "C" fn(i64, *const u8) });
+        let register_trampoline_load = emit_load_field(&register_trampoline_field, "register_trampoline", quote! { ::interoptopus::lang::plugin::RegisterTrampolineFn });
 
         quote! {
             impl ::interoptopus::lang::plugin::Plugin for #name {
@@ -238,6 +238,10 @@ impl PluginModel {
                         #(#service_loads,)*
                         #register_trampoline_load,
                     })
+                }
+
+                fn register_trampoline_fn(&self) -> ::interoptopus::lang::plugin::RegisterTrampolineFn {
+                    self.register_trampoline
                 }
             }
         }
