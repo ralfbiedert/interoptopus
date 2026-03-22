@@ -9,4 +9,9 @@ public class Plugin : IPlugin
     {
         throw new Exception("Panic!");
     }
+
+    public static ResultVoidError PanicWithResult()
+    {
+        throw new Exception("Panic!");
+    }
 }

@@ -1,3 +1,6 @@
+use crate::patterns::result::Error;
+use interoptopus::ffi;
+
 interoptopus::plugin!(Primitives {
     fn primitive_void();
     fn primitive_u8(x: u8) -> u8;
@@ -14,4 +17,5 @@ interoptopus::plugin!(Primitives {
 
 interoptopus::plugin!(Behavior {
     fn panic();
+    fn panic_with_result() -> ffi::Result<(), Error>;
 });
