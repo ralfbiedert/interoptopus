@@ -3,7 +3,6 @@ use crate::types::string::UseString;
 use interoptopus::lang::types::TypeInfo;
 use interoptopus::{callback, ffi};
 use std::ffi::c_void;
-use std::ptr::null;
 
 callback!(MyCallback(value: u32) -> u32);
 callback!(MyCallbackNamespaced(value: u32) -> u32, namespace = NAMESPACE_COMMON);

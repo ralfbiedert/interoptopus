@@ -18,3 +18,12 @@ pub const TRAMPOLINE_WIRE_CREATE: i64 = 0x4952_4F50_5743_0001;
 ///
 /// Signature: `extern "C" fn(data: *mut u8, len: i32, capacity: i32)`
 pub const TRAMPOLINE_WIRE_DESTROY: i64 = 0x4952_4F50_5743_0002;
+
+/// Trampoline ID for the uncaught-exception handler.
+///
+/// Signature: `extern "C" fn(message: *const u8, len: i32)`
+///
+/// Called by the plugin whenever a `[UnmanagedCallersOnly]` trampoline method
+/// catches an otherwise-unhandled exception. `message` is a UTF-8 byte slice
+/// of length `len` (not null-terminated).
+pub const TRAMPOLINE_UNCAUGHT_EXCEPTION: i64 = 0x4952_4F50_5743_0003;

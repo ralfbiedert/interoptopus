@@ -1,8 +1,11 @@
 use crate::{define_plugin, load_plugin};
 use interoptopus::plugin;
+use interoptopus_csharp::plugin::DotNetRuntime;
 use reference_project::plugins::functions::{Behavior, Primitives};
 use std::error::Error;
 use std::panic::catch_unwind;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 #[test]
 fn define_plugins() -> Result<(), Box<dyn Error>> {
@@ -35,14 +38,21 @@ fn load_plugin_functions_primitive() -> Result<(), Box<dyn Error>> {
 #[ignore]
 #[test]
 fn load_plugin_functions_behavior() -> Result<(), Box<dyn Error>> {
-    let plugin = load_plugin!(Behavior, "functions_behavior.dll");
+    let exception_called = Arc::new(AtomicBool::new(false));
+    let exception_called_clone = Arc::clone(&exception_called);
 
-    // As C# apparently doesn't support `C-unwind` when called this way
-    // it will crash the application. That means either make sure
-    // - your methods don't throw,
-    // - you add a manual try {} catch {} around them and decide what to return if it throws,
-    // - use ffi::Result
-    // plugin.panic();
+    let loader = DotNetRuntime::new()?
+        .set_exception_handler(move |x| {
+            println!("{x}");
+            exception_called_clone.store(true, Ordering::SeqCst);
+        })
+        .dll_loader_with_namespace(super::plugin_path_for("functions_behavior.dll"), "My.Company")?;
+
+    let plugin = Behavior::new(&loader)?;
+
+    plugin.panic();
+
+    assert!(exception_called.load(Ordering::SeqCst), "exception handler was not called after panic");
 
     Ok(())
 }

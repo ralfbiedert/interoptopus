@@ -71,19 +71,20 @@ impl Pass {
                         if let Some(inner_id) = async_inner {
                             let (args_str, forward_str) = unmanaged_args_except_last(func, unmanaged_names, unmanaged_conversion);
                             let continuation = async_continuation(inner_id, types, unmanaged_conversion);
-                            format!(
-                                "    [UnmanagedCallersOnly]\n    \
-                                 public static void {ffi_name}({args_str})\n    \
-                                 {{\n        \
-                                     _ = Plugin.{pascal_name}({forward_str}).{continuation};\n    \
-                                 }}"
-                            )
+                            let inner = format!("_ = Plugin.{pascal_name}({forward_str}).{continuation};");
+                            method_block(ffi_name, "void", &args_str, &try_catch_void(&inner))
                         } else {
                             let (args_str, forward_str) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
                             let rval_unmanaged = rval_unmanaged_name(func, rval_type, unmanaged_names);
                             let call = format!("Plugin.{pascal_name}({forward_str})");
                             let rval_suffix = unmanaged_conversion.to_unmanaged_suffix(func.signature.rval);
-                            format!("    [UnmanagedCallersOnly]\n    public static {rval_unmanaged} {ffi_name}({args_str}) => {call}{rval_suffix};")
+                            let inner = format!("{call}{rval_suffix}");
+                            let body = if rval_type == "void" {
+                                try_catch_void(&format!("{inner};"))
+                            } else {
+                                try_catch_return(&inner)
+                            };
+                            method_block(ffi_name, rval_unmanaged, &args_str, &body)
                         }
                     }
                     TrampolineKind::ServiceCtor { service_id } => {
@@ -91,15 +92,12 @@ impl Pass {
                         let type_name = types.get(svc.ty).map(|t| t.name.as_str()).unwrap_or("");
                         let method_name = service_method_name(type_name, ffi_name);
                         let (args_str, forward_str) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
-                        format!(
-                            "    [UnmanagedCallersOnly]\n    \
-                             public static nint {ffi_name}({args_str})\n    \
-                             {{\n        \
-                                 var obj = {type_name}.{method_name}({forward_str});\n        \
-                                 var handle = GCHandle.Alloc(obj);\n        \
-                                 return GCHandle.ToIntPtr(handle);\n    \
-                             }}"
-                        )
+                        let inner = format!(
+                            "var obj = {type_name}.{method_name}({forward_str});\n            \
+                             var handle = GCHandle.Alloc(obj);\n            \
+                             return GCHandle.ToIntPtr(handle);"
+                        );
+                        method_block(ffi_name, "nint", &args_str, &try_catch_inner(&inner, true))
                     }
                     TrampolineKind::ServiceMethod { service_id } => {
                         let Some(svc) = svc_lookup.get(service_id) else { continue };
@@ -115,54 +113,39 @@ impl Pass {
                                 format!("nint self, {args_str}")
                             };
                             let continuation = async_continuation(inner_id, types, unmanaged_conversion);
-                            format!(
-                                "    [UnmanagedCallersOnly]\n    \
-                                 public static void {ffi_name}({self_args_str})\n    \
-                                 {{\n        \
-                                     var handle = GCHandle.FromIntPtr(self);\n        \
-                                     var obj = (I{type_name}<{type_name}>)handle.Target!;\n        \
-                                     _ = obj.{method_name}({forward_str}).{continuation};\n    \
-                                 }}"
-                            )
+                            let inner = format!(
+                                "var handle = GCHandle.FromIntPtr(self);\n            \
+                                 var obj = (I{type_name}<{type_name}>)handle.Target!;\n            \
+                                 _ = obj.{method_name}({forward_str}).{continuation};"
+                            );
+                            method_block(ffi_name, "void", &self_args_str, &try_catch_void(&inner))
                         } else {
                             let (args_str, forward_str) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
                             let rval_unmanaged = rval_unmanaged_name(func, rval_type, unmanaged_names);
-
-                            // The inventory does not include `self` in arguments, so prepend `nint self` to the signature.
                             let self_args_str = if args_str.is_empty() {
                                 "nint self".to_string()
                             } else {
                                 format!("nint self, {args_str}")
                             };
-
                             let call = format!("obj.{method_name}({forward_str})");
                             let rval_suffix = unmanaged_conversion.to_unmanaged_suffix(func.signature.rval);
+                            let prelude = format!(
+                                "var handle = GCHandle.FromIntPtr(self);\n            \
+                                 var obj = (I{type_name}<{type_name}>)handle.Target!;"
+                            );
                             let body = if rval_type == "void" {
-                                format!("        {call};")
+                                let inner = format!("{prelude}\n            {call};");
+                                try_catch_void(&inner)
                             } else {
-                                format!("        return {call}{rval_suffix};")
+                                let inner = format!("{prelude}\n            return {call}{rval_suffix};");
+                                try_catch_inner(&inner, true)
                             };
-
-                            format!(
-                                "    [UnmanagedCallersOnly]\n    \
-                                 public static {rval_unmanaged} {ffi_name}({self_args_str})\n    \
-                                 {{\n        \
-                                     var handle = GCHandle.FromIntPtr(self);\n        \
-                                     var obj = (I{type_name}<{type_name}>)handle.Target!;\n\
-                                     {body}\n    \
-                                 }}"
-                            )
+                            method_block(ffi_name, rval_unmanaged, &self_args_str, &body)
                         }
                     }
                     TrampolineKind::ServiceDestructor { .. } => {
-                        format!(
-                            "    [UnmanagedCallersOnly]\n    \
-                             public static void {ffi_name}(nint self)\n    \
-                             {{\n        \
-                                 var handle = GCHandle.FromIntPtr(self);\n        \
-                                 handle.Free();\n    \
-                             }}"
-                        )
+                        let inner = "var handle = GCHandle.FromIntPtr(self);\n            handle.Free();";
+                        method_block(ffi_name, "void", "nint self", &try_catch_void(inner))
                     }
                 };
 
@@ -261,6 +244,49 @@ fn async_callback_inner(func: &Function, types: &model::common::types::all::Pass
         TypeKind::TypePattern(TypePattern::AsyncCallback(inner)) => Some(*inner),
         _ => None,
     }
+}
+
+/// Renders a complete `[UnmanagedCallersOnly]` method block.
+fn method_block(ffi_name: &str, rval: &str, args: &str, body: &str) -> String {
+    format!(
+        "    [UnmanagedCallersOnly]\n    \
+         public static {rval} {ffi_name}({args})\n    \
+         {{\n        \
+             {body}\n    \
+         }}"
+    )
+}
+
+/// Wraps `inner` in a try/catch for void methods.
+fn try_catch_void(inner: &str) -> String {
+    format!(
+        "try\n        {{\n            \
+             {inner}\n        \
+         }}\n        \
+         catch (Exception e)\n        \
+         {{\n            \
+             Trampolines.UncaughtException(e.ToString());\n        \
+         }}"
+    )
+}
+
+/// Wraps `inner` (which already contains `return`) in a try/catch that returns `default` on error.
+fn try_catch_return(expr: &str) -> String {
+    try_catch_inner(&format!("return {expr};"), true)
+}
+
+/// Wraps a multi-statement `inner` in a try/catch. If `has_return` is true the catch returns `default`.
+fn try_catch_inner(inner: &str, has_return: bool) -> String {
+    let catch_tail = if has_return { "\n            return default;" } else { "" };
+    format!(
+        "try\n        {{\n            \
+             {inner}\n        \
+         }}\n        \
+         catch (Exception e)\n        \
+         {{\n            \
+             Trampolines.UncaughtException(e.ToString());{catch_tail}\n        \
+         }}"
+    )
 }
 
 /// Returns the `.ContinueWith(...)` expression that invokes `cb.UnsafeComplete` after the task.
