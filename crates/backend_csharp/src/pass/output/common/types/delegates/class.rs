@@ -100,7 +100,7 @@ impl Pass {
                 context.insert("rval_to_managed", &rval_to_managed);
                 context.insert("args", &args);
 
-                let rendered = templates.render("rust/types/delegate/class.cs", &context)?;
+                let rendered = templates.render("common/types/delegate/class.cs", &context)?;
                 rendered_delegates.push(rendered);
             }
 

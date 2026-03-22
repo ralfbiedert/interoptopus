@@ -62,7 +62,7 @@ impl Pass {
                 ctx.insert("class_name", &ty.name);
                 ctx.insert("field_decls", &field_decls);
 
-                let result = templates.render("rust/wire/wire_helper_class.cs", &ctx)?;
+                let result = templates.render("common/wire/wire_helper_class.cs", &ctx)?;
                 rendered.push(result);
             }
 

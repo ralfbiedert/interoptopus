@@ -86,7 +86,7 @@ impl Pass {
                 context.insert("deserialize_body", &deserialize_body);
                 context.insert("size_body", &size_body);
 
-                let result = templates.render("rust/wire/wire_type.cs", &context)?;
+                let result = templates.render("common/wire/wire_type.cs", &context)?;
                 rendered.push(result);
             }
 

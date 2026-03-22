@@ -74,7 +74,7 @@ public partial class {{ name }} : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    internal Unmanaged ToUnmanaged()
+    internal Unmanaged IntoUnmanaged()
     {
         var rval = new Unmanaged();
         rval._callback = _ptr;
@@ -103,7 +103,7 @@ public partial class {{ name }} : IDisposable
         internal IntPtr _data;
         internal IntPtr _destructor;
 
-        public {{ name }} ToManaged()
+        public {{ name }} IntoManaged()
         {
             var rval = new {{ name }}();
             rval._ptr = _callback;
@@ -132,10 +132,10 @@ public partial class {{ name }} : IDisposable
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+        public Unmanaged IntoUnmanaged() { return _managed.IntoUnmanaged(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public {{ name }} ToManaged() { return _unmanaged.ToManaged(); }
+        public {{ name }} IntoManaged() { return _unmanaged.IntoManaged(); }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void Free() {}

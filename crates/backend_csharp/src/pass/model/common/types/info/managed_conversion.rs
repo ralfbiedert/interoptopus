@@ -45,7 +45,7 @@ impl Pass {
                 TypeKind::Pointer(_) => ManagedConversion::AsIs,
                 TypeKind::Delegate(d) => match d.kind {
                     DelegateKind::Signature => ManagedConversion::AsIs,
-                    DelegateKind::Class => ManagedConversion::To,
+                    DelegateKind::Class => ManagedConversion::Into,
                 },
 
                 // Services and opaques transfer ownership

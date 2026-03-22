@@ -10,9 +10,9 @@ pub use overload::{DelegateFamily, OverloadFamily, PointerFamily};
 pub enum ManagedConversion {
     /// Primitive types that convert via language built-ins
     AsIs,
-    /// Conversion via `To...` methods, indicating no ownership transfer.
+    /// Conversion via `To...` methods, indicating no ownership transfer (Rust type is `Copy`).
     To,
-    /// Conversion via `Into...` methods, indicating ownership transfer.
+    /// Conversion via `Into...` methods, indicating ownership transfer (Rust type has `Drop`).
     Into,
 }
 

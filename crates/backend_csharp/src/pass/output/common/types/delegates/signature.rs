@@ -65,7 +65,7 @@ impl Pass {
                 context.insert("rval_managed", &rval_managed);
                 context.insert("args", &args);
 
-                let r = templates.render("rust/types/delegate/signature.cs", &context)?;
+                let r = templates.render("common/types/delegate/signature.cs", &context)?;
                 rendered.push(r);
             }
 
