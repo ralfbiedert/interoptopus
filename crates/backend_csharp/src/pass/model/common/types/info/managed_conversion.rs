@@ -10,7 +10,7 @@
 
 use crate::lang::TypeId;
 use crate::lang::types::ManagedConversion;
-use crate::lang::types::kind::{DelegateKind, TypeKind};
+use crate::lang::types::kind::{DelegateKind, TypeKind, Util};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashMap;
@@ -73,7 +73,8 @@ impl Pass {
                         // Move semantics (ownership transfer)
                         TypePattern::Utf8String => ManagedConversion::Into,
                         TypePattern::Vec(_) => ManagedConversion::Into,
-                        TypePattern::AsyncCallback(_) => ManagedConversion::Into,
+                        // AsyncCallbackCommonNative is already the blittable struct — it IS the unmanaged form.
+                        TypePattern::AsyncCallback(_) => ManagedConversion::AsIs,
                         TypePattern::Wire(_) => ManagedConversion::Into,
 
                         // Option/Result: inspect variant payloads (same logic as DataEnum)
@@ -164,9 +165,15 @@ impl Pass {
                 //       `Option<ManagedConversion>` instead. Also, maybe the core TypeInfo
                 //       should have a Copy / Move marker this is primarily based on for all other
                 //       types.
-                TypeKind::AsyncHelper(_) | TypeKind::Wire(_) => ManagedConversion::Into,
+                TypeKind::AsyncHelper(_) => ManagedConversion::AsIs,
+                TypeKind::Wire(_) => ManagedConversion::Into,
                 TypeKind::Task(_) => ManagedConversion::Into,
-                TypeKind::Util(_) => ManagedConversion::Into,
+                TypeKind::Util(x) => match x {
+                    Util::InteropException => ManagedConversion::Into,
+                    Util::EnumException => ManagedConversion::Into,
+                    Util::AsyncCallbackCommon => ManagedConversion::AsIs,
+                    Util::WireBuffer => ManagedConversion::Into,
+                },
                 TypeKind::WireOnly(_) => ManagedConversion::Into,
             };
 

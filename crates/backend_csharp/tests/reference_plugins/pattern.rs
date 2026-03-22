@@ -1,5 +1,6 @@
 use crate::{define_plugin, load_plugin};
 use interoptopus::ffi;
+use reference_project::patterns::callback::MyCallback;
 use reference_project::patterns::result::Error;
 use reference_project::plugins::pattern::Pattern;
 use reference_project::types::basic::Vec3f32;
@@ -30,6 +31,12 @@ fn load_plugin() -> Result<(), Box<dyn StdError>> {
     assert_eq!(result.x, 0.0);
     assert_eq!(result.y, 0.0);
     assert_eq!(result.z, 0.0);
+
+    // Plugin ignores input and always returns Ok(Vec3f32::default())
+    let callback = MyCallback::from_fn(|x| x + 1);
+    let result = plugin.delegate_1(callback);
+    let i = result.call(3, 4);
+    assert_eq!(i, 8);
 
     Ok(())
 }

@@ -368,7 +368,7 @@ impl DotnetLibrary {
         o.wire_types.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
         o.wire_helper_classes.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
         o.wires.process(&mut pass_meta, &self.output_master, &o.wire_types, &o.wire_helper_classes)?;
-        o.trampoline.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &m.service_all)?;
+        o.trampoline.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &m.service_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
         o.plugin_interface.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all)?;
         o.service_interface.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all)?;
 

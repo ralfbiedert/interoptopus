@@ -15,13 +15,11 @@ public partial class {{ inner_type }}
 }
 
 {% endif -%}
-public partial struct {{ wire_name }}
+[NativeMarshalling(typeof(MarshallerMeta))]
+public partial class {{ wire_name }} : IDisposable
 {
     public WireBuffer Buffer;
-}
 
-public partial struct {{ wire_name }}
-{
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static {{ wire_name }} From({{ inner_type }} value)
     {
@@ -57,5 +55,55 @@ public partial struct {{ wire_name }}
     public void Dispose()
     {
         Buffer.Dispose();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    internal Unmanaged IntoUnmanaged()
+    {
+        var rval = new Unmanaged { Buffer = Buffer };
+        Buffer = default;
+        return rval;
+    }
+
+    [CustomMarshaller(typeof({{ wire_name }}), MarshalMode.Default, typeof(Marshaller))]
+    private struct MarshallerMeta { }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Unmanaged
+    {
+        public WireBuffer Buffer;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public {{ wire_name }} IntoManaged()
+        {
+            return new {{ wire_name }} { Buffer = Buffer };
+        }
+    }
+
+    public ref struct Marshaller
+    {
+        private {{ wire_name }} _managed;
+        private Unmanaged _unmanaged;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Marshaller({{ wire_name }} managed) { _managed = managed; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void FromManaged({{ wire_name }} managed) { _managed = managed; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public {{ wire_name }} ToManaged() { return _unmanaged.IntoManaged(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Free() {}
     }
 }
