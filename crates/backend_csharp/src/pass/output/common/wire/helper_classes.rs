@@ -7,7 +7,7 @@
 use crate::lang::types::kind::TypeKind;
 use crate::lang::types::kind::wire::WireOnly;
 use crate::output::{FileType, Output};
-use crate::pass::output::rust::wire::WireCodeGen;
+use crate::pass::output::common::wire::WireCodeGen;
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus::inventory::Types as RsTypes;
 use interoptopus_backends::template::Context;

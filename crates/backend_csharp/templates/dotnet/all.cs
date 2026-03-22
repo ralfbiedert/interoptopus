@@ -5,6 +5,10 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
 namespace {{ namespace }};
+{% for delegate in delegates %}
+
+{{ delegate }}
+{% endfor %}
 {% for composite in composites %}
 
 {{ composite }}

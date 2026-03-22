@@ -40,11 +40,13 @@ pub struct DotnetLibraryConfig {
     pub output_trampoline: output::dotnet::trampoline::Config,
     pub output_trampolines: output::dotnet::trampolines::Config,
     pub output_wire_buffer: output::common::pattern::wire_buffer::Config,
-    pub output_wire_types: output::rust::wire::wire_type::Config,
-    pub output_wire_helper_classes: output::rust::wire::helper_classes::Config,
-    pub output_wires: output::rust::wire::all::Config,
+    pub output_wire_types: output::common::wire::wire_type::Config,
+    pub output_wire_helper_classes: output::common::wire::helper_classes::Config,
+    pub output_wires: output::common::wire::all::Config,
     pub output_plugin_interface: output::dotnet::interface::plugin::Config,
     pub output_service_interface: output::dotnet::interface::service::Config,
+    pub output_delegates_class: output::common::types::delegates::class::Config,
+    pub output_delegates_signature: output::common::types::delegates::signature::Config,
     pub output_composite_ty: output::common::types::composites::definition::Config,
     pub output_composite_body_unmanaged: output::common::types::composites::body_unmanaged::Config,
     pub output_composite_body_to_unmanaged: output::common::types::composites::body_to_unmanaged::Config,
@@ -107,6 +109,8 @@ impl Default for DotnetLibraryConfig {
             output_wires: Default::default(),
             output_plugin_interface: Default::default(),
             output_service_interface: Default::default(),
+            output_delegates_class: Default::default(),
+            output_delegates_signature: Default::default(),
             output_composite_ty: Default::default(),
             output_composite_body_unmanaged: Default::default(),
             output_composite_body_to_unmanaged: Default::default(),
@@ -170,11 +174,13 @@ pub struct IntermediateOutputPasses {
     pub trampoline: output::dotnet::trampoline::Pass,
     pub trampolines: output::dotnet::trampolines::Pass,
     pub wire_buffer: output::common::pattern::wire_buffer::Pass,
-    pub wire_types: output::rust::wire::wire_type::Pass,
-    pub wire_helper_classes: output::rust::wire::helper_classes::Pass,
-    pub wires: output::rust::wire::all::Pass,
+    pub wire_types: output::common::wire::wire_type::Pass,
+    pub wire_helper_classes: output::common::wire::helper_classes::Pass,
+    pub wires: output::common::wire::all::Pass,
     pub plugin_interface: output::dotnet::interface::plugin::Pass,
     pub service_interface: output::dotnet::interface::service::Pass,
+    pub delegates_class: output::common::types::delegates::class::Pass,
+    pub delegates_signature: output::common::types::delegates::signature::Pass,
     pub composite_ty: output::common::types::composites::definition::Pass,
     pub composite_body_unmanaged: output::common::types::composites::body_unmanaged::Pass,
     pub composite_body_to_unmanaged: output::common::types::composites::body_to_unmanaged::Pass,
@@ -260,11 +266,13 @@ impl DotnetLibrary {
                 trampoline: output::dotnet::trampoline::Pass::new(config.output_trampoline),
                 trampolines: output::dotnet::trampolines::Pass::new(config.output_trampolines),
                 wire_buffer: output::common::pattern::wire_buffer::Pass::new(config.output_wire_buffer),
-                wire_types: output::rust::wire::wire_type::Pass::new(config.output_wire_types),
-                wire_helper_classes: output::rust::wire::helper_classes::Pass::new(config.output_wire_helper_classes),
-                wires: output::rust::wire::all::Pass::new(config.output_wires),
+                wire_types: output::common::wire::wire_type::Pass::new(config.output_wire_types),
+                wire_helper_classes: output::common::wire::helper_classes::Pass::new(config.output_wire_helper_classes),
+                wires: output::common::wire::all::Pass::new(config.output_wires),
                 plugin_interface: output::dotnet::interface::plugin::Pass::new(config.output_plugin_interface),
                 service_interface: output::dotnet::interface::service::Pass::new(config.output_service_interface),
+                delegates_class: output::common::types::delegates::class::Pass::new(config.output_delegates_class),
+                delegates_signature: output::common::types::delegates::signature::Pass::new(config.output_delegates_signature),
                 composite_ty: output::common::types::composites::definition::Pass::new(config.output_composite_ty),
                 composite_body_unmanaged: output::common::types::composites::body_unmanaged::Pass::new(config.output_composite_body_unmanaged),
                 composite_body_to_unmanaged: output::common::types::composites::body_to_unmanaged::Pass::new(config.output_composite_body_to_unmanaged),
@@ -353,6 +361,8 @@ impl DotnetLibrary {
         o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_exception_for_variant, &o.enum_body_tostring, &o.unmanaged_conversion)?;
         o.enums.process(&mut pass_meta, &self.output_master, &m.type_all, &o.enum_ty, &o.enum_body)?;
         o.util.process(&mut pass_meta, &self.output_master)?;
+        o.delegates_class.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
+        o.delegates_signature.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.trampolines.process(&mut pass_meta, &self.output_master)?;
         o.wire_buffer.process(&mut pass_meta, &self.output_master, &m.wire_helpers, &self.inventory.functions, &self.inventory.types)?;
         o.wire_types.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;

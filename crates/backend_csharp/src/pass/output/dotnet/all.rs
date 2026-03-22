@@ -34,6 +34,9 @@ impl Pass {
             let plugin_interface = intermediary.plugin_interface.interface_for(file).unwrap_or("");
             let service_interfaces = intermediary.service_interface.interfaces_for(file).unwrap_or(&[]);
             let trampolines = intermediary.trampoline.trampolines_for(file).unwrap_or(&[]);
+            let delegates_class = intermediary.delegates_class.delegates_for(file).unwrap_or(&[]);
+            let delegates_signature = intermediary.delegates_signature.delegates_for(file).unwrap_or(&[]);
+            let delegates: Vec<&str> = delegates_class.iter().chain(delegates_signature.iter()).map(String::as_str).collect();
             let composites = intermediary.composites.composites_for(file).unwrap_or(&[]);
             let enums = intermediary.enums.enums_for(file).unwrap_or(&[]);
             let util = intermediary.util.utils_for(file).unwrap_or("");
@@ -42,6 +45,7 @@ impl Pass {
             let wires = intermediary.wires.wires_for(file).unwrap_or(&[]);
 
             context.insert("namespace", file.target.namespace());
+            context.insert("delegates", &delegates);
             context.insert("composites", &composites);
             context.insert("enums", &enums);
             context.insert("util", &util);

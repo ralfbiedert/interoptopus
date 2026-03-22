@@ -26,8 +26,8 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
-        wire_types: &output::rust::wire::wire_type::Pass,
-        helper_classes: &output::rust::wire::helper_classes::Pass,
+        wire_types: &output::common::wire::wire_type::Pass,
+        helper_classes: &output::common::wire::helper_classes::Pass,
     ) -> OutputResult {
         for file in output_master.outputs_of(FileType::Csharp) {
             let mut combined = Vec::new();
