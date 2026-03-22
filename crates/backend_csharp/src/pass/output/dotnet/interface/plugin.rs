@@ -9,6 +9,9 @@
 //! ```
 //!
 use crate::lang::plugin::TrampolineKind;
+use crate::lang::types::kind::{TypeKind, TypePattern};
+use crate::lang::types::kind::Primitive;
+use crate::lang::TypeId;
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::casing::rust_to_pascal;
@@ -46,13 +49,22 @@ impl Pass {
 
                 let Some(func) = fns_all.get(entry.fn_id) else { continue };
 
-                let rval_name = types.get(func.signature.rval).map(|t| t.name.as_str()).unwrap_or("void");
                 let pascal_name = rust_to_pascal(&func.name);
+                let async_inner = async_callback_inner(&func.signature.arguments, types);
 
+                let rval_name = if let Some(inner_id) = async_inner {
+                    task_type_name(inner_id, types)
+                } else {
+                    types.get(func.signature.rval).map(|t| t.name.clone()).unwrap_or_else(|| "void".to_string())
+                };
+
+                // For async methods omit the trailing AsyncCallback parameter.
+                let arg_count = if async_inner.is_some() { func.signature.arguments.len().saturating_sub(1) } else { func.signature.arguments.len() };
                 let args: Vec<String> = func
                     .signature
                     .arguments
                     .iter()
+                    .take(arg_count)
                     .filter_map(|arg| {
                         let ty_name = types.get(arg.ty).map(|t| &t.name)?;
                         Some(format!("{} {}", ty_name, arg.name))
@@ -80,5 +92,26 @@ impl Pass {
     #[must_use]
     pub fn interface_for(&self, output: &Output) -> Option<&str> {
         self.interfaces.get(output).map(String::as_str)
+    }
+}
+
+/// If the last argument is `AsyncCallback<T>`, returns the inner `TypeId`.
+pub(super) fn async_callback_inner(args: &[crate::lang::functions::Argument], types: &model::common::types::all::Pass) -> Option<TypeId> {
+    let last = args.last()?;
+    let ty = types.get(last.ty)?;
+    match &ty.kind {
+        TypeKind::TypePattern(TypePattern::AsyncCallback(inner)) => Some(*inner),
+        _ => None,
+    }
+}
+
+/// Returns `"Task"` for void inner types or `"Task<TypeName>"` for value types.
+pub(super) fn task_type_name(inner_id: TypeId, types: &model::common::types::all::Pass) -> String {
+    let is_void = matches!(types.get(inner_id).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
+    if is_void {
+        "Task".to_string()
+    } else {
+        let name = types.get(inner_id).map(|t| t.name.as_str()).unwrap_or("void");
+        format!("Task<{name}>")
     }
 }

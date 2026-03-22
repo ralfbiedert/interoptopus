@@ -4,26 +4,26 @@ namespace My.Company;
 
 class Plugin : IPlugin
 {
-    public static void Raw1(AsyncCallbackCommonNative cb)
+    public async static Task<uint> Raw1()
     {
-        throw new NotImplementedException();
+        await Task.Yield();
+        return 123;
     }
 }
 
 class AsyncBasic: IAsyncBasic<AsyncBasic>
 {
-    public static AsyncBasic AsyncbasicCreate()
+    public static AsyncBasic AsyncbasicCreate() => new();
+
+    public async Task<uint> AsyncbasicRaw(uint x)
     {
-        return  new AsyncBasic();
+        await Task.Yield();
+        return x;
     }
 
-    public void AsyncbasicRaw(uint x, AsyncCallbackCommonNative cb)
+    public async Task<uint> AsyncbasicRaw2()
     {
-        
-    }
-
-    public void AsyncbasicRaw2(AsyncCallbackCommonNative cb)
-    {
-        cb.UnsafeComplete();
+        await Task.Yield();
+        return 123;
     }
 }

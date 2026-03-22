@@ -11,6 +11,9 @@
 use crate::lang::ServiceId;
 use crate::lang::plugin::TrampolineKind;
 use crate::lang::service::Service;
+use crate::lang::types::kind::Primitive;
+use crate::lang::types::kind::{TypeKind, TypePattern};
+use crate::lang::TypeId;
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use crate::lang::functions::Function;
@@ -64,11 +67,24 @@ impl Pass {
                 let method = match &entry.kind {
                     TrampolineKind::Raw => {
                         let pascal_name = rust_to_pascal(ffi_name);
-                        let (args_str, forward_str) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
-                        let rval_unmanaged = rval_unmanaged_name(func, rval_type, unmanaged_names);
-                        let call = format!("Plugin.{pascal_name}({forward_str})");
-                        let rval_suffix = unmanaged_conversion.to_unmanaged_suffix(func.signature.rval);
-                        format!("    [UnmanagedCallersOnly]\n    public static {rval_unmanaged} {ffi_name}({args_str}) => {call}{rval_suffix};")
+                        let async_inner = async_callback_inner(func, types);
+                        if let Some(inner_id) = async_inner {
+                            let (args_str, forward_str) = unmanaged_args_except_last(func, unmanaged_names, unmanaged_conversion);
+                            let continuation = async_continuation(inner_id, types);
+                            format!(
+                                "    [UnmanagedCallersOnly]\n    \
+                                 public static void {ffi_name}({args_str})\n    \
+                                 {{\n        \
+                                     _ = Plugin.{pascal_name}({forward_str}).{continuation};\n    \
+                                 }}"
+                            )
+                        } else {
+                            let (args_str, forward_str) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
+                            let rval_unmanaged = rval_unmanaged_name(func, rval_type, unmanaged_names);
+                            let call = format!("Plugin.{pascal_name}({forward_str})");
+                            let rval_suffix = unmanaged_conversion.to_unmanaged_suffix(func.signature.rval);
+                            format!("    [UnmanagedCallersOnly]\n    public static {rval_unmanaged} {ffi_name}({args_str}) => {call}{rval_suffix};")
+                        }
                     }
                     TrampolineKind::ServiceCtor { service_id } => {
                         let Some(svc) = svc_lookup.get(service_id) else { continue };
@@ -89,33 +105,54 @@ impl Pass {
                         let Some(svc) = svc_lookup.get(service_id) else { continue };
                         let type_name = types.get(svc.ty).map(|t| t.name.as_str()).unwrap_or("");
                         let method_name = service_method_name(type_name, ffi_name);
-                        let (args_str, forward_str) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
-                        let rval_unmanaged = rval_unmanaged_name(func, rval_type, unmanaged_names);
+                        let async_inner = async_callback_inner(func, types);
 
-                        // The inventory does not include `self` in arguments, so prepend `nint self` to the signature.
-                        let self_args_str = if args_str.is_empty() {
-                            "nint self".to_string()
+                        if let Some(inner_id) = async_inner {
+                            let (args_str, forward_str) = unmanaged_args_except_last(func, unmanaged_names, unmanaged_conversion);
+                            let self_args_str = if args_str.is_empty() {
+                                "nint self".to_string()
+                            } else {
+                                format!("nint self, {args_str}")
+                            };
+                            let continuation = async_continuation(inner_id, types);
+                            format!(
+                                "    [UnmanagedCallersOnly]\n    \
+                                 public static void {ffi_name}({self_args_str})\n    \
+                                 {{\n        \
+                                     var handle = GCHandle.FromIntPtr(self);\n        \
+                                     var obj = (I{type_name}<{type_name}>)handle.Target!;\n        \
+                                     _ = obj.{method_name}({forward_str}).{continuation};\n    \
+                                 }}"
+                            )
                         } else {
-                            format!("nint self, {args_str}")
-                        };
+                            let (args_str, forward_str) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
+                            let rval_unmanaged = rval_unmanaged_name(func, rval_type, unmanaged_names);
 
-                        let call = format!("obj.{method_name}({forward_str})");
-                        let rval_suffix = unmanaged_conversion.to_unmanaged_suffix(func.signature.rval);
-                        let body = if rval_type == "void" {
-                            format!("        {call};")
-                        } else {
-                            format!("        return {call}{rval_suffix};")
-                        };
+                            // The inventory does not include `self` in arguments, so prepend `nint self` to the signature.
+                            let self_args_str = if args_str.is_empty() {
+                                "nint self".to_string()
+                            } else {
+                                format!("nint self, {args_str}")
+                            };
 
-                        format!(
-                            "    [UnmanagedCallersOnly]\n    \
-                             public static {rval_unmanaged} {ffi_name}({self_args_str})\n    \
-                             {{\n        \
-                                 var handle = GCHandle.FromIntPtr(self);\n        \
-                                 var obj = (I{type_name}<{type_name}>)handle.Target!;\n\
-                                 {body}\n    \
-                             }}"
-                        )
+                            let call = format!("obj.{method_name}({forward_str})");
+                            let rval_suffix = unmanaged_conversion.to_unmanaged_suffix(func.signature.rval);
+                            let body = if rval_type == "void" {
+                                format!("        {call};")
+                            } else {
+                                format!("        return {call}{rval_suffix};")
+                            };
+
+                            format!(
+                                "    [UnmanagedCallersOnly]\n    \
+                                 public static {rval_unmanaged} {ffi_name}({self_args_str})\n    \
+                                 {{\n        \
+                                     var handle = GCHandle.FromIntPtr(self);\n        \
+                                     var obj = (I{type_name}<{type_name}>)handle.Target!;\n\
+                                     {body}\n    \
+                                 }}"
+                            )
+                        }
                     }
                     TrampolineKind::ServiceDestructor { .. } => {
                         format!(
@@ -180,4 +217,58 @@ fn rval_unmanaged_name<'a>(
     unmanaged_names: &'a output::common::conversion::unmanaged_names::Pass,
 ) -> &'a str {
     unmanaged_names.name(func.signature.rval).map(String::as_str).unwrap_or(rval_type)
+}
+
+/// Returns `(args_str, forward_str)` for an async `[UnmanagedCallersOnly]` signature.
+///
+/// - `args_str`: all unmanaged parameters including the trailing `AsyncCallback` arg
+/// - `forward_str`: only the non-callback args, forwarded with to-managed conversions
+fn unmanaged_args_except_last(
+    func: &Function,
+    unmanaged_names: &output::common::conversion::unmanaged_names::Pass,
+    unmanaged_conversion: &output::common::conversion::unmanaged_conversion::Pass,
+) -> (String, String) {
+    let n = func.signature.arguments.len().saturating_sub(1);
+
+    // All args in the unmanaged signature (callback stays as-is, it's AsIs/blittable).
+    let args: Vec<String> = func
+        .signature
+        .arguments
+        .iter()
+        .filter_map(|arg| {
+            let ty_name = unmanaged_names.name(arg.ty)?;
+            Some(format!("{ty_name} {}", arg.name))
+        })
+        .collect();
+
+    // Only forward the non-callback args to the managed call.
+    let forward: Vec<String> = func
+        .signature
+        .arguments
+        .iter()
+        .take(n)
+        .map(|a| format!("{}{}", a.name, unmanaged_conversion.to_managed_suffix(a.ty)))
+        .collect();
+
+    (args.join(", "), forward.join(", "))
+}
+
+/// If the last argument is `AsyncCallback<T>`, returns the inner `TypeId`.
+fn async_callback_inner(func: &Function, types: &model::common::types::all::Pass) -> Option<TypeId> {
+    let last = func.signature.arguments.last()?;
+    let ty = types.get(last.ty)?;
+    match &ty.kind {
+        TypeKind::TypePattern(TypePattern::AsyncCallback(inner)) => Some(*inner),
+        _ => None,
+    }
+}
+
+/// Returns the `.ContinueWith(...)` expression that invokes `cb.UnsafeComplete` after the task.
+fn async_continuation(inner_id: TypeId, types: &model::common::types::all::Pass) -> String {
+    let is_void = matches!(types.get(inner_id).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
+    if is_void {
+        "ContinueWith(_ => cb.UnsafeComplete())".to_string()
+    } else {
+        "ContinueWith(t => cb.UnsafeComplete(t.Result))".to_string()
+    }
 }

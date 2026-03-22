@@ -13,6 +13,7 @@
 //!
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::output::dotnet::interface::plugin::{async_callback_inner, task_type_name};
 use interoptopus_backends::casing::service_method_name;
 use std::collections::HashMap;
 
@@ -75,13 +76,21 @@ impl Pass {
                 for &fn_id in &svc.methods {
                     let Some(func) = fns_all.get(fn_id) else { continue };
                     let method_name = service_method_name(type_name, &func.name);
-                    let rval_name = types.get(func.signature.rval).map(|t| t.name.as_str()).unwrap_or("void");
+                    let async_inner = async_callback_inner(&func.signature.arguments, types);
 
-                    // The inventory does not include `self` in the arguments, so use all args
+                    let rval_name = if let Some(inner_id) = async_inner {
+                        task_type_name(inner_id, types)
+                    } else {
+                        types.get(func.signature.rval).map(|t| t.name.clone()).unwrap_or_else(|| "void".to_string())
+                    };
+
+                    // For async methods omit the trailing AsyncCallback parameter.
+                    let arg_count = if async_inner.is_some() { func.signature.arguments.len().saturating_sub(1) } else { func.signature.arguments.len() };
                     let args: Vec<String> = func
                         .signature
                         .arguments
                         .iter()
+                        .take(arg_count)
                         .filter_map(|arg| {
                             let ty = types.get(arg.ty).map(|t| &t.name)?;
                             Some(format!("{} {}", ty, arg.name))
