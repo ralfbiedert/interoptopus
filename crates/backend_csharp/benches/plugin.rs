@@ -1,9 +1,10 @@
 use interoptopus::wire::Wire;
 use interoptopus_csharp::plugin::DotNetRuntime;
 use reference_project::plugins::functions::Primitives;
-use reference_project::plugins::service::ServiceBasic;
+use reference_project::plugins::service::{ServiceAsync, ServiceBasic};
 use reference_project::plugins::wire::Wired;
 use std::collections::HashMap;
+use std::future::Future;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
@@ -21,6 +22,25 @@ const ITERATIONS: u32 = 100_000;
 
 fn calibrate() -> Duration {
     measure(ITERATIONS, || {})
+}
+
+fn measure_async<F, Fut>(rt: &tokio::runtime::Runtime, n: u32, f: F) -> Duration
+where
+    F: Fn() -> Fut,
+    Fut: Future<Output = ()>,
+{
+    for _ in 0..n {
+        rt.block_on(f());
+    }
+    let start = Instant::now();
+    for _ in 0..n {
+        rt.block_on(f());
+    }
+    start.elapsed()
+}
+
+fn calibrate_async(rt: &tokio::runtime::Runtime) -> Duration {
+    measure_async(rt, ITERATIONS, || async {})
 }
 
 fn measure<F: Fn()>(n: u32, f: F) -> Duration {
@@ -67,7 +87,15 @@ fn main() {
         .expect("Failed to load service_basic.dll");
     let service = ServiceBasic::new(&service_loader).expect("Failed to load ServiceBasic plugin");
 
+    let service_async_loader = runtime
+        .dll_loader_with_namespace(dll_path("service_async.dll"), "My.Company")
+        .expect("Failed to load service_async.dll");
+    let service_async = ServiceAsync::new(&service_async_loader).expect("Failed to load ServiceAsync plugin");
+
+    let rt = tokio::runtime::Runtime::new().expect("Failed to create tokio runtime");
+
     let baseline = calibrate();
+    let baseline_async = calibrate_async(&rt);
     let mut entries: Vec<Entry> = Vec::new();
 
     let t = measure(ITERATIONS, || primitives.primitive_void());
@@ -75,13 +103,17 @@ fn main() {
     println!("primitive_void(): {ns:.0}");
     entries.push(Entry { name: "primitive_void()".to_string(), ns });
 
-    let t = measure(ITERATIONS, || { let _ = primitives.primitive_u32(42); });
+    let t = measure(ITERATIONS, || {
+        let _ = primitives.primitive_u32(42);
+    });
     let ns = ns_per_call(t, baseline, ITERATIONS);
     println!("primitive_u32(42): {ns:.0}");
     entries.push(Entry { name: "primitive_u32(42)".to_string(), ns });
 
     let svc = service.servicea_create();
-    let t = measure(ITERATIONS, || { let _ = svc.call(5); });
+    let t = measure(ITERATIONS, || {
+        let _ = svc.call(5);
+    });
     let ns = ns_per_call(t, baseline, ITERATIONS);
     println!("svc.call(5): {ns:.0}");
     entries.push(Entry { name: "svc.call(5)".to_string(), ns });
@@ -94,15 +126,56 @@ fn main() {
     println!("wire_string(Wire::from(\"{{}}\")).unwire(): {ns:.0}");
     entries.push(Entry { name: r#"wire_string(Wire::from("{}")).unwire()"#.to_string(), ns });
 
-    let map16: HashMap<String, String> = (0..16)
-        .map(|i| (format!("{:016}", i), format!("{:016}", i)))
-        .collect();
+    let map1: HashMap<String, String> = (0..1).map(|i| (format!("{:016}", i), format!("{:016}", i))).collect();
+    let t = measure(ITERATIONS, || {
+        let _ = wired.wire_hashmap_string(Wire::from(map1.clone())).unwire();
+    });
+    let ns = ns_per_call(t, baseline, ITERATIONS);
+    println!("wire_hashmap_string(Wire::from(1x{{1char,1char}})).unwire(): {ns:.0}");
+    entries.push(Entry { name: "wire_hashmap_string(Wire::from(16x{16char,16char})).unwire()".to_string(), ns });
+
+    let map16: HashMap<String, String> = (0..16).map(|i| (format!("{:016}", i), format!("{:016}", i))).collect();
+    dbg!(&map16);
     let t = measure(ITERATIONS, || {
         let _ = wired.wire_hashmap_string(Wire::from(map16.clone())).unwire();
     });
     let ns = ns_per_call(t, baseline, ITERATIONS);
     println!("wire_hashmap_string(Wire::from(16x{{16char,16char}})).unwire(): {ns:.0}");
     entries.push(Entry { name: "wire_hashmap_string(Wire::from(16x{16char,16char})).unwire()".to_string(), ns });
+
+    let hashmap = HashMap::from([("foo".to_string(), "bar".to_string())]);
+
+    let t = measure_async(&rt, ITERATIONS, || async {
+        let _ = service_async.add_one(1).await;
+    });
+    let ns = ns_per_call(t, baseline_async, ITERATIONS);
+    println!("async service_async.add_one(1): {ns:.0}");
+    entries.push(Entry { name: "async service_async.add_one(1)".to_string(), ns });
+
+    let t = measure_async(&rt, ITERATIONS, || async {
+        let wire = Wire::from(hashmap.clone());
+        let _ = service_async.wire_1(wire).await;
+    });
+    let ns = ns_per_call(t, baseline_async, ITERATIONS);
+    println!("async service_async.wire_1(Wire::from({{1char,1char}})).await: {ns:.0}");
+    entries.push(Entry { name: r#"async service_async.wire_1(Wire::from({1char,1char})).await"#.to_string(), ns });
+
+    let async_svc = service_async.asyncbasic_create();
+
+    let t = measure_async(&rt, ITERATIONS, || async {
+        let _ = async_svc.add_one(1).await;
+    });
+    let ns = ns_per_call(t, baseline_async, ITERATIONS);
+    println!("async async_svc.add_one(1): {ns:.0}");
+    entries.push(Entry { name: "async async_svc.add_one(1)".to_string(), ns });
+
+    let t = measure_async(&rt, ITERATIONS, || async {
+        let wire = Wire::from(hashmap.clone());
+        let _ = async_svc.wire_1(wire).await;
+    });
+    let ns = ns_per_call(t, baseline_async, ITERATIONS);
+    println!("async async_svc.wire_1(Wire::from({{1char,1char}})).await: {ns:.0}");
+    entries.push(Entry { name: r#"async async_svc.wire_1(Wire::from({1char,1char})).await"#.to_string(), ns });
 
     // Write markdown results
     let mut md = String::new();
