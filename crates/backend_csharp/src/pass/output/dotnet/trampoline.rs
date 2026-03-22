@@ -70,7 +70,7 @@ impl Pass {
                         let async_inner = async_callback_inner(func, types);
                         if let Some(inner_id) = async_inner {
                             let (args_str, forward_str) = unmanaged_args_except_last(func, unmanaged_names, unmanaged_conversion);
-                            let continuation = async_continuation(inner_id, types);
+                            let continuation = async_continuation(inner_id, types, unmanaged_conversion);
                             format!(
                                 "    [UnmanagedCallersOnly]\n    \
                                  public static void {ffi_name}({args_str})\n    \
@@ -114,7 +114,7 @@ impl Pass {
                             } else {
                                 format!("nint self, {args_str}")
                             };
-                            let continuation = async_continuation(inner_id, types);
+                            let continuation = async_continuation(inner_id, types, unmanaged_conversion);
                             format!(
                                 "    [UnmanagedCallersOnly]\n    \
                                  public static void {ffi_name}({self_args_str})\n    \
@@ -264,11 +264,12 @@ fn async_callback_inner(func: &Function, types: &model::common::types::all::Pass
 }
 
 /// Returns the `.ContinueWith(...)` expression that invokes `cb.UnsafeComplete` after the task.
-fn async_continuation(inner_id: TypeId, types: &model::common::types::all::Pass) -> String {
+fn async_continuation(inner_id: TypeId, types: &model::common::types::all::Pass, unmanaged_conversion: &output::common::conversion::unmanaged_conversion::Pass) -> String {
     let is_void = matches!(types.get(inner_id).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
     if is_void {
         "ContinueWith(_ => cb.UnsafeComplete())".to_string()
     } else {
-        "ContinueWith(t => cb.UnsafeComplete(t.Result))".to_string()
+        let suffix = unmanaged_conversion.to_unmanaged_suffix(inner_id);
+        format!("ContinueWith(t => cb.UnsafeComplete(t.Result{suffix}))")
     }
 }

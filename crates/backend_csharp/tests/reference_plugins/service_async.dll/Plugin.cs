@@ -16,14 +16,21 @@ class Plugin : IPlugin
         await Task.Yield();
     }
 
-    public static Task<WireOfHashMapStringString> Wire1(WireOfHashMapStringString x)
+    public static async Task<WireOfHashMapStringString> Wire1(WireOfHashMapStringString x)
     {
-        throw new NotImplementedException();
+        await Task.Yield();
+        var dictionary = x.Unwire();
+        dictionary["hello"] = "world";
+        return WireOfHashMapStringString.From(dictionary);
     }
 
-    public static Task<ResultWireOfHashMapStringStringError> Wire2(WireOfHashMapStringString x)
+    public static async Task<ResultWireOfHashMapStringStringError> Wire2(WireOfHashMapStringString x)
     {
-        throw new NotImplementedException();
+        await Task.Yield();
+        var dictionary = x.Unwire();
+        dictionary["hello"] = "world";
+        var wire = WireOfHashMapStringString.From(dictionary);
+        return ResultWireOfHashMapStringStringError.Ok(wire);
     }
 }
 
@@ -42,13 +49,20 @@ class AsyncBasic: IAsyncBasic<AsyncBasic>
         return x + 1;
     }
 
-    public Task<WireOfHashMapStringString> AsyncbasicWire1(WireOfHashMapStringString x)
+    public async Task<WireOfHashMapStringString> AsyncbasicWire1(WireOfHashMapStringString x)
     {
-        throw new NotImplementedException();
+        await Task.Yield();
+        var dictionary = x.Unwire();
+        dictionary["hello"] = "world";
+        return WireOfHashMapStringString.From(dictionary);
     }
 
-    public Task<ResultWireOfHashMapStringStringError> AsyncbasicWire2(WireOfHashMapStringString x)
+    public async Task<ResultWireOfHashMapStringStringError> AsyncbasicWire2(WireOfHashMapStringString x)
     {
-        throw new NotImplementedException();
+        await Task.Yield();
+        var dictionary = x.Unwire();
+        dictionary["hello"] = "world";
+        var wire = WireOfHashMapStringString.From(dictionary);
+        return ResultWireOfHashMapStringStringError.Ok(wire);
     }
 }

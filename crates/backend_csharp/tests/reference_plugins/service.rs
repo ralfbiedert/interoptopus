@@ -1,5 +1,8 @@
 use crate::{define_plugin, load_plugin};
+use interoptopus::ffi;
+use interoptopus::wire::Wire;
 use reference_project::plugins::service::{ServiceAsync, ServiceBasic};
+use std::collections::HashMap;
 use std::error::Error;
 
 #[test]
@@ -32,10 +35,31 @@ async fn load_plugin_service_async() -> Result<(), Box<dyn Error>> {
     let i = plugin.add_one(1).await;
     assert_eq!(i, 2);
 
+    let hashmap = HashMap::from([("foo".to_string(), "bar".to_string())]);
+    let mut result = plugin.wire_1(Wire::from(hashmap.clone())).await;
+    let map = result.unwire();
+    assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
+    assert_eq!(map.get("hello").map(String::as_str), Some("world"));
+
+    let mut result = plugin.wire_2(Wire::from(hashmap.clone())).await;
+    let map = result.unwrap().unwire();
+    assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
+    assert_eq!(map.get("hello").map(String::as_str), Some("world"));
+
     let svc = plugin.asyncbasic_create();
     svc.call_void().await;
     let i = svc.add_one(1).await;
     assert_eq!(i, 2);
+
+    let mut result = svc.wire_1(Wire::from(hashmap.clone())).await;
+    let map = result.unwire();
+    assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
+    assert_eq!(map.get("hello").map(String::as_str), Some("world"));
+
+    let mut result = svc.wire_2(Wire::from(hashmap)).await;
+    let map = result.unwrap().unwire();
+    assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
+    assert_eq!(map.get("hello").map(String::as_str), Some("world"));
 
     Ok(())
 }
