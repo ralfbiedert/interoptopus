@@ -149,6 +149,40 @@ fn option() {
 }
 
 #[test]
+fn named_callback() {
+    use interoptopus::callback;
+    callback!(LayoutCallback(x: i32) -> i32);
+
+    // repr(C): fn_ptr, ctx_ptr, dtor_ptr — three pointer-width words
+    assert_eq!(mem::size_of::<LayoutCallback>(), 3 * PTR_SIZE);
+    assert_eq!(mem::align_of::<LayoutCallback>(), PTR_SIZE);
+
+    // new(): fn_ptr non-null, ctx_ptr null, dtor_ptr null
+    extern "C" fn my_fn(x: i32, _: *const std::ffi::c_void) -> i32 { x }
+    let cb = LayoutCallback::new(my_fn);
+    let raw = &cb as *const LayoutCallback as *const u8;
+    unsafe {
+        let fn_ptr = *(raw as *const *const u8);
+        assert!(!fn_ptr.is_null(), "fn_ptr must be non-null");
+        let ctx_ptr = *(raw.add(PTR_SIZE) as *const *const u8);
+        assert!(ctx_ptr.is_null(), "ctx_ptr must be null for new()");
+        let dtor_ptr = *(raw.add(2 * PTR_SIZE) as *const *const u8);
+        assert!(dtor_ptr.is_null(), "dtor_ptr must be null for new()");
+    }
+
+    // from_closure(): dtor_ptr non-null, ctx_ptr non-null (points to the boxed closure)
+    let cb2 = LayoutCallback::from_closure(|x| x + 1);
+    let raw2 = &cb2 as *const LayoutCallback as *const u8;
+    unsafe {
+        let ctx_ptr = *(raw2.add(PTR_SIZE) as *const *const u8);
+        assert!(!ctx_ptr.is_null(), "ctx_ptr must be non-null for from_closure()");
+        let dtor_ptr = *(raw2.add(2 * PTR_SIZE) as *const *const u8);
+        assert!(!dtor_ptr.is_null(), "dtor_ptr must be non-null for from_closure()");
+    }
+    // cb2 dropped here, destructor runs automatically
+}
+
+#[test]
 fn result() {
     // repr(u32): discriminant is u32
     assert_eq!(mem::align_of::<ffi::Result<u32, u32>>(), 4);

@@ -50,7 +50,7 @@ pub fn pattern_callback_5() -> SumDelegate1 {
 
 #[ffi]
 pub fn pattern_callback_6() -> SumDelegate2 {
-    SumDelegate2(Some(exposed_sum2), null()) // Similarly, compare #108
+    SumDelegate2(Some(exposed_sum2), null(), None) // Similarly, compare #108
 }
 
 #[ffi]

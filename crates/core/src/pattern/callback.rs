@@ -142,20 +142,60 @@ macro_rules! callback {
     };
 
     ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty $(, namespace = $ns:expr)?) => {
-        #[derive(Default, Clone, Copy)]
+        #[derive(Default)]
         #[repr(C)]
-        pub struct $name(::std::option::Option<extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>, *const ::std::ffi::c_void);
+        pub struct $name(
+            ::std::option::Option<extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>,
+            *const ::std::ffi::c_void,
+            ::std::option::Option<unsafe extern "C" fn(*const ::std::ffi::c_void)>,
+        );
 
         // Safety: This is a transparent wrapper around a function pointer
-        //         and user-managed callback state. From out perspective
+        //         and user-managed callback state. From our perspective
         //         this is thread safe, as long as the caller's code is.
         unsafe impl ::std::marker::Send for $name {}
         unsafe impl ::std::marker::Sync for $name {}
 
+        impl ::std::ops::Drop for $name {
+            fn drop(&mut self) {
+                if let Some(dtor) = self.2 {
+                    // Safety: destructor is only set by from_closure, which boxes the closure
+                    // and stores the raw pointer in self.1. Drop runs exactly once.
+                    unsafe { dtor(self.1) };
+                }
+            }
+        }
+
         impl $name {
             /// Creates a new instance of the callback using `extern "C" fn`
             pub fn new(func: extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval) -> Self {
-                Self(Some(func), ::std::ptr::null())
+                Self(Some(func), ::std::ptr::null(), None)
+            }
+
+            /// Creates a callback from a Rust closure.
+            ///
+            /// The closure is heap-allocated and owned by this value. When the value is dropped
+            /// on the Rust side the allocation is freed automatically. When ownership is moved
+            /// across an FFI boundary (e.g. to C#), the foreign caller is responsible for
+            /// invoking the destructor stored in the third field (e.g. via `Dispose()`).
+            pub fn from_closure<F>(f: F) -> Self
+            where
+                F: Fn($($ty),*) -> $rval + Send + 'static,
+            {
+                extern "C" fn trampoline<F: Fn($($ty),*) -> $rval>(
+                    $($param: $ty,)*
+                    ctx: *const ::std::ffi::c_void,
+                ) -> $rval {
+                    let f = unsafe { &*(ctx as *const F) };
+                    f($($param,)*)
+                }
+
+                unsafe extern "C" fn destructor<F>(ctx: *const ::std::ffi::c_void) {
+                    drop(unsafe { ::std::boxed::Box::from_raw(ctx as *mut F) });
+                }
+
+                let ptr = ::std::boxed::Box::into_raw(::std::boxed::Box::new(f)) as *const ::std::ffi::c_void;
+                Self(Some(trampoline::<F>), ptr, Some(destructor::<F>))
             }
 
             /// Will call function if it exists, panic otherwise.
@@ -174,7 +214,7 @@ macro_rules! callback {
 
         impl From<for<> extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval> for $name {
             fn from(x: extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval) -> Self {
-                Self(Some(x), ::std::ptr::null())
+                Self(Some(x), ::std::ptr::null(), None)
             }
         }
 

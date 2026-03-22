@@ -5,7 +5,6 @@ use crate::patterns::result::Error;
 use interoptopus::{ffi, ffi::*};
 
 #[ffi]
-#[derive(Copy, Clone)]
 pub struct CallbackTable {
     pub my_callback: MyCallback,
     pub my_callback_namespaced: MyCallbackNamespaced,
