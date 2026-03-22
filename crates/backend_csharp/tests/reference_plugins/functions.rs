@@ -15,7 +15,6 @@ fn define_plugins() -> Result<(), Box<dyn Error>> {
 }
 
 // Test ignored since we can't rely on a working .NET runtime being available on CI
-#[ignore]
 #[test]
 fn load_plugin_functions_primitive() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(Primitives, "functions_primitive.dll");
@@ -35,7 +34,6 @@ fn load_plugin_functions_primitive() -> Result<(), Box<dyn Error>> {
 }
 
 // Test ignored since we can't rely on a working .NET runtime being available on CI
-#[ignore]
 #[test]
 fn load_plugin_functions_behavior() -> Result<(), Box<dyn Error>> {
     let exception_called = Arc::new(AtomicBool::new(false));

@@ -13,7 +13,6 @@ fn define_plugins() -> Result<(), Box<dyn Error>> {
 }
 
 // Test ignored since we can't rely on a working .NET runtime being available on CI
-#[ignore]
 #[test]
 fn load_plugin_service_basic() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(ServiceBasic, "service_basic.dll");
@@ -26,7 +25,6 @@ fn load_plugin_service_basic() -> Result<(), Box<dyn Error>> {
 }
 
 // Test ignored since we can't rely on a working .NET runtime being available on CI
-#[ignore]
 #[tokio::test]
 async fn load_plugin_service_async() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(ServiceAsync, "service_async.dll");

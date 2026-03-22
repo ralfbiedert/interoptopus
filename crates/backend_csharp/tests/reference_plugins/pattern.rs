@@ -13,7 +13,6 @@ fn define_plugin() -> Result<(), Box<dyn StdError>> {
 }
 
 // Test ignored since we can't rely on a working .NET runtime being available on CI
-#[ignore]
 #[test]
 fn load_plugin() -> Result<(), Box<dyn StdError>> {
     let plugin = load_plugin!(Pattern, "pattern.dll");
