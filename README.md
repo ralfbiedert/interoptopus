@@ -88,34 +88,49 @@ for an overview:
 ## Performance 🏁
 
 Generated low-level bindings are _zero cost_ w.r.t. hand-crafted bindings for that language.
-
 That said, even hand-crafted bindings encounter some target-specific overhead
 at the FFI boundary (e.g., marshalling, pinning, and safety checks). For C# that cost
 is often nanoseconds, for Python it can be microseconds.
 
 For a quick overview, this table lists some common round trip times in _ns / call_:
 
-| Construct                              | C#               |
+### C# -> Rust
+
+The 'forward calling mode', i.e, a C# application calling an embedded Rust `.dll`. Used when you 
+have a legacy app but want high-performance Rust under the hood.
+
+| Construct                              | ns / call   |
 |----------------------------------------|------------------|
 | `primitive_void()`                     | 3                |
 | `primitive_u64(0)`                     | 4                |
-| `pattern_option(Option.None)`          | 14               |
-| `pattern_delegate_adhoc(x => x[0])`    | 477 <sup>1</sup> |
 | `pattern_delegate_retained(delegate)`  | 21               |
 | `pattern_ascii_pointer("hello world")` | 20               |
 | `pattern_utf8_string("hello world")`   | 52               |
-| `await serviceAsync.Success()`         | 361 <sup>2</sup> |
+| `await serviceAsync.Success()`         | 361 <sup>1</sup> |
 
-<sup>1</sup> First time delegate creation and pinning is expensive in C# (100's of ns). We
-recommend you retain the delegate instead for >20x faster
-calls, [see for example here][csharp-callbacks].<br/>
-<sup>2</sup> Preliminary numbers for full round trip to tokio and back. Although async calls have some intrinsic
-overhead
-(e.g., spawning a new `TaskCompletionSource` is ~100ns), some of that overhead appears to be a
+<sup>1</sup> Full round trip to tokio and back. Although async calls have some intrinsic
+overhead (e.g., spawning a new `TaskCompletionSource` is ~100ns), some of that overhead appears to be a
 benchmarking effect when spin-waiting for a newly spawned task. In essence, if your application
 benefits from async this overhead is negligible, but simple getters or setters shouldn't needlessly be made async.
 
-<br/>
+
+### Rust -> .NET
+
+The 'reverse calling mode', a Rust application loading a .NET `.dll`. Used when you have a modern
+Rust app, but need to rely on legacy .NET libraries. 
+
+| Construct                                              | ns / call |
+|--------------------------------------------------------|-----------|
+| `plugin.primitive_void()`                              | 6         |
+| `plugin.primitive_u32(42)`                             | 4         |
+| `plugin.wire_hashmap_string({"foo": "bar"}).unwire()`  | 951       |
+| `plugin.wire_hashmap_string(16 x {_16: _16}).unwire()` | 5268      |
+| `plugin.async service.add_one(1).await`                | 1097      |
+
+
+In essence, plain calls are near-zero overhead. Wire-based (JSON) transfers scale with payload size.
+Async plugin calls add ~1–2 µs due to task scheduling on both sides.
+
 
 ## Feature Flags
 
