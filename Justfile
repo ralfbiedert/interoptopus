@@ -38,13 +38,8 @@ test-dotnet:
     cargo test --test mod reference_project::interop  --all-features
     dotnet test crates/backend_csharp/tests/reference_project/Tests/Tests.csproj
 
-# Runs plugin benchmarks (Rust calling .NET).
-bench-plugin:
-    # Regenerate the plugin interop files
-    cargo test --test mod plugins::basic::can_run_dotnet_pipeline --all-features -- --include-ignored
-    # Build the .NET plugin DLL
-    cd crates/backend_csharp/tests/plugins/dotnet_plugin && dotnet build -c Release
-    # Run the Rust-to-.NET benchmarks
+# Runs plugin benchmarks (Rust → .NET). Requires `just build-dotnet-plugins` first.
+bench:
     cargo bench --bench plugin -p interoptopus_csharp --features unstable-plugins
 
 # Runs .NET benchmarks.
