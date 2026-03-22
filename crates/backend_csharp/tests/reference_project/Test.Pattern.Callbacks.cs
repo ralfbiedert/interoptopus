@@ -56,7 +56,16 @@ public class TestPatternDelegates
         cb.Dispose();
     }
 
-
+    [Fact]
+    public void pattern_callback_6()
+    {
+        var cb = Interop.pattern_callback_6();
+        var rval = cb.Call(1, 2);
+        cb.Dispose();
+        
+        Assert.Equal(3, rval);
+    }
+    
     [Fact]
     public void pattern_ffi_slice_delegate()
     {
@@ -159,17 +168,9 @@ public class TestPatternDelegates
         Assert.Equal("hello world", r2b);
     }
 
-    [Fact]
-    public void pattern_callback_6()
-    {
-        var cb = Interop.pattern_callback_6();
-        var result = cb.Call(3, 7);
-        Assert.Equal(10, result);
-        cb.Dispose();
-    }
 
     [Fact]
-    public unsafe void pattern_callback_9()
+    public void pattern_callback_9()
     {
         var result = Interop.pattern_callback_9((IntPtr x, IntPtr y) =>
         {

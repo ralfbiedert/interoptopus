@@ -45,12 +45,12 @@ pub fn pattern_callback_4(callback: MyCallbackNamespaced, x: u32) -> u32 {
 
 #[ffi]
 pub fn pattern_callback_5() -> SumDelegate1 {
-    (exposed_sum1 as extern "C" fn(*const c_void)).into() // This is an ugly Rust limitation right now, compare #108
+    SumDelegate1::from_closure(|| {})
 }
 
 #[ffi]
 pub fn pattern_callback_6() -> SumDelegate2 {
-    SumDelegate2(Some(exposed_sum2), null(), None) // Similarly, compare #108
+    SumDelegate2::from_closure(|x, y| x + y)
 }
 
 #[ffi]
@@ -85,13 +85,4 @@ pub fn pattern_callback_9(x: Pointers) -> i32 {
     let mut b = 2;
     x.call(&a, &mut b);
     b
-}
-
-pub extern "C" fn exposed_sum1(x: *const c_void) {
-    println!("0x{x:?}");
-    eprintln!("0x{x:?}");
-}
-
-pub extern "C" fn exposed_sum2(x: i32, y: i32, _: *const c_void) -> i32 {
-    x + y
 }

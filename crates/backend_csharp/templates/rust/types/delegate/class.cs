@@ -2,11 +2,16 @@
 public delegate {{ rval_unmanaged_name }} {{ name }}Native({% for arg in args %}{{ arg.unmanaged_name }} {{ arg.name }}, {% endfor %}IntPtr callback_data);
 public delegate {{ rval_managed }} {{ name }}Delegate({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %});
 
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+delegate void {{ name }}Destructor(IntPtr data);
+
 public partial class {{ name }}
 {
     private {{ name }}Delegate _managed;
     private {{ name }}Native _native;
     private IntPtr _ptr;
+    private IntPtr _data;
+    private IntPtr _destructor;
     private Exception _exception;
 }
 
@@ -51,9 +56,9 @@ public partial class {{ name }} : IDisposable
     {
         var __target = Marshal.GetDelegateForFunctionPointer<{{ name }}Native>(_ptr);
         {% if not is_void %}
-        return __target({% for arg in args %}{{ arg.name }}{{ arg.to_unmanaged }}, {% endfor %}IntPtr.Zero){{ rval_to_managed }};
+        return __target({% for arg in args %}{{ arg.name }}{{ arg.to_unmanaged }}, {% endfor %}_data){{ rval_to_managed }};
         {% else %}
-        __target({% for arg in args %}{{ arg.name }}{{ arg.to_unmanaged }}, {% endfor %}IntPtr.Zero);
+        __target({% for arg in args %}{{ arg.name }}{{ arg.to_unmanaged }}, {% endfor %}_data);
         {% endif %}
     }
 
@@ -61,6 +66,11 @@ public partial class {{ name }} : IDisposable
     public void Dispose()
     {
         if (_exception != null) throw _exception;
+        if (_destructor != IntPtr.Zero)
+        {
+            Marshal.GetDelegateForFunctionPointer<{{ name }}Destructor>(_destructor)(_data);
+            _destructor = IntPtr.Zero;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -69,6 +79,7 @@ public partial class {{ name }} : IDisposable
         var rval = new Unmanaged();
         rval._callback = _ptr;
         rval._data = IntPtr.Zero;
+        rval._destructor = IntPtr.Zero;
         return rval;
     }
 
@@ -78,6 +89,7 @@ public partial class {{ name }} : IDisposable
         var rval = new Unmanaged();
         rval._callback = _ptr;
         rval._data = IntPtr.Zero;
+        rval._destructor = IntPtr.Zero;
         return rval;
     }
 
@@ -89,11 +101,14 @@ public partial class {{ name }} : IDisposable
     {
         internal IntPtr _callback;
         internal IntPtr _data;
+        internal IntPtr _destructor;
 
         public {{ name }} ToManaged()
         {
             var rval = new {{ name }}();
             rval._ptr = _callback;
+            rval._data = _data;
+            rval._destructor = _destructor;
             return rval;
         }
 
