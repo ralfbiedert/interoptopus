@@ -45,12 +45,12 @@ pub fn pattern_callback_4(callback: MyCallbackNamespaced, x: u32) -> u32 {
 
 #[ffi]
 pub fn pattern_callback_5() -> SumDelegate1 {
-    SumDelegate1::from_closure(|| {})
+    SumDelegate1::from_fn(|| {})
 }
 
 #[ffi]
 pub fn pattern_callback_6() -> SumDelegate2 {
-    SumDelegate2::from_closure(|x, y| x + y)
+    SumDelegate2::from_fn(|x, y| x + y)
 }
 
 #[ffi]

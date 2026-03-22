@@ -56,12 +56,12 @@ fn closure_drop_frees_allocation() {
     assert!(weak.upgrade().is_none(), "Arc must be dropped after cb is dropped");
 }
 
-// Dropping a new()-created callback (no destructor) is a no-op.
+// Dropping a plain function-pointer callback (no destructor) is a no-op.
 #[test]
 fn drop_noop_on_fn_ptr_callback() {
     callback!(Noop2() -> ());
 
     extern "C" fn nothing(_: *const std::ffi::c_void) {}
-    let cb = Noop2::new(nothing);
+    let cb = Noop2 { callback: Some(nothing), data: std::ptr::null(), destructor: None };
     drop(cb); // must not crash or double-free
 }

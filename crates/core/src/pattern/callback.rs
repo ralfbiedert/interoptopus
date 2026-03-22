@@ -144,11 +144,16 @@ macro_rules! callback {
     ($name:ident($($param:ident: $ty:ty),*) -> $rval:ty $(, namespace = $ns:expr)?) => {
         #[derive(Default)]
         #[repr(C)]
-        pub struct $name(
-            ::std::option::Option<extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>,
-            *const ::std::ffi::c_void,
-            ::std::option::Option<unsafe extern "C" fn(*const ::std::ffi::c_void)>,
-        );
+        pub struct $name {
+            /// The function pointer to invoke. `None` means the callback is absent.
+            pub callback: ::std::option::Option<extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>,
+            /// Opaque context pointer passed as the last argument on every call.
+            pub data: *const ::std::ffi::c_void,
+            /// Optional destructor for `data`. Set by [`from_closure`](Self::from_closure);
+            /// `None` for plain function-pointer callbacks. The foreign caller (e.g. C#
+            /// `Dispose()`) must invoke this exactly once when done with the callback.
+            pub destructor: ::std::option::Option<unsafe extern "C" fn(*const ::std::ffi::c_void)>,
+        }
 
         // Safety: This is a transparent wrapper around a function pointer
         //         and user-managed callback state. From our perspective
@@ -158,29 +163,24 @@ macro_rules! callback {
 
         impl ::std::ops::Drop for $name {
             fn drop(&mut self) {
-                if let Some(dtor) = self.2 {
+                if let Some(dtor) = self.destructor {
                     // Safety: destructor is only set by from_closure, which boxes the closure
-                    // and stores the raw pointer in self.1. Drop runs exactly once.
-                    unsafe { dtor(self.1) };
+                    // and stores the raw pointer in self.data. Drop runs exactly once.
+                    unsafe { dtor(self.data) };
                 }
             }
         }
 
         impl $name {
-            /// Creates a new instance of the callback using `extern "C" fn`
-            pub fn new(func: extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval) -> Self {
-                Self(Some(func), ::std::ptr::null(), None)
-            }
-
             /// Creates a callback from a Rust closure.
             ///
             /// The closure is heap-allocated and owned by this value. When the value is dropped
             /// on the Rust side the allocation is freed automatically. When ownership is moved
             /// across an FFI boundary (e.g. to C#), the foreign caller is responsible for
             /// invoking the destructor stored in the third field (e.g. via `Dispose()`).
-            pub fn from_closure<F>(f: F) -> Self
+            pub fn from_fn<F>(f: F) -> Self
             where
-                F: Fn($($ty),*) -> $rval + Send + 'static,
+                F: Fn($($ty),*) -> $rval + Send + Sync + 'static,
             {
                 extern "C" fn trampoline<F: Fn($($ty),*) -> $rval>(
                     $($param: $ty,)*
@@ -195,18 +195,18 @@ macro_rules! callback {
                 }
 
                 let ptr = ::std::boxed::Box::into_raw(::std::boxed::Box::new(f)) as *const ::std::ffi::c_void;
-                Self(Some(trampoline::<F>), ptr, Some(destructor::<F>))
+                Self { callback: Some(trampoline::<F>), data: ptr, destructor: Some(destructor::<F>) }
             }
 
             /// Will call function if it exists, panic otherwise.
             pub fn call(&self, $($param: $ty),*) -> $rval {
-                self.0.expect("Assumed function would exist but it didn't.")($($param,)* self.1)
+                self.callback.expect("Assumed function would exist but it didn't.")($($param,)* self.data)
             }
 
             /// Will call function only if it exists
             pub fn call_if_some(&self, $($param: $ty,)*) -> ::std::option::Option<$rval> {
-                match self.0 {
-                    Some(c) => Some(c($($param,)* self.1)),
+                match self.callback {
+                    Some(c) => Some(c($($param,)* self.data)),
                     None => None
                 }
             }
@@ -214,13 +214,13 @@ macro_rules! callback {
 
         impl From<for<> extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval> for $name {
             fn from(x: extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval) -> Self {
-                Self(Some(x), ::std::ptr::null(), None)
+                Self { callback: Some(x), data: ::std::ptr::null(), destructor: None }
             }
         }
 
         impl From<$name> for ::std::option::Option<extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval> {
             fn from(x: $name) -> Self {
-                x.0
+                x.callback
             }
         }
 
