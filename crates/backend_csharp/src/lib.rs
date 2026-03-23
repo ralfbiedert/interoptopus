@@ -1,3 +1,4 @@
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![doc = include_str!("../README.md")]
 #![allow(unused)] // TODO: For now, since lots of bare bones structs
 #![allow(unexpected_cfgs)]
@@ -16,9 +17,11 @@ mod error;
 mod macros;
 mod pipeline;
 #[cfg(any(feature = "unstable-plugins", docsrs))]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable-plugins")))]
 pub mod plugin;
 
 pub use error::Error;
 #[cfg(any(feature = "unstable-plugins", docsrs))]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable-plugins")))]
 pub use pipeline::{DotnetLibrary, DotnetLibraryBuilder};
 pub use pipeline::{RustLibrary, RustLibraryBuilder};

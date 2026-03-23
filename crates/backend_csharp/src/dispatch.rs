@@ -27,6 +27,7 @@ impl Dispatch {
     }
 
     #[cfg(any(feature = "unstable-plugins", docsrs))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable-plugins")))]
     pub fn plugin_defaults_with(name: impl Into<String>) -> Self {
         use crate::lang::plugin::PLUGIN_DEFAULT_MODULE;
         let name = name.into();

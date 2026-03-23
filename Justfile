@@ -54,7 +54,7 @@ binstall-deps force="":
 
 # Opens cargo docs using nightly for doc feature bubbles.
 docs open="":
-    RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --no-deps {{ open }}
+    RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --no-deps {{ open }}
 
 # Updates the top-level README from the core crate's README (the source of truth).
 update-readme:
