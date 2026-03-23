@@ -46,12 +46,12 @@ pub fn ffi_inventory() -> RustInventory {
 
 ## ... Interoptopus generates
 
-| Language | Crate                                                                             | Sample Output<sup>1</sup>                                                                                             | Status |
-|----------|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|--------|
-| C#       | [**interoptopus_csharp**][interoptopus_csharp]           | [Interop.cs][interop-cs] | ✅      |
-| C        | [**interoptopus_c**][interoptopus_c]                     | -                        | ⏯️     |
-| Python   | [**interoptopus_cpython**][interoptopus_cpython]         | -                        | ⏯️     |
-| Other    | Write your own backend<sup>2</sup>                       | -                        |
+| Language | Crate                                            | Sample Output<sup>1</sup> | Status |
+|----------|--------------------------------------------------|---------------------------|--------|
+| C#       | [**interoptopus_csharp**][interoptopus_csharp]   | [Interop.cs][interop-cs]  | ✅      |
+| C        | [**interoptopus_c**][interoptopus_c]             | -                         | ⏯️     |
+| Python   | [**interoptopus_cpython**][interoptopus_cpython] | -                         | ⏯️     |
+| Other    | Write your own backend<sup>2</sup>               | -                         |
 
 <sup>✅</sup> Tier 1 target. Active maintenance and production use. Full support of all features.<br/>
 <sup>⏯️</sup> Tier 2 target. Currently suspended, contributors wanted!<br/>
@@ -94,42 +94,38 @@ is often nanoseconds, for Python it can be microseconds.
 
 For a quick overview, this table lists some common round trip times in _ns / call_, measured on .NET 10 and Windows 11:
 
-### C# -> Rust
+### C# calling Rust
 
-The 'forward calling mode', i.e, a C# application calling an embedded Rust `.dll`. Used when you 
+The 'forward calling mode', i.e, a C# application calling an embedded Rust `.dll`. Used when you
 have a legacy app but want high-performance Rust under the hood.
 
-| Construct                              | ns / call   |
-|----------------------------------------|------------------|
-| `primitive_void()`                     | 3                |
-| `primitive_u64(0)`                     | 4                |
-| `pattern_delegate_retained(delegate)`  | 21               |
-| `pattern_ascii_pointer("hello world")` | 20               |
-| `pattern_utf8_string("hello world")`   | 52               |
-| `await serviceAsync.Success()`         | 361 <sup>1</sup> |
+| Construct                              | ns / call |
+|----------------------------------------|-----------|
+| `primitive_void()`                     | 3         |
+| `primitive_u64(0)`                     | 4         |
+| `pattern_delegate_retained(delegate)`  | 21        |
+| `pattern_ascii_pointer("hello world")` | 20        |
+| `pattern_utf8_string("hello world")`   | 52        |
+| `await serviceAsync.Success()`         | 361       |
 
-<sup>1</sup> Full round trip to tokio and back. Although async calls have some intrinsic
-overhead (e.g., spawning a new `TaskCompletionSource` is ~100ns), some of that overhead appears to be a
-benchmarking effect when spin-waiting for a newly spawned task. In essence, if your application
-benefits from async this overhead is negligible, but simple getters or setters shouldn't needlessly be made async.
-
-
-### Rust -> .NET
+### Rust calling .NET
 
 The 'reverse calling mode', a Rust application loading a .NET `.dll`. Used when you have a modern
-Rust app, but need to rely on legacy .NET libraries. 
+Rust app, but need to rely on legacy .NET libraries.
 
-| Construct                                              | ns / call |
-|--------------------------------------------------------|-----------|
-| `plugin.primitive_void()`                              | 6         |
-| `plugin.primitive_u32(42)`                             | 4         |
-| `plugin.wire_hashmap_string({"foo": "bar"}).unwire()`  | 951       |
-| `plugin.wire_hashmap_string(16 x {_16: _16}).unwire()` | 5268      |
-| `plugin.add_one(1).await`                              | 1097      |
+| Construct                                              | ns / call         |
+|--------------------------------------------------------|-------------------|
+| `plugin.primitive_void()`                              | 6                 |
+| `plugin.primitive_u32(42)`                             | 4                 |
+| `plugin.wire_hashmap_string({"foo": "bar"}).unwire()`  | 951               |
+| `plugin.wire_hashmap_string(16 x {_16: _16}).unwire()` | 5268              |
+| `plugin.add_one(1).await` [sequential]                 | 4779 <sup>1</sup> |
+| `plugin.add_one(1).await` [64 in-flight]               | 570               |
 
+<sup>1</sup> Includes kernel wakeup overhead — see the [FAQ][faq].
 
-Loading the .NET runtime and a plugin adds about ~20 MB to the process' memory footprint. Note this heavily depends on 
-what your plugin actually does; the numbers here are for a 'hello world' use case:  
+Loading the .NET runtime and a plugin adds about ~20 MB to the process' memory footprint. Note this heavily depends on
+what your plugin actually does; the numbers here are for a 'hello world' use case:
 
 | Phase                | RSS (MB) |
 |----------------------|----------|
@@ -138,10 +134,8 @@ what your plugin actually does; the numbers here are for a 'hello world' use cas
 | + .NET Plugin Loaded | 24.33    |
 | + Method call        | 24.34    |
 
-In essence, plain calls are near-zero overhead. 
-Wire-based (JSON) transfers scale with payload size. Async calls add 300 ns to 1 µs due to task scheduling on both sides.
+In essence, plain calls are near-zero overhead. Wire-based (JSON) transfers scale with payload size.
 The .NET runtime adds ~20 MB RSS on first plugin load.
-
 
 ## Feature Flags
 
@@ -173,7 +167,6 @@ PRs are very welcome!
 - New features or patterns must be materialized in the reference project and accompanied by
   at least an C# interop test.
 
-
 [crates.io-badge]: https://img.shields.io/crates/v/interoptopus.svg
 [crates.io-url]: https://crates.io/crates/interoptopus
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
@@ -183,7 +176,6 @@ PRs are very welcome!
 [rust-version-url]: https://github.com/ralfbiedert/interoptopus
 [rust-build-badge]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg
 [rust-build-url]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml
-
 [interoptopus_csharp]: https://crates.io/crates/interoptopus_csharp
 [interoptopus_c]: https://crates.io/crates/interoptopus_backend_c
 [interoptopus_cpython]: https://crates.io/crates/interoptopus_backend_cpython
