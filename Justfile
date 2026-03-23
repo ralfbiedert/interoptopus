@@ -32,6 +32,7 @@ test-dotnet:
 # Runs plugin benchmarks (Rust → .NET). Requires `just build-dotnet-plugins` first.
 bench:
     cargo bench --bench plugin -p interoptopus_csharp --features unstable-plugins
+    cargo bench --bench plugin_memory -p interoptopus_csharp --features unstable-plugins
 
 # Runs .NET benchmarks.
 bench-dotnet:

@@ -13,6 +13,11 @@ name = "plugin"
 harness = false
 required-features = ["unstable-plugins"]
 
+[[bench]]
+name = "plugin_memory"
+harness = false
+required-features = ["unstable-plugins"]
+
 [features]
 dotnet = ["dep:netcorehost", "dep:tempfile"]
 unstable-plugins = ["dotnet", "interoptopus/unstable-plugins"]
@@ -31,6 +36,7 @@ interoptopus = { workspace = true, features = ["serde"] }
 interoptopus_csharp = { path = ".", features = ["unstable-plugins"] }
 reference_project.workspace = true
 insta.workspace = true
+memory-stats.workspace = true
 tokio.workspace = true
 
 [lints]
