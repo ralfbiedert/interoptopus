@@ -210,7 +210,7 @@ pub use interoptopus_proc::AsyncRuntime;
 ///
 /// ```rust,ignore
 /// // Direct functions — call straight through to the loaded FFI symbol:
-/// plugin.add_one(1)                          
+/// plugin.add_one(1)
 /// plugin.process(Wire::from("hi")).await
 ///
 /// // Service constructor — symbol name is the lowercased type name + "_create":
@@ -229,7 +229,7 @@ pub use interoptopus_proc::AsyncRuntime;
 ///
 /// ```rust,ignore
 /// let loader = DotNetRuntime::new()?
-///     .set_exception_handler(|msg| eprintln!("plugin error: {msg}"))
+///     .exception_handler(|msg| eprintln!("plugin error: {msg}"))
 ///     .dll_loader("path/to/my_plugin.dll")?;
 ///
 /// let plugin = MyPlugin::new(&loader)?;

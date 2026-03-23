@@ -100,7 +100,7 @@ impl DotNetRuntime {
     /// The handler receives the exception message as a `String`. It is invoked on whatever
     /// thread the trampoline ran on, so it must be `Send + Sync`.
     #[must_use]
-    pub fn set_exception_handler(mut self, handler: impl Fn(String) + Send + Sync + 'static) -> Self {
+    pub fn exception_handler(mut self, handler: impl Fn(String) + Send + Sync + 'static) -> Self {
         self.exception_handler = Some(Arc::new(handler));
         self
     }
