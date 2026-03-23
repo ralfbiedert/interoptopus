@@ -92,7 +92,7 @@ That said, even hand-crafted bindings encounter some target-specific overhead
 at the FFI boundary (e.g., marshalling, pinning, and safety checks). For C# that cost
 is often nanoseconds, for Python it can be microseconds.
 
-For a quick overview, this table lists some common round trip times in _ns / call_:
+For a quick overview, this table lists some common round trip times in _ns / call_, measured on .NET 10 and Windows 11:
 
 ### C# -> Rust
 
@@ -128,8 +128,19 @@ Rust app, but need to rely on legacy .NET libraries.
 | `plugin.add_one(1).await`                              | 1097      |
 
 
-In essence, plain calls are near-zero overhead. Wire-based (JSON) transfers scale with payload size.
-Async plugin calls add ~1 µs due to task scheduling on both sides.
+Loading the .NET runtime and a plugin adds about ~20 MB to the process' memory footprint. Note this heavily depends on 
+what your plugin actually does; the numbers here are for a 'hello world' use case:  
+
+| Phase                | RSS (MB) |
+|----------------------|----------|
+| Pure Rust app        | 4.94     |
+| + .NET Runtime       | 5.96     |
+| + .NET Plugin Loaded | 24.33    |
+| + Method call        | 24.34    |
+
+In essence, plain calls are near-zero overhead. 
+Wire-based (JSON) transfers scale with payload size. Async plugin calls add ~1 µs due to task scheduling on both sides.
+The .NET runtime adds ~20 MB RSS on first plugin load.
 
 
 ## Feature Flags
