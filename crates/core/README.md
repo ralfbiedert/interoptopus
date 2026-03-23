@@ -139,7 +139,7 @@ what your plugin actually does; the numbers here are for a 'hello world' use cas
 | + Method call        | 24.34    |
 
 In essence, plain calls are near-zero overhead. 
-Wire-based (JSON) transfers scale with payload size. Async plugin calls add ~1 µs due to task scheduling on both sides.
+Wire-based (JSON) transfers scale with payload size. Async calls add 300 ns to 1 µs due to task scheduling on both sides.
 The .NET runtime adds ~20 MB RSS on first plugin load.
 
 
