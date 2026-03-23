@@ -194,7 +194,7 @@ impl FunctionModel {
     fn emit_emission(&self) -> TokenStream {
         match &self.args.module {
             Some(crate::function::args::ModuleKind::Named(name)) => {
-                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::FileEmission(::interoptopus::lang::meta::FileEmission::CustomModule(::interoptopus::lang::meta::Module::new(#name))) }
+                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::FileEmission(::interoptopus::lang::meta::FileEmission::CustomModule(::interoptopus::lang::meta::Module::from_string(#name))) }
             }
             Some(crate::function::args::ModuleKind::Common) => {
                 quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::FileEmission(::interoptopus::lang::meta::FileEmission::Common) }

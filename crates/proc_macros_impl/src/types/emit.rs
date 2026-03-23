@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote_spanned;
-use syn::Error;
 use syn::spanned::Spanned;
+use syn::Error;
 
 use crate::types::model::{TypeData, TypeModel, VariantData};
 
@@ -311,7 +311,7 @@ impl TypeModel {
     fn emit_emission(&self) -> TokenStream {
         match &self.args.module {
             Some(crate::types::args::ModuleKind::Named(name)) => {
-                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::FileEmission(::interoptopus::lang::meta::FileEmission::CustomModule(::interoptopus::lang::meta::Module::new(#name))) }
+                quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::FileEmission(::interoptopus::lang::meta::FileEmission::CustomModule(::interoptopus::lang::meta::Module::from_string(#name))) }
             }
             Some(crate::types::args::ModuleKind::Common) => {
                 quote_spanned! { self.name.span() => ::interoptopus::lang::meta::Emission::FileEmission(::interoptopus::lang::meta::FileEmission::Common) }
