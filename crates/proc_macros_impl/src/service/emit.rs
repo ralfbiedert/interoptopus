@@ -317,7 +317,7 @@ impl ServiceModel {
 
         quote_spanned! { ctor.name.span() =>
             #docs
-            #[allow(clippy::used_underscore_items)]
+            #[allow(clippy::used_underscore_items, clippy::forget_non_drop)]
             #ffi_attr
             unsafe fn #function_name #generics(
                 #async_params
