@@ -115,12 +115,12 @@ Rust app, but need to rely on legacy .NET libraries.
 
 | Construct                                              | ns / call         |
 |--------------------------------------------------------|-------------------|
-| `plugin.primitive_void()`                              | 6                 |
-| `plugin.primitive_u32(42)`                             | 4                 |
-| `plugin.wire_hashmap_string({"foo": "bar"}).unwire()`  | 951               |
-| `plugin.wire_hashmap_string(16 x {_16: _16}).unwire()` | 5268              |
-| `plugin.add_one(1).await` [sequential]                 | 4779 <sup>1</sup> |
-| `plugin.add_one(1).await` [64 in-flight]               | 570               |
+| `plugin.primitive_void()`                              | 1                 |
+| `plugin.primitive_u32(42)`                             | 2                 |
+| `plugin.wire_hashmap_string({"foo": "bar"}).unwire()`  | 957               |
+| `plugin.wire_hashmap_string(16 x {_16: _16}).unwire()` | 5338              |
+| `plugin.add_one(1).await` [sequential]                 | 1340 <sup>1</sup> |
+| `plugin.add_one(1).await` [64 in-flight]               | 628               |
 
 <sup>1</sup> Includes kernel wakeup overhead — see the [FAQ][faq].
 

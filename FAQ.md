@@ -15,7 +15,7 @@ resume a Tokio task, it calls the waker. If no Tokio worker thread is active, th
 up — a futex operation that costs 1–4 µs. With other tasks already running, the waker hands off
 directly to an active thread and the overhead drops a dramatic 8x despite 64x more work in flight:
 
-| Construct                                | ns / call |
+| Construct [run on Linux]                 | ns / call |
 |------------------------------------------|-----------|
 | `plugin.add_one(1).await` [sequential]   | 4779      |
 | `plugin.add_one(1).await` [64 in-flight] | 570       |
