@@ -5,9 +5,9 @@
 //! `MethodKind::Regular` with their C#-ified signatures.
 
 use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
-use crate::pass::model::dotnet::interface::csharp_signature;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::model::dotnet::interface::csharp_signature;
+use crate::pass::{ModelResult, PassInfo, model};
 use interoptopus::lang::meta::{Emission, FileEmission};
 use interoptopus_backends::casing::service_method_name;
 

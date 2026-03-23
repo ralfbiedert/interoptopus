@@ -14,9 +14,9 @@
 use crate::dispatch::{Item, ItemKind};
 use crate::lang::plugin::interface::MethodKind;
 use crate::output::{FileType, Output};
-use crate::pass::{model, output, OutputResult, PassInfo};
-use std::collections::HashMap;
 use crate::pass::output::dotnet::interface::format_args;
+use crate::pass::{OutputResult, PassInfo, model, output};
+use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct Config {}

@@ -42,7 +42,8 @@ impl Multibuf {
     ///
     /// The default overwrite policy is [`Overwrite::Always`].
     pub fn add_buffer(&mut self, name: impl AsRef<str>, value: String) {
-        self.buffers.insert(name.as_ref().to_string(), BufEntry { content: value, overwrite: Overwrite::Always });
+        self.buffers
+            .insert(name.as_ref().to_string(), BufEntry { content: value, overwrite: Overwrite::Always });
     }
 
     /// Adds or replaces a named buffer with the given content and overwrite policy.

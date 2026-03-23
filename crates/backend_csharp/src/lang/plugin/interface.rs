@@ -1,5 +1,5 @@
-use crate::lang::functions::Signature;
 use crate::lang::FunctionId;
+use crate::lang::functions::Signature;
 use interoptopus::lang::meta::Emission;
 
 pub enum InterfaceKind {

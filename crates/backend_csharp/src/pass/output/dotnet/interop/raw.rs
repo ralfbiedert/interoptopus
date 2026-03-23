@@ -8,8 +8,8 @@
 
 use crate::lang::FunctionId;
 use crate::lang::plugin::TrampolineKind;
-use crate::pass::{OutputResult, PassInfo, model, output};
 use crate::pass::output::dotnet::interop::{async_callback_inner, async_continuation, rval_unmanaged_name, unmanaged_args, unmanaged_args_except_last};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 

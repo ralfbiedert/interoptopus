@@ -128,7 +128,6 @@ impl DotNetRuntime {
         Ok(DllLoader { delegate_loader, type_name, exception_handler: self.exception_handler.clone() })
     }
 
-
     /// Returns a reference to the underlying runtime context.
     #[must_use]
     pub fn context(&self) -> &HostfxrContext<InitializedForRuntimeConfig> {

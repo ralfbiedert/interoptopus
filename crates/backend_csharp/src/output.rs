@@ -16,11 +16,7 @@ impl Target {
     ///
     /// The default overwrite policy is [`Overwrite::Always`].
     pub fn new(file_name: impl AsRef<str>, namespace: impl AsRef<str>) -> Self {
-        Self {
-            file_name: file_name.as_ref().to_string(),
-            namespace: namespace.as_ref().to_string(),
-            overwrite: Overwrite::Always,
-        }
+        Self { file_name: file_name.as_ref().to_string(), namespace: namespace.as_ref().to_string(), overwrite: Overwrite::Always }
     }
 
     /// Sets the overwrite policy for this target.

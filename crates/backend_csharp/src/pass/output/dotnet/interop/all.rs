@@ -11,8 +11,8 @@
 use crate::dispatch::{Item, ItemKind};
 use crate::lang::plugin::PLUGIN_DEFAULT_EMISSION;
 use crate::output::{FileType, Output};
-use crate::pass::{OutputResult, PassInfo, model, output};
 use crate::pass::output::dotnet::interop::{raw, service};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 

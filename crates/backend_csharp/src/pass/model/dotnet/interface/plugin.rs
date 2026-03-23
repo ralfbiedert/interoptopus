@@ -3,11 +3,11 @@
 //! Each raw function becomes a `Method` with `MethodKind::Static` and a C#-ified
 //! name and signature (async functions get `Task<T>` return types).
 
-use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
 use crate::lang::plugin::TrampolineKind;
-use crate::pass::model::dotnet::interface::csharp_signature;
+use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::model::dotnet::interface::csharp_signature;
+use crate::pass::{ModelResult, PassInfo, model};
 use interoptopus::lang::meta::{Emission, FileEmission};
 use interoptopus_backends::casing::rust_to_pascal;
 

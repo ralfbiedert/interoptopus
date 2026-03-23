@@ -12,8 +12,8 @@
 //! Only emitted into output files that contain at least one trampoline function.
 
 use crate::output::{FileType, Output};
-use crate::pass::{OutputResult, PassInfo, model, output};
 use crate::pass::output::dotnet::interop;
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -31,12 +31,7 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, rendered: HashMap::default() }
     }
 
-    pub fn process(
-        &mut self,
-        _pass_meta: &mut crate::pass::PassMeta,
-        output_master: &output::common::master::Pass,
-        interop_pass: &interop::all::Pass,
-    ) -> OutputResult {
+    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::common::master::Pass, interop_pass: &interop::all::Pass) -> OutputResult {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(FileType::Csharp) {

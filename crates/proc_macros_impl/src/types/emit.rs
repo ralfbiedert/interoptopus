@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote_spanned;
-use syn::spanned::Spanned;
 use syn::Error;
+use syn::spanned::Spanned;
 
 use crate::types::model::{TypeData, TypeModel, VariantData};
 
