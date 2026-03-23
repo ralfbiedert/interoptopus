@@ -82,7 +82,7 @@ use std::task::{Context, Poll, Waker};
 #[doc(hidden)]
 #[derive(Clone, Copy)]
 #[repr(C)]
-pub struct AsyncCallback<T>(Option<extern "C" fn(&T, *const c_void) -> ()>, *const c_void);
+pub struct AsyncCallback<T>(Option<extern "C" fn(*const T, *const c_void) -> ()>, *const c_void);
 
 // SAFETY: This is "safe-ish", as the type itself and its pointer are safe to send.
 // However, this type must not be used / called with non-{send, sync} types. The proc
@@ -92,12 +92,12 @@ unsafe impl<T> Sync for AsyncCallback<T> {}
 
 impl<T: TypeInfo> AsyncCallback<T> {
     ///   Creates a new instance of the callback using  `extern "C" fn`
-    pub fn new(func: extern "C" fn(&T, *const c_void)) -> Self {
+    pub fn new(func: extern "C" fn(*const T, *const c_void)) -> Self {
         Self(Some(func), null())
     }
 
     /// Creates a callback with an explicit context pointer (e.g., a leaked `Arc` for use with [`AsyncCallbackFuture`]).
-    pub fn with_context(func: extern "C" fn(&T, *const c_void), context: *const c_void) -> Self {
+    pub fn with_context(func: extern "C" fn(*const T, *const c_void), context: *const c_void) -> Self {
         Self(Some(func), context)
     }
 
@@ -106,9 +106,11 @@ impl<T: TypeInfo> AsyncCallback<T> {
     /// # Safety
     ///
     /// `AsyncCallback` has blanket `Send` and `Sync` impls regardless of `T`.
-    /// The caller must ensure that `T` is actually safe to send across threads
-    /// and that the callback pointer and context are still valid.
-    pub unsafe fn call(&self, t: &T) {
+    /// The caller must ensure that `T` is actually safe to send across threads,
+    /// that the callback pointer and context are still valid, and that the
+    /// pointee will not be used after this call (the callee takes ownership
+    /// via `ptr::read`).
+    pub unsafe fn call(&self, t: *const T) {
         self.0.expect("Assumed function would exist but it didn't.")(t, self.1);
     }
 
@@ -117,9 +119,11 @@ impl<T: TypeInfo> AsyncCallback<T> {
     /// # Safety
     ///
     /// `AsyncCallback` has blanket `Send` and `Sync` impls regardless of `T`.
-    /// The caller must ensure that `T` is actually safe to send across threads
-    /// and that the callback pointer and context are still valid.
-    pub unsafe fn call_if_some(&self, t: &T) -> Option<()> {
+    /// The caller must ensure that `T` is actually safe to send across threads,
+    /// that the callback pointer and context are still valid, and that the
+    /// pointee will not be used after this call (the callee takes ownership
+    /// via `ptr::read`).
+    pub unsafe fn call_if_some(&self, t: *const T) -> Option<()> {
         match self.0 {
             Some(c) => {
                 c(t, self.1);
@@ -129,13 +133,13 @@ impl<T: TypeInfo> AsyncCallback<T> {
         }
     }
 }
-impl<T: TypeInfo> From<extern "C" fn(&T, *const c_void)> for AsyncCallback<T> {
-    fn from(x: extern "C" fn(&T, *const c_void) -> ()) -> Self {
+impl<T: TypeInfo> From<extern "C" fn(*const T, *const c_void)> for AsyncCallback<T> {
+    fn from(x: extern "C" fn(*const T, *const c_void) -> ()) -> Self {
         Self(Some(x), null())
     }
 }
 
-impl<T: TypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(&T, *const c_void)> {
+impl<T: TypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(*const T, *const c_void)> {
     fn from(x: AsyncCallback<T>) -> Self {
         x.0
     }
@@ -194,14 +198,15 @@ struct FutureState<T> {
     waker: Option<Waker>,
 }
 
-extern "C" fn async_callback_complete<T: Clone + Send + 'static>(value: &T, context: *const c_void) {
+extern "C" fn async_callback_complete<T: Send + 'static>(value: *const T, context: *const c_void) {
     // Safety: `context` is always an `Arc<Mutex<FutureState<T>>>` created in
     // `AsyncCallbackFuture::new` via `Arc::into_raw`. We reclaim ownership here —
     // this matches the one extra strong count deposited by `into_raw`.
     let state = unsafe { Arc::from_raw(context.cast::<Mutex<FutureState<T>>>()) };
     let mut lock = state.lock().unwrap();
-    // TODO: This should become a `std::ptr::read`, and `&T` in signature a `*const T` instead.
-    lock.result = Some(value.clone());
+    // Safety: The caller guarantees `value` is valid and that the pointee will not
+    // be used afterwards (the caller forgets the original to prevent double-drop).
+    lock.result = Some(unsafe { std::ptr::read(value) });
     if let Some(waker) = lock.waker.take() {
         waker.wake();
     }
@@ -223,7 +228,7 @@ pub struct AsyncCallbackFuture<T> {
     state: Arc<Mutex<FutureState<T>>>,
 }
 
-impl<T: Clone + Send + 'static + TypeInfo> AsyncCallbackFuture<T> {
+impl<T: Send + 'static + TypeInfo> AsyncCallbackFuture<T> {
     /// Creates a `(future, callback)` pair.
     pub fn new() -> (Self, AsyncCallback<T>) {
         let state = Arc::new(Mutex::new(FutureState { result: None, waker: None }));
@@ -236,7 +241,7 @@ impl<T: Clone + Send + 'static + TypeInfo> AsyncCallbackFuture<T> {
     }
 }
 
-impl<T: Clone + Send + 'static> Future for AsyncCallbackFuture<T> {
+impl<T: Send + 'static> Future for AsyncCallbackFuture<T> {
     type Output = T;
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<T> {

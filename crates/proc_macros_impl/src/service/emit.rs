@@ -338,13 +338,27 @@ impl ServiceModel {
                         let _result = #service_call(_async_runtime, #param_names).await;
                         match _result {
                             ::interoptopus::ffi::Ok(service_instance) => {
-                                callback.call(&::interoptopus::ffi::Ok(
+                                let _cb_result = ::interoptopus::ffi::Ok(
                                     ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
-                                ));
+                                );
+                                callback.call(&raw const _cb_result);
+                                ::std::mem::forget(_cb_result);
                             }
-                            ::interoptopus::ffi::Err(err) => callback.call(&::interoptopus::ffi::Err(err)),
-                            ::interoptopus::ffi::Result::Panic => callback.call(&::interoptopus::ffi::Result::Panic),
-                            ::interoptopus::ffi::Result::Null => callback.call(&::interoptopus::ffi::Result::Null),
+                            ::interoptopus::ffi::Err(err) => {
+                                let _cb_result = ::interoptopus::ffi::Err(err);
+                                callback.call(&raw const _cb_result);
+                                ::std::mem::forget(_cb_result);
+                            }
+                            ::interoptopus::ffi::Result::Panic => {
+                                let _cb_result: #callback_type = ::interoptopus::ffi::Result::Panic;
+                                callback.call(&raw const _cb_result);
+                                ::std::mem::forget(_cb_result);
+                            }
+                            ::interoptopus::ffi::Result::Null => {
+                                let _cb_result: #callback_type = ::interoptopus::ffi::Result::Null;
+                                callback.call(&raw const _cb_result);
+                                ::std::mem::forget(_cb_result);
+                            }
                         }
                     });
                 }
@@ -511,10 +525,9 @@ impl ServiceModel {
                     _instance_invoke.spawn(move |_ctx| async move {
                         let _async_this = ::interoptopus::pattern::asynk::Async::new(_instance_inside, _ctx);
                         let _result = #service_type::#method_name(_async_this, #param_names).await;
-                        callback.call(&_result);
+                        callback.call(&raw const _result);
                         // Prevent Rust from dropping owned data (e.g. ffi::String) after the
-                        // callback, since the foreign side took ownership of the raw pointers
-                        // during the callback.
+                        // callback, since the callee took ownership via ptr::read.
                         ::std::mem::forget(_result);
                     });
                     ::interoptopus::ffi::Ok(::std::ptr::null())
