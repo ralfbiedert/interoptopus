@@ -1,4 +1,13 @@
+pub mod interface;
+
+/// Module for `IPlugin` and `IService`-like interfaces.
+pub const PLUGIN_DEFAULT_MODULE: Module = Module::from_str("Default.Plugin");
+
+/// Emission for `IPlugin` and `IService`-like interfaces.
+pub const PLUGIN_DEFAULT_EMISSION: Emission = Emission::FileEmission(FileEmission::CustomModule(PLUGIN_DEFAULT_MODULE));
+
 use crate::lang::{FunctionId, ServiceId};
+use interoptopus::lang::meta::{Emission, FileEmission, Module};
 
 #[derive(Debug, Clone)]
 pub enum TrampolineKind {

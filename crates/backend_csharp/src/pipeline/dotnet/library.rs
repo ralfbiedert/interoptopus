@@ -32,12 +32,15 @@ pub struct DotnetLibraryConfig {
     pub model_service_map: model::common::service::all::Config,
     pub model_type_util: model::common::types::util::Config,
     pub model_trampoline: model::dotnet::trampoline::Config,
+    pub model_plugin_interface: model::dotnet::interface::plugin::Config,
+    pub model_service_interfaces: model::dotnet::interface::service::Config,
     pub model_wire_helpers: model::common::wire::helpers::Config,
     pub model_wire_nested: model::common::wire::nested::Config,
     pub output_master: output::common::master::Config,
     pub output_unmanaged_conversion: output::common::conversion::unmanaged_conversion::Config,
     pub output_unmanaged_names: output::common::conversion::unmanaged_names::Config,
     pub output_conversion_fields: output::common::conversion::fields::Config,
+    pub output_register_items: output::dotnet::register_items::Config,
     pub output_interop_raw: output::dotnet::interop::raw::Config,
     pub output_interop_service: output::dotnet::interop::service::Config,
     pub output_interop: output::dotnet::interop::all::Config,
@@ -68,6 +71,7 @@ pub struct DotnetLibraryConfig {
     pub output_enum_body: output::common::types::enums::body::Config,
     pub output_enum: output::common::types::enums::all::Config,
     pub output_util: output::common::types::util::Config,
+    pub output_using: output::dotnet::using::Config,
     pub output_final: output::dotnet::all::Config,
 }
 
@@ -100,6 +104,8 @@ pub struct ModelPasses {
     pub service_all: model::common::service::all::Pass,
     pub type_util: model::common::types::util::Pass,
     pub trampoline: model::dotnet::trampoline::Pass,
+    pub plugin_interface: model::dotnet::interface::plugin::Pass,
+    pub service_interfaces: model::dotnet::interface::service::Pass,
     pub wire_helpers: model::common::wire::helpers::Pass,
     pub wire_nested: model::common::wire::nested::Pass,
 }
@@ -109,6 +115,7 @@ pub struct IntermediateOutputPasses {
     pub unmanaged_conversion: output::common::conversion::unmanaged_conversion::Pass,
     pub unmanaged_names: output::common::conversion::unmanaged_names::Pass,
     pub conversion_fields: output::common::conversion::fields::Pass,
+    pub register_items: output::dotnet::register_items::Pass,
     pub interop_raw: output::dotnet::interop::raw::Pass,
     pub interop_service: output::dotnet::interop::service::Pass,
     pub interop: output::dotnet::interop::all::Pass,
@@ -139,6 +146,7 @@ pub struct IntermediateOutputPasses {
     pub enum_body: output::common::types::enums::body::Pass,
     pub enums: output::common::types::enums::all::Pass,
     pub util: output::common::types::util::Pass,
+    pub using: output::dotnet::using::Pass,
 }
 
 /// Code generation pipeline for .NET plugins (reverse interop).
@@ -196,6 +204,8 @@ impl DotnetLibrary {
                 service_all: model::common::service::all::Pass::new(config.model_service_map),
                 type_util: model::common::types::util::Pass::new(config.model_type_util),
                 trampoline: model::dotnet::trampoline::Pass::new(config.model_trampoline),
+                plugin_interface: model::dotnet::interface::plugin::Pass::new(config.model_plugin_interface),
+                service_interfaces: model::dotnet::interface::service::Pass::new(config.model_service_interfaces),
                 wire_helpers: model::common::wire::helpers::Pass::new(config.model_wire_helpers),
                 wire_nested: model::common::wire::nested::Pass::new(config.model_wire_nested),
             },
@@ -204,6 +214,7 @@ impl DotnetLibrary {
                 unmanaged_conversion: output::common::conversion::unmanaged_conversion::Pass::new(config.output_unmanaged_conversion),
                 unmanaged_names: output::common::conversion::unmanaged_names::Pass::new(config.output_unmanaged_names),
                 conversion_fields: output::common::conversion::fields::Pass::new(config.output_conversion_fields),
+                register_items: output::dotnet::register_items::Pass::new(config.output_register_items),
                 interop_raw: output::dotnet::interop::raw::Pass::new(config.output_interop_raw),
                 interop_service: output::dotnet::interop::service::Pass::new(config.output_interop_service),
                 interop: output::dotnet::interop::all::Pass::new(config.output_interop),
@@ -234,6 +245,7 @@ impl DotnetLibrary {
                 enum_body: output::common::types::enums::body::Pass::new(config.output_enum_body),
                 enums: output::common::types::enums::all::Pass::new(config.output_enum),
                 util: output::common::types::util::Pass::new(config.output_util),
+                using: output::dotnet::using::Pass::new(config.output_using),
             },
             output_final: output::dotnet::all::Pass::new(config.output_final),
             output: Multibuf::default(),
@@ -277,6 +289,8 @@ impl DotnetLibrary {
             r.run(m.wire_helpers.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.wire_nested.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &mut m.type_names, &self.inventory.types))?;
             r.run(m.trampoline.process(&mut pass_meta, &m.fns_all, &m.service_all))?;
+            r.run(m.plugin_interface.process(&mut pass_meta, &m.trampoline, &m.fns_all, &m.type_all))?;
+            r.run(m.service_interfaces.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
 
             Ok(())
         })?;
@@ -285,6 +299,9 @@ impl DotnetLibrary {
 
         // Output passes
         self.output_master.process(&mut pass_meta, &m.type_all, &m.fns_all)?;
+
+        o.register_items.process(&mut pass_meta, &mut self.output_master, &m.plugin_interface, &m.service_interfaces)?;
+        o.using.process(&mut pass_meta, &self.output_master)?;
         o.unmanaged_conversion.process(&mut pass_meta, &m.type_managed_conversion, &m.type_all)?;
         o.unmanaged_names.process(&mut pass_meta, &m.type_all, &m.type_managed_conversion)?;
         o.conversion_fields.process(&mut pass_meta, &self.output_master, &m.type_all)?;
@@ -307,17 +324,17 @@ impl DotnetLibrary {
         o.util.process(&mut pass_meta, &self.output_master)?;
         o.delegates_class.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
         o.delegates_signature.process(&mut pass_meta, &self.output_master, &m.type_all)?;
-        o.trampoline.process(&mut pass_meta, &self.output_master)?;
         o.pattern_bools.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.wire_buffer.process(&mut pass_meta, &self.output_master, &m.wire_helpers, &self.inventory.functions, &self.inventory.types)?;
         o.wire_types.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
         o.wire_helper_classes.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
         o.wires.process(&mut pass_meta, &self.output_master, &o.wire_types, &o.wire_helper_classes)?;
-        o.interop_raw.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
-        o.interop_service.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &m.service_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
+        o.interop_raw.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.plugin_interface, &m.fns_all, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
+        o.interop_service.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.service_interfaces, &m.fns_all, &m.type_all, &m.service_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
         o.interop.process(&mut pass_meta, &self.output_master, &m.trampoline, &o.interop_raw, &o.interop_service)?;
-        o.plugin_interface.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all)?;
-        o.service_interface.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all)?;
+        o.trampoline.process(&mut pass_meta, &self.output_master, &o.interop)?;
+        o.plugin_interface.process(&mut pass_meta, &self.output_master, &m.plugin_interface, &m.type_all)?;
+        o.service_interface.process(&mut pass_meta, &self.output_master, &m.service_interfaces, &m.type_all)?;
 
         // Final output pass
         self.output_final.process(&mut pass_meta, &self.output_master, &self.output_passes, &mut self.output)?;

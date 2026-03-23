@@ -1,5 +1,7 @@
 //! Cross-cutting metadata: documentation, visibility, and emission/placement rules.
 
+use std::borrow::Cow;
+
 /// The visibility of an item when written. Not all backends support all visibility levels.
 #[derive(Clone, Copy, Default, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -16,12 +18,19 @@ pub enum Visibility {
 /// at a later stage.
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct Module(String);
+pub struct Module(Cow<'static, str>);
 
 impl Module {
     /// Creates a module identifier from a string (e.g., `"foo.bar"`).
-    pub fn new(s: impl Into<String>) -> Self {
-        Self(s.into())
+    #[must_use]
+    pub fn from_string(s: impl Into<String>) -> Self {
+        Self(Cow::from(s.into()))
+    }
+
+    /// Creates a module identifier from a static 'str (e.g., `"foo.bar"`).
+    #[must_use]
+    pub const fn from_str(s: &'static str) -> Self {
+        Self(Cow::Borrowed(s))
     }
 }
 
@@ -100,7 +109,7 @@ pub fn common_or_module_emission(x: &[Emission]) -> Emission {
     if x.iter().all(|x| matches!(x, Emission::Builtin | Emission::FileEmission(FileEmission::Common))) {
         Emission::FileEmission(FileEmission::Common)
     } else if x.iter().any(|x| matches!(x, Emission::FileEmission(FileEmission::CustomModule(_)))) {
-        Emission::FileEmission(FileEmission::CustomModule(Module::new("")))
+        Emission::FileEmission(FileEmission::CustomModule(Module::from_string("")))
     } else {
         // At least one Default inner type → Default
         Emission::FileEmission(FileEmission::Default)

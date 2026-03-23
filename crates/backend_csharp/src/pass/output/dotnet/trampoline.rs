@@ -8,9 +8,12 @@
 //! This is the plugin-mode counterpart of the `WireInterop` class used in the
 //! Rust-library pipeline (which uses `[LibraryImport]` to call into the native
 //! DLL directly).
+//!
+//! Only emitted into output files that contain at least one trampoline function.
 
 use crate::output::{FileType, Output};
-use crate::pass::{OutputResult, PassInfo, output};
+use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::output::dotnet::interop;
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -28,12 +31,24 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, rendered: HashMap::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::common::master::Pass) -> OutputResult {
+    pub fn process(
+        &mut self,
+        _pass_meta: &mut crate::pass::PassMeta,
+        output_master: &output::common::master::Pass,
+        interop_pass: &interop::all::Pass,
+    ) -> OutputResult {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(FileType::Csharp) {
-            let ctx = Context::new();
-            let content = templates.render("dotnet/trampoline.cs", &ctx)?.trim().to_string();
+            let has_trampolines = interop_pass.trampolines_for(file).is_some_and(|t| !t.is_empty());
+
+            let content = if has_trampolines {
+                let ctx = Context::new();
+                templates.render("dotnet/trampoline.cs", &ctx)?.trim().to_string()
+            } else {
+                String::new()
+            };
+
             self.rendered.insert(file.clone(), content);
         }
 

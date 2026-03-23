@@ -79,7 +79,7 @@ impl Pass {
             context.insert("util", &util);
 
             let final_ = templates.render("rust/all.cs", &context)?;
-            output.add_buffer(file.target.file_name(), final_);
+            output.add_buffer_with_overwrite(file.target.file_name(), final_, file.target.overwrite_policy());
         }
 
         Ok(())

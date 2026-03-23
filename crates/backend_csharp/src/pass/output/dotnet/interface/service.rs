@@ -1,7 +1,5 @@
 //! Renders service interfaces (e.g. `IFoo<TSelf>`) with method declarations.
 //!
-//! Each service produces an interface with a self-referencing generic constraint:
-//!
 //! ```csharp
 //! public interface IFoo<TSelf> where TSelf : IFoo<TSelf>
 //! {
@@ -11,11 +9,14 @@
 //! }
 //! ```
 //!
+//! Uses the service interface model pass for method names and signatures.
+
+use crate::dispatch::{Item, ItemKind};
+use crate::lang::plugin::interface::MethodKind;
 use crate::output::{FileType, Output};
-use crate::pass::output::dotnet::interface::plugin::{async_callback_inner, task_type_name};
-use crate::pass::{OutputResult, PassInfo, model, output};
-use interoptopus_backends::casing::service_method_name;
+use crate::pass::{model, output, OutputResult, PassInfo};
 use std::collections::HashMap;
+use crate::pass::output::dotnet::interface::format_args;
 
 #[derive(Default)]
 pub struct Config {}
@@ -35,80 +36,37 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
-        services: &model::common::service::all::Pass,
-        fns_all: &model::common::fns::all::Pass,
+        service_interfaces: &model::dotnet::interface::service::Pass,
         types: &model::common::types::all::Pass,
     ) -> OutputResult {
         for file in output_master.outputs_of(FileType::Csharp) {
             let mut all_interfaces = Vec::new();
 
-            let mut sorted_services: Vec<_> = services.iter().collect();
-            sorted_services.sort_by_key(|(_, svc)| types.get(svc.ty).map_or("", |t| t.name.as_str()));
-
-            for (_svc_id, svc) in sorted_services {
-                let Some(type_info) = types.get(svc.ty) else { continue };
-                let type_name = &type_info.name;
-                let interface_name = format!("I{type_name}");
+            for interface in service_interfaces.interfaces() {
+                let Some(fe) = interface.emission.file_emission() else { continue };
+                if !output_master.item_belongs_to(Item { kind: ItemKind::PluginInterface, emission: fe.clone() }, file) {
+                    continue;
+                }
 
                 let mut members = Vec::new();
 
-                // Constructors → `static abstract TSelf MethodName(args…);`
-                for &fn_id in &svc.ctors {
-                    let Some(func) = fns_all.get(fn_id) else { continue };
-                    let method_name = service_method_name(type_name, &func.name);
+                for method in &interface.methods {
+                    let args_str = format_args(&method.csharp.arguments, types);
 
-                    // Ctor args exclude the return (Self), and the return type is TSelf
-                    let args: Vec<String> = func
-                        .signature
-                        .arguments
-                        .iter()
-                        .filter_map(|arg| {
-                            let ty = types.get(arg.ty).map(|t| &t.name)?;
-                            Some(format!("{} {}", ty, arg.name))
-                        })
-                        .collect();
-                    let args_str = args.join(", ");
-
-                    members.push(format!("    static abstract TSelf {method_name}({args_str});"));
-                }
-
-                // Methods → `ReturnType MethodName(args…);`
-                for &fn_id in &svc.methods {
-                    let Some(func) = fns_all.get(fn_id) else { continue };
-                    let method_name = service_method_name(type_name, &func.name);
-                    let async_inner = async_callback_inner(&func.signature.arguments, types);
-
-                    let rval_name = if let Some(inner_id) = async_inner {
-                        task_type_name(inner_id, types)
-                    } else {
-                        types.get(func.signature.rval).map_or_else(|| "void".to_string(), |t| t.name.clone())
+                    let line = match method.kind {
+                        MethodKind::Static => {
+                            format!("    static abstract TSelf {}({args_str});", method.name)
+                        }
+                        MethodKind::Regular => {
+                            format!("    {} {}({args_str});", method.rval_name, method.name)
+                        }
                     };
 
-                    // For async methods omit the trailing AsyncCallback parameter.
-                    let arg_count = if async_inner.is_some() {
-                        func.signature.arguments.len().saturating_sub(1)
-                    } else {
-                        func.signature.arguments.len()
-                    };
-                    let args: Vec<String> = func
-                        .signature
-                        .arguments
-                        .iter()
-                        .take(arg_count)
-                        .filter_map(|arg| {
-                            let ty = types.get(arg.ty).map(|t| &t.name)?;
-                            Some(format!("{} {}", ty, arg.name))
-                        })
-                        .collect();
-                    let args_str = args.join(", ");
-
-                    members.push(format!("    {rval_name} {method_name}({args_str});"));
+                    members.push(line);
                 }
-
-                // Destructor is not part of the interface — it's handled by the trampoline
 
                 let body = members.join("\n");
-                let rendered = format!("public interface {interface_name}<TSelf> where TSelf : {interface_name}<TSelf>\n{{\n{body}\n}}");
+                let rendered = format!("public interface {}<TSelf> where TSelf : {}<TSelf>\n{{\n{body}\n}}", interface.name, interface.name);
 
                 all_interfaces.push(rendered);
             }

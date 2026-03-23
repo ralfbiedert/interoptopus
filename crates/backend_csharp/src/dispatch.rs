@@ -26,6 +26,19 @@ impl Dispatch {
         Self::custom(|_, _| Target::new("Interop.cs", "My.Company"))
     }
 
+    #[cfg(feature = "unstable-plugins")]
+    pub fn plugin_defaults_with(name: impl Into<String>) -> Self {
+        use crate::lang::plugin::PLUGIN_DEFAULT_MODULE;
+        let name = name.into();
+        let name_common = format!("{name}.Common");
+        Self::custom(move |x, _| match x.emission {
+            FileEmission::Common => Target::new("Interop.Common.cs", name_common.clone()),
+            FileEmission::Default => Target::new("Interop.User.cs", name.clone()),
+            FileEmission::CustomModule(ref m) if *m == PLUGIN_DEFAULT_MODULE => Target::new("Interop.Plugin.cs", "Interoptopus.API"),
+            FileEmission::CustomModule(_) => Target::new("Interop.User.cs", name.clone()),
+        })
+    }
+
     /// Routes the given item to an output file.
     pub fn classify(&mut self, item: Item) -> Target {
         (self.dispatch)(item, Meta {})
@@ -44,6 +57,8 @@ pub enum ItemKind {
     Type(TypeId, Type),
     /// A function declaration.
     Function(FunctionId, Function),
+    /// A plugin or service interface (e.g. `IPlugin`, `IFoo<TSelf>`).
+    PluginInterface,
 }
 
 /// Reserved for future dispatch metadata.

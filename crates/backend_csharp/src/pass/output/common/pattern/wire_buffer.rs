@@ -11,7 +11,10 @@
 //! When Wire types are present but no helper functions are found (plugin mode),
 //! they call `Trampoline.WireCreate/WireDestroy` (function pointers registered
 //! by the Rust host at load time).
+//!
+//! Only emitted into the output file where `UTIL_WIRE_BUFFER` is routed.
 
+use crate::lang::types::csharp;
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus::inventory::{Functions, Types as RsTypes};
@@ -43,23 +46,27 @@ impl Pass {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(FileType::Csharp) {
-            let content = if let Some(h) = wire_helpers.helpers() {
-                // Rust mode: builtins_wire!() found — use DllImport entry points.
-                let create_name = &rs_functions[&h.create_fn].name;
-                let destroy_name = &rs_functions[&h.destroy_fn].name;
+            let content = if output_master.type_belongs_to(csharp::UTIL_WIRE_BUFFER, file) {
+                if let Some(h) = wire_helpers.helpers() {
+                    // Rust mode: builtins_wire!() found — use DllImport entry points.
+                    let create_name = &rs_functions[&h.create_fn].name;
+                    let destroy_name = &rs_functions[&h.destroy_fn].name;
 
-                let mut context = Context::new();
-                context.insert("create_entry_point", create_name);
-                context.insert("destroy_entry_point", destroy_name);
-                context.insert("plugin_mode", &false);
-                templates.render("common/pattern/wire_buffer.cs", &context)?.trim().to_string()
-            } else if has_wire_types(rs_types) {
-                // Plugin mode: no helper functions, but Wire types present — use Trampoline.
-                let mut context = Context::new();
-                context.insert("plugin_mode", &true);
-                context.insert("create_entry_point", "");
-                context.insert("destroy_entry_point", "");
-                templates.render("common/pattern/wire_buffer.cs", &context)?.trim().to_string()
+                    let mut context = Context::new();
+                    context.insert("create_entry_point", create_name);
+                    context.insert("destroy_entry_point", destroy_name);
+                    context.insert("plugin_mode", &false);
+                    templates.render("common/pattern/wire_buffer.cs", &context)?.trim().to_string()
+                } else if has_wire_types(rs_types) {
+                    // Plugin mode: no helper functions, but Wire types present — use Trampoline.
+                    let mut context = Context::new();
+                    context.insert("plugin_mode", &true);
+                    context.insert("create_entry_point", "");
+                    context.insert("destroy_entry_point", "");
+                    templates.render("common/pattern/wire_buffer.cs", &context)?.trim().to_string()
+                } else {
+                    String::new()
+                }
             } else {
                 String::new()
             };

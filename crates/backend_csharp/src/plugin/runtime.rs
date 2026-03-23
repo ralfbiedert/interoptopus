@@ -27,6 +27,7 @@ struct HandlerShim {
 ///
 /// `ctx` is a `*mut HandlerShim` produced by [`Box::into_raw`] in
 /// [`DllLoader::load_plugin`] and intentionally leaked.
+#[allow(clippy::cast_ptr_alignment)]
 unsafe extern "C" fn uncaught_exception_callback(ctx: *const u8, message: *const u8, len: i32) {
     // SAFETY: ctx was produced by Box::into_raw(Box::new(HandlerShim { ... })) in
     // load_plugin and intentionally leaked, so the pointer is valid and properly

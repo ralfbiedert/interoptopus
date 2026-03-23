@@ -45,6 +45,9 @@ impl Pass {
             let wire_buffer = intermediary.wire_buffer.wire_buffer_for(file).unwrap_or("");
             let wires = intermediary.wires.wires_for(file).unwrap_or(&[]);
 
+            let usings = intermediary.using.using_for(file).unwrap_or("");
+
+            context.insert("usings", usings);
             context.insert("namespace", file.target.namespace());
             context.insert("delegates", &delegates);
             context.insert("composites", &composites);
@@ -59,7 +62,7 @@ impl Pass {
             context.insert("trampolines", &trampolines);
 
             let rendered = templates.render("dotnet/all.cs", &context)?;
-            output.add_buffer(file.target.file_name(), rendered);
+            output.add_buffer_with_overwrite(file.target.file_name(), rendered, file.target.overwrite_policy());
         }
 
         Ok(())

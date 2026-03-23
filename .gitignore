@@ -43,3 +43,5 @@ RESULTS.md
 # Project-specific
 Interop.cs
 Interop.Common.cs
+Interop.Plugin.cs
+Interop.User.cs

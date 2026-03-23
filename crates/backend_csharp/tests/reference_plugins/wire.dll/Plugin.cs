@@ -1,4 +1,5 @@
 using My.Company;
+using My.Company.Common;
 using Newtonsoft.Json;
 
 namespace My.Company;

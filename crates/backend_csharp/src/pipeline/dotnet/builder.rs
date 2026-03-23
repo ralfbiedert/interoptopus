@@ -1,6 +1,10 @@
 use super::library::{DotnetLibrary, DotnetLibraryConfig};
 use crate::dispatch::Dispatch;
+use crate::lang::plugin::PLUGIN_DEFAULT_MODULE;
+use crate::output::Target;
+use crate::pass::output;
 use interoptopus::inventory::ForeignInventory;
+use interoptopus::lang::meta::FileEmission;
 
 /// Builder for configuring and constructing a [`DotnetLibrary`].
 #[derive(Default)]
@@ -11,7 +15,16 @@ pub struct DotnetLibraryBuilder {
 
 impl DotnetLibraryBuilder {
     pub(crate) fn new(inventory: ForeignInventory) -> Self {
-        Self { inventory, ..Self::default() }
+        let default_dispatch = Dispatch::custom(|x, _| match x.emission {
+            FileEmission::Common => Target::new("Interop.Common.cs", "My.Company.Common"),
+            FileEmission::Default => Target::new("Interop.User.cs", "My.Company"),
+            FileEmission::CustomModule(m) if m == PLUGIN_DEFAULT_MODULE => Target::new("Interop.Plugin.cs", "Interoptopus.API"),
+            FileEmission::CustomModule(_) => Target::new("Interop.User.cs", "My.Company"),
+        });
+
+        let config = DotnetLibraryConfig { output_master: output::common::master::Config { dispatch: default_dispatch, ..Default::default() }, ..Default::default() };
+
+        Self { inventory, config }
     }
 
     /// Sets the dispatch strategy that routes items to output files.

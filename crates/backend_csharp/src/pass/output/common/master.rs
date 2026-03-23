@@ -6,12 +6,12 @@
 //! without duplicating dispatch logic.
 
 use crate::dispatch::{Dispatch, Item, ItemKind};
-use crate::lang::meta::Emission;
 use crate::lang::{FunctionId, TypeId};
 use crate::output::{FileType, Output, Target};
 use crate::pass::{OutputResult, PassInfo, model};
 use crate::template::templates;
 use interoptopus_backends::template::TemplateEngine;
+use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 
 pub struct Config {
@@ -27,7 +27,8 @@ impl Default for Config {
 
 pub struct Pass {
     info: PassInfo,
-    config: Config,
+    dispatch: RefCell<Dispatch>,
+    templates: TemplateEngine,
     outputs: Vec<Output>,
     /// Which output file each type should be rendered into.
     type_routing: HashMap<TypeId, Target>,
@@ -38,18 +39,26 @@ pub struct Pass {
 impl Pass {
     #[must_use]
     pub fn new(config: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, config, outputs: vec![], type_routing: HashMap::new(), fn_routing: HashMap::new() }
+        Self {
+            info: PassInfo { name: file!() },
+            dispatch: RefCell::new(config.dispatch),
+            templates: config.templates,
+            outputs: vec![],
+            type_routing: HashMap::new(),
+            fn_routing: HashMap::new(),
+        }
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, types: &model::common::types::all::Pass, fns_all: &model::common::fns::all::Pass) -> OutputResult {
         let mut seen_files: HashSet<Target> = HashSet::new();
+        let dispatch = self.dispatch.get_mut();
 
         // Classify all emittable types
         for (&type_id, ty) in types.iter() {
             let Some(file_emission) = ty.emission.file_emission() else { continue };
 
             let item = Item { kind: ItemKind::Type(type_id, ty.clone()), emission: file_emission.clone() };
-            let file_name = self.config.dispatch.classify(item);
+            let file_name = dispatch.classify(item);
 
             self.type_routing.insert(type_id, file_name.clone());
             seen_files.insert(file_name);
@@ -60,7 +69,7 @@ impl Pass {
             let Some(file_emission) = func.emission.file_emission() else { continue };
 
             let item = Item { kind: ItemKind::Function(fn_id, func.clone()), emission: file_emission.clone() };
-            let file_name = self.config.dispatch.classify(item);
+            let file_name = dispatch.classify(item);
 
             self.fn_routing.insert(fn_id, file_name.clone());
             seen_files.insert(file_name);
@@ -80,14 +89,19 @@ impl Pass {
         Ok(())
     }
 
-    #[must_use]
-    pub fn dispatch(&self) -> &Dispatch {
-        &self.config.dispatch
+    /// Registers an additional item so its emission is classified and may
+    /// create a new output file. Call after `process()`.
+    pub fn register_item(&mut self, item: Item) {
+        let target = self.dispatch.get_mut().classify(item);
+        if !self.outputs.iter().any(|o| o.target == target) {
+            self.outputs.push(Output { target, kind: FileType::Csharp });
+            self.outputs.sort();
+        }
     }
 
     #[must_use]
     pub fn templates(&self) -> &TemplateEngine {
-        &self.config.templates
+        &self.templates
     }
 
     pub fn outputs(&self) -> impl Iterator<Item = &Output> {
@@ -108,5 +122,14 @@ impl Pass {
     #[must_use]
     pub fn fn_belongs_to(&self, fn_id: FunctionId, output: &Output) -> bool {
         self.fn_routing.get(&fn_id).is_some_and(|f| *f == output.target)
+    }
+
+    /// Returns true if the given item should be rendered into the given output file.
+    ///
+    /// Classifies the item on demand via the dispatch function.
+    #[must_use]
+    pub fn item_belongs_to(&self, item: Item, output: &Output) -> bool {
+        let target = self.dispatch.borrow_mut().classify(item);
+        target == output.target
     }
 }

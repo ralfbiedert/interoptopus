@@ -12,7 +12,13 @@ mod wire;
 #[macro_export]
 macro_rules! define_plugin {
     ($plugin:ty, $name:expr) => {{
+        use interoptopus::lang::meta::FileEmission;
+        use interoptopus_csharp::dispatch::Dispatch;
+        use interoptopus_csharp::lang::plugin::PLUGIN_DEFAULT_MODULE;
+        use interoptopus_csharp::output::Target;
+
         let multibuf = ::interoptopus_csharp::DotnetLibrary::builder(<$plugin as ::interoptopus::lang::plugin::PluginInfo>::inventory())
+            .dispatch(Dispatch::plugin_defaults_with("My.Company"))
             .build()
             .process()?;
 
