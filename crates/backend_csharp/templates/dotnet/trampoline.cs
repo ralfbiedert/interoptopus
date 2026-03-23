@@ -1,5 +1,5 @@
 /// Stores runtime trampolines registered by the Rust host at plugin load time.
-public static unsafe class Trampolines
+public static unsafe class Trampoline
 {
     private static delegate* unmanaged[Cdecl]<int, int*, int*, IntPtr> _wire_create;
     private static delegate* unmanaged[Cdecl]<IntPtr, int, int, void> _wire_destroy;

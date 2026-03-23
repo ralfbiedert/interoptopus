@@ -15,7 +15,7 @@ public partial struct WireBuffer
     public static unsafe WireBuffer Allocate(int size)
     {
 {% if plugin_mode %}
-        var ptr = Trampolines.WireCreate(size, out var outLen, out var outCapacity);
+        var ptr = Trampoline.WireCreate(size, out var outLen, out var outCapacity);
 {% else %}
         var ptr = WireInterop.interoptopus_wire_create(size, out var outLen, out var outCapacity);
 {% endif %}
@@ -43,7 +43,7 @@ public partial struct WireBuffer
         {
 {% if plugin_mode %}
             if (capacity > 0)
-                Trampolines.WireDestroy(data, len, capacity);
+                Trampoline.WireDestroy(data, len, capacity);
 {% else %}
             if (capacity > 0)
                 WireInterop.interoptopus_wire_destroy(data, len, capacity);

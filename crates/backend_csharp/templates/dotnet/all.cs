@@ -25,9 +25,9 @@ namespace {{ namespace }};
 
 {{ util }}
 {% endif %}
-{% if trampolines_class %}
+{% if trampoline_class %}
 
-{{ trampolines_class }}
+{{ trampoline_class }}
 {% endif %}
 {% if wire_buffer %}
 

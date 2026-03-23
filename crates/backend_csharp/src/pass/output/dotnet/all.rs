@@ -33,7 +33,7 @@ impl Pass {
 
             let plugin_interface = intermediary.plugin_interface.interface_for(file).unwrap_or("");
             let service_interfaces = intermediary.service_interface.interfaces_for(file).unwrap_or(&[]);
-            let trampolines = intermediary.trampoline.trampolines_for(file).unwrap_or(&[]);
+            let trampolines = intermediary.interop.trampolines_for(file).unwrap_or(&[]);
             let delegates_class = intermediary.delegates_class.delegates_for(file).unwrap_or(&[]);
             let delegates_signature = intermediary.delegates_signature.delegates_for(file).unwrap_or(&[]);
             let delegates: Vec<&str> = delegates_class.iter().chain(delegates_signature.iter()).map(String::as_str).collect();
@@ -41,7 +41,7 @@ impl Pass {
             let enums = intermediary.enums.enums_for(file).unwrap_or(&[]);
             let pattern_bools = intermediary.pattern_bools.bool_for(file).unwrap_or("");
             let util = intermediary.util.utils_for(file).unwrap_or("");
-            let trampolines_class = intermediary.trampolines.trampolines_for(file).unwrap_or("");
+            let trampoline_class = intermediary.trampoline.trampoline_for(file).unwrap_or("");
             let wire_buffer = intermediary.wire_buffer.wire_buffer_for(file).unwrap_or("");
             let wires = intermediary.wires.wires_for(file).unwrap_or(&[]);
 
@@ -51,7 +51,7 @@ impl Pass {
             context.insert("enums", &enums);
             context.insert("pattern_bools", &pattern_bools);
             context.insert("util", &util);
-            context.insert("trampolines_class", trampolines_class);
+            context.insert("trampoline_class", trampoline_class);
             context.insert("wire_buffer", wire_buffer);
             context.insert("wires", &wires);
             context.insert("plugin_interface", plugin_interface);

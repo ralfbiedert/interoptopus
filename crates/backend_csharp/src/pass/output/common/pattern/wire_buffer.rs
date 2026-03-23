@@ -9,7 +9,7 @@
 //! `WireInterop.interoptopus_wire_create/destroy` via `[LibraryImport]`.
 //!
 //! When Wire types are present but no helper functions are found (plugin mode),
-//! they call `Trampolines.WireCreate/WireDestroy` (function pointers registered
+//! they call `Trampoline.WireCreate/WireDestroy` (function pointers registered
 //! by the Rust host at load time).
 
 use crate::output::{FileType, Output};
@@ -54,7 +54,7 @@ impl Pass {
                 context.insert("plugin_mode", &false);
                 templates.render("common/pattern/wire_buffer.cs", &context)?.trim().to_string()
             } else if has_wire_types(rs_types) {
-                // Plugin mode: no helper functions, but Wire types present — use Trampolines.
+                // Plugin mode: no helper functions, but Wire types present — use Trampoline.
                 let mut context = Context::new();
                 context.insert("plugin_mode", &true);
                 context.insert("create_entry_point", "");

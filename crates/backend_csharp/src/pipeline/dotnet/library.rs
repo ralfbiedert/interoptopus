@@ -38,8 +38,10 @@ pub struct DotnetLibraryConfig {
     pub output_unmanaged_conversion: output::common::conversion::unmanaged_conversion::Config,
     pub output_unmanaged_names: output::common::conversion::unmanaged_names::Config,
     pub output_conversion_fields: output::common::conversion::fields::Config,
+    pub output_interop_raw: output::dotnet::interop::raw::Config,
+    pub output_interop_service: output::dotnet::interop::service::Config,
+    pub output_interop: output::dotnet::interop::all::Config,
     pub output_trampoline: output::dotnet::trampoline::Config,
-    pub output_trampolines: output::dotnet::trampolines::Config,
     pub output_pattern_bools: output::common::pattern::bools::Config,
     pub output_wire_buffer: output::common::pattern::wire_buffer::Config,
     pub output_wire_types: output::common::wire::wire_type::Config,
@@ -107,8 +109,10 @@ pub struct IntermediateOutputPasses {
     pub unmanaged_conversion: output::common::conversion::unmanaged_conversion::Pass,
     pub unmanaged_names: output::common::conversion::unmanaged_names::Pass,
     pub conversion_fields: output::common::conversion::fields::Pass,
+    pub interop_raw: output::dotnet::interop::raw::Pass,
+    pub interop_service: output::dotnet::interop::service::Pass,
+    pub interop: output::dotnet::interop::all::Pass,
     pub trampoline: output::dotnet::trampoline::Pass,
-    pub trampolines: output::dotnet::trampolines::Pass,
     pub pattern_bools: output::common::pattern::bools::Pass,
     pub wire_buffer: output::common::pattern::wire_buffer::Pass,
     pub wire_types: output::common::wire::wire_type::Pass,
@@ -200,8 +204,10 @@ impl DotnetLibrary {
                 unmanaged_conversion: output::common::conversion::unmanaged_conversion::Pass::new(config.output_unmanaged_conversion),
                 unmanaged_names: output::common::conversion::unmanaged_names::Pass::new(config.output_unmanaged_names),
                 conversion_fields: output::common::conversion::fields::Pass::new(config.output_conversion_fields),
+                interop_raw: output::dotnet::interop::raw::Pass::new(config.output_interop_raw),
+                interop_service: output::dotnet::interop::service::Pass::new(config.output_interop_service),
+                interop: output::dotnet::interop::all::Pass::new(config.output_interop),
                 trampoline: output::dotnet::trampoline::Pass::new(config.output_trampoline),
-                trampolines: output::dotnet::trampolines::Pass::new(config.output_trampolines),
                 pattern_bools: output::common::pattern::bools::Pass::new(config.output_pattern_bools),
                 wire_buffer: output::common::pattern::wire_buffer::Pass::new(config.output_wire_buffer),
                 wire_types: output::common::wire::wire_type::Pass::new(config.output_wire_types),
@@ -301,13 +307,15 @@ impl DotnetLibrary {
         o.util.process(&mut pass_meta, &self.output_master)?;
         o.delegates_class.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
         o.delegates_signature.process(&mut pass_meta, &self.output_master, &m.type_all)?;
-        o.trampolines.process(&mut pass_meta, &self.output_master)?;
+        o.trampoline.process(&mut pass_meta, &self.output_master)?;
         o.pattern_bools.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.wire_buffer.process(&mut pass_meta, &self.output_master, &m.wire_helpers, &self.inventory.functions, &self.inventory.types)?;
         o.wire_types.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
         o.wire_helper_classes.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
         o.wires.process(&mut pass_meta, &self.output_master, &o.wire_types, &o.wire_helper_classes)?;
-        o.trampoline.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &m.service_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
+        o.interop_raw.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
+        o.interop_service.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all, &m.service_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
+        o.interop.process(&mut pass_meta, &self.output_master, &m.trampoline, &o.interop_raw, &o.interop_service)?;
         o.plugin_interface.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.fns_all, &m.type_all)?;
         o.service_interface.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all)?;
 

@@ -14,7 +14,7 @@ pub mod output;
 /// In `Rust` mode the generated C# code uses `[LibraryImport]` to call into
 /// Rust functions (e.g., `WireInterop.interoptopus_wire_create`). In `Plugin`
 /// mode those functions are not available via DLL import; instead the Rust host
-/// registers them at load time through `Trampolines.RegisterTrampoline`.
+/// registers them at load time through `Trampoline.RegisterTrampoline`.
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub enum OperationMode {
     /// Standard mode — C# calls a Rust native library via P/Invoke.
