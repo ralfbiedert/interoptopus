@@ -57,7 +57,9 @@ impl Pass {
             for &fn_id in &svc.ctors {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
-                let (csharp_sig, rval_name) = csharp_signature(&func.signature.arguments, func.signature.rval, types);
+                let Some((csharp_sig, rval_name)) = csharp_signature(&func.signature.arguments, func.signature.rval, types) else {
+                    return Ok(Unchanged);
+                };
 
                 methods.push(Method { name: method_name, kind: MethodKind::Static, base: fn_id, csharp: csharp_sig, rval_name });
             }
@@ -66,7 +68,9 @@ impl Pass {
             for &fn_id in &svc.methods {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
-                let (csharp_sig, rval_name) = csharp_signature(&func.signature.arguments, func.signature.rval, types);
+                let Some((csharp_sig, rval_name)) = csharp_signature(&func.signature.arguments, func.signature.rval, types) else {
+                    return Ok(Unchanged);
+                };
 
                 methods.push(Method { name: method_name, kind: MethodKind::Regular, base: fn_id, csharp: csharp_sig, rval_name });
             }

@@ -51,7 +51,10 @@ impl Pass {
             let Some(func) = fns_all.get(entry.fn_id) else { continue };
 
             let pascal_name = rust_to_pascal(&func.name);
-            let (csharp_sig, rval_name) = csharp_signature(&func.signature.arguments, func.signature.rval, types);
+            let Some((csharp_sig, rval_name)) = csharp_signature(&func.signature.arguments, func.signature.rval, types) else {
+                // Type not yet resolved — wait for next iteration.
+                return Ok(Unchanged);
+            };
 
             methods.push(Method { name: pascal_name, kind: MethodKind::Static, base: entry.fn_id, csharp: csharp_sig, rval_name });
         }

@@ -1,11 +1,10 @@
 use crate::{define_plugin, load_plugin};
-use interoptopus::plugin;
 use interoptopus_csharp::plugin::DotNetRuntime;
 use reference_project::plugins::functions::{Behavior, Primitives};
 use std::error::Error;
-use std::panic::catch_unwind;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
+use crate::reference_plugins::plugin_path_for;
 
 #[test]
 fn define_plugins() -> Result<(), Box<dyn Error>> {
@@ -43,7 +42,7 @@ fn load_plugin_functions_behavior() -> Result<(), Box<dyn Error>> {
         .set_exception_handler(move |_| {
             exception_called_clone.store(true, Ordering::SeqCst);
         })
-        .dll_loader_with_namespace(super::plugin_path_for("functions_behavior.dll"), "My.Company")?;
+        .dll_loader(plugin_path_for("functions_behavior.dll"))?;
 
     let plugin = Behavior::new(&loader)?;
 

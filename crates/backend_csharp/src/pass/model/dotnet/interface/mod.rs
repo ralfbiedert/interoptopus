@@ -17,31 +17,35 @@ pub(super) fn async_callback_inner(args: &[Argument], types: &TypesAll) -> Optio
 }
 
 /// Returns `"Task"` for void inner types or `"Task<TypeName>"` for value types.
-pub(super) fn task_type_name(inner_id: TypeId, types: &TypesAll) -> String {
+/// Returns `None` if the inner type is not yet resolved.
+pub(super) fn task_type_name(inner_id: TypeId, types: &TypesAll) -> Option<String> {
     let is_void = matches!(types.get(inner_id).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
     if is_void {
-        "Task".to_string()
+        Some("Task".to_string())
     } else {
-        let name = types.get(inner_id).map_or("void", |t| t.name.as_str());
-        format!("Task<{name}>")
+        let name = &types.get(inner_id)?.name;
+        Some(format!("Task<{name}>"))
     }
 }
 
 /// Builds a C# `Signature` from a function's arguments and return type,
 /// handling async functions (replacing `AsyncCallback<T>` return with `Task<T>`
 /// and stripping the callback parameter).
-pub(super) fn csharp_signature(args: &[Argument], rval: TypeId, types: &TypesAll) -> (Signature, String) {
+///
+/// Returns `None` if any referenced type is not yet resolved in the type map.
+pub(super) fn csharp_signature(args: &[Argument], rval: TypeId, types: &TypesAll) -> Option<(Signature, String)> {
     let async_inner = async_callback_inner(args, types);
 
     let rval_name = if let Some(inner_id) = async_inner {
-        task_type_name(inner_id, types)
+        task_type_name(inner_id, types)?
     } else {
-        types.get(rval).map_or_else(|| "void".to_string(), |t| t.name.clone())
+        let ty = types.get(rval)?;
+        ty.name.clone()
     };
 
     let arg_count = if async_inner.is_some() { args.len().saturating_sub(1) } else { args.len() };
     let arguments: Vec<Argument> = args.iter().take(arg_count).cloned().collect();
     let rval_type_id = if let Some(inner_id) = async_inner { inner_id } else { rval };
 
-    (Signature { arguments, rval: rval_type_id }, rval_name)
+    Some((Signature { arguments, rval: rval_type_id }, rval_name))
 }

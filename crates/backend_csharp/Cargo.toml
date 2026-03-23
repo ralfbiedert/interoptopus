@@ -15,7 +15,7 @@ unstable-plugins = ["dotnet", "interoptopus/unstable-plugins"]
 [dependencies]
 interoptopus.workspace = true
 interoptopus_backends.workspace = true
-netcorehost = { workspace = true, optional = true }
+netcorehost = { workspace = true, optional = true, features = ["nethost-download", "net9_0"] }
 tempfile = { workspace = true, optional = true }
 
 [build-dependencies]

@@ -31,7 +31,7 @@ macro_rules! define_plugin {
 #[macro_export]
 macro_rules! load_plugin {
     ($plugin:ty, $name:expr) => {{
-        let loader = ::interoptopus_csharp::plugin::DotNetRuntime::new()?.dll_loader_with_namespace(super::plugin_path_for($name), "My.Company")?;
+        let loader = ::interoptopus_csharp::plugin::DotNetRuntime::new()?.dll_loader(super::plugin_path_for($name))?;
         <$plugin>::new(&loader)?
     }};
 }

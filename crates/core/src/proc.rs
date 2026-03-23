@@ -230,7 +230,7 @@ pub use interoptopus_proc::AsyncRuntime;
 /// ```rust,ignore
 /// let loader = DotNetRuntime::new()?
 ///     .set_exception_handler(|msg| eprintln!("plugin error: {msg}"))
-///     .dll_loader_with_namespace("path/to/my_plugin.dll", "My.Company")?;
+///     .dll_loader("path/to/my_plugin.dll")?;
 ///
 /// let plugin = MyPlugin::new(&loader)?;
 /// ```

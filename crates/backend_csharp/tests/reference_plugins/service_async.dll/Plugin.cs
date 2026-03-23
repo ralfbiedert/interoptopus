@@ -1,4 +1,5 @@
 using My.Company;
+using My.Company.Common;
 
 namespace My.Company;
 
