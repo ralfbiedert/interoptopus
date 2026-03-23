@@ -3,6 +3,10 @@ alias t := test
 alias d := docs
 alias doc := docs
 
+# Runs all tests CI would perform before merging a PR.
+[arg("verbose", long="verbose", short="v", value="--verbose")]
+ci verbose="": (build verbose) (test verbose) test-dotnet lint
+
 # Builds the workspace with all features.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
 build verbose="":
@@ -42,10 +46,6 @@ lint:
     cargo clippy -- -D warnings
     RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
     diff -q crates/core/README.md README.md # Make sure top-level README is up to date.
-
-# Runs all tests CI would perform before merging a PR.
-[arg("verbose", long="verbose", short="v", value="--verbose")]
-ci verbose="": (build verbose) (test verbose) test-dotnet lint
 
 # Install all required tools, needs `binstall`, see https://github.com/cargo-bins/cargo-binstall
 binstall-deps force="":
