@@ -26,7 +26,7 @@ impl Dispatch {
         Self::custom(|_, _| Target::new("Interop.cs", "My.Company"))
     }
 
-    #[cfg(feature = "unstable-plugins")]
+    #[cfg(any(feature = "unstable-plugins", docsrs))]
     pub fn plugin_defaults_with(name: impl Into<String>) -> Self {
         use crate::lang::plugin::PLUGIN_DEFAULT_MODULE;
         let name = name.into();

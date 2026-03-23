@@ -32,5 +32,7 @@ tokio.workspace = true
 workspace = true
 
 [package.metadata.docs.rs]
-all-features = true
+# Don't use all-features — `dotnet`/`unstable-plugins` pull in netcorehost
+# which requires nethost-download at build time and fails on docs.rs.
+features = []
 rustdoc-args = ["--cfg", "docsrs"]

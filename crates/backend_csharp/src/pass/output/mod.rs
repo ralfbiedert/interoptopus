@@ -1,4 +1,4 @@
 pub mod common;
-#[cfg(feature = "unstable-plugins")]
+#[cfg(any(feature = "unstable-plugins", docsrs))]
 pub mod dotnet;
 pub mod rust;

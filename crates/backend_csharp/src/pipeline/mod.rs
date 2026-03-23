@@ -1,11 +1,11 @@
 mod csharp;
-#[cfg(feature = "unstable-plugins")]
+#[cfg(any(feature = "unstable-plugins", docsrs))]
 mod dotnet;
 mod rust;
 
 use crate::Error;
 use crate::pass::{ModelResult, Outcome};
-#[cfg(feature = "unstable-plugins")]
+#[cfg(any(feature = "unstable-plugins", docsrs))]
 pub use dotnet::{DotnetLibrary, DotnetLibraryBuilder, DotnetLibraryConfig, IntermediateOutputPasses as DotnetOutputPasses, ModelPasses as DotnetModelPasses};
 pub use rust::{IntermediateOutputPasses, ModelPasses, RustLibrary, RustLibraryBuilder, RustLibraryConfig};
 

@@ -6,7 +6,7 @@ pub mod functions;
 mod id;
 pub mod meta;
 pub mod pattern;
-#[cfg(feature = "unstable-plugins")]
+#[cfg(any(feature = "unstable-plugins", docsrs))]
 pub mod plugin;
 pub mod service;
 pub mod types;
