@@ -1,29 +1,29 @@
 use crate::plugins::plugin_path_for;
-use interoptopus_csharp::plugin::DotNetRuntime;
+use interoptopus_csharp::plugin::runtime;
 use reference_project::plugins::functions::Behavior;
 use std::error::Error;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 
 // Test ignored since we can't rely on a working .NET runtime being available on CI
 #[test]
-fn multiple_concurrent_plugins_work() -> Result<(), Box<dyn Error>> {
-    let handles: Vec<_> = (0..16)
+fn concurrent_same_plugins_work() -> Result<(), Box<dyn Error>> {
+    let exception_count = Arc::new(AtomicU32::new(0));
+    let exception_count_clone = Arc::clone(&exception_count);
+
+    let rt = runtime()?;
+    rt.exception_handler(move |_| {
+        exception_count_clone.fetch_add(1, Ordering::SeqCst);
+    });
+
+    let num_threads = 16;
+    let handles: Vec<_> = (0..num_threads)
         .map(|_| {
             std::thread::spawn(move || {
-                let exception_called = Arc::new(AtomicBool::new(false));
-                let exception_called_clone = Arc::clone(&exception_called);
+                let rt = runtime().expect("failed to initialize .NET runtime");
+                let plugin = rt.load::<Behavior>(plugin_path_for("functions_behavior.dll")).expect("failed to load plugin");
 
-                let runtime = DotNetRuntime::new().expect("failed to create runtime").exception_handler(move |_| {
-                    exception_called_clone.store(true, Ordering::SeqCst);
-                });
-
-                let loader = runtime.dll_loader(plugin_path_for("functions_behavior.dll")).expect("failed to load dll");
-
-                let plugin = Behavior::new(&loader).expect("failed to create plugin");
                 plugin.panic();
-
-                assert!(exception_called.load(Ordering::SeqCst), "exception handler was not called after panic");
             })
         })
         .collect();
@@ -31,6 +31,8 @@ fn multiple_concurrent_plugins_work() -> Result<(), Box<dyn Error>> {
     for h in handles {
         h.join().expect("thread panicked");
     }
+
+    assert_eq!(exception_count.load(Ordering::SeqCst), num_threads, "expected one exception per thread");
 
     Ok(())
 }

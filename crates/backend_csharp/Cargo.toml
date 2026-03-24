@@ -9,14 +9,12 @@ rust-version.workspace = true
 version.workspace = true
 
 [features]
-dotnet = ["dep:netcorehost", "dep:tempfile"]
-unstable-plugins = ["dotnet", "interoptopus/unstable-plugins"]
+unstable-plugins = ["interoptopus/unstable-plugins", "dep:interoptopus_csharp_rt"]
 
 [dependencies]
 interoptopus.workspace = true
 interoptopus_backends.workspace = true
-netcorehost = { workspace = true, optional = true, features = ["nethost-download", "net9_0"] }
-tempfile = { workspace = true, optional = true }
+interoptopus_csharp_rt = { workspace = true, optional = true }
 
 [build-dependencies]
 interoptopus_backends.workspace = true

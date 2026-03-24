@@ -1,0 +1,18 @@
+[package]
+name = "interoptopus_csharp_rt"
+description = "The C# runtime loader for Interoptopus."
+# Separately versioned to minimize static state duplication due to the singleton FFI .NET runtime nature.
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+interoptopus = { workspace = true, features = ["unstable-plugins"] }
+netcorehost = { workspace = true, features = ["nethost-download", "net9_0"] }
+tempfile.workspace = true
+
+[lints]
+workspace = true
