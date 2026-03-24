@@ -34,7 +34,7 @@ impl AsyncRuntime for Service {
 
     fn spawn<Fn, F>(&self, _f: Fn)
     where
-        Fn: FnOnce(()) -> F,
+        Fn: FnOnce(()) -> F + Send + 'static,
         F: Future<Output = ()> + Send + 'static,
     {
     }
