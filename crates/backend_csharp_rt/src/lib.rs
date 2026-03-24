@@ -76,6 +76,7 @@ impl DotnetRuntime {
     /// # Panics
     /// May only be called once. Panics if called a second time.
     pub fn exception_handler(&self, handler: impl Fn(String) + Send + Sync + 'static) {
+        // TODO: Should we allow multiple handlers that all get called?
         assert!(self.exception_handler.set(Arc::new(handler)).is_ok(), "exception handler already set");
     }
 
@@ -84,9 +85,9 @@ impl DotnetRuntime {
     /// Each plugin type `T` and each DLL path may only be used in one combination.
     /// Calling with the same `(T, path)` returns the previously loaded instance.
     ///
-    /// # Panics
-    /// - If `T` was previously loaded from a different path.
-    /// - If `path` was previously loaded for a different plugin type.
+    /// # Errors
+    /// Can fail if `T` was previously loaded from a different path, or `path` was previously
+    /// loaded for a different plugin type.
     pub fn load<T: Plugin + Send + Sync + 'static>(&self, dll_path: impl AsRef<Path>) -> Result<&T, PluginLoadError> {
         let type_id = TypeId::of::<T>();
         let path = dll_path.as_ref().to_path_buf();
