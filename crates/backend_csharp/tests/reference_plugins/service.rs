@@ -12,7 +12,6 @@ fn define_plugins() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-// Test ignored since we can't rely on a working .NET runtime being available on CI
 #[test]
 fn load_plugin_service_basic() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(ServiceBasic, "service_basic.dll");

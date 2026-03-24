@@ -36,10 +36,10 @@ impl Pass {
         }
 
         // Register interface emissions.
-        if let Some(iface) = plugin_interface.interface() {
-            if let Some(fe) = iface.emission.file_emission() {
-                output_master.register_item(Item { kind: ItemKind::PluginInterface, emission: fe.clone() });
-            }
+        if let Some(iface) = plugin_interface.interface()
+            && let Some(fe) = iface.emission.file_emission()
+        {
+            output_master.register_item(Item { kind: ItemKind::PluginInterface, emission: fe.clone() });
         }
 
         for iface in service_interfaces.interfaces() {

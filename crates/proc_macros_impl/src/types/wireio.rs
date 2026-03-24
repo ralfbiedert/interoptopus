@@ -22,7 +22,7 @@ impl TypeModel {
 
         let is_unsupported_enum = match &self.data {
             TypeData::Enum(enum_data) => !enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)),
-            _ => false,
+            TypeData::Struct(_) => false,
         };
 
         let use_underscore_params = is_unsupported_enum || self.args.opaque || self.args.service || has_skipped_fields;

@@ -52,13 +52,13 @@ impl Pass {
                 let rval = types
                     .get(function.signature.rval)
                     .map(|t| &t.name)
-                    .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of overload `{name}`")))?;
+                    .ok_or_else(|| crate::Error::from(format!("rval of overload `{name}`")))?;
 
                 let mut args: Vec<HashMap<&str, String>> = Vec::new();
                 for arg in &function.signature.arguments {
                     let arg_type = types
                         .get(arg.ty)
-                        .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of overload `{}`", arg.name, name)))?;
+                        .ok_or_else(|| crate::Error::from(format!("arg `{}` of overload `{}`", arg.name, name)))?;
                     let mut m = HashMap::new();
                     m.insert("name", arg.name.clone());
                     let decorated = match &arg_type.decorators.param {

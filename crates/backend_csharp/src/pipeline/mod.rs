@@ -43,7 +43,7 @@ pub fn loop_model_passes_until_done(mut f: impl FnMut(&mut PassRunner) -> Result
 
         counter += 1;
         if counter > PASS_LIMIT {
-            return Err(Error::PassLimit);
+            return Err(Error::from("Pass iteration limit reached."));
         }
     }
     Ok(())

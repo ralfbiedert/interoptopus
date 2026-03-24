@@ -3,8 +3,8 @@ use crate::{define_plugin, load_plugin};
 use interoptopus_csharp::plugin::runtime;
 use reference_project::plugins::functions::{Behavior, Primitives};
 use std::error::Error;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 #[test]
 fn define_plugins() -> Result<(), Box<dyn Error>> {
@@ -13,7 +13,6 @@ fn define_plugins() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-// Test ignored since we can't rely on a working .NET runtime being available on CI
 #[test]
 fn load_plugin_functions_primitive() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(Primitives, "functions_primitive.dll");

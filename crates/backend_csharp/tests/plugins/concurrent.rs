@@ -2,10 +2,9 @@ use crate::plugins::plugin_path_for;
 use interoptopus_csharp::plugin::runtime;
 use reference_project::plugins::functions::Behavior;
 use std::error::Error;
-use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU32, Ordering};
 
-// Test ignored since we can't rely on a working .NET runtime being available on CI
 #[test]
 fn concurrent_same_plugins_work() -> Result<(), Box<dyn Error>> {
     let exception_count = Arc::new(AtomicU32::new(0));

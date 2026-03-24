@@ -235,8 +235,11 @@ impl TypeModel {
                     let variant_docs = variant.docs.join("\n");
                     let kind = match &variant.data {
                         VariantData::Unit => {
-                            let disc = if let Some(expr) = &variant._discriminant {
-                                quote_spanned! { variant.name.span() => (#expr) as usize }
+                            let disc = if let Some(expr) = &variant.discriminant {
+                                quote_spanned! { variant.name.span() => {
+                                    #[allow(clippy::unnecessary_cast)]
+                                    { (#expr) as usize }
+                                }}
                             } else {
                                 let d = next_discriminant;
                                 quote_spanned! { variant.name.span() => #d }

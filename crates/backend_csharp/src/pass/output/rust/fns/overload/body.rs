@@ -114,7 +114,7 @@ fn render(
     let rval = types
         .get(overload_fn.signature.rval)
         .map(|t| t.name.clone())
-        .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of overload `{name}`")))?;
+        .ok_or_else(|| crate::Error::from(format!("rval of overload `{name}`")))?;
 
     let is_void = !is_async && matches!(types.get(original_fn.signature.rval).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
 
@@ -158,7 +158,7 @@ fn resolve_args(
             ArgTransform::PassThrough => {
                 let arg_type = types
                     .get(arg.ty)
-                    .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of overload `{}`", arg.name, fn_name)))?;
+                    .ok_or_else(|| crate::Error::from(format!("arg `{}` of overload `{}`", arg.name, fn_name)))?;
                 let decorated = match &arg_type.decorators.param {
                     Some(d) => format!("{d} {}", arg_type.name),
                     None => arg_type.name.clone(),
@@ -169,11 +169,11 @@ fn resolve_args(
             }
             ArgTransform::Ref => {
                 let Some(OverloadFamily::Pointer(family)) = type_overloads.get(arg.ty) else {
-                    return Err(crate::Error::MissingTypeName(format!("pointer family for arg `{}` of overload `{}`", arg.name, fn_name)));
+                    return Err(crate::Error::from(format!("pointer family for arg `{}` of overload `{}`", arg.name, fn_name)));
                 };
                 let arg_type = types
                     .get(family.by_ref)
-                    .ok_or_else(|| crate::Error::MissingTypeName(format!("ref type for arg `{}` of overload `{}`", arg.name, fn_name)))?;
+                    .ok_or_else(|| crate::Error::from(format!("ref type for arg `{}` of overload `{}`", arg.name, fn_name)))?;
                 let decorated = match &arg_type.decorators.param {
                     Some(d) => format!("{d} {}", arg_type.name),
                     None => arg_type.name.clone(),
@@ -184,16 +184,16 @@ fn resolve_args(
             }
             ArgTransform::WrapDelegate => {
                 let Some(OverloadFamily::Delegate(family)) = type_overloads.get(arg.ty) else {
-                    return Err(crate::Error::MissingTypeName(format!("delegate family for arg `{}` of overload `{}`", arg.name, fn_name)));
+                    return Err(crate::Error::from(format!("delegate family for arg `{}` of overload `{}`", arg.name, fn_name)));
                 };
                 let sig_name = types
                     .get(family.signature)
                     .map(|t| &t.name)
-                    .ok_or_else(|| crate::Error::MissingTypeName(format!("delegate sig for arg `{}` of overload `{}`", arg.name, fn_name)))?;
+                    .ok_or_else(|| crate::Error::from(format!("delegate sig for arg `{}` of overload `{}`", arg.name, fn_name)))?;
                 let class_name = types
                     .get(family.class)
                     .map(|t| &t.name)
-                    .ok_or_else(|| crate::Error::MissingTypeName(format!("delegate class for arg `{}` of overload `{}`", arg.name, fn_name)))?;
+                    .ok_or_else(|| crate::Error::from(format!("delegate class for arg `{}` of overload `{}`", arg.name, fn_name)))?;
                 m.insert("ty", Value::String(sig_name.clone()));
                 m.insert("is_ref", Value::String("false".into()));
                 m.insert("is_wrap", Value::String("true".into()));

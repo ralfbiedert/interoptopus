@@ -39,14 +39,14 @@ impl Pass {
                 let name = &function.name;
                 let rval_type = types
                     .get(function.signature.rval)
-                    .ok_or_else(|| crate::Error::MissingTypeName(format!("rval of function `{name}`")))?;
+                    .ok_or_else(|| crate::Error::from(format!("rval of function `{name}`")))?;
                 let rval = &rval_type.name;
 
                 let mut args: Vec<HashMap<&str, String>> = Vec::new();
                 for arg in &function.signature.arguments {
                     let arg_type = types
                         .get(arg.ty)
-                        .ok_or_else(|| crate::Error::MissingTypeName(format!("arg `{}` of function `{}`", arg.name, name)))?;
+                        .ok_or_else(|| crate::Error::from(format!("arg `{}` of function `{}`", arg.name, name)))?;
                     let mut m = HashMap::new();
                     m.insert("name", arg.name.clone());
                     let decorated = match &arg_type.decorators.param {

@@ -1,11 +1,15 @@
 //! Singleton .NET runtime and assembly loader for Interoptopus.
 //!
-//! Provides a lazily-initialized, process-global [`DotNetRuntime`] via [`runtime()`].
-//! Plugins are loaded as singletons via [`DotNetRuntime::load`] — each plugin
+//! Provides a lazily-initialized, process-global [`DotnetRuntime`] via [`runtime()`].
+//! Plugins are loaded as singletons via [`DotnetRuntime::load`] — each plugin
 //! type and DLL path may only be used once.
 //!
 //! The .NET CLR can only be loaded once per process, so this crate enforces that
 //! constraint by exposing a single shared instance.
+
+mod error;
+
+pub use error::DotnetError;
 
 use interoptopus::lang::plugin::{Plugin, PluginLoadError};
 use interoptopus::trampoline::{TRAMPOLINE_UNCAUGHT_EXCEPTION, TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX};
@@ -14,7 +18,6 @@ use netcorehost::nethost;
 use netcorehost::pdcstring::PdCString;
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
-use std::fmt;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 
@@ -36,12 +39,12 @@ struct Inner {
     path_to_type: HashMap<PathBuf, TypeId>,
 }
 
-/// A loaded .NET runtime.
+/// .NET runtime that can load plugin DLLs.
 ///
 /// Only one instance can exist per process (CLR limitation). Use [`runtime()`]
 /// to obtain the shared singleton. Plugins are loaded as singletons via
 /// [`load_from`](Self::load).
-pub struct DotNetRuntime {
+pub struct DotnetRuntime {
     inner: Mutex<Inner>,
     exception_handler: OnceLock<Arc<dyn Fn(String) + Send + Sync>>,
     _temp_dir: tempfile::TempDir,
@@ -49,63 +52,39 @@ pub struct DotNetRuntime {
 
 // SAFETY: All mutable state is behind a Mutex. The raw pointers inside
 // HostfxrContext prevent auto-impl but all access is serialized.
-unsafe impl Send for DotNetRuntime {}
-unsafe impl Sync for DotNetRuntime {}
+unsafe impl Send for DotnetRuntime {}
+unsafe impl Sync for DotnetRuntime {}
 
-/// Errors that can occur when initializing the .NET runtime.
-#[derive(Debug)]
-pub enum DotNetError {
-    HostfxrLoad(netcorehost::nethost::LoadHostfxrError),
-    RuntimeInit(netcorehost::error::HostingError),
-    Io(std::io::Error),
-    InitFailed(String),
-}
-
-impl fmt::Display for DotNetError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::HostfxrLoad(e) => write!(f, "failed to load hostfxr: {e}"),
-            Self::RuntimeInit(e) => write!(f, "failed to initialize .NET runtime: {e}"),
-            Self::Io(e) => write!(f, "IO error: {e}"),
-            Self::InitFailed(msg) => write!(f, "runtime initialization failed previously: {msg}"),
-        }
-    }
-}
-
-impl std::error::Error for DotNetError {}
-
-impl DotNetRuntime {
-    fn new() -> Result<Self, DotNetError> {
-        let temp_dir = tempfile::tempdir().map_err(DotNetError::Io)?;
+impl DotnetRuntime {
+    fn new() -> Result<Self, DotnetError> {
+        let temp_dir = tempfile::tempdir()?;
         let config_path = temp_dir.path().join("interoptopus.runtimeconfig.json");
 
-        std::fs::write(&config_path, DEFAULT_RUNTIME_CONFIG).map_err(DotNetError::Io)?;
+        std::fs::write(&config_path, DEFAULT_RUNTIME_CONFIG)?;
 
-        let fxr = nethost::load_hostfxr().map_err(DotNetError::HostfxrLoad)?;
+        let fxr = nethost::load_hostfxr()?;
         let config_pdc = PdCString::from_os_str(config_path.as_os_str()).expect("temp path contains null bytes");
-        let context = fxr.initialize_for_runtime_config(config_pdc).map_err(DotNetError::RuntimeInit)?;
+        let context = fxr.initialize_for_runtime_config(config_pdc)?;
 
         let inner = Mutex::new(Inner { context, plugins: HashMap::new(), type_to_path: HashMap::new(), path_to_type: HashMap::new() });
 
         Ok(Self { inner, exception_handler: OnceLock::new(), _temp_dir: temp_dir })
     }
 
-    /// Sets the global exception handler called when a plugin reports an uncaught exception.
+    /// Sets the exception handler called when a plugin reports an uncaught exception.
     ///
+    /// # Panics
     /// May only be called once. Panics if called a second time.
     pub fn exception_handler(&self, handler: impl Fn(String) + Send + Sync + 'static) {
-        if self.exception_handler.set(Arc::new(handler)).is_err() {
-            panic!("exception handler already set");
-        }
+        assert!(self.exception_handler.set(Arc::new(handler)).is_ok(), "exception handler already set");
     }
 
-    /// Loads a plugin of type `T` from the given DLL path, returning a cached singleton.
+    /// Loads a plugin of type `T` from the given DLL path.
     ///
     /// Each plugin type `T` and each DLL path may only be used in one combination.
     /// Calling with the same `(T, path)` returns the previously loaded instance.
     ///
     /// # Panics
-    ///
     /// - If `T` was previously loaded from a different path.
     /// - If `path` was previously loaded for a different plugin type.
     pub fn load<T: Plugin + Send + Sync + 'static>(&self, dll_path: impl AsRef<Path>) -> Result<&T, PluginLoadError> {
@@ -115,11 +94,20 @@ impl DotNetRuntime {
         let mut inner = self.inner.lock().expect("runtime mutex poisoned");
 
         // Enforce uniqueness: each T maps to exactly one path and vice versa.
-        if let Some(existing_path) = inner.type_to_path.get(&type_id) {
-            assert!(*existing_path == path, "plugin {} already loaded from {:?}, cannot load from {:?}", std::any::type_name::<T>(), existing_path, path,);
+        if let Some(existing_path) = inner.type_to_path.get(&type_id)
+            && *existing_path != path
+        {
+            return Err(PluginLoadError::LoadFailed(format!(
+                "plugin {} already loaded from {}, cannot load from {}",
+                std::any::type_name::<T>(),
+                existing_path.display(),
+                path.display()
+            )));
         }
-        if let Some(existing_type) = inner.path_to_type.get(&path) {
-            assert!(*existing_type == type_id, "DLL {:?} already loaded for a different plugin type", path,);
+        if let Some(existing_type) = inner.path_to_type.get(&path)
+            && *existing_type != type_id
+        {
+            return Err(PluginLoadError::LoadFailed(format!("DLL {} already loaded for a different plugin type", path.display())));
         }
 
         // Return cached instance.
@@ -128,7 +116,7 @@ impl DotNetRuntime {
             // SAFETY: The Box is heap-allocated inside a HashMap in the 'static singleton.
             // Entries are never removed and the HashMap's growth only moves the Box pointer
             // (a thin wrapper around a heap pointer), not the heap data it points to.
-            return Ok(unsafe { &*(reference as *const T) });
+            return Ok(unsafe { &*std::ptr::from_ref::<T>(reference) });
         }
 
         // Load assembly and resolve symbols.
@@ -178,26 +166,28 @@ impl DotNetRuntime {
 
         let reference = inner.plugins.get(&type_id).unwrap().downcast_ref::<T>().unwrap();
         // SAFETY: Same as above — heap-allocated, never removed, lives in a 'static singleton.
-        Ok(unsafe { &*(reference as *const T) })
+        let ptr = unsafe { &*std::ptr::from_ref::<T>(reference) };
+        drop(inner);
+        Ok(ptr)
     }
 }
 
-static RUNTIME: OnceLock<Result<DotNetRuntime, String>> = OnceLock::new();
+static RUNTIME: OnceLock<Result<DotnetRuntime, String>> = OnceLock::new();
 
-/// Returns the process-global .NET runtime, initializing it on first call.
+/// Returns the process-global .NET runtime.
 ///
 /// The .NET CLR can only be loaded once per process. This function lazily
 /// creates the singleton and returns a shared reference on every subsequent call.
 ///
 /// # Errors
 ///
-/// Returns [`DotNetError`] if the runtime failed to initialize.
+/// Returns [`DotnetError`] if the runtime failed to initialize.
 /// Once successfully initialized, all subsequent calls return the same instance.
-pub fn runtime() -> Result<&'static DotNetRuntime, DotNetError> {
+pub fn runtime() -> Result<&'static DotnetRuntime, DotnetError> {
     RUNTIME
-        .get_or_init(|| DotNetRuntime::new().map_err(|e| e.to_string()))
+        .get_or_init(|| DotnetRuntime::new().map_err(|e| e.to_string()))
         .as_ref()
-        .map_err(|msg| DotNetError::InitFailed(msg.clone()))
+        .map_err(|msg| DotnetError::from(msg.clone()))
 }
 
 /// Concrete Sized wrapper so we can store the trait-object handler behind a thin pointer.

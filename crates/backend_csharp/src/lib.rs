@@ -16,6 +16,7 @@ pub mod config;
 mod error;
 mod macros;
 mod pipeline;
+
 #[cfg(any(feature = "unstable-plugins", docsrs))]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable-plugins")))]
 pub mod plugin;
