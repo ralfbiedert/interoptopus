@@ -25,7 +25,7 @@ impl RuntimeModel {
 
                 fn spawn<Fn, F>(&self, f: Fn)
                 where
-                    Fn: FnOnce(Self::T) -> F,
+                    Fn: FnOnce(Self::T) -> F + Send + 'static,
                     F: ::std::future::Future<Output = ()> + Send + 'static,
                 {
                     self.#forward_field.spawn(f)

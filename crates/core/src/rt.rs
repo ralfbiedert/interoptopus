@@ -81,7 +81,7 @@ impl AsyncRuntime for Tokio {
 
     fn spawn<Fn, F>(&self, f: Fn)
     where
-        Fn: FnOnce(Self::T) -> F,
+        Fn: FnOnce(Self::T) -> F + Send + 'static,
         F: Future<Output = ()> + Send + 'static,
     {
         self.rt.spawn(f(()));
