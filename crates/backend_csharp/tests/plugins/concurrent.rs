@@ -1,5 +1,5 @@
 use crate::plugins::plugin_path_for;
-use interoptopus_csharp::plugin::runtime;
+use interoptopus_csharp::runtime;
 use reference_project::plugins::functions::Behavior;
 use std::error::Error;
 use std::sync::Arc;

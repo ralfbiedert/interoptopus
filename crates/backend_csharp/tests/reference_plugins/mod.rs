@@ -31,7 +31,7 @@ macro_rules! define_plugin {
 #[macro_export]
 macro_rules! load_plugin {
     ($plugin:ty, $name:expr) => {{
-        let rt = ::interoptopus_csharp::plugin::runtime().expect("failed to initialize .NET runtime");
+        let rt = ::interoptopus_csharp::runtime().expect("failed to initialize .NET runtime");
         rt.load::<$plugin>(super::plugin_path_for($name))?
     }};
 }

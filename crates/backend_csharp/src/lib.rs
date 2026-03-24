@@ -17,11 +17,11 @@ mod error;
 mod macros;
 mod pipeline;
 
+pub use error::Error;
 #[cfg(any(feature = "unstable-plugins", docsrs))]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable-plugins")))]
-pub mod plugin;
-
-pub use error::Error;
+#[doc(inline)]
+pub use interoptopus_csharp_rt::{DotnetRuntime, runtime};
 #[cfg(any(feature = "unstable-plugins", docsrs))]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable-plugins")))]
 pub use pipeline::{DotnetLibrary, DotnetLibraryBuilder};

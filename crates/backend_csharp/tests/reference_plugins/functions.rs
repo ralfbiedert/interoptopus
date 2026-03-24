@@ -1,6 +1,6 @@
 use crate::reference_plugins::plugin_path_for;
 use crate::{define_plugin, load_plugin};
-use interoptopus_csharp::plugin::runtime;
+use interoptopus_csharp::runtime;
 use reference_project::plugins::functions::{Behavior, Primitives};
 use std::error::Error;
 use std::sync::Arc;
