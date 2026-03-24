@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::quote_spanned;
 use syn::spanned::Spanned;
 
-use crate::types::model::{TypeData, TypeModel};
+use crate::types::model::{TypeData, TypeModel, VariantData};
 
 impl TypeModel {
     pub fn emit_wireio_impl(&self) -> TokenStream {
@@ -20,7 +20,12 @@ impl TypeModel {
             TypeData::Enum(_) => false,
         };
 
-        let use_underscore_params = matches!(&self.data, TypeData::Enum(_)) || self.args.opaque || self.args.service || has_skipped_fields;
+        let is_unsupported_enum = match &self.data {
+            TypeData::Enum(enum_data) => !enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)),
+            _ => false,
+        };
+
+        let use_underscore_params = is_unsupported_enum || self.args.opaque || self.args.service || has_skipped_fields;
 
         let (write_param, read_param) = if use_underscore_params {
             (quote_spanned! { name.span() => _out }, quote_spanned! { name.span() => _input })
@@ -146,9 +151,26 @@ impl TypeModel {
                     ::std::result::Result::Ok(())
                 }
             }
-            TypeData::Enum(_) => {
-                quote_spanned! { self.name.span() =>
-                    ::interoptopus::bad_wire!()
+            TypeData::Enum(enum_data) => {
+                if enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)) {
+                    let name = &self.name;
+                    let arms = enum_data.variants.iter().map(|v| {
+                        let vname = &v.name;
+                        quote_spanned! { vname.span() =>
+                            #name::#vname => #name::#vname as u32,
+                        }
+                    });
+
+                    quote_spanned! { self.name.span() =>
+                        let __disc = match self {
+                            #(#arms)*
+                        };
+                        <u32 as ::interoptopus::lang::types::WireIO>::write(&__disc, out)
+                    }
+                } else {
+                    quote_spanned! { self.name.span() =>
+                        ::interoptopus::bad_wire!()
+                    }
                 }
             }
         }
@@ -221,9 +243,30 @@ impl TypeModel {
                     #struct_construction
                 }
             }
-            TypeData::Enum(_) => {
-                quote_spanned! { self.name.span() =>
-                    ::interoptopus::bad_wire!()
+            TypeData::Enum(enum_data) => {
+                if enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)) {
+                    let name = &self.name;
+                    let match_arms = enum_data.variants.iter().map(|variant| {
+                        let vname = &variant.name;
+                        quote_spanned! { vname.span() =>
+                            x if x == #name::#vname as u32 => ::std::result::Result::Ok(#name::#vname),
+                        }
+                    });
+
+                    quote_spanned! { self.name.span() =>
+                        let __discriminant = <u32 as ::interoptopus::lang::types::WireIO>::read(input)?;
+                        match __discriminant {
+                            #(#match_arms)*
+                            _ => ::std::result::Result::Err(::interoptopus::lang::types::SerializationError::InvalidDiscriminant(
+                                stringify!(#name).to_string(),
+                                __discriminant as usize,
+                            )),
+                        }
+                    }
+                } else {
+                    quote_spanned! { self.name.span() =>
+                        ::interoptopus::bad_wire!()
+                    }
                 }
             }
         }
@@ -281,9 +324,15 @@ impl TypeModel {
                     quote_spanned! { self.name.span() => #(#sizes)+* }
                 }
             }
-            TypeData::Enum(_) => {
-                quote_spanned! { self.name.span() =>
-                    ::interoptopus::bad_wire!()
+            TypeData::Enum(enum_data) => {
+                if enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)) {
+                    quote_spanned! { self.name.span() =>
+                        ::std::mem::size_of::<u32>()
+                    }
+                } else {
+                    quote_spanned! { self.name.span() =>
+                        ::interoptopus::bad_wire!()
+                    }
                 }
             }
         }

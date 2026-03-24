@@ -156,11 +156,17 @@ impl Loader for DllLoader {
     fn load_plugin<T: Plugin>(&self) -> Result<T, PluginLoadError> {
         let plugin = T::load_from(|symbol_name| self.load_symbol(symbol_name))?;
 
+        // Register wire buffer trampolines (alloc/free) so the managed side can
+        // create Wire<T> values that allocate Rust-owned memory.
+        let register_fn = plugin.register_trampoline_fn();
+        interoptopus::register_wire_trampolines!(|id, ptr| {
+            (register_fn)(id, ptr);
+        });
+
         // Register the uncaught-exception callback and its context pointer with the
         // managed side. The context is a heap-allocated Arc clone that the callback
         // reads on every invocation — no global state involved.
         if let Some(handler) = &self.exception_handler {
-            let register_fn = plugin.register_trampoline_fn();
             let ctx = Box::into_raw(Box::new(HandlerShim { handler: Arc::clone(handler) })) as *const u8;
             register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION, uncaught_exception_callback as *const u8);
             register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX, ctx);

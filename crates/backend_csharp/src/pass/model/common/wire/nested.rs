@@ -135,6 +135,9 @@ fn collect_nested_from_type(rs_types: &RsTypes, ty_id: RsTypeId, out: &mut Vec<R
             collect_nested_from_type(rs_types, *k, out, visited);
             collect_nested_from_type(rs_types, *v, out, visited);
         }
+        RsTypeKind::Array(arr) => {
+            collect_nested_from_type(rs_types, arr.ty, out, visited);
+        }
         _ => {}
     }
 }

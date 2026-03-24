@@ -229,17 +229,25 @@ impl TypeModel {
                 }
             }
             TypeData::Enum(enum_data) => {
+                let mut next_discriminant: usize = 0;
                 let variants = enum_data.variants.iter().map(|variant| {
                     let variant_name = variant.name.to_string();
                     let variant_docs = variant.docs.join("\n");
                     let kind = match &variant.data {
                         VariantData::Unit => {
-                            // For now, we use 0 as default - proper discriminant evaluation would need more work
+                            let disc = if let Some(expr) = &variant._discriminant {
+                                quote_spanned! { variant.name.span() => (#expr) as usize }
+                            } else {
+                                let d = next_discriminant;
+                                quote_spanned! { variant.name.span() => #d }
+                            };
+                            next_discriminant += 1;
                             quote_spanned! { variant.name.span() =>
-                                ::interoptopus::lang::types::VariantKind::Unit(0)
+                                ::interoptopus::lang::types::VariantKind::Unit(#disc)
                             }
                         }
                         VariantData::Tuple(ty) => {
+                            next_discriminant += 1;
                             quote_spanned! { variant.name.span() =>
                                 ::interoptopus::lang::types::VariantKind::Tuple(
                                     <#ty as ::interoptopus::lang::types::TypeInfo>::id()

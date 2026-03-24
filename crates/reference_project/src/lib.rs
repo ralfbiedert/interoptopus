@@ -180,8 +180,11 @@ pub fn inventory() -> RustInventory {
         .register(function!(patterns::vec::pattern_vec_7))
         .register(function!(patterns::vec::pattern_vec_8))
         // Wire
+        .register(function!(wire::array::wire_accept_byte_array))
+        .register(function!(wire::array::wire_return_byte_array))
         .register(function!(wire::basic::wire_accept_string_1))
         .register(function!(wire::basic::wire_accept_string_2))
+        .register(function!(wire::basic::wire_accept_enum_1))
         .register(function!(wire::nested::wire_deeply_nested_1))
         .register(function!(wire::nested::wire_deeply_nested_2))
         // Constants

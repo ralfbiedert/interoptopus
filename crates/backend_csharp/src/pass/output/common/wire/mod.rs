@@ -11,7 +11,7 @@ pub mod helper_classes;
 pub mod wire_type;
 
 use interoptopus::inventory::{TypeId, Types as RsTypes};
-use interoptopus::lang::types::{Primitive, Struct, TypeKind as RsTypeKind, WireOnly};
+use interoptopus::lang::types::{Array, Layout, Primitive, Struct, TypeKind as RsTypeKind, WireOnly};
 
 /// Generates C# serialization code for the wire format by walking Rust types.
 ///
@@ -38,6 +38,8 @@ impl WireCodeGen<'_> {
                 format!("Dictionary<{}, {}>", self.cs_type_name(*k), self.cs_type_name(*v))
             }
             RsTypeKind::Struct(_) => ty.name.clone(),
+            RsTypeKind::Enum(_) => ty.name.clone(),
+            RsTypeKind::Array(arr) => format!("{}[]", self.cs_type_name(arr.ty)),
             _ => "object".to_string(),
         }
     }
@@ -119,6 +121,17 @@ impl WireCodeGen<'_> {
                 lines.push(format!("{pi}}}"));
                 lines.push(format!("{p}}}"));
             }
+            RsTypeKind::Array(arr) => {
+                let idx = format!("_i{depth}");
+                let pi = pad(indent + 1);
+                lines.push(format!("{p}for (int {idx} = 0; {idx} < {len}; {idx}++)", len = arr.len));
+                lines.push(format!("{p}{{"));
+                self.emit_serialize(lines, arr.ty, &format!("{val}[{idx}]"), depth + 1, indent + 1);
+                lines.push(format!("{p}}}"));
+            }
+            RsTypeKind::Enum(_) => {
+                lines.push(format!("{p}writer.Write({val}.ToUnmanaged()._variant);"));
+            }
             RsTypeKind::Struct(s) => {
                 for f in &s.fields {
                     self.emit_serialize(lines, f.ty, &format!("{val}.{}", f.name), depth, indent);
@@ -182,6 +195,20 @@ impl WireCodeGen<'_> {
                 lines.push(format!("{pi}}}"));
                 lines.push(format!("{p}}}"));
             }
+            RsTypeKind::Array(arr) => {
+                let cs_elem = self.cs_type_name(arr.ty);
+                let idx = format!("_i{depth}");
+                let pi = pad(indent + 1);
+                lines.push(format!("{p}{target} = new {cs_elem}[{len}];", len = arr.len));
+                lines.push(format!("{p}for (int {idx} = 0; {idx} < {len}; {idx}++)", len = arr.len));
+                lines.push(format!("{p}{{"));
+                self.emit_deserialize(lines, arr.ty, &format!("{target}[{idx}]"), depth + 1, indent + 1);
+                lines.push(format!("{p}}}"));
+            }
+            RsTypeKind::Enum(_) => {
+                let enum_name = self.cs_type_name(ty_id);
+                lines.push(format!("{p}{{ var _u = new {enum_name}.Unmanaged(); _u._variant = reader.ReadUInt32(); {target} = _u.ToManaged(); }}"));
+            }
             RsTypeKind::Struct(s) => {
                 let struct_name = self.cs_type_name(ty_id);
                 lines.push(format!("{p}{target} = new {struct_name}();"));
@@ -231,6 +258,18 @@ impl WireCodeGen<'_> {
                 lines.push(format!("{pi}}}"));
                 lines.push(format!("{p}}}"));
             }
+            RsTypeKind::Array(arr) => {
+                let idx = format!("_i{depth}");
+                let pi = pad(indent + 1);
+                lines.push(format!("{p}for (int {idx} = 0; {idx} < {len}; {idx}++)", len = arr.len));
+                lines.push(format!("{p}{{"));
+                self.emit_size(lines, arr.ty, &format!("{val}[{idx}]"), depth + 1, indent + 1);
+                lines.push(format!("{p}}}"));
+            }
+            RsTypeKind::Enum(e) => {
+                let prim = enum_repr_primitive(e);
+                lines.push(format!("{p}_size += {};", cs_primitive_size(prim)));
+            }
             RsTypeKind::Struct(s) => {
                 for f in &s.fields {
                     self.emit_size(lines, f.ty, &format!("{val}.{}", f.name), depth, indent);
@@ -238,6 +277,13 @@ impl WireCodeGen<'_> {
             }
             _ => {}
         }
+    }
+}
+
+fn enum_repr_primitive(e: &interoptopus::lang::types::Enum) -> Primitive {
+    match e.repr.layout {
+        Layout::Primitive(p) => p,
+        _ => Primitive::U32,
     }
 }
 
