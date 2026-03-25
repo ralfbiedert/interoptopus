@@ -55,7 +55,8 @@ impl Pass {
 
                     let line = match method.kind {
                         MethodKind::Static => {
-                            format!("    static abstract TSelf {}({args_str});", method.name)
+                            let rval = if method.is_async { "Task<TSelf>" } else { "TSelf" };
+                            format!("    static abstract {rval} {}({args_str});", method.name)
                         }
                         MethodKind::Regular => {
                             let rval_name = rval_display_name(method, types);

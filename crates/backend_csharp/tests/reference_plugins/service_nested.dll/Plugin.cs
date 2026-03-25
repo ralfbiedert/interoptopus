@@ -38,12 +38,12 @@ public partial class NestedA : INestedA<NestedA>
         throw new NotImplementedException();
     }
 
-    public static NestedA NestedaCreateAsync()
+    public static Task<NestedA> NestedaCreateAsync()
     {
         throw new NotImplementedException();
     }
 
-    public static NestedA NestedaCreateResultAsync()
+    public static Task<NestedA> NestedaCreateResultAsync()
     {
         throw new NotImplementedException();
     }
@@ -81,12 +81,12 @@ public partial class NestedB : INestedB<NestedB>
         throw new NotImplementedException();
     }
 
-    public void NestedbAcceptRef(IntPtr a)
+    public void NestedbAcceptRef(NestedA a)
     {
         throw new NotImplementedException();
     }
 
-    public Task NestedbAcceptAsyncRef(IntPtr a)
+    public Task NestedbAcceptAsyncRef(NestedA a)
     {
         throw new NotImplementedException();
     }
