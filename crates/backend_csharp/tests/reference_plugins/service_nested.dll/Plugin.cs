@@ -26,7 +26,7 @@ class Plugin : IPlugin
     }
 }
 
-public class NestedA : INestedA<NestedA>
+public partial class NestedA : INestedA<NestedA>
 {
     public static NestedA NestedaCreate()
     {

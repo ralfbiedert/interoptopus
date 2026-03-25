@@ -61,6 +61,7 @@ pub struct DotnetLibraryConfig {
     pub output_composite_body_as_unmanaged: output::common::types::composites::body_as_unmanaged::Config,
     pub output_composite_body: output::common::types::composites::body::Config,
     pub output_composite: output::common::types::composites::all::Config,
+    pub output_service_types: output::common::types::services::all::Config,
     pub output_enum_ty: output::common::types::enums::definition::Config,
     pub output_enum_body_unmanaged_variant: output::common::types::enums::body_unmanaged_variant::Config,
     pub output_enum_body_unmanaged: output::common::types::enums::body_unmanaged::Config,
@@ -137,6 +138,7 @@ pub struct IntermediateOutputPasses {
     pub composite_body_as_unmanaged: output::common::types::composites::body_as_unmanaged::Pass,
     pub composite_body: output::common::types::composites::body::Pass,
     pub composites: output::common::types::composites::all::Pass,
+    pub service_types: output::common::types::services::all::Pass,
     pub enum_ty: output::common::types::enums::definition::Pass,
     pub enum_body_unmanaged_variant: output::common::types::enums::body_unmanaged_variant::Pass,
     pub enum_body_unmanaged: output::common::types::enums::body_unmanaged::Pass,
@@ -237,6 +239,7 @@ impl DotnetLibrary {
                 composite_body_as_unmanaged: output::common::types::composites::body_as_unmanaged::Pass::new(config.output_composite_body_as_unmanaged),
                 composite_body: output::common::types::composites::body::Pass::new(config.output_composite_body),
                 composites: output::common::types::composites::all::Pass::new(config.output_composite),
+                service_types: output::common::types::services::all::Pass::new(config.output_service_types),
                 enum_ty: output::common::types::enums::definition::Pass::new(config.output_enum_ty),
                 enum_body_unmanaged_variant: output::common::types::enums::body_unmanaged_variant::Pass::new(config.output_enum_body_unmanaged_variant),
                 enum_body_unmanaged: output::common::types::enums::body_unmanaged::Pass::new(config.output_enum_body_unmanaged),
@@ -315,6 +318,7 @@ impl DotnetLibrary {
         o.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields, &m.type_nullable)?;
         o.composite_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.unmanaged_conversion, &o.composite_body_unmanaged, &o.composite_body_to_unmanaged, &o.composite_body_as_unmanaged)?;
         o.composites.process(&mut pass_meta, &self.output_master, &m.type_all, &o.composite_ty, &o.composite_body)?;
+        o.service_types.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.enum_ty.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class)?;
         o.enum_body_unmanaged_variant.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names)?;
         o.enum_body_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion)?;

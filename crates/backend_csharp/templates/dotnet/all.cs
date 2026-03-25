@@ -9,6 +9,10 @@
 
 {{ delegate }}
 {%- endfor %}
+{%- for svc_type in service_types %}
+
+{{ svc_type }}
+{%- endfor %}
 {%- for composite in composites %}
 
 {{ composite }}

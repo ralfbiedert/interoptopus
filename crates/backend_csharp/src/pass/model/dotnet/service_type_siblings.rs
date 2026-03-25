@@ -101,7 +101,11 @@ impl Pass {
 
             kinds.set(sibling_id, sibling_kind.clone());
             names.set(sibling_id, sibling_name.clone());
-            types.set(sibling_id, Type { emission, name: sibling_name, kind: sibling_kind, decorators });
+            // The sibling is used internally by interface method return types but must not
+            // be emitted as its own type definition — the original pointer-based Result type
+            // already provides the Unmanaged struct and conversions.
+            let sibling_emission = crate::lang::meta::Emission::Builtin;
+            types.set(sibling_id, Type { emission: sibling_emission, name: sibling_name, kind: sibling_kind, decorators });
 
             self.siblings.insert(service_type_id, ServiceSiblings { result: Some(sibling_id) });
             self.processed.insert(service_type_id);

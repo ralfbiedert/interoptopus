@@ -38,6 +38,7 @@ impl Pass {
             let delegates_signature = intermediary.delegates_signature.delegates_for(file).unwrap_or(&[]);
             let delegates: Vec<&str> = delegates_class.iter().chain(delegates_signature.iter()).map(String::as_str).collect();
             let composites = intermediary.composites.composites_for(file).unwrap_or(&[]);
+            let service_types = intermediary.service_types.services_for(file).unwrap_or(&[]);
             let enums = intermediary.enums.enums_for(file).unwrap_or(&[]);
             let pattern_bools = intermediary.pattern_bools.bool_for(file).unwrap_or("");
             let util = intermediary.util.utils_for(file).unwrap_or("");
@@ -51,6 +52,7 @@ impl Pass {
             context.insert("namespace", file.target.namespace());
             context.insert("delegates", &delegates);
             context.insert("composites", &composites);
+            context.insert("service_types", &service_types);
             context.insert("enums", &enums);
             context.insert("pattern_bools", &pattern_bools);
             context.insert("util", &util);
