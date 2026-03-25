@@ -9,8 +9,10 @@ pub mod inventory;
 pub mod lang;
 pub mod pattern;
 #[cfg(feature = "unstable-plugins")]
+pub mod plugin;
+#[cfg(feature = "unstable-plugins")]
 #[doc(hidden)]
-pub mod trampoline;
+pub use plugin::trampoline;
 pub mod wire;
 
 #[doc(hidden)]

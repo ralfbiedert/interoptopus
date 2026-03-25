@@ -48,8 +48,8 @@ impl Pass {
                     DelegateKind::Class => ManagedConversion::Into,
                 },
 
-                // Services and opaques transfer ownership
-                TypeKind::Service => ManagedConversion::Into,
+                // Services are opaque handles (nint) — no managed/unmanaged conversion needed.
+                TypeKind::Service => ManagedConversion::AsIs,
                 TypeKind::Opaque => ManagedConversion::Into,
 
                 // Arrays follow their element type, but are at least To

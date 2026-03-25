@@ -1,7 +1,7 @@
 use crate::{define_plugin, load_plugin};
 use interoptopus::ffi;
 use interoptopus::wire::Wire;
-use reference_project::plugins::service::{ServiceAsync, ServiceBasic};
+use reference_project::plugins::service::{ServiceAsync, ServiceBasic, ServiceNested};
 use std::collections::HashMap;
 use std::error::Error;
 
@@ -9,6 +9,7 @@ use std::error::Error;
 fn define_plugins() -> Result<(), Box<dyn Error>> {
     define_plugin!(ServiceBasic, "service_basic.dll");
     define_plugin!(ServiceAsync, "service_async.dll");
+    define_plugin!(ServiceNested, "service_nested.dll");
     Ok(())
 }
 

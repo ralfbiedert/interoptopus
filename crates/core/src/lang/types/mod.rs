@@ -70,7 +70,9 @@ pub enum TypeKind {
     FnPointer(Signature),
     /// A `*const T` pointer.
     ReadPointer(TypeId),
-    /// A service (opaque, class-like).
+    /// A service (opaque, class-like). These can never be observed directly but only as
+    /// a `&Service` or similar. If they do appear in a signature directly it's because some
+    /// proc macro or codegen silently converts them to `&Service` behind the scenes.
     Service,
     /// A `*mut T` pointer.
     ReadWritePointer(TypeId),

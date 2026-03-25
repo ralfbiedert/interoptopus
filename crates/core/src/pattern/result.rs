@@ -55,20 +55,11 @@ impl<T, E> ResultAs for Result<T, E> {
     type AsT<X> = Result<X, E>;
 }
 
-impl<T, E> Result<T, E>
-where
-    T: TypeInfo,
-    E: TypeInfo,
-{
+impl<T, E> Result<T, E> {
     /// Returns `true` if the result is `Ok`.
     #[must_use]
     pub fn is_ok(&self) -> bool {
-        match self {
-            Self::Ok(_) => true,
-            Self::Err(_) => false,
-            Self::Panic => false,
-            Self::Null => false,
-        }
+        matches!(self, Self::Ok(_))
     }
 
     /// Returns the `Ok` variant if it exists, otherwise panics.
