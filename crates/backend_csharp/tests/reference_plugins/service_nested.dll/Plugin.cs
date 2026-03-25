@@ -7,87 +7,99 @@ class Plugin : IPlugin
 {
     public static NestedA CreateA()
     {
-        throw new NotImplementedException();
+        return new NestedA(10);
     }
 
     public static Task<NestedA> CreateAAsync()
     {
-        throw new NotImplementedException();
+        return Task.FromResult(new NestedA(20));
     }
 
     public static Task<ResultNestedAError> CreateAAsyncResult()
     {
-        throw new NotImplementedException();
+        return Task.FromResult(ResultNestedAError.Ok(new NestedA(30).IntoUnmanaged()._handle));
     }
 
     public static ResultNestedAError CreateAResult()
     {
-        throw new NotImplementedException();
+        return ResultNestedAError.Ok(new NestedA(40).IntoUnmanaged()._handle);
     }
 }
 
 public partial class NestedA : INestedA<NestedA>
 {
+    public int Value { get; }
+
+    public NestedA() { Value = 0; }
+    public NestedA(int value) { Value = value; }
+
     public static NestedA NestedaCreate()
     {
-        throw new NotImplementedException();
+        return new NestedA(100);
     }
 
     public static NestedA NestedaCreateResult()
     {
-        throw new NotImplementedException();
+        return new NestedA(200);
     }
 
     public static Task<NestedA> NestedaCreateAsync()
     {
-        throw new NotImplementedException();
+        return Task.FromResult(new NestedA(300));
     }
 
     public static Task<NestedA> NestedaCreateResultAsync()
     {
-        throw new NotImplementedException();
+        return Task.FromResult(new NestedA(400));
     }
 
     public NestedB NestedaCreateOther()
     {
-        throw new NotImplementedException();
+        return new NestedB(Value + 1);
     }
 
     public ResultNestedBError NestedaCreateOtherResult()
     {
-        throw new NotImplementedException();
+        return ResultNestedBError.Ok(new NestedB(Value + 2).IntoUnmanaged()._handle);
     }
 
     public Task<NestedB> NestedaCreateOtherAsync()
     {
-        throw new NotImplementedException();
+        return Task.FromResult(new NestedB(Value + 3));
     }
 
     public Task<ResultNestedBError> NestedaCreateOtherResultAsync()
     {
-        throw new NotImplementedException();
+        return Task.FromResult(ResultNestedBError.Ok(new NestedB(Value + 4).IntoUnmanaged()._handle));
     }
 }
 
 public partial class NestedB : INestedB<NestedB>
 {
+    public int Value { get; }
+
+    public NestedB() { Value = 0; }
+    public NestedB(int value) { Value = value; }
+
     public void NestedbAccept(NestedA a)
     {
-        throw new NotImplementedException();
+        _ = a.Value;
     }
 
     public Task NestedbAcceptAsync(NestedA a)
     {
-        throw new NotImplementedException();
+        _ = a.Value;
+        return Task.CompletedTask;
     }
 
     public void NestedbAcceptRef(NestedA a)
     {
-        throw new NotImplementedException();
+        _ = a.Value;
     }
 
     public Task NestedbAcceptAsyncRef(NestedA a)
     {
-        throw new NotImplementedException();
+        _ = a.Value;
+        return Task.CompletedTask;
     }
 }

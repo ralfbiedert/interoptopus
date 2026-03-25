@@ -24,6 +24,25 @@ fn load_plugin_service_basic() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+#[test]
+fn load_plugin_service_nested() -> Result<(), Box<dyn Error>> {
+    let plugin = load_plugin!(ServiceNested, "service_nested.dll");
+
+    // Bare fn returning service
+    let a = plugin.create_a();
+    // Service ctor
+    let a2 = plugin.nesteda_create();
+    // Service method returning another service
+    let b = a2.create_other();
+    // Service accepting another service (ownership transfer)
+    b.accept(a);
+    // Drop services
+    drop(b);
+    drop(a2);
+
+    Ok(())
+}
+
 // Test ignored since we can't rely on a working .NET runtime being available on CI
 #[tokio::test]
 async fn load_plugin_service_async() -> Result<(), Box<dyn Error>> {
