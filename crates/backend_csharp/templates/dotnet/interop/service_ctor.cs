@@ -4,8 +4,8 @@
         try
         {
             var obj = {{ type_name }}.{{ method_name }}({{ forward }});
-            var handle = GCHandle.Alloc(obj);
-            return GCHandle.ToIntPtr(handle);
+            var h = GCHandle.Alloc(obj);
+            return GCHandle.ToIntPtr(h);
         }
         catch (Exception e)
         {

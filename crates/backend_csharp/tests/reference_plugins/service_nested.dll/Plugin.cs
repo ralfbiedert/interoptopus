@@ -69,44 +69,24 @@ public partial class NestedA : INestedA<NestedA>
     }
 }
 
-public class NestedB : INestedA<NestedB>
+public partial class NestedB : INestedB<NestedB>
 {
-    public static NestedB NestedaCreate()
+    public void NestedbAccept(NestedA a)
     {
         throw new NotImplementedException();
     }
 
-    public static NestedB NestedaCreateResult()
+    public Task NestedbAcceptAsync(NestedA a)
     {
         throw new NotImplementedException();
     }
 
-    public static NestedB NestedaCreateAsync()
+    public void NestedbAcceptRef(IntPtr a)
     {
         throw new NotImplementedException();
     }
 
-    public static NestedB NestedaCreateResultAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    public NestedB NestedaCreateOther()
-    {
-        throw new NotImplementedException();
-    }
-
-    public ResultNestedBError NestedaCreateOtherResult()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<NestedB> NestedaCreateOtherAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<ResultNestedBError> NestedaCreateOtherResultAsync()
+    public Task NestedbAcceptAsyncRef(IntPtr a)
     {
         throw new NotImplementedException();
     }

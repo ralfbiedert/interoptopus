@@ -1,9 +1,10 @@
 //! Renders `[UnmanagedCallersOnly]` trampoline methods for service constructors,
 //! methods, and destructors.
 //!
-//! Service ctors allocate a `GCHandle`, methods cast `self` back to the interface,
-//! and destructors free the handle. Async service methods use `.ContinueWith(...)`
-//! to complete the `AsyncCallback`.
+//! Service ctors return `TypeName.Unmanaged` via `.IntoUnmanaged()`.
+//! Methods dereference the `*const ServiceHandle` self pointer via
+//! `Marshal.ReadIntPtr(self)` to recover the GCHandle.
+//! Destructors receive the ServiceHandle by value and free it.
 //!
 //! Method names and type names are resolved from the service interface model pass.
 
@@ -62,15 +63,37 @@ impl Pass {
                     let Some(svc) = svc_lookup.get(service_id) else { continue };
                     let type_name = types.get(svc.ty).map_or("", |t| t.name.as_str());
                     let Some(&method_name) = method_names.get(&entry.fn_id) else { continue };
-                    let (args, forward) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
+                    let is_async = async_callback_inner(func, types).is_some();
 
-                    let mut ctx = Context::new();
-                    ctx.insert("ffi_name", ffi_name);
-                    ctx.insert("args", &args);
-                    ctx.insert("type_name", type_name);
-                    ctx.insert("method_name", method_name);
-                    ctx.insert("forward", &forward);
-                    templates.render("dotnet/interop/service_ctor.cs", &ctx)?
+                    if is_async {
+                        // Async ctor: strip callback from forwarded args, use continuation.
+                        let (args, forward) = unmanaged_args_except_last(func, unmanaged_names, unmanaged_conversion);
+                        let continuation = format!(
+                            "ContinueWith(t => cb.UnsafeComplete(t.Result.IntoUnmanaged()))"
+                        );
+
+                        let mut ctx = Context::new();
+                        ctx.insert("ffi_name", ffi_name);
+                        ctx.insert("args", &args);
+                        ctx.insert("type_name", type_name);
+                        ctx.insert("method_name", method_name);
+                        ctx.insert("forward", &forward);
+                        ctx.insert("continuation", &continuation);
+                        templates.render("dotnet/interop/service_ctor_async.cs", &ctx)?
+                    } else {
+                        // Sync ctor: return TypeName.Unmanaged via .IntoUnmanaged().
+                        let (args, forward) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
+                        let rval_type = format!("{type_name}.Unmanaged");
+
+                        let mut ctx = Context::new();
+                        ctx.insert("ffi_name", ffi_name);
+                        ctx.insert("args", &args);
+                        ctx.insert("rval_type", &rval_type);
+                        ctx.insert("type_name", type_name);
+                        ctx.insert("method_name", method_name);
+                        ctx.insert("forward", &forward);
+                        templates.render("dotnet/interop/service_ctor.cs", &ctx)?
+                    }
                 }
                 TrampolineKind::ServiceMethod { service_id } => {
                     let Some(svc) = svc_lookup.get(service_id) else { continue };
@@ -82,9 +105,10 @@ impl Pass {
 
                     if let Some(inner_id) = async_inner {
                         let (args, forward) = service_aware_args_except_last(func, types, unmanaged_names, unmanaged_conversion);
-                        let self_args = if args.is_empty() { "nint self".to_string() } else { format!("nint self, {args}") };
-                        let continuation = if resolve_ptr_to_service_name(inner_id, types).is_some() {
-                            "ContinueWith(t => { var h = GCHandle.Alloc(t.Result); cb.UnsafeComplete(GCHandle.ToIntPtr(h)); })".to_string()
+                        let self_args = if args.is_empty() { "nint self".to_string() } else { format!("IntPtr self, {args}") };
+
+                        let continuation = if let Some(svc_name) = resolve_ptr_to_service_name(inner_id, types) {
+                            "ContinueWith(t => cb.UnsafeComplete(t.Result.IntoUnmanaged()))".to_string()
                         } else {
                             async_continuation(inner_id, types, unmanaged_conversion)
                         };
@@ -98,24 +122,25 @@ impl Pass {
                         ctx.insert("continuation", &continuation);
                         templates.render("dotnet/interop/service_method_async.cs", &ctx)?
                     } else if rval_is_service {
-                        // Return type is a service — wrap result in GCHandle (same pattern as ctors)
+                        let ret_svc_name = resolve_ptr_to_service_name(func.signature.rval, types).unwrap();
                         let (args, forward) = service_aware_args(func, types, unmanaged_names, unmanaged_conversion);
-                        let self_args = if args.is_empty() { "nint self".to_string() } else { format!("nint self, {args}") };
+                        let self_args = if args.is_empty() { "nint self".to_string() } else { format!("IntPtr self, {args}") };
+                        let rval_type = format!("{ret_svc_name}.Unmanaged");
 
                         let mut ctx = Context::new();
                         ctx.insert("ffi_name", ffi_name);
+                        ctx.insert("rval_type", &rval_type);
                         ctx.insert("args", &self_args);
                         ctx.insert("type_name", type_name);
                         ctx.insert("method_name", method_name);
                         ctx.insert("forward", &forward);
-                        // Reuse the ctor template which does GCHandle.Alloc + ToIntPtr
                         templates.render("dotnet/interop/service_method_returns_service.cs", &ctx)?
                     } else {
                         let (args, forward) = service_aware_args(func, types, unmanaged_names, unmanaged_conversion);
                         let rval_unmanaged = rval_unmanaged_name(func, rval_type, unmanaged_names);
                         let rval_suffix = unmanaged_conversion.to_unmanaged_suffix(func.signature.rval);
                         let is_void = rval_type == "void";
-                        let self_args = if args.is_empty() { "nint self".to_string() } else { format!("nint self, {args}") };
+                        let self_args = if args.is_empty() { "nint self".to_string() } else { format!("IntPtr self, {args}") };
 
                         let mut ctx = Context::new();
                         ctx.insert("ffi_name", ffi_name);
@@ -129,9 +154,17 @@ impl Pass {
                         templates.render("dotnet/interop/service_method_sync.cs", &ctx)?
                     }
                 }
-                TrampolineKind::ServiceDestructor { .. } => {
+                TrampolineKind::ServiceDestructor { service_id } => {
+                    let Some(svc) = svc_lookup.get(service_id) else { continue };
+                    let type_name = types.get(svc.ty).map_or("", |t| t.name.as_str());
+                    // Destructor receives ServiceHandle by value (one IntPtr).
+                    let args = format!("{type_name}.Unmanaged self");
+                    let self_expr = "self._handle";
+
                     let mut ctx = Context::new();
                     ctx.insert("ffi_name", ffi_name);
+                    ctx.insert("args", &args);
+                    ctx.insert("self_expr", self_expr);
                     templates.render("dotnet/interop/service_destructor.cs", &ctx)?
                 }
                 TrampolineKind::Raw => continue,
@@ -161,7 +194,24 @@ fn resolve_ptr_to_service_name(type_id: crate::lang::TypeId, types: &model::comm
     None
 }
 
-/// Like `unmanaged_args` but handles pointer-to-service params by unwrapping GCHandle.
+/// Returns the managed service class name if `type_id` is a double-pointer to service
+/// (i.e., `*const *const Service` — the FFI form of `&Service`).
+fn resolve_double_ptr_to_service_name(type_id: crate::lang::TypeId, types: &model::common::types::all::Pass) -> Option<String> {
+    let ty = types.get(type_id)?;
+    if let TypeKind::Pointer(outer) = &ty.kind {
+        let inner = types.get(outer.target)?;
+        if let TypeKind::Pointer(p) = &inner.kind {
+            let target = types.get(p.target)?;
+            if matches!(&target.kind, TypeKind::Service) {
+                return Some(target.name.clone());
+            }
+        }
+    }
+    None
+}
+
+/// Like `unmanaged_args` but handles pointer-to-service params by unwrapping GCHandle,
+/// and double-pointer-to-service params (ref params) by dereferencing first.
 fn service_aware_args(
     func: &crate::lang::functions::Function,
     types: &model::common::types::all::Pass,
@@ -175,6 +225,10 @@ fn service_aware_args(
 
     let forward: Vec<String> = func.signature.arguments.iter().map(|a| {
         if let Some(svc_name) = resolve_ptr_to_service_name(a.ty, types) {
+            // Owned service param — ServiceHandle by value, unwrap GCHandle directly.
+            format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
+        } else if let Some(svc_name) = resolve_double_ptr_to_service_name(a.ty, types) {
+            // Ref service param — pointer-to-ServiceHandle, dereference then unwrap.
             format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
         } else {
             format!("{}{}", a.name, unmanaged_conversion.to_managed_suffix(a.ty))
@@ -184,7 +238,7 @@ fn service_aware_args(
     (args.join(", "), forward.join(", "))
 }
 
-/// Like `unmanaged_args_except_last` but handles pointer-to-service params by unwrapping GCHandle.
+/// Like `unmanaged_args_except_last` but handles service params.
 fn service_aware_args_except_last(
     func: &crate::lang::functions::Function,
     types: &model::common::types::all::Pass,
@@ -200,6 +254,8 @@ fn service_aware_args_except_last(
 
     let forward: Vec<String> = func.signature.arguments.iter().take(n).map(|a| {
         if let Some(svc_name) = resolve_ptr_to_service_name(a.ty, types) {
+            format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
+        } else if let Some(svc_name) = resolve_double_ptr_to_service_name(a.ty, types) {
             format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
         } else {
             format!("{}{}", a.name, unmanaged_conversion.to_managed_suffix(a.ty))

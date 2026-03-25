@@ -3,8 +3,7 @@
     {
         try
         {
-            var handle = GCHandle.FromIntPtr({{ self_expr }});
-            handle.Free();
+            _ = {{ type_name }}.{{ method_name }}({{ forward }}).{{ continuation }};
         }
         catch (Exception e)
         {

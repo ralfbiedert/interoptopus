@@ -72,4 +72,7 @@ ids:
 test-agent:
     # Agents: Feel free to update the test logic here for the task at hand.
     cargo test --test mod reference_plugins::service::define_plugins
+    dotnet build crates/backend_csharp/tests/reference_plugins/service_basic.dll/service_basic.csproj
+    dotnet build crates/backend_csharp/tests/reference_plugins/service_async.dll/service_async.csproj
     dotnet build crates/backend_csharp/tests/reference_plugins/service_nested.dll/service_nested.csproj
+    cargo test --test mod reference_plugins::service -p interoptopus_csharp

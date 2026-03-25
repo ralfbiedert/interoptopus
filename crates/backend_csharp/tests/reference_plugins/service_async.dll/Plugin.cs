@@ -35,7 +35,7 @@ class Plugin : IPlugin
     }
 }
 
-class AsyncBasic: IAsyncBasic<AsyncBasic>
+partial class AsyncBasic: IAsyncBasic<AsyncBasic>
 {
     public static AsyncBasic AsyncbasicCreate() => new();
     

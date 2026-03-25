@@ -2,7 +2,7 @@ using My.Company;
 
 namespace My.Company;
 
-class ServiceA: IServiceA<ServiceA>
+partial class ServiceA: IServiceA<ServiceA>
 {
     public static ServiceA ServiceaCreate()
     {
