@@ -1,11 +1,8 @@
 //! Builds service interface models (`IFoo<TSelf>`) from service definitions.
 //!
-//! Each service produces an `Interface` with `InterfaceKind::Service`. Constructors
-//! become `MethodKind::Static` methods returning `TSelf`, regular methods become
-//! `MethodKind::Regular` with their C#-ified signatures.
-//!
 //! Pointer-to-service types in return positions are resolved to service class names.
-//! Result types containing pointer-to-service are replaced with their managed siblings.
+//! Result types wrapping service handles are replaced with their managed siblings
+//! (created by the `service_type_siblings` pass).
 
 use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
 use crate::pass::Outcome::Unchanged;
@@ -45,6 +42,8 @@ impl Pass {
             return Ok(Unchanged);
         }
 
+        let service_return_map = siblings.build_service_return_map(services, fns_all, types);
+
         let mut sorted_services: Vec<_> = services.iter().collect();
         sorted_services.sort_by_key(|(_, svc)| types.get(svc.ty).map_or("", |t| t.name.as_str()));
 
@@ -63,7 +62,6 @@ impl Pass {
                 let Some((csharp_sig, rval_name)) = csharp_signature(&func.signature.arguments, func.signature.rval, types) else {
                     return Ok(Unchanged);
                 };
-
                 methods.push(Method { name: method_name, kind: MethodKind::Static, base: fn_id, csharp: csharp_sig, rval_name });
             }
 
@@ -73,10 +71,7 @@ impl Pass {
                 let Some((csharp_sig, rval_name)) = csharp_signature(&func.signature.arguments, func.signature.rval, types) else {
                     return Ok(Unchanged);
                 };
-
-                // Use managed sibling type for Result<ptr-to-svc, E> returns.
-                let rval_name = resolve_interface_rval(csharp_sig.rval, &rval_name, siblings, types);
-
+                let rval_name = resolve_interface_rval(&rval_name, &method_name, siblings, &service_return_map, types);
                 methods.push(Method { name: method_name, kind: MethodKind::Regular, base: fn_id, csharp: csharp_sig, rval_name });
             }
 

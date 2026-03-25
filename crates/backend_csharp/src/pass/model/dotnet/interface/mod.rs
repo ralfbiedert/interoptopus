@@ -6,6 +6,7 @@ use crate::lang::functions::{Argument, Signature};
 use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
 use crate::pass::model;
 use crate::pass::model::common::types::all::Pass as TypesAll;
+use std::collections::HashMap;
 
 /// If the last argument is `AsyncCallback<T>`, returns the inner `TypeId`.
 pub(super) fn async_callback_inner(args: &[Argument], types: &TypesAll) -> Option<TypeId> {
@@ -66,17 +67,40 @@ fn resolve_ptr_to_service(type_id: TypeId, types: &TypesAll) -> Option<String> {
     None
 }
 
-/// Resolve the rval for an interface method, using the sibling map when the
-/// return type has a managed sibling (e.g., `ResultIntPtrError` → `ResultNestedBError`).
+/// Resolve the rval for an interface method.
+///
+/// If the rval is a Result wrapping a service handle (detected by method name convention),
+/// returns the managed sibling type name (e.g., `ResultNestedBError`).
+/// `method_name` is used to find the base method and determine which service is involved.
 pub(super) fn resolve_interface_rval(
-    rval: TypeId,
     rval_name: &str,
+    method_name: &str,
     siblings: &model::dotnet::service_type_siblings::Pass,
+    service_return_map: &HashMap<String, (String, TypeId)>,
     types: &TypesAll,
 ) -> String {
-    if let Some(sibling_id) = siblings.sibling(rval) {
-        if let Some(sibling_ty) = types.get(sibling_id) {
-            return sibling_ty.name.clone();
+    // Try Result-containing suffixes first — these use the sibling Result type.
+    for suffix in &["ResultAsync", "AsyncResult", "Result"] {
+        if let Some(base) = method_name.strip_suffix(suffix) {
+            if let Some((_svc_name, svc_type_id)) = service_return_map.get(base) {
+                if let Some(svc_siblings) = siblings.for_service(*svc_type_id) {
+                    if let Some(result_sibling_id) = svc_siblings.result {
+                        if let Some(sibling_ty) = types.get(result_sibling_id) {
+                            if suffix.contains("Async") {
+                                return format!("Task<{}>", sibling_ty.name);
+                            }
+                            return sibling_ty.name.clone();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Pure async suffix — use the service class name directly in Task<>.
+    if let Some(base) = method_name.strip_suffix("Async") {
+        if let Some((svc_name, _)) = service_return_map.get(base) {
+            return format!("Task<{svc_name}>");
         }
     }
     rval_name.to_string()

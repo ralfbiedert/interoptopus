@@ -1,8 +1,4 @@
 //! Builds the `IPlugin` interface model from raw (non-service) trampoline entries.
-//!
-//! Each raw function becomes a `Method` with `MethodKind::Static` and a C#-ified
-//! name and signature. Pointer-to-service returns are resolved to service class names,
-//! and Result types with service siblings are upgraded.
 
 use crate::lang::plugin::TrampolineKind;
 use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
@@ -44,6 +40,8 @@ impl Pass {
             return Ok(Unchanged);
         }
 
+        let service_return_map = siblings.build_service_return_map(services, fns_all, types);
+
         let mut methods = Vec::new();
 
         for entry in trampoline_model.entries() {
@@ -58,7 +56,7 @@ impl Pass {
                 return Ok(Unchanged);
             };
 
-            let rval_name = resolve_interface_rval(csharp_sig.rval, &rval_name, siblings, types);
+            let rval_name = resolve_interface_rval(&rval_name, &pascal_name, siblings, &service_return_map, types);
 
             methods.push(Method { name: pascal_name, kind: MethodKind::Static, base: entry.fn_id, csharp: csharp_sig, rval_name });
         }
