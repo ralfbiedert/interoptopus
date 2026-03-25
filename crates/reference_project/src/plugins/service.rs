@@ -29,34 +29,21 @@ interoptopus::plugin!(ServiceAsync {
 });
 
 interoptopus::plugin!(ServiceNested {
-    // extern service AsyncBasic;
-
-    fn create_a() -> NestedA;
-    async fn create_a_async() -> NestedA;
-    fn create_a_result() -> ffi::Result<NestedA, Error>;
-    async fn create_a_async_result() -> ffi::Result<NestedA, Error>;
+    fn create_a(value: u32) -> NestedA;
+    fn create_a_result(value: u32) -> ffi::Result<NestedA, Error>;
 
     impl NestedA {
-        fn create() -> Self;
-        fn create_result() -> ffi::Result<Self, Error>;
-        async fn create_async() -> Self;
-        async fn create_result_async() -> ffi::Result<Self, Error>;
+        fn create(value: u32) -> Self;
+        fn get_value(&self) -> u32;
+        fn add(&self, x: u32) -> u32;
         fn create_other(&self) -> NestedB;
-        fn create_other_result(&self) -> ffi::Result<NestedB, Error>;
-        async fn create_other_async(&self) -> NestedB;
-        async fn create_other_result_async(&self) -> ffi::Result<NestedB, Error>;
+        fn create_other_with(&self, extra: u32) -> NestedB;
     }
 
     impl NestedB {
-        fn accept(&self, a: NestedA); // knows nested is other service!!!!
-        async fn accept_async(&self, a: NestedA);
-        fn accept_ref(&self, a: &NestedA);
-        async fn accept_async_ref(&self, a: &NestedA);
+        fn get_value(&self) -> u32;
+        fn add(&self, x: u32) -> u32;
+        fn accept(&self, a: NestedA) -> u32;
+        fn accept_ref(&self, a: &NestedA) -> u32;
     }
 });
-
-// #[test]
-// fn foo() {
-//     let x: ServiceNested;
-//     // x.create_a().
-// }
