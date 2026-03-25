@@ -523,8 +523,11 @@ fn emit_service_registration(s: &ServiceBlock, svc_names: &HashSet<String>) -> T
     let prefix = s.prefix();
     let type_id_expr = service_type_id_expr(&svc_name_str);
 
+    let ptr_type_id_expr = service_ptr_type_id_expr(&svc_name_str);
+
     let register_type = quote! {
         {
+            // Register the service type itself.
             let ty = ::interoptopus::lang::types::Type {
                 name: #svc_name_str.to_string(),
                 visibility: ::interoptopus::lang::meta::Visibility::Public,
@@ -535,6 +538,16 @@ fn emit_service_registration(s: &ServiceBlock, svc_names: &HashSet<String>) -> T
                 kind: ::interoptopus::lang::types::TypeKind::Service,
             };
             inventory.register_type(#type_id_expr, ty);
+
+            // Register *const ServiceType (pointer-to-service) used in FFI signatures.
+            let ptr_ty = ::interoptopus::lang::types::Type {
+                name: format!("*const {}", #svc_name_str),
+                visibility: ::interoptopus::lang::meta::Visibility::Public,
+                docs: ::interoptopus::lang::meta::Docs::empty(),
+                emission: ::interoptopus::lang::meta::Emission::Builtin,
+                kind: ::interoptopus::lang::types::TypeKind::ReadPointer(#type_id_expr),
+            };
+            inventory.register_type(#ptr_type_id_expr, ptr_ty);
         }
     };
 
@@ -558,7 +571,8 @@ fn emit_service_registration(s: &ServiceBlock, svc_names: &HashSet<String>) -> T
             let ret_ty: Type = syn::parse_quote! { isize };
             (Some(ret_ty), None)
         };
-        emit_function_registration(fn_name, &ctor.params, ret.as_ref(), Some(&type_id_expr), cb_ty, svc_names)
+        // Ctors use the pointer-to-service TypeId as self_type_id override for the rval.
+        emit_function_registration(fn_name, &ctor.params, ret.as_ref(), Some(&ptr_type_id_expr), cb_ty, svc_names)
     });
 
     let method_registrations = methods.iter().zip(method_fn_names.iter()).map(|(method, fn_name)| {
@@ -645,10 +659,10 @@ fn emit_function_registration(
             let pname_str = p.name.to_string();
             let pty = &p.ty;
             if let Some(svc_name) = direct_service_name(pty, svc_names) {
-                let tid = service_type_id_expr(&svc_name);
+                let tid = service_ptr_type_id_expr(&svc_name);
                 quote! { ::interoptopus::lang::function::Argument::new(#pname_str, #tid) }
             } else if let Some(svc_name) = ref_service_name(pty, svc_names) {
-                let tid = service_type_id_expr(&svc_name);
+                let tid = service_ptr_type_id_expr(&svc_name);
                 quote! { ::interoptopus::lang::function::Argument::new(#pname_str, #tid) }
             } else {
                 quote! { ::interoptopus::lang::function::Argument::new(#pname_str, <#pty as ::interoptopus::lang::types::TypeInfo>::id()) }
@@ -668,7 +682,7 @@ fn emit_function_registration(
         }
     } else if let Some(ty) = ret {
         if let Some(svc_name) = direct_service_name(ty, svc_names) {
-            service_type_id_expr(&svc_name)
+            service_ptr_type_id_expr(&svc_name)
         } else {
             quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::id() }
         }
@@ -737,11 +751,11 @@ fn ffi_ret_or_unit(ret: Option<&Type>, svc_names: &HashSet<String>) -> TokenStre
 
 fn ffi_reg_ret(ty: &Type, svc_names: &HashSet<String>) -> Type {
     if direct_service_name(ty, svc_names).is_some() {
-        // Keep the original type — emit_function_registration will use the service TypeId.
-        // This lets the C# backend see TypeKind::Service in direct returns and infer
-        // the service type for Result/async siblings.
-        return ty.clone();
+        // Direct service returns are handled by emit_function_registration via service_ptr_type_id_expr.
+        ty.clone()
     } else if result_service_name(ty, svc_names).is_some() {
+        // Result<Service, E> → Result<isize, E> at the FFI level.
+        // The C# backend infers the service type from sibling methods.
         let err_ty = result_err_type(ty).unwrap();
         syn::parse_quote! { ::interoptopus::ffi::Result<isize, #err_ty> }
     } else {
@@ -938,4 +952,10 @@ fn function_id_expr(fn_name: &str) -> TokenStream {
 
 fn service_type_id_expr(svc_name: &str) -> TokenStream {
     quote! { ::interoptopus::inventory::TypeId::from_id(::interoptopus::inventory::Id::new(::interoptopus::inventory::hash_str(#svc_name))) }
+}
+
+/// `*const ServiceType` TypeId = service_type_id.derive(PTR_CONST_DERIVE)
+fn service_ptr_type_id_expr(svc_name: &str) -> TokenStream {
+    let svc_tid = service_type_id_expr(svc_name);
+    quote! { ::interoptopus::lang::types::type_id_ptr(#svc_tid) }
 }

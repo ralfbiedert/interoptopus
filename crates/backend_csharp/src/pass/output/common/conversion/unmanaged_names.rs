@@ -28,14 +28,10 @@ impl Pass {
         for (type_id, ty) in types.iter() {
             let managed_name = &ty.name;
 
-            let unmanaged_name = match &ty.kind {
-                // Service types are opaque handles — always nint at the unmanaged level.
-                crate::lang::types::kind::TypeKind::Service => "nint".to_string(),
-                _ => match managed_conversion.managed_conversion(*type_id) {
-                    Some(ManagedConversion::AsIs) => managed_name.clone(),
-                    Some(_) => format!("{managed_name}.Unmanaged"),
-                    None => managed_name.clone(),
-                },
+            let unmanaged_name = match managed_conversion.managed_conversion(*type_id) {
+                Some(ManagedConversion::AsIs) => managed_name.clone(),
+                Some(_) => format!("{managed_name}.Unmanaged"),
+                None => managed_name.clone(),
             };
 
             self.names.insert(*type_id, unmanaged_name);

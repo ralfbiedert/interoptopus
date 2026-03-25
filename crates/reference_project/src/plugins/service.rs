@@ -16,7 +16,7 @@ interoptopus::plugin!(ServiceAsync {
     async fn wire_1(x: Wire<HashMap<String, String>>) -> Wire<HashMap<String, String>>;
     async fn wire_2(x: Wire<HashMap<String, String>>) -> ffi::Result<Wire<HashMap<String, String>>, Error>;
 
-    // async_basic_create() -> usize // knows Self is special usize service
+    // async_basic_create(^) -> usize // knows Self is special usize service
     //
 
     impl AsyncBasic {

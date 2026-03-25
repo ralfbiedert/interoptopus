@@ -4,13 +4,12 @@
 //! become `MethodKind::Static` methods returning `TSelf`, regular methods become
 //! `MethodKind::Regular` with their C#-ified signatures.
 //!
-//! When a service method returns another service type directly (e.g., `-> NestedB`),
-//! Result-wrapped or async siblings (e.g., `-> Result<nint, Error>` or async `-> nint`)
-//! get their return types upgraded to use the service class name instead of `nint`.
+//! Pointer-to-service types in return positions are resolved to service class names.
+//! Result types containing pointer-to-service are replaced with their managed siblings.
 
 use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::model::dotnet::interface::{build_service_return_map, csharp_signature, upgrade_service_return};
+use crate::pass::model::dotnet::interface::{csharp_signature, resolve_interface_rval};
 use crate::pass::{ModelResult, PassInfo, model};
 use interoptopus::lang::meta::{Emission, FileEmission};
 use interoptopus_backends::casing::service_method_name;
@@ -36,6 +35,7 @@ impl Pass {
         services: &model::common::service::all::Pass,
         fns_all: &model::common::fns::all::Pass,
         types: &model::common::types::all::Pass,
+        siblings: &model::dotnet::service_type_siblings::Pass,
     ) -> ModelResult {
         if self.done {
             return Ok(Unchanged);
@@ -44,8 +44,6 @@ impl Pass {
         if services.iter().next().is_none() {
             return Ok(Unchanged);
         }
-
-        let service_return_map = build_service_return_map(services, fns_all, types);
 
         let mut sorted_services: Vec<_> = services.iter().collect();
         sorted_services.sort_by_key(|(_, svc)| types.get(svc.ty).map_or("", |t| t.name.as_str()));
@@ -59,7 +57,6 @@ impl Pass {
 
             let mut methods = Vec::new();
 
-            // Constructors → static abstract TSelf
             for &fn_id in &svc.ctors {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
@@ -70,7 +67,6 @@ impl Pass {
                 methods.push(Method { name: method_name, kind: MethodKind::Static, base: fn_id, csharp: csharp_sig, rval_name });
             }
 
-            // Methods → regular instance methods (with service return upgrade)
             for &fn_id in &svc.methods {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
@@ -78,7 +74,8 @@ impl Pass {
                     return Ok(Unchanged);
                 };
 
-                let rval_name = upgrade_service_return(&method_name, &rval_name, &service_return_map);
+                // Use managed sibling type for Result<ptr-to-svc, E> returns.
+                let rval_name = resolve_interface_rval(csharp_sig.rval, &rval_name, siblings, types);
 
                 methods.push(Method { name: method_name, kind: MethodKind::Regular, base: fn_id, csharp: csharp_sig, rval_name });
             }

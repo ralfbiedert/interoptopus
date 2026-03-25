@@ -48,8 +48,9 @@ impl Pass {
                     DelegateKind::Class => ManagedConversion::Into,
                 },
 
-                // Services are opaque handles (nint) — no managed/unmanaged conversion needed.
-                TypeKind::Service => ManagedConversion::AsIs,
+                // Services are opaque types; they don't appear directly in FFI signatures
+                // (pointer-to-service does), but mark them Into for ownership semantics.
+                TypeKind::Service => ManagedConversion::Into,
                 TypeKind::Opaque => ManagedConversion::Into,
 
                 // Arrays follow their element type, but are at least To
@@ -182,6 +183,10 @@ impl Pass {
         }
 
         Ok(outcome)
+    }
+
+    pub fn set(&mut self, ty: TypeId, conversion: ManagedConversion) {
+        self.managed_conversion.insert(ty, conversion);
     }
 
     #[must_use]

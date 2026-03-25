@@ -77,13 +77,13 @@ impl Pass {
                     let type_name = types.get(svc.ty).map_or("", |t| t.name.as_str());
                     let Some(&method_name) = method_names.get(&entry.fn_id) else { continue };
                     let rval_type = types.get(func.signature.rval).map_or("void", |t| t.name.as_str());
-                    let rval_is_service = matches!(types.get(func.signature.rval).map(|t| &t.kind), Some(TypeKind::Service));
+                    let rval_is_service = resolve_ptr_to_service_name(func.signature.rval, types).is_some();
                     let async_inner = async_callback_inner(func, types);
 
                     if let Some(inner_id) = async_inner {
                         let (args, forward) = service_aware_args_except_last(func, types, unmanaged_names, unmanaged_conversion);
                         let self_args = if args.is_empty() { "nint self".to_string() } else { format!("nint self, {args}") };
-                        let continuation = if matches!(types.get(inner_id).map(|t| &t.kind), Some(TypeKind::Service)) {
+                        let continuation = if resolve_ptr_to_service_name(inner_id, types).is_some() {
                             "ContinueWith(t => { var h = GCHandle.Alloc(t.Result); cb.UnsafeComplete(GCHandle.ToIntPtr(h)); })".to_string()
                         } else {
                             async_continuation(inner_id, types, unmanaged_conversion)
@@ -149,7 +149,19 @@ impl Pass {
     }
 }
 
-/// Like `unmanaged_args` but handles service type params by unwrapping GCHandle.
+/// Returns the managed service class name if `type_id` is a pointer-to-service.
+fn resolve_ptr_to_service_name(type_id: crate::lang::TypeId, types: &model::common::types::all::Pass) -> Option<String> {
+    let ty = types.get(type_id)?;
+    if let TypeKind::Pointer(p) = &ty.kind {
+        let target = types.get(p.target)?;
+        if matches!(&target.kind, TypeKind::Service) {
+            return Some(target.name.clone());
+        }
+    }
+    None
+}
+
+/// Like `unmanaged_args` but handles pointer-to-service params by unwrapping GCHandle.
 fn service_aware_args(
     func: &crate::lang::functions::Function,
     types: &model::common::types::all::Pass,
@@ -162,9 +174,8 @@ fn service_aware_args(
     }).collect();
 
     let forward: Vec<String> = func.signature.arguments.iter().map(|a| {
-        if matches!(types.get(a.ty).map(|t| &t.kind), Some(TypeKind::Service)) {
-            let ty_name = types.get(a.ty).map_or("object", |t| t.name.as_str());
-            format!("({ty_name})GCHandle.FromIntPtr({}).Target!", a.name)
+        if let Some(svc_name) = resolve_ptr_to_service_name(a.ty, types) {
+            format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
         } else {
             format!("{}{}", a.name, unmanaged_conversion.to_managed_suffix(a.ty))
         }
@@ -173,7 +184,7 @@ fn service_aware_args(
     (args.join(", "), forward.join(", "))
 }
 
-/// Like `unmanaged_args_except_last` but handles service type params by unwrapping GCHandle.
+/// Like `unmanaged_args_except_last` but handles pointer-to-service params by unwrapping GCHandle.
 fn service_aware_args_except_last(
     func: &crate::lang::functions::Function,
     types: &model::common::types::all::Pass,
@@ -188,9 +199,8 @@ fn service_aware_args_except_last(
     }).collect();
 
     let forward: Vec<String> = func.signature.arguments.iter().take(n).map(|a| {
-        if matches!(types.get(a.ty).map(|t| &t.kind), Some(TypeKind::Service)) {
-            let ty_name = types.get(a.ty).map_or("object", |t| t.name.as_str());
-            format!("({ty_name})GCHandle.FromIntPtr({}).Target!", a.name)
+        if let Some(svc_name) = resolve_ptr_to_service_name(a.ty, types) {
+            format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
         } else {
             format!("{}{}", a.name, unmanaged_conversion.to_managed_suffix(a.ty))
         }
