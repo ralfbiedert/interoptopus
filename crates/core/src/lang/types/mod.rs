@@ -23,7 +23,7 @@ pub use array::Array;
 pub use enums::{Enum, Variant, VariantKind};
 pub use pattern::TypePattern;
 pub use primitive::{Primitive, PrimitiveValue};
-pub use std::{type_id_ptr, type_id_ptr_mut, type_id_result};
+pub use std::{type_id_ptr, type_id_ptr_mut};
 pub use structs::{Field, Struct};
 pub use wire::{WireIO, WireOnly};
 

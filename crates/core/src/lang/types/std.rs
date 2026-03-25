@@ -72,15 +72,6 @@ pub fn type_id_ptr(x: TypeId) -> TypeId {
     x.derive(0x20973BD3D67EF4E0323195B99A01FD5E)
 }
 
-// TODO THIS METHOD IS PLAIN WRONG AND MUST GO
-/// Derives the [`TypeId`] of `Result<T, E>` from the [`TypeId`] of `T`.
-///
-/// Uses the same derivation as `<ffi::Result<T, E> as TypeInfo>::id()`.
-#[must_use]
-pub fn type_id_result(ok: TypeId) -> TypeId {
-    TypeId::new(0x9BCBD2325F73A8CBDAE991B5BB8EB6FC).derive_id(ok)
-}
-
 /// Derives the [`TypeId`] of `*mut T` from the [`TypeId`] of `T`.
 ///
 /// This uses the same derive constant as `impl_ptr!` for `*mut T`, `&mut T`,

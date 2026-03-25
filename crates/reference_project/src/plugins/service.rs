@@ -54,3 +54,7 @@ interoptopus::plugin!(ServiceNested {
         async fn accept_async_ref(&self, a: &NestedA);
     }
 });
+
+fn foo() {
+    // let x= ServiceNested::asd
+}
