@@ -1,0 +1,19 @@
+using My.Company;
+using My.Company.Common;
+
+namespace My.Company;
+
+class Plugin : IPlugin
+{
+   
+}
+
+public class NestedA : INestedA<NestedA>
+{
+   
+}
+
+public class NestedB : INestedA<NestedB>
+{
+   
+}

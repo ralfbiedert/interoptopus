@@ -55,6 +55,8 @@ interoptopus::plugin!(ServiceNested {
     }
 });
 
-fn foo() {
-    // let x= ServiceNested::asd
-}
+// #[test]
+// fn foo() {
+//     let x: ServiceNested;
+//     // x.create_a().
+// }

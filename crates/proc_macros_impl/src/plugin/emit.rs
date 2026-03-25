@@ -458,7 +458,7 @@ fn emit_instance_method(
                 pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                     #(#forget_stmts)*
                     let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
-                    (self.#field)(self.handle, #(#ffi_args,)* cb);
+                    (self.#field)(&self.handle as *const _, #(#ffi_args,)* cb);
                     #(#field_src_lets)*
                     async move {
                         let raw = future.await;
@@ -471,7 +471,7 @@ fn emit_instance_method(
             quote! {
                 pub fn #method_name(&self, #(#params),*) -> #ret_ty {
                     #(#forget_stmts)*
-                    let raw: #ffi_ret_ty = (self.#field)(self.handle, #(#ffi_args),*);
+                    let raw: #ffi_ret_ty = (self.#field)(&self.handle as *const _, #(#ffi_args),*);
                     ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, |handle| #ret_svc_ident { handle, #(#field_copies,)* })
                 }
             }
@@ -482,7 +482,7 @@ fn emit_instance_method(
             pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                 #(#forget_stmts)*
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new();
-                (self.#field)(self.handle, #(#ffi_args,)* cb);
+                (self.#field)(&self.handle as *const _, #(#ffi_args,)* cb);
                 future
             }
         }
@@ -491,7 +491,7 @@ fn emit_instance_method(
         quote! {
             pub fn #method_name(&self, #(#params),*) #ret {
                 #(#forget_stmts)*
-                (self.#field)(self.handle, #(#ffi_args),*)
+                (self.#field)(&self.handle as *const _, #(#ffi_args),*)
             }
         }
     }
@@ -687,7 +687,7 @@ fn emit_function_registration(
                 quote! { <::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::register(inventory); }
             } else if let Some(svc_name) = ref_service_name(ty, svc_names) {
                 let svc_ident = format_ident!("{}", svc_name);
-                quote! { <::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::register(inventory); }
+                quote! { <*const ::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::register(inventory); }
             } else {
                 quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory); }
             }
@@ -713,7 +713,7 @@ fn emit_function_registration(
                 quote! { ::interoptopus::lang::function::Argument::new(#pname_str, <::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::id()) }
             } else if let Some(svc_name) = ref_service_name(pty, svc_names) {
                 let svc_ident = format_ident!("{}", svc_name);
-                quote! { ::interoptopus::lang::function::Argument::new(#pname_str, <::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::id()) }
+                quote! { ::interoptopus::lang::function::Argument::new(#pname_str, <*const ::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::id()) }
             } else {
                 quote! { ::interoptopus::lang::function::Argument::new(#pname_str, <#pty as ::interoptopus::lang::types::TypeInfo>::id()) }
             }
@@ -763,7 +763,7 @@ fn ffi_param_ty(ty: &Type, svc_names: &HashSet<String>) -> TokenStream {
         quote! { ::interoptopus::ffi::ServiceHandle<#svc_ident> }
     } else if let Some(svc_name) = ref_service_name(ty, svc_names) {
         let svc_ident = format_ident!("{}", svc_name);
-        quote! { ::interoptopus::ffi::ServiceHandle<#svc_ident> }
+        quote! { *const ::interoptopus::ffi::ServiceHandle<#svc_ident> }
     } else {
         quote! { #ty }
     }
@@ -846,10 +846,10 @@ fn ffi_ctor_cb_ret(c: &crate::plugin::model::PluginMethod, svc_ident: &Ident) ->
 fn method_ffi_fn_ty(ffi_ptys: &[TokenStream], ret: Option<&Type>, is_async: bool, self_svc: &Ident, svc_names: &HashSet<String>) -> TokenStream {
     if is_async {
         let cb_ret = ffi_ret_or_unit(ret, svc_names);
-        quote! { extern "C" fn(::interoptopus::ffi::ServiceHandle<#self_svc>, #(#ffi_ptys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) }
+        quote! { extern "C" fn(*const ::interoptopus::ffi::ServiceHandle<#self_svc>, #(#ffi_ptys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) }
     } else {
         let ret_toks = ffi_ret_arrow(ret, svc_names);
-        quote! { extern "C" fn(::interoptopus::ffi::ServiceHandle<#self_svc>, #(#ffi_ptys),*) #ret_toks }
+        quote! { extern "C" fn(*const ::interoptopus::ffi::ServiceHandle<#self_svc>, #(#ffi_ptys),*) #ret_toks }
     }
 }
 
@@ -943,8 +943,12 @@ fn ffi_call_args(params: &[PluginParam], svc_names: &HashSet<String>) -> Vec<Tok
         .iter()
         .map(|p| {
             let pname = &p.name;
-            if direct_service_name(&p.ty, svc_names).is_some() || ref_service_name(&p.ty, svc_names).is_some() {
+            if direct_service_name(&p.ty, svc_names).is_some() {
+                // Owned service — pass handle by value.
                 quote! { #pname.handle }
+            } else if ref_service_name(&p.ty, svc_names).is_some() {
+                // Reference to service — pass pointer to handle.
+                quote! { &#pname.handle as *const _ }
             } else {
                 quote! { #pname }
             }
