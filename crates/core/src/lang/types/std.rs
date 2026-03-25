@@ -1,8 +1,8 @@
 use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
-use crate::lang::types::SerializationError;
 use crate::lang::types::wire::WireIO;
+use crate::lang::types::SerializationError;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
 use std::collections::HashMap;
 use std::io::{Read, Write};
@@ -70,6 +70,15 @@ impl_ptr!(Option<&'_ T>, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01
 #[must_use]
 pub fn type_id_ptr(x: TypeId) -> TypeId {
     x.derive(0x20973BD3D67EF4E0323195B99A01FD5E)
+}
+
+// TODO THIS METHOD IS PLAIN WRONG AND MUST GO
+/// Derives the [`TypeId`] of `Result<T, E>` from the [`TypeId`] of `T`.
+///
+/// Uses the same derivation as `<ffi::Result<T, E> as TypeInfo>::id()`.
+#[must_use]
+pub fn type_id_result(ok: TypeId) -> TypeId {
+    TypeId::new(0x9BCBD2325F73A8CBDAE991B5BB8EB6FC).derive_id(ok)
 }
 
 /// Derives the [`TypeId`] of `*mut T` from the [`TypeId`] of `T`.

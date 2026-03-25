@@ -71,4 +71,5 @@ ids:
 # Can be used by agents for the current task.
 test-agent:
     # Agents: Feel free to update the test logic here for the task at hand.
-    # cargo test --test mod reference_project::interop
+    cargo test --test mod reference_plugins::service::define_plugins
+    dotnet build crates/backend_csharp/tests/reference_plugins/service_nested.dll/service_nested.csproj

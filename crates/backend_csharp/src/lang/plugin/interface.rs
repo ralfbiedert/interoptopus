@@ -1,4 +1,5 @@
 use crate::lang::FunctionId;
+use crate::lang::TypeId;
 use crate::lang::functions::Signature;
 use interoptopus::lang::meta::Emission;
 
@@ -22,8 +23,10 @@ pub struct Method {
     pub base: FunctionId,
     /// C#-ified signature (async callback stripped, args resolved).
     pub csharp: Signature,
-    /// Resolved C# return type name (e.g. `"uint"`, `"Task<uint>"`, `"void"`).
-    pub rval_name: String,
+    /// Resolved C# return type (e.g. the sibling ResultTypeId, service TypeId, etc.).
+    pub rval_id: TypeId,
+    /// Whether this method is async (wraps return in `Task<>`).
+    pub is_async: bool,
 }
 
 pub struct Interface {

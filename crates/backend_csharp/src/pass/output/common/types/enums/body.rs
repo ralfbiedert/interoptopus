@@ -49,6 +49,14 @@ impl Pass {
 
             let name = &ty.name;
 
+            // Managed-only types (e.g. Result<Service, Error> siblings) have no Unmanaged representation.
+            let is_managed_only = match type_kind {
+                TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _)) | TypeKind::TypePattern(TypePattern::Option(ok_ty, _)) => {
+                    types.get(*ok_ty).is_some_and(|t| matches!(&t.kind, TypeKind::Service))
+                }
+                _ => false,
+            };
+
             let ty = *type_id;
             let struct_or_class = if struct_class.is_struct(ty) { "struct" } else { "class" };
             let is_disposable = disposable.is_disposable(*type_id).unwrap_or(false);
@@ -90,6 +98,7 @@ impl Pass {
             context.insert("name", name);
             context.insert("struct_or_class", struct_or_class);
             context.insert("is_disposable", &is_disposable);
+            context.insert("is_managed_only", &is_managed_only);
             context.insert("disposable_variants", &disposable_variants);
             context.insert("unmanaged_variants", &unmanaged_variants);
             context.insert("unmanaged", &unmanaged);

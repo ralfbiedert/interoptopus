@@ -12,7 +12,7 @@
 
 use crate::dispatch::{Item, ItemKind};
 use crate::output::{FileType, Output};
-use crate::pass::output::dotnet::interface::format_args;
+use crate::pass::output::dotnet::interface::{format_args, rval_display_name};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use std::collections::HashMap;
 
@@ -55,7 +55,8 @@ impl Pass {
 
             for method in &interface.methods {
                 let args_str = format_args(&method.csharp.arguments, types);
-                members.push(format!("    static abstract {} {}({args_str});", method.rval_name, method.name));
+                let rval_name = rval_display_name(method, types);
+                members.push(format!("    static abstract {} {}({args_str});", rval_name, method.name));
             }
 
             if members.is_empty() {

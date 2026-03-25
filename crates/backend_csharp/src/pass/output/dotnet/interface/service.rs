@@ -14,7 +14,7 @@
 use crate::dispatch::{Item, ItemKind};
 use crate::lang::plugin::interface::MethodKind;
 use crate::output::{FileType, Output};
-use crate::pass::output::dotnet::interface::format_args;
+use crate::pass::output::dotnet::interface::{format_args, rval_display_name};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use std::collections::HashMap;
 
@@ -58,7 +58,8 @@ impl Pass {
                             format!("    static abstract TSelf {}({args_str});", method.name)
                         }
                         MethodKind::Regular => {
-                            format!("    {} {}({args_str});", method.rval_name, method.name)
+                            let rval_name = rval_display_name(method, types);
+                            format!("    {} {}({args_str});", rval_name, method.name)
                         }
                     };
 

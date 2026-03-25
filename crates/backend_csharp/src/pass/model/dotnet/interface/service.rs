@@ -1,12 +1,12 @@
 //! Builds service interface models (`IFoo<TSelf>`) from service definitions.
 //!
-//! Pointer-to-service types in return positions are resolved to service class names.
+//! Pointer-to-service types in return positions are resolved to service TypeIds.
 //! Result types wrapping service handles are replaced with their managed siblings
 //! (created by the `service_type_siblings` pass).
 
 use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::model::dotnet::interface::{csharp_signature, resolve_interface_rval};
+use crate::pass::model::dotnet::interface::resolve_method_info;
 use crate::pass::{ModelResult, PassInfo, model};
 use interoptopus::lang::meta::{Emission, FileEmission};
 use interoptopus_backends::casing::service_method_name;
@@ -42,8 +42,6 @@ impl Pass {
             return Ok(Unchanged);
         }
 
-        let service_return_map = siblings.build_service_return_map(services, fns_all, types);
-
         let mut sorted_services: Vec<_> = services.iter().collect();
         sorted_services.sort_by_key(|(_, svc)| types.get(svc.ty).map_or("", |t| t.name.as_str()));
 
@@ -59,20 +57,19 @@ impl Pass {
             for &fn_id in &svc.ctors {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
-                let Some((csharp_sig, rval_name)) = csharp_signature(&func.signature.arguments, func.signature.rval, types) else {
+                let Some((csharp_sig, rval_id, is_async)) = resolve_method_info(&func.signature.arguments, func.signature.rval, types, siblings) else {
                     return Ok(Unchanged);
                 };
-                methods.push(Method { name: method_name, kind: MethodKind::Static, base: fn_id, csharp: csharp_sig, rval_name });
+                methods.push(Method { name: method_name, kind: MethodKind::Static, base: fn_id, csharp: csharp_sig, rval_id, is_async });
             }
 
             for &fn_id in &svc.methods {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
-                let Some((csharp_sig, rval_name)) = csharp_signature(&func.signature.arguments, func.signature.rval, types) else {
+                let Some((csharp_sig, rval_id, is_async)) = resolve_method_info(&func.signature.arguments, func.signature.rval, types, siblings) else {
                     return Ok(Unchanged);
                 };
-                let rval_name = resolve_interface_rval(&rval_name, &method_name, siblings, &service_return_map, types);
-                methods.push(Method { name: method_name, kind: MethodKind::Regular, base: fn_id, csharp: csharp_sig, rval_name });
+                methods.push(Method { name: method_name, kind: MethodKind::Regular, base: fn_id, csharp: csharp_sig, rval_id, is_async });
             }
 
             interfaces.push(Interface { name: interface_name, emission: Emission::FileEmission(FileEmission::Default), kind: InterfaceKind::Service, methods });

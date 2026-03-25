@@ -1,6 +1,9 @@
+{%- if not is_managed_only -%}
 [NativeMarshalling(typeof(MarshallerMeta))]
+{% endif -%}
 public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposable{% endif %}
 {
+{%- if not is_managed_only %}
     {%- for item in unmanaged_variants %}
     {{ item | indent }}
     {% endfor %}
@@ -10,7 +13,7 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
     {{ to_unmanaged | indent }}
 
     {{ as_unmanaged | indent }}
-
+{% endif %}
     {{ exception_for_variant | indent }}
 
     {{ ctors | indent }}
@@ -23,7 +26,8 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
         if (_variant == {{ v.tag }}) {{ v.name }}?.Dispose();
         {%- endfor %}
     }
-{% endif %}
+{% endif -%}
+{%- if not is_managed_only %}
     [CustomMarshaller(typeof({{ name }}), MarshalMode.Default, typeof(Marshaller))]
     private struct MarshallerMeta { }
 
@@ -54,4 +58,5 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
         public void Free() {}
     }
 
+{% endif -%}
 }
