@@ -4,7 +4,9 @@ pub mod service;
 use crate::lang::TypeId;
 use crate::lang::functions::{Argument, Signature};
 use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
+use crate::pass::model;
 use crate::pass::model::common::types::all::Pass as TypesAll;
+use std::collections::HashMap;
 
 /// If the last argument is `AsyncCallback<T>`, returns the inner `TypeId`.
 pub(super) fn async_callback_inner(args: &[Argument], types: &TypesAll) -> Option<TypeId> {
@@ -48,4 +50,71 @@ pub(super) fn csharp_signature(args: &[Argument], rval: TypeId, types: &TypesAll
     let rval_type_id = if let Some(inner_id) = async_inner { inner_id } else { rval };
 
     Some((Signature { arguments, rval: rval_type_id }, rval_name))
+}
+
+/// Builds a map from C# method name → target service class name for service methods
+/// that return a service type directly.
+///
+/// This map is used by both the service and plugin interface passes to upgrade
+/// `nint`/`ResultNintError`/`Task<nint>` return types to proper service class names
+/// for Result-wrapped and async siblings.
+pub(super) fn build_service_return_map(
+    services: &model::common::service::all::Pass,
+    fns_all: &model::common::fns::all::Pass,
+    types: &TypesAll,
+) -> HashMap<String, String> {
+    use interoptopus_backends::casing::{rust_to_pascal, service_method_name};
+
+    let mut map = HashMap::new();
+
+    for (_svc_id, svc) in services.iter() {
+        let Some(type_info) = types.get(svc.ty) else { continue };
+        let type_name = &type_info.name;
+
+        for &fn_id in &svc.methods {
+            let Some(func) = fns_all.get(fn_id) else { continue };
+            if let Some(ty) = types.get(func.signature.rval) {
+                if matches!(&ty.kind, TypeKind::Service) {
+                    let method_name = service_method_name(type_name, &func.name);
+                    map.insert(method_name, ty.name.clone());
+                }
+            }
+        }
+    }
+
+    // Also check bare (non-service) functions for direct service returns.
+    // Use PascalCase function name as the key (matching IPlugin method naming).
+    for (_, func) in fns_all.originals() {
+        if let Some(ty) = types.get(func.signature.rval) {
+            if matches!(&ty.kind, TypeKind::Service) {
+                let pascal_name = rust_to_pascal(&func.name);
+                map.insert(pascal_name, ty.name.clone());
+            }
+        }
+    }
+
+    map
+}
+
+/// If a sibling method with the same base name returns a service type directly,
+/// upgrade this method's return type to use the service class name instead of `nint`.
+///
+/// Matching rules (by method name suffix convention):
+/// - `FooResult` → replace `ResultNintError` → `ResultNestedBError`
+/// - `FooAsync` → replace `Task<nint>` → `Task<NestedB>`
+/// - `FooResultAsync` / `FooAsyncResult` → replace accordingly
+pub(super) fn upgrade_service_return(method_name: &str, rval_name: &str, service_return_map: &HashMap<String, String>) -> String {
+    let suffixes = ["ResultAsync", "AsyncResult", "Result", "Async"];
+
+    for suffix in &suffixes {
+        if let Some(base) = method_name.strip_suffix(suffix) {
+            if let Some(service_name) = service_return_map.get(base) {
+                // Replace both "Nint" (PascalCase in composed names like ResultNintError)
+                // and "nint" (in generic positions like Task<nint>)
+                return rval_name.replace("Nint", service_name).replace("nint", service_name);
+            }
+        }
+    }
+
+    rval_name.to_string()
 }

@@ -206,13 +206,7 @@ impl PluginModel {
                 let cb = Some(quote! { ::interoptopus::pattern::asynk::AsyncCallback<#cb_inner> });
                 (None, cb)
             } else {
-                let ffi_ret = f.ret.as_ref().map(|ty| {
-                    if direct_service_name(ty, svc_names).is_some() {
-                        ty.clone()
-                    } else {
-                        ffi_reg_ret(ty, svc_names)
-                    }
-                });
+                let ffi_ret = f.ret.as_ref().map(|ty| ffi_reg_ret(ty, svc_names));
                 (ffi_ret, None)
             };
             emit_function_registration(&f.name.to_string(), &f.params, ret.as_ref(), None, cb_ty, svc_names)
@@ -573,15 +567,7 @@ fn emit_service_registration(s: &ServiceBlock, svc_names: &HashSet<String>) -> T
             let cb = Some(quote! { ::interoptopus::pattern::asynk::AsyncCallback<#cb_inner> });
             (None, cb)
         } else {
-            // For direct service returns, keep the original type so the backend sees the service TypeId.
-            // For Result-wrapped, ffi_reg_ret substitutes isize (producing ResultNintError in C#).
-            let ffi_ret = method.ret.as_ref().map(|ty| {
-                if direct_service_name(ty, svc_names).is_some() {
-                    ty.clone()
-                } else {
-                    ffi_reg_ret(ty, svc_names)
-                }
-            });
+            let ffi_ret = method.ret.as_ref().map(|ty| ffi_reg_ret(ty, svc_names));
             (ffi_ret, None)
         };
         emit_function_registration(fn_name, &method.params, ret.as_ref(), Some(&type_id_expr), cb_ty, svc_names)
@@ -751,7 +737,10 @@ fn ffi_ret_or_unit(ret: Option<&Type>, svc_names: &HashSet<String>) -> TokenStre
 
 fn ffi_reg_ret(ty: &Type, svc_names: &HashSet<String>) -> Type {
     if direct_service_name(ty, svc_names).is_some() {
-        syn::parse_quote! { isize }
+        // Keep the original type — emit_function_registration will use the service TypeId.
+        // This lets the C# backend see TypeKind::Service in direct returns and infer
+        // the service type for Result/async siblings.
+        return ty.clone();
     } else if result_service_name(ty, svc_names).is_some() {
         let err_ty = result_err_type(ty).unwrap();
         syn::parse_quote! { ::interoptopus::ffi::Result<isize, #err_ty> }

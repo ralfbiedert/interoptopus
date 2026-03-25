@@ -2,11 +2,14 @@
 //!
 //! Each raw function becomes a `Method` with `MethodKind::Static` and a C#-ified
 //! name and signature (async functions get `Task<T>` return types).
+//!
+//! When a bare function returns a service type directly, Result-wrapped or async
+//! siblings get their return types upgraded to use the service class name.
 
 use crate::lang::plugin::TrampolineKind;
 use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::model::dotnet::interface::csharp_signature;
+use crate::pass::model::dotnet::interface::{build_service_return_map, csharp_signature, upgrade_service_return};
 use crate::pass::{ModelResult, PassInfo, model};
 use interoptopus::lang::meta::{Emission, FileEmission};
 use interoptopus_backends::casing::rust_to_pascal;
@@ -32,6 +35,7 @@ impl Pass {
         trampoline_model: &model::dotnet::trampoline::Pass,
         fns_all: &model::common::fns::all::Pass,
         types: &model::common::types::all::Pass,
+        services: &model::common::service::all::Pass,
     ) -> ModelResult {
         if self.done {
             return Ok(Unchanged);
@@ -40,6 +44,8 @@ impl Pass {
         if trampoline_model.entries().is_empty() {
             return Ok(Unchanged);
         }
+
+        let service_return_map = build_service_return_map(services, fns_all, types);
 
         let mut methods = Vec::new();
 
@@ -52,9 +58,10 @@ impl Pass {
 
             let pascal_name = rust_to_pascal(&func.name);
             let Some((csharp_sig, rval_name)) = csharp_signature(&func.signature.arguments, func.signature.rval, types) else {
-                // Type not yet resolved — wait for next iteration.
                 return Ok(Unchanged);
             };
+
+            let rval_name = upgrade_service_return(&pascal_name, &rval_name, &service_return_map);
 
             methods.push(Method { name: pascal_name, kind: MethodKind::Static, base: entry.fn_id, csharp: csharp_sig, rval_name });
         }

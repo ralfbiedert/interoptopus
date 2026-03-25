@@ -289,7 +289,7 @@ impl DotnetLibrary {
             r.run(m.wire_helpers.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.wire_nested.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &mut m.type_names, &self.inventory.types))?;
             r.run(m.trampoline.process(&mut pass_meta, &m.fns_all, &m.service_all))?;
-            r.run(m.plugin_interface.process(&mut pass_meta, &m.trampoline, &m.fns_all, &m.type_all))?;
+            r.run(m.plugin_interface.process(&mut pass_meta, &m.trampoline, &m.fns_all, &m.type_all, &m.service_all))?;
             r.run(m.service_interfaces.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
 
             Ok(())

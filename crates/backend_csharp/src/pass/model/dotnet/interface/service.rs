@@ -3,10 +3,14 @@
 //! Each service produces an `Interface` with `InterfaceKind::Service`. Constructors
 //! become `MethodKind::Static` methods returning `TSelf`, regular methods become
 //! `MethodKind::Regular` with their C#-ified signatures.
+//!
+//! When a service method returns another service type directly (e.g., `-> NestedB`),
+//! Result-wrapped or async siblings (e.g., `-> Result<nint, Error>` or async `-> nint`)
+//! get their return types upgraded to use the service class name instead of `nint`.
 
 use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::model::dotnet::interface::csharp_signature;
+use crate::pass::model::dotnet::interface::{build_service_return_map, csharp_signature, upgrade_service_return};
 use crate::pass::{ModelResult, PassInfo, model};
 use interoptopus::lang::meta::{Emission, FileEmission};
 use interoptopus_backends::casing::service_method_name;
@@ -41,6 +45,8 @@ impl Pass {
             return Ok(Unchanged);
         }
 
+        let service_return_map = build_service_return_map(services, fns_all, types);
+
         let mut sorted_services: Vec<_> = services.iter().collect();
         sorted_services.sort_by_key(|(_, svc)| types.get(svc.ty).map_or("", |t| t.name.as_str()));
 
@@ -64,13 +70,15 @@ impl Pass {
                 methods.push(Method { name: method_name, kind: MethodKind::Static, base: fn_id, csharp: csharp_sig, rval_name });
             }
 
-            // Methods → regular instance methods
+            // Methods → regular instance methods (with service return upgrade)
             for &fn_id in &svc.methods {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
                 let Some((csharp_sig, rval_name)) = csharp_signature(&func.signature.arguments, func.signature.rval, types) else {
                     return Ok(Unchanged);
                 };
+
+                let rval_name = upgrade_service_return(&method_name, &rval_name, &service_return_map);
 
                 methods.push(Method { name: method_name, kind: MethodKind::Regular, base: fn_id, csharp: csharp_sig, rval_name });
             }
