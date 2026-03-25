@@ -201,6 +201,16 @@ impl PluginModel {
         let name_str = name.to_string();
 
         let bare_registrations = self.functions.iter().map(|f| {
+            let rval_ov = f.ret.as_ref().and_then(|ty| {
+                if let Some(svc_name) = direct_service_name(ty, svc_names) {
+                    Some(service_ptr_type_id_expr(&svc_name))
+                } else if let Some(svc_name) = result_service_name(ty, svc_names) {
+                    let svc_ptr_id = service_ptr_type_id_expr(&svc_name);
+                    Some(quote! { ::interoptopus::lang::types::type_id_result(#svc_ptr_id) })
+                } else {
+                    None
+                }
+            });
             let (ret, cb_ty) = if f.is_async {
                 let cb_inner = ffi_ret_or_unit(f.ret.as_ref(), svc_names);
                 let cb = Some(quote! { ::interoptopus::pattern::asynk::AsyncCallback<#cb_inner> });
@@ -209,8 +219,43 @@ impl PluginModel {
                 let ffi_ret = f.ret.as_ref().map(|ty| ffi_reg_ret(ty, svc_names));
                 (ffi_ret, None)
             };
-            emit_function_registration(&f.name.to_string(), &f.params, ret.as_ref(), None, cb_ty, svc_names)
+            emit_function_registration(&f.name.to_string(), &f.params, ret.as_ref(), None, cb_ty, svc_names, rval_ov.as_ref())
         });
+
+        // Register Result<*const Service, Error> types for bare functions returning Result<Service, E>.
+        let bare_result_registrations: Vec<_> = {
+            let mut regs = Vec::new();
+            let mut seen = std::collections::HashSet::new();
+            for f in &self.functions {
+                if let Some(ret_ty) = &f.ret {
+                    if let Some(svc_name) = result_service_name(ret_ty, svc_names) {
+                        if let Some(err_ty) = result_err_type(ret_ty) {
+                            let key = format!("{svc_name}_{}", quote! { #err_ty });
+                            if seen.insert(key) {
+                                let target_ptr = service_ptr_type_id_expr(&svc_name);
+                                let result_id = quote! { ::interoptopus::lang::types::type_id_result(#target_ptr) };
+                                let err_id = quote! { <#err_ty as ::interoptopus::lang::types::TypeInfo>::id() };
+                                regs.push(quote! {
+                                    {
+                                        let result_ty = ::interoptopus::lang::types::Type {
+                                            name: format!("Result<*const {}, {}>", #svc_name, stringify!(#err_ty)),
+                                            visibility: ::interoptopus::lang::meta::Visibility::Public,
+                                            docs: ::interoptopus::lang::meta::Docs::empty(),
+                                            emission: ::interoptopus::lang::meta::Emission::Builtin,
+                                            kind: ::interoptopus::lang::types::TypeKind::TypePattern(
+                                                ::interoptopus::lang::types::TypePattern::Result(#target_ptr, #err_id),
+                                            ),
+                                        };
+                                        inventory.register_type(#result_id, result_ty);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            regs
+        };
 
         let service_registrations: Vec<_> = self.services.iter().map(|s| emit_service_registration(s, svc_names)).collect();
 
@@ -225,6 +270,7 @@ impl PluginModel {
                 }
 
                 fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
+                    #(#bare_result_registrations)*
                     #(#bare_registrations)*
                     #(#service_registrations)*
                 }
@@ -559,23 +605,41 @@ fn emit_service_registration(s: &ServiceBlock, svc_names: &HashSet<String>) -> T
     let destructor_fn_name = format!("{prefix}_drop");
 
     let ctor_registrations = ctors.iter().zip(ctor_fn_names.iter()).map(|(ctor, fn_name)| {
-        let (ret, cb_ty) = if ctor.is_async {
+        let (ret, cb_ty, rval_ov) = if ctor.is_async {
             let cb_inner = ffi_ctor_cb_ret(ctor);
             let cb = Some(quote! { ::interoptopus::pattern::asynk::AsyncCallback<#cb_inner> });
-            (None, cb)
+            // Async ctors returning Result<Self, E> need the result rval override.
+            let ov = if is_result_self_return(ctor.ret.as_ref()) {
+                Some(quote! { ::interoptopus::lang::types::type_id_result(#ptr_type_id_expr) })
+            } else {
+                None
+            };
+            (None, cb, ov)
         } else if is_result_self_return(ctor.ret.as_ref()) {
             let err_ty = result_err_type(ctor.ret.as_ref().unwrap()).unwrap();
             let ret_ty: Type = syn::parse_quote! { ::interoptopus::ffi::Result<isize, #err_ty> };
-            (Some(ret_ty), None)
+            let ov = quote! { ::interoptopus::lang::types::type_id_result(#ptr_type_id_expr) };
+            (Some(ret_ty), None, Some(ov))
         } else {
             let ret_ty: Type = syn::parse_quote! { isize };
-            (Some(ret_ty), None)
+            (Some(ret_ty), None, None)
         };
-        // Ctors use the pointer-to-service TypeId as self_type_id override for the rval.
-        emit_function_registration(fn_name, &ctor.params, ret.as_ref(), Some(&ptr_type_id_expr), cb_ty, svc_names)
+        emit_function_registration(fn_name, &ctor.params, ret.as_ref(), Some(&ptr_type_id_expr), cb_ty, svc_names, rval_ov.as_ref())
     });
 
     let method_registrations = methods.iter().zip(method_fn_names.iter()).map(|(method, fn_name)| {
+        // Compute rval_override for methods returning Service or Result<Service, E>.
+        // Also used for async methods where the callback inner type loses service info.
+        let rval_ov = method.ret.as_ref().and_then(|ty| {
+            if let Some(svc_name) = direct_service_name(ty, svc_names) {
+                Some(service_ptr_type_id_expr(&svc_name))
+            } else if let Some(svc_name) = result_service_name(ty, svc_names) {
+                let svc_ptr_id = service_ptr_type_id_expr(&svc_name);
+                Some(quote! { ::interoptopus::lang::types::type_id_result(#svc_ptr_id) })
+            } else {
+                None
+            }
+        });
         let (ret, cb_ty) = if method.is_async {
             let cb_inner = ffi_ret_or_unit(method.ret.as_ref(), svc_names);
             let cb = Some(quote! { ::interoptopus::pattern::asynk::AsyncCallback<#cb_inner> });
@@ -584,10 +648,69 @@ fn emit_service_registration(s: &ServiceBlock, svc_names: &HashSet<String>) -> T
             let ffi_ret = method.ret.as_ref().map(|ty| ffi_reg_ret(ty, svc_names));
             (ffi_ret, None)
         };
-        emit_function_registration(fn_name, &method.params, ret.as_ref(), Some(&type_id_expr), cb_ty, svc_names)
+        emit_function_registration(fn_name, &method.params, ret.as_ref(), Some(&type_id_expr), cb_ty, svc_names, rval_ov.as_ref())
     });
 
-    let destructor_registration = emit_function_registration(&destructor_fn_name, &[], None, None, None, svc_names);
+    let destructor_registration = emit_function_registration(&destructor_fn_name, &[], None, None, None, svc_names, None);
+
+    // Register Result<*const Service, Error> types for ctors/methods returning Result<Self/Service, E>.
+    let mut result_type_registrations = Vec::new();
+    let mut seen_err_types = std::collections::HashSet::new();
+    for ctor in &ctors {
+        if is_result_self_return(ctor.ret.as_ref()) {
+            if let Some(err_ty) = result_err_type(ctor.ret.as_ref().unwrap()) {
+                let key = quote! { #err_ty }.to_string();
+                if seen_err_types.insert(key) {
+                    let result_id = quote! { ::interoptopus::lang::types::type_id_result(#ptr_type_id_expr) };
+                    let err_id = quote! { <#err_ty as ::interoptopus::lang::types::TypeInfo>::id() };
+                    result_type_registrations.push(quote! {
+                        {
+                            let result_ty = ::interoptopus::lang::types::Type {
+                                name: format!("Result<*const {}, {}>", #svc_name_str, stringify!(#err_ty)),
+                                visibility: ::interoptopus::lang::meta::Visibility::Public,
+                                docs: ::interoptopus::lang::meta::Docs::empty(),
+                                emission: ::interoptopus::lang::meta::Emission::FileEmission(
+                                    ::interoptopus::lang::meta::FileEmission::Default,
+                                ),
+                                kind: ::interoptopus::lang::types::TypeKind::TypePattern(
+                                    ::interoptopus::lang::types::TypePattern::Result(#ptr_type_id_expr, #err_id),
+                                ),
+                            };
+                            inventory.register_type(#result_id, result_ty);
+                        }
+                    });
+                }
+            }
+        }
+    }
+    for method in &methods {
+        if let Some(ret_ty) = &method.ret {
+            if let Some(svc_name) = result_service_name(ret_ty, svc_names) {
+                if let Some(err_ty) = result_err_type(ret_ty) {
+                    let target_ptr = service_ptr_type_id_expr(&svc_name);
+                    let key = format!("{svc_name}_{}", quote! { #err_ty });
+                    if seen_err_types.insert(key) {
+                        let result_id = quote! { ::interoptopus::lang::types::type_id_result(#target_ptr) };
+                        let err_id = quote! { <#err_ty as ::interoptopus::lang::types::TypeInfo>::id() };
+                        result_type_registrations.push(quote! {
+                            {
+                                let result_ty = ::interoptopus::lang::types::Type {
+                                    name: format!("Result<*const {}, {}>", #svc_name, stringify!(#err_ty)),
+                                    visibility: ::interoptopus::lang::meta::Visibility::Public,
+                                    docs: ::interoptopus::lang::meta::Docs::empty(),
+                                    emission: ::interoptopus::lang::meta::Emission::Builtin,
+                                    kind: ::interoptopus::lang::types::TypeKind::TypePattern(
+                                        ::interoptopus::lang::types::TypePattern::Result(#target_ptr, #err_id),
+                                    ),
+                                };
+                                inventory.register_type(#result_id, result_ty);
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
 
     let ctor_id_exprs = ctor_fn_names.iter().map(|n| function_id_expr(n));
     let method_id_exprs = method_fn_names.iter().map(|n| function_id_expr(n));
@@ -603,6 +726,7 @@ fn emit_service_registration(s: &ServiceBlock, svc_names: &HashSet<String>) -> T
 
     quote! {
         #register_type
+        #(#result_type_registrations)*
         #(#ctor_registrations)*
         #(#method_registrations)*
         #destructor_registration
@@ -629,6 +753,7 @@ fn emit_function_registration(
     self_type_id: Option<&TokenStream>,
     async_callback_ty: Option<TokenStream>,
     svc_names: &HashSet<String>,
+    rval_override: Option<&TokenStream>,
 ) -> TokenStream {
     let type_registrations: Vec<_> = params
         .iter()
@@ -674,7 +799,9 @@ fn emit_function_registration(
         quote! { ::interoptopus::lang::function::Argument::new("cb", <#cb_ty as ::interoptopus::lang::types::TypeInfo>::id()) }
     });
 
-    let rval = if is_self_return(ret) {
+    let rval = if let Some(override_id) = rval_override {
+        quote! { #override_id }
+    } else if is_self_return(ret) {
         if let Some(tid) = self_type_id {
             quote! { #tid }
         } else {
@@ -683,6 +810,9 @@ fn emit_function_registration(
     } else if let Some(ty) = ret {
         if let Some(svc_name) = direct_service_name(ty, svc_names) {
             service_ptr_type_id_expr(&svc_name)
+        } else if let Some(svc_name) = result_service_name(ty, svc_names) {
+            let svc_ptr_id = service_ptr_type_id_expr(&svc_name);
+            quote! { ::interoptopus::lang::types::type_id_result(#svc_ptr_id) }
         } else {
             quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::id() }
         }
@@ -749,13 +879,15 @@ fn ffi_ret_or_unit(ret: Option<&Type>, svc_names: &HashSet<String>) -> TokenStre
     }
 }
 
+
+
 fn ffi_reg_ret(ty: &Type, svc_names: &HashSet<String>) -> Type {
     if direct_service_name(ty, svc_names).is_some() {
         // Direct service returns are handled by emit_function_registration via service_ptr_type_id_expr.
         ty.clone()
     } else if result_service_name(ty, svc_names).is_some() {
         // Result<Service, E> → Result<isize, E> at the FFI level.
-        // The C# backend infers the service type from sibling methods.
+        // emit_service_registration separately registers the Result<*const Service, E> type.
         let err_ty = result_err_type(ty).unwrap();
         syn::parse_quote! { ::interoptopus::ffi::Result<isize, #err_ty> }
     } else {
