@@ -23,21 +23,21 @@ public partial class NestedA : INestedA<NestedA>
     public NestedA() { Value = 0; }
     public NestedA(uint value) { Value = value; }
 
-    public static NestedA NestedaCreate(uint value)
+    public static NestedA Create(uint value)
     {
         return new NestedA(value);
     }
 
-    public uint NestedaGetValue() => Value;
+    public uint GetValue() => Value;
 
-    public uint NestedaAdd(uint x) => Value + x;
+    public uint Add(uint x) => Value + x;
 
-    public NestedB NestedaCreateOther()
+    public NestedB CreateOther()
     {
         return new NestedB(Value);
     }
 
-    public NestedB NestedaCreateOtherWith(uint extra)
+    public NestedB CreateOtherWith(uint extra)
     {
         return new NestedB(Value + extra);
     }
@@ -50,11 +50,11 @@ public partial class NestedB : INestedB<NestedB>
     public NestedB() { Value = 0; }
     public NestedB(uint value) { Value = value; }
 
-    public uint NestedbGetValue() => Value;
+    public uint GetValue() => Value;
 
-    public uint NestedbAdd(uint x) => Value + x;
+    public uint Add(uint x) => Value + x;
 
-    public uint NestedbAccept(NestedA a) => Value + a.Value;
+    public uint Accept(NestedA a) => Value + a.Value;
 
-    public uint NestedbAcceptRef(NestedA a) => Value + a.Value;
+    public uint AcceptRef(NestedA a) => Value + a.Value;
 }

@@ -28,22 +28,22 @@ partial class Plugin : IPlugin
 
 partial class NestedA: INestedA<NestedA>
 {
-    public static ResultNestedAUint NestedaCreate(uint value)
+    public static ResultNestedAUint Create(uint value)
     {
         throw new NotImplementedException();
     }
 
-    public static Task<ResultNestedAUint> NestedaCreateAsync(uint value)
+    public static Task<ResultNestedAUint> CreateAsync(uint value)
     {
         throw new NotImplementedException();
     }
 
-    public ResultUintUint NestedaGetValue()
+    public ResultUintUint GetValue()
     {
         throw new NotImplementedException();
     }
 
-    public Task<ResultUintUint> NestedaGetValueAsync()
+    public Task<ResultUintUint> GetValueAsync()
     {
         throw new NotImplementedException();
     }

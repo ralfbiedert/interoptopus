@@ -34,7 +34,6 @@ fn load_plugin() -> Result<(), Box<dyn Error>> {
 
     let a = plugin.create_a(0).unwrap();
     let b = plugin.get_value().unwrap();
-    // let c = plugin.ne
-    let x = plugin.nesteda_create(13);
+    let x = plugin.nested_a_create(13);
     Ok(())
 }

@@ -18,7 +18,7 @@ fn define_plugins() -> Result<(), Box<dyn Error>> {
 fn load_plugin_service_basic() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(ServiceBasic, "service_basic.dll", super::BASE);
 
-    let svc = plugin.servicea_create();
+    let svc = plugin.service_a_create();
     assert_eq!(svc.call(5), 6);
     assert_eq!(svc.call(10), 11);
 
@@ -45,14 +45,14 @@ fn load_plugin_service_nested() -> Result<(), Box<dyn Error>> {
 
     // Test service ctor
     for i in 0..100u32 {
-        let a = plugin.nesteda_create(i * 3);
+        let a = plugin.nested_a_create(i * 3);
         assert_eq!(a.get_value(), i * 3);
         assert_eq!(a.add(7), i * 3 + 7);
     }
 
     // Test nested service creation: A creates B, B inherits A's value
     for i in 0..100u32 {
-        let a = plugin.nesteda_create(i);
+        let a = plugin.nested_a_create(i);
         let b = a.create_other();
         assert_eq!(b.get_value(), i, "create_other should inherit A's value {i}");
         assert_eq!(b.add(5), i + 5);
@@ -64,9 +64,9 @@ fn load_plugin_service_nested() -> Result<(), Box<dyn Error>> {
 
     // Test B accepting A (ownership transfer) — returns sum of values
     for i in 0..50u32 {
-        let a = plugin.nesteda_create(i);
+        let a = plugin.nested_a_create(i);
         let b_val = i * 2;
-        let a_for_b = plugin.nesteda_create(b_val);
+        let a_for_b = plugin.nested_a_create(b_val);
         let b = a_for_b.create_other();
         assert_eq!(b.get_value(), b_val);
 
@@ -76,8 +76,8 @@ fn load_plugin_service_nested() -> Result<(), Box<dyn Error>> {
 
     // Test B accepting A by ref — returns sum, A stays alive
     for i in 0..50u32 {
-        let a = plugin.nesteda_create(i);
-        let b = plugin.nesteda_create(i + 10).create_other();
+        let a = plugin.nested_a_create(i);
+        let b = plugin.nested_a_create(i + 10).create_other();
 
         let sum = b.accept_ref(&a);
         assert_eq!(sum, (i + 10) + i);
@@ -89,7 +89,7 @@ fn load_plugin_service_nested() -> Result<(), Box<dyn Error>> {
     // Mixed: create many, interleave operations
     let mut services_a = Vec::new();
     for i in 0..100u32 {
-        services_a.push(plugin.nesteda_create(i));
+        services_a.push(plugin.nested_a_create(i));
     }
     for (i, a) in services_a.iter().enumerate() {
         assert_eq!(a.get_value(), i as u32);
@@ -127,7 +127,7 @@ async fn load_plugin_service_async() -> Result<(), Box<dyn Error>> {
     assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
     assert_eq!(map.get("hello").map(String::as_str), Some("world"));
 
-    let svc = plugin.asyncbasic_create();
+    let svc = plugin.async_basic_create();
     svc.call_void().await;
     let i = svc.add_one(1).await;
     assert_eq!(i, 2);

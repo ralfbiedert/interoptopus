@@ -67,7 +67,7 @@ impl PluginModel {
 
 impl ServiceBlock {
     pub fn prefix(&self) -> String {
-        self.name.to_string().to_lowercase()
+        pascal_to_snake(&self.name.to_string())
     }
 
     /// Constructors: methods without `&self` that return `Self` or `ffi::Result<Self, E>`.
@@ -246,6 +246,21 @@ pub fn transitive_returned_services(s: &ServiceBlock, all_services: &[ServiceBlo
         }
     }
     result.sort();
+    result
+}
+
+/// Converts a `PascalCase` name to `snake_case`.
+fn pascal_to_snake(name: &str) -> String {
+    let mut result = String::with_capacity(name.len() + 4);
+    for (i, c) in name.chars().enumerate() {
+        if c.is_uppercase() && i > 0 {
+            let prev = name.as_bytes()[i - 1];
+            if prev.is_ascii_lowercase() || prev.is_ascii_digit() {
+                result.push('_');
+            }
+        }
+        result.extend(c.to_lowercase());
+    }
     result
 }
 

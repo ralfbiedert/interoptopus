@@ -37,20 +37,20 @@ class Plugin : IPlugin
 
 partial class AsyncBasic: IAsyncBasic<AsyncBasic>
 {
-    public static AsyncBasic AsyncbasicCreate() => new();
+    public static AsyncBasic Create() => new();
     
-    public async Task AsyncbasicCallVoid()
+    public async Task CallVoid()
     {
         await Task.Yield();
     }
 
-    public async Task<uint> AsyncbasicAddOne(uint x)
+    public async Task<uint> AddOne(uint x)
     {
         await Task.Yield();
         return x + 1;
     }
 
-    public async Task<WireOfHashMapStringString> AsyncbasicWire1(WireOfHashMapStringString x)
+    public async Task<WireOfHashMapStringString> Wire1(WireOfHashMapStringString x)
     {
         await Task.Yield();
         var dictionary = x.Unwire();
@@ -58,7 +58,7 @@ partial class AsyncBasic: IAsyncBasic<AsyncBasic>
         return WireOfHashMapStringString.From(dictionary);
     }
 
-    public async Task<ResultWireOfHashMapStringStringError> AsyncbasicWire2(WireOfHashMapStringString x)
+    public async Task<ResultWireOfHashMapStringStringError> Wire2(WireOfHashMapStringString x)
     {
         await Task.Yield();
         var dictionary = x.Unwire();

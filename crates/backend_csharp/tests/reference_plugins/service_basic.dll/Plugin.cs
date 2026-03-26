@@ -4,12 +4,12 @@ namespace My.Company;
 
 partial class ServiceA: IServiceA<ServiceA>
 {
-    public static ServiceA ServiceaCreate()
+    public static ServiceA Create()
     {
         return new();
     }
 
-    public uint ServiceaCall(uint x)
+    public uint Call(uint x)
     {
         return x + 1;
     }
