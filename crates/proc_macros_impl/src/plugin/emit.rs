@@ -553,6 +553,24 @@ fn emit_service_type_info(s: &ServiceBlock) -> TokenStream {
     }
 }
 
+/// Generate `WireIO` impl for service structs (always panics — services are not wire-safe).
+fn emit_service_wire_io(s: &ServiceBlock) -> TokenStream {
+    let name = &s.name;
+    quote! {
+        impl ::interoptopus::lang::types::WireIO for #name {
+            fn write(&self, _: &mut impl ::std::io::Write) -> ::std::result::Result<(), ::interoptopus::lang::types::SerializationError> {
+                ::interoptopus::bad_wire!()
+            }
+            fn read(_: &mut impl ::std::io::Read) -> ::std::result::Result<Self, ::interoptopus::lang::types::SerializationError> {
+                ::interoptopus::bad_wire!()
+            }
+            fn live_size(&self) -> usize {
+                ::interoptopus::bad_wire!()
+            }
+        }
+    }
+}
+
 /// Generate `Send + Sync` impls for service structs.
 ///
 /// The handle is an opaque pointer that is never dereferenced on the Rust side,
