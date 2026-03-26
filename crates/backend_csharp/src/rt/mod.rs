@@ -3,6 +3,8 @@
 //! Provides two runtime backends:
 //! - [`dynamic`] — Hosts the .NET CLR via `netcorehost` and loads managed assemblies.
 //! - [`aot`] — Loads ahead-of-time compiled native libraries via `libloading`.
+//!
+use interoptopus::ffi;
 
 #[cfg(feature = "rt-aot")]
 pub mod aot;
@@ -13,3 +15,5 @@ mod error;
 mod shared;
 
 pub use error::RuntimeError;
+
+pub type Try<T> = ffi::Result<T, u32>;

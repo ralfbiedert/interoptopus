@@ -8,15 +8,15 @@ use std::error::Error;
 
 #[test]
 fn define_plugins() -> Result<(), Box<dyn Error>> {
-    define_plugin!(ServiceBasic, "service_basic.dll");
-    define_plugin!(ServiceAsync, "service_async.dll");
-    define_plugin!(ServiceNested, "service_nested.dll");
+    define_plugin!(ServiceBasic, "service_basic.dll", super::BASE);
+    define_plugin!(ServiceAsync, "service_async.dll", super::BASE);
+    define_plugin!(ServiceNested, "service_nested.dll", super::BASE);
     Ok(())
 }
 
 #[test]
 fn load_plugin_service_basic() -> Result<(), Box<dyn Error>> {
-    let plugin = load_plugin!(ServiceBasic, "service_basic.dll");
+    let plugin = load_plugin!(ServiceBasic, "service_basic.dll", super::BASE);
 
     let svc = plugin.servicea_create();
     assert_eq!(svc.call(5), 6);
@@ -27,7 +27,7 @@ fn load_plugin_service_basic() -> Result<(), Box<dyn Error>> {
 
 #[test]
 fn load_plugin_service_nested() -> Result<(), Box<dyn Error>> {
-    let plugin = load_plugin!(ServiceNested, "service_nested.dll");
+    let plugin = load_plugin!(ServiceNested, "service_nested.dll", super::BASE);
 
     // Test bare fn creating a service
     for i in 0..100u32 {
@@ -110,7 +110,7 @@ fn load_plugin_service_nested() -> Result<(), Box<dyn Error>> {
 // Test ignored since we can't rely on a working .NET runtime being available on CI
 #[tokio::test]
 async fn load_plugin_service_async() -> Result<(), Box<dyn Error>> {
-    let plugin = load_plugin!(ServiceAsync, "service_async.dll");
+    let plugin = load_plugin!(ServiceAsync, "service_async.dll", super::BASE);
 
     plugin.call_void().await;
     let i = plugin.add_one(1).await;

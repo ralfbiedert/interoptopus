@@ -8,13 +8,13 @@ use std::error::Error as StdError;
 
 #[test]
 fn define_plugin() -> Result<(), Box<dyn StdError>> {
-    define_plugin!(Pattern, "pattern.dll");
+    define_plugin!(Pattern, "pattern.dll", super::BASE);
     Ok(())
 }
 
 #[test]
 fn load_plugin() -> Result<(), Box<dyn StdError>> {
-    let plugin = load_plugin!(Pattern, "pattern.dll");
+    let plugin = load_plugin!(Pattern, "pattern.dll", super::BASE);
 
     // Plugin ignores input and always returns Ok(Vec3f32::default())
     let input = ffi::Result::Ok(Vec3f32 { x: 1.0, y: 2.0, z: 3.0 });

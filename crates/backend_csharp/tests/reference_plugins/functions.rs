@@ -1,4 +1,3 @@
-use crate::reference_plugins::plugin_path_for;
 use crate::{define_plugin, load_plugin};
 use interoptopus_csharp::rt::dynamic::runtime as dotnet_runtime;
 use reference_project::plugins::functions::{Behavior, Primitives};
@@ -8,14 +7,14 @@ use std::sync::Arc;
 
 #[test]
 fn define_plugins() -> Result<(), Box<dyn Error>> {
-    define_plugin!(Primitives, "functions_primitive.dll");
-    define_plugin!(Behavior, "functions_behavior.dll");
+    define_plugin!(Primitives, "functions_primitive.dll", super::BASE);
+    define_plugin!(Behavior, "functions_behavior.dll", super::BASE);
     Ok(())
 }
 
 #[test]
 fn load_plugin_functions_primitive() -> Result<(), Box<dyn Error>> {
-    let plugin = load_plugin!(Primitives, "functions_primitive.dll");
+    let plugin = load_plugin!(Primitives, "functions_primitive.dll", super::BASE);
 
     plugin.primitive_void();
     assert_eq!(plugin.primitive_u8(1), 2);
@@ -42,7 +41,7 @@ fn load_plugin_functions_behavior() -> Result<(), Box<dyn Error>> {
         exception_called_clone.store(true, Ordering::SeqCst);
     });
 
-    let plugin = rt.load::<Behavior>(plugin_path_for("functions_behavior.dll"))?;
+    let plugin = rt.load::<Behavior>(crate::dll_path_for(super::BASE, "functions_behavior.dll"))?;
 
     plugin.panic();
 

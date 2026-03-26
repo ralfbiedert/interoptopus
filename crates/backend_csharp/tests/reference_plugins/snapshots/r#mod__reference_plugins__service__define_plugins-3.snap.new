@@ -1,0 +1,709 @@
+---
+source: crates/backend_csharp/tests/reference_plugins/service.rs
+assertion_line: 13
+expression: multibuf
+---
+=== Interop.Common.cs ===
+// Auto-generated plugin interop
+
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using Interoptopus.API;
+using My.Company;
+
+namespace My.Company.Common;
+
+[Serializable]
+[StructLayout(LayoutKind.Sequential)]
+public partial struct Bool
+{
+    byte value;
+}
+
+public partial struct Bool
+{
+    public static readonly Bool True = new Bool { value = 1 };
+    public static readonly Bool False = new Bool { value = 0 };
+
+    public Bool(bool b)
+    {
+        value = (byte)(b ? 1 : 0);
+    }
+
+    public bool Is => value == 1;
+
+    public static implicit operator Bool(bool b) => new Bool(b);
+    public static implicit operator bool(Bool b) => b.Is;
+}
+
+public class InteropException(string text) : Exception(text) { }
+
+public class EnumException() : InteropException($"Enum variant mismatch.")  { }
+
+public class EnumException<T>(T t) : InteropException($"Enum variant mismatch.")
+{
+    public T Value { get; } = t;
+}
+
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate void AsyncCallbackCommon(IntPtr data, IntPtr callback_data);
+
+[StructLayout(LayoutKind.Sequential)]
+public partial struct AsyncCallbackCommonNative
+{
+    internal IntPtr _ptr;
+    internal IntPtr _ts;
+}
+
+public partial struct AsyncCallbackCommonNative
+{
+    /// Signals completion with no return value (corresponds to <c>AsyncCallback&lt;()&gt;</c> on the Rust side).
+    public unsafe void UnsafeComplete()
+    {
+        if (_ptr == IntPtr.Zero) return;
+        var fn = (delegate* unmanaged[Cdecl]<void*, IntPtr, void>)_ptr;
+        // &() in Rust is a valid zero-sized reference; pass a non-null dummy so Rust never sees null.
+        byte dummy = 0;
+        fn(&dummy, _ts);
+    }
+
+    /// Signals completion with a value (corresponds to <c>AsyncCallback&lt;T&gt;</c> on the Rust side).
+    public unsafe void UnsafeComplete<T>(T t) where T : unmanaged
+    {
+        if (_ptr == IntPtr.Zero) return;
+        var fn = (delegate* unmanaged[Cdecl]<T*, IntPtr, void>)_ptr;
+        fn(&t, _ts);
+    }
+}
+=== Interop.Plugin.cs ===
+// Auto-generated plugin interop
+
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using My.Company.Common;
+using My.Company;
+
+namespace Interoptopus.API;
+
+/// Stores runtime trampolines registered by the Rust host at plugin load time.
+public static unsafe class Trampoline
+{
+    private static delegate* unmanaged[Cdecl]<int, int*, int*, IntPtr> _wire_create;
+    private static delegate* unmanaged[Cdecl]<IntPtr, int, int, void> _wire_destroy;
+    private static delegate* unmanaged[Cdecl]<nint, byte*, int, void> _uncaught_exception;
+    private static nint _uncaught_exception_ctx;
+
+    private const long WIRE_CREATE              = 0x4952_4F50_5743_0001;
+    private const long WIRE_DESTROY             = 0x4952_4F50_5743_0002;
+    private const long UNCAUGHT_EXCEPTION       = 0x4952_4F50_5743_0003;
+    private const long UNCAUGHT_EXCEPTION_CTX   = 0x4952_4F50_5743_0004;
+
+    public static void Register(long id, IntPtr fn_ptr)
+    {
+        if (id == WIRE_CREATE)            _wire_create            = (delegate* unmanaged[Cdecl]<int, int*, int*, IntPtr>)fn_ptr;
+        if (id == WIRE_DESTROY)           _wire_destroy           = (delegate* unmanaged[Cdecl]<IntPtr, int, int, void>)fn_ptr;
+        if (id == UNCAUGHT_EXCEPTION)     _uncaught_exception     = (delegate* unmanaged[Cdecl]<nint, byte*, int, void>)fn_ptr;
+        if (id == UNCAUGHT_EXCEPTION_CTX) _uncaught_exception_ctx = fn_ptr;
+    }
+
+    public static IntPtr WireCreate(int size, out int len, out int capacity)
+    {
+        fixed (int* pLen = &len, pCap = &capacity)
+        {
+            return _wire_create(size, pLen, pCap);
+        }
+    }
+
+    public static void WireDestroy(IntPtr data, int len, int capacity)
+    {
+        _wire_destroy(data, len, capacity);
+    }
+
+    /// Notifies the Rust host that an unhandled exception escaped a trampoline method.
+    /// Safe to call even if no handler has been registered.
+    public static void UncaughtException(string message)
+    {
+        if (_uncaught_exception == null) return;
+        var bytes = System.Text.Encoding.UTF8.GetBytes(message);
+        fixed (byte* ptr = bytes)
+        {
+            _uncaught_exception(_uncaught_exception_ctx, ptr, bytes.Length);
+        }
+    }
+}
+
+public static class Interop
+{
+
+    [UnmanagedCallersOnly(EntryPoint = "register_trampoline")]
+    public static void register_trampoline(long id, IntPtr fn_ptr) => Trampoline.Register(id, fn_ptr);
+
+
+    [UnmanagedCallersOnly(EntryPoint = "create_a")]
+    public static NestedA.Unmanaged create_a(uint value)
+    {
+        try
+        {
+            return Plugin.CreateA(value).IntoUnmanaged();
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+            return default;
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "create_a_result")]
+    public static ResultNestedAError.Unmanaged create_a_result(uint value)
+    {
+        try
+        {
+            return Plugin.CreateAResult(value).ToUnmanaged();
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+            return default;
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "nesteda_add")]
+    public static uint nesteda_add(IntPtr self, uint x)
+    {
+        try
+        {
+            var handle = GCHandle.FromIntPtr(self);
+            var obj = (INestedA<NestedA>)handle.Target!;
+            return obj.NestedaAdd(x);
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+            return default;
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "nesteda_create")]
+    public static nint nesteda_create(uint value)
+    {
+        try
+        {
+            var obj = NestedA.NestedaCreate(value);
+            var h = GCHandle.Alloc(obj);
+            return GCHandle.ToIntPtr(h);
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+            return default;
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "nesteda_create_other")]
+    public static NestedB.Unmanaged nesteda_create_other(nint self)
+    {
+        try
+        {
+            var handle = GCHandle.FromIntPtr(self);
+            var obj = (INestedA<NestedA>)handle.Target!;
+            return obj.NestedaCreateOther().IntoUnmanaged();
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+            return default;
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "nesteda_create_other_with")]
+    public static NestedB.Unmanaged nesteda_create_other_with(IntPtr self, uint extra)
+    {
+        try
+        {
+            var handle = GCHandle.FromIntPtr(self);
+            var obj = (INestedA<NestedA>)handle.Target!;
+            return obj.NestedaCreateOtherWith(extra).IntoUnmanaged();
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+            return default;
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "nesteda_drop")]
+    public static void nesteda_drop(NestedA.Unmanaged self)
+    {
+        try
+        {
+            var handle = GCHandle.FromIntPtr(self._handle);
+            handle.Free();
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "nesteda_get_value")]
+    public static uint nesteda_get_value(nint self)
+    {
+        try
+        {
+            var handle = GCHandle.FromIntPtr(self);
+            var obj = (INestedA<NestedA>)handle.Target!;
+            return obj.NestedaGetValue();
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+            return default;
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "nestedb_accept")]
+    public static uint nestedb_accept(IntPtr self, IntPtr a)
+    {
+        try
+        {
+            var handle = GCHandle.FromIntPtr(self);
+            var obj = (INestedB<NestedB>)handle.Target!;
+            return obj.NestedbAccept((NestedA)GCHandle.FromIntPtr(a).Target!);
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+            return default;
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "nestedb_accept_ref")]
+    public static uint nestedb_accept_ref(IntPtr self, IntPtr a)
+    {
+        try
+        {
+            var handle = GCHandle.FromIntPtr(self);
+            var obj = (INestedB<NestedB>)handle.Target!;
+            return obj.NestedbAcceptRef((NestedA)GCHandle.FromIntPtr(a).Target!);
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+            return default;
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "nestedb_add")]
+    public static uint nestedb_add(IntPtr self, uint x)
+    {
+        try
+        {
+            var handle = GCHandle.FromIntPtr(self);
+            var obj = (INestedB<NestedB>)handle.Target!;
+            return obj.NestedbAdd(x);
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+            return default;
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "nestedb_drop")]
+    public static void nestedb_drop(NestedB.Unmanaged self)
+    {
+        try
+        {
+            var handle = GCHandle.FromIntPtr(self._handle);
+            handle.Free();
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+        }
+    }
+
+
+    [UnmanagedCallersOnly(EntryPoint = "nestedb_get_value")]
+    public static uint nestedb_get_value(nint self)
+    {
+        try
+        {
+            var handle = GCHandle.FromIntPtr(self);
+            var obj = (INestedB<NestedB>)handle.Target!;
+            return obj.NestedbGetValue();
+        }
+        catch (Exception e)
+        {
+            Trampoline.UncaughtException(e.ToString());
+            return default;
+        }
+    }
+
+
+}
+=== Interop.User.cs ===
+// Auto-generated plugin interop
+
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using My.Company.Common;
+using Interoptopus.API;
+
+namespace My.Company;
+
+public partial class NestedA : IDisposable
+{
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Unmanaged
+    {
+        internal IntPtr _handle;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public NestedA IntoManaged()
+        {
+            var h = GCHandle.FromIntPtr(_handle);
+            var obj = (NestedA)h.Target!;
+            h.Free();
+            return obj;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public NestedA AsManaged()
+        {
+            return (NestedA)GCHandle.FromIntPtr(_handle).Target!;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    public Unmanaged IntoUnmanaged()
+    {
+        var h = GCHandle.Alloc(this);
+        return new Unmanaged { _handle = GCHandle.ToIntPtr(h) };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    public Unmanaged AsUnmanaged()
+    {
+        var h = GCHandle.Alloc(this);
+        return new Unmanaged { _handle = GCHandle.ToIntPtr(h) };
+    }
+
+    public void Dispose() { }
+}
+
+
+public partial class NestedB : IDisposable
+{
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Unmanaged
+    {
+        internal IntPtr _handle;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public NestedB IntoManaged()
+        {
+            var h = GCHandle.FromIntPtr(_handle);
+            var obj = (NestedB)h.Target!;
+            h.Free();
+            return obj;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public NestedB AsManaged()
+        {
+            return (NestedB)GCHandle.FromIntPtr(_handle).Target!;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    public Unmanaged IntoUnmanaged()
+    {
+        var h = GCHandle.Alloc(this);
+        return new Unmanaged { _handle = GCHandle.ToIntPtr(h) };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    public Unmanaged AsUnmanaged()
+    {
+        var h = GCHandle.Alloc(this);
+        return new Unmanaged { _handle = GCHandle.ToIntPtr(h) };
+    }
+
+    public void Dispose() { }
+}
+
+
+public partial struct Error
+{
+    uint _variant;
+}
+
+
+[NativeMarshalling(typeof(MarshallerMeta))]
+public partial struct Error
+{
+
+    [StructLayout(LayoutKind.Explicit)]
+    public unsafe struct Unmanaged
+    {
+        [FieldOffset(0)]
+        internal uint _variant;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal Error ToManaged()
+        {
+            var _managed = new Error();
+            _managed._variant = _variant;
+            return _managed;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    internal Unmanaged ToUnmanaged()
+    {
+        var _unmanaged = new Unmanaged();
+        _unmanaged._variant = _variant;
+        return _unmanaged;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    internal Unmanaged AsUnmanaged()
+    {
+        var _unmanaged = new Unmanaged();
+        _unmanaged._variant = _variant;
+        return _unmanaged;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    public Exception ExceptionForVariant()
+    {
+        if (_variant == 0) return new EnumException();
+        throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+    }
+
+    // Ctors
+    public static Error Fail => new() { _variant = 0 };
+
+    // Checks
+    public bool IsFail => _variant == 0;
+
+    // Conversions
+    public void AsFail() { if (_variant != 0) throw ExceptionForVariant(); }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    public override string ToString()
+    {
+        if (_variant == 0) return "Fail";
+        throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+    }
+
+    [CustomMarshaller(typeof(Error), MarshalMode.Default, typeof(Marshaller))]
+    private struct MarshallerMeta { }
+
+    public ref struct Marshaller
+    {
+        private Error _managed;
+        private Unmanaged _unmanaged;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Marshaller(Error managed) { _managed = managed; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void FromManaged(Error managed) { _managed = managed; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Error ToManaged() { return _unmanaged.ToManaged(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Free() {}
+    }
+
+}
+
+
+public partial struct ResultNestedAError
+{
+    uint _variant;
+    IntPtr _Ok;
+    Error _Err;
+}
+
+
+[NativeMarshalling(typeof(MarshallerMeta))]
+public partial struct ResultNestedAError
+{
+    [StructLayout(LayoutKind.Sequential)]
+    internal unsafe struct UnmanagedOk
+    {
+        internal uint _variant;
+        internal IntPtr _Ok;
+    }
+    
+    [StructLayout(LayoutKind.Sequential)]
+    internal unsafe struct UnmanagedErr
+    {
+        internal uint _variant;
+        internal Error.Unmanaged _Err;
+    }
+    
+
+    [StructLayout(LayoutKind.Explicit)]
+    public unsafe struct Unmanaged
+    {
+        [FieldOffset(0)]
+        internal uint _variant;
+
+        [FieldOffset(0)]
+        internal UnmanagedOk _Ok;
+
+        [FieldOffset(0)]
+        internal UnmanagedErr _Err;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        internal ResultNestedAError ToManaged()
+        {
+            var _managed = new ResultNestedAError();
+            _managed._variant = _variant;
+            if (_variant == 0) _managed._Ok = _Ok._Ok;
+            if (_variant == 1) _managed._Err = _Err._Err.ToManaged();
+            return _managed;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    internal Unmanaged ToUnmanaged()
+    {
+        var _unmanaged = new Unmanaged();
+        _unmanaged._variant = _variant;
+        if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+        if (_variant == 1) _unmanaged._Err._Err = _Err.ToUnmanaged();
+        return _unmanaged;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    internal Unmanaged AsUnmanaged()
+    {
+        var _unmanaged = new Unmanaged();
+        _unmanaged._variant = _variant;
+        if (_variant == 0) _unmanaged._Ok._Ok = _Ok;
+        if (_variant == 1) _unmanaged._Err._Err = _Err.AsUnmanaged();
+        return _unmanaged;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    public Exception ExceptionForVariant()
+    {
+        if (_variant == 0) return new EnumException<IntPtr>(_Ok);
+        if (_variant == 1) return new EnumException<Error>(_Err);
+        if (_variant == 2) return new EnumException();
+        if (_variant == 3) return new EnumException();
+        throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+    }
+
+    // Ctors
+    public static ResultNestedAError Ok(IntPtr value) => new() { _variant = 0, _Ok = value };
+    public static ResultNestedAError Err(Error value) => new() { _variant = 1, _Err = value };
+    public static ResultNestedAError Panic => new() { _variant = 2 };
+    public static ResultNestedAError Null => new() { _variant = 3 };
+
+    // Checks
+    public bool IsOk => _variant == 0;
+    public bool IsErr => _variant == 1;
+    public bool IsPanic => _variant == 2;
+    public bool IsNull => _variant == 3;
+
+    // Conversions
+    public IntPtr AsOk() { if (_variant != 0) { throw ExceptionForVariant(); } else { return _Ok; } }
+    public Error AsErr() { if (_variant != 1) { throw ExceptionForVariant(); } else { return _Err; } }
+    public void AsPanic() { if (_variant != 2) throw ExceptionForVariant(); }
+    public void AsNull() { if (_variant != 3) throw ExceptionForVariant(); }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    public override string ToString()
+    {
+        if (_variant == 0) return "Ok(...)";
+        if (_variant == 1) return "Err(...)";
+        if (_variant == 2) return "Panic";
+        if (_variant == 3) return "Null";
+        throw new InteropException("Illegal enum state detected. This is a severe error and should never happen.");
+    }
+
+    [CustomMarshaller(typeof(ResultNestedAError), MarshalMode.Default, typeof(Marshaller))]
+    private struct MarshallerMeta { }
+
+    public ref struct Marshaller
+    {
+        private ResultNestedAError _managed;
+        private Unmanaged _unmanaged;
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Marshaller(ResultNestedAError managed) { _managed = managed; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void FromManaged(ResultNestedAError managed) { _managed = managed; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public ResultNestedAError ToManaged() { return _unmanaged.ToManaged(); }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public void Free() {}
+    }
+
+}
+
+
+public interface IPlugin
+{
+    static abstract NestedA CreateA(uint value);
+    static abstract ResultNestedAError CreateAResult(uint value);
+}
+
+public interface INestedA<TSelf> where TSelf : INestedA<TSelf>
+{
+    static abstract TSelf NestedaCreate(uint value);
+    uint NestedaGetValue();
+    uint NestedaAdd(uint x);
+    NestedB NestedaCreateOther();
+    NestedB NestedaCreateOtherWith(uint extra);
+}
+
+public interface INestedB<TSelf> where TSelf : INestedB<TSelf>
+{
+    uint NestedbGetValue();
+    uint NestedbAdd(uint x);
+    uint NestedbAccept(NestedA a);
+    uint NestedbAcceptRef(NestedA a);
+}

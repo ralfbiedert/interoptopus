@@ -8,13 +8,13 @@ use std::error::Error;
 
 #[test]
 fn define_plugin() -> Result<(), Box<dyn Error>> {
-    define_plugin!(Complex, "complex.dll");
+    define_plugin!(Complex, "complex.dll", super::BASE);
     Ok(())
 }
 
 #[test]
 fn load_plugin() -> Result<(), Box<dyn Error>> {
-    let plugin = load_plugin!(Complex, "complex.dll");
+    let plugin = load_plugin!(Complex, "complex.dll", super::BASE);
 
     let input = Vec3f32 { x: 1.0, y: 2.0, z: 3.0 };
     let result = plugin.vec3f32(input);
