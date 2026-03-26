@@ -131,7 +131,7 @@ fn field(name: &str, ty: TypeId) -> Field {
     Field { name: name.to_string(), docs: Docs::default(), visibility: Visibility::Public, ty }
 }
 
-fn variant(name: &str, tag: usize, ty: Option<TypeId>) -> Variant {
+fn variant(name: &str, tag: isize, ty: Option<TypeId>) -> Variant {
     Variant { name: name.to_string(), docs: Docs::default(), tag, ty }
 }
 

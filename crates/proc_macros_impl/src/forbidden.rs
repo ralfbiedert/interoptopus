@@ -1,6 +1,6 @@
 /// Identifiers known to cause issues in some backend language that shouldn't be used in Rust either.
 #[allow(dead_code)]
-pub const FORBIDDEN_NAMES: [&str; 137] = [
+pub const FORBIDDEN_NAMES: [&str; 136] = [
     "abstract",
     "add",
     "alias",
@@ -74,7 +74,6 @@ pub const FORBIDDEN_NAMES: [&str; 137] = [
     "namespace",
     "new",
     "nint",
-    "None",
     "nonlocal",
     "not",
     "notnull",

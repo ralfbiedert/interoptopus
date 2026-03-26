@@ -5,7 +5,7 @@ use interoptopus::lang::meta::Docs;
 pub struct Variant {
     pub name: String,
     pub docs: Docs,
-    pub tag: usize,
+    pub tag: isize,
     pub ty: Option<TypeId>,
 }
 

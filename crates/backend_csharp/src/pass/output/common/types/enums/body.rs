@@ -83,7 +83,7 @@ impl Pass {
                     .map(|v| {
                         let mut m = HashMap::new();
                         m.insert("name", Value::String(format!("_{}", v.name)));
-                        m.insert("tag", Value::from(v.tag as u64));
+                        m.insert("tag", Value::from(v.tag as i64));
                         m
                     })
                     .collect()

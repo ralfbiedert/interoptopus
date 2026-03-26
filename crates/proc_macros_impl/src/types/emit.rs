@@ -229,7 +229,7 @@ impl TypeModel {
                 }
             }
             TypeData::Enum(enum_data) => {
-                let mut next_discriminant: usize = 0;
+                let mut next_discriminant: isize = 0;
                 let variants = enum_data.variants.iter().map(|variant| {
                     let variant_name = variant.name.to_string();
                     let variant_docs = variant.docs.join("\n");
@@ -238,7 +238,7 @@ impl TypeModel {
                             let disc = if let Some(expr) = &variant.discriminant {
                                 quote_spanned! { variant.name.span() => {
                                     #[allow(clippy::unnecessary_cast)]
-                                    { (#expr) as usize }
+                                    { (#expr) as isize }
                                 }}
                             } else {
                                 let d = next_discriminant;
@@ -304,7 +304,7 @@ impl TypeModel {
                 TypeData::Struct(_) => quote_spanned! { self.name.span() => ::interoptopus::lang::types::Layout::C },
                 TypeData::Enum(_) => quote_spanned! { self.name.span() =>
                     ::interoptopus::lang::types::Layout::Primitive(
-                        ::interoptopus::lang::types::Primitive::U32
+                        ::interoptopus::lang::types::Primitive::I32
                     )
                 },
             }

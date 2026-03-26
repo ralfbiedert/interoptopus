@@ -176,7 +176,7 @@ pub const fn assert_service_ctor_safe<T: TypeInfo>() {
 pub enum SerializationError {
     Io(::std::io::Error),
     InvalidData(String),
-    InvalidDiscriminant(String, usize),
+    InvalidDiscriminant(String, isize),
 }
 
 impl From<::std::io::Error> for SerializationError {

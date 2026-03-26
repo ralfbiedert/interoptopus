@@ -28,3 +28,10 @@ pub enum EnumPayload {
     // D { x: Vec3f32 },
     // E(u8, u8, u8),
 }
+
+#[ffi]
+pub enum EnumNegative {
+    A = -1,
+    B = -0,
+    C = 1,
+}

@@ -66,7 +66,7 @@ fn add_repr_attribute(input: &mut DeriveInput, args: &FfiTypeArgs) -> syn::Resul
     } else {
         match &input.data {
             syn::Data::Struct(_) => syn::parse_quote! { #[repr(C)] },
-            syn::Data::Enum(_) => syn::parse_quote! { #[repr(u32)] },
+            syn::Data::Enum(_) => syn::parse_quote! { #[repr(i32)] },
             syn::Data::Union(_) => return Err(syn::Error::new_spanned(input, "Unions are not supported")),
         }
     };

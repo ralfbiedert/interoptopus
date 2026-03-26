@@ -7,7 +7,7 @@ use crate::lang::types::Repr;
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum VariantKind {
     /// A unit variant with an explicit discriminant value.
-    Unit(usize),
+    Unit(isize),
     /// A tuple variant carrying a single payload type.
     Tuple(TypeId),
 }

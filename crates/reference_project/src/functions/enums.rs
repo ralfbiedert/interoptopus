@@ -1,6 +1,6 @@
 use crate::types::basic::Vec3f32;
 use crate::types::complex::Layer3;
-use crate::types::enums::EnumPayload;
+use crate::types::enums::{EnumNegative, EnumPayload};
 use interoptopus::ffi;
 
 #[ffi]
@@ -32,4 +32,9 @@ pub fn enums_4(x: Layer3<ffi::String>) -> ffi::String {
         Layer3::A(x) => x.maybe_3,
         Layer3::B(x) => x.layer_1.maybe_3,
     }
+}
+
+#[ffi]
+pub fn enums_5(x: EnumNegative) -> EnumNegative {
+    x
 }

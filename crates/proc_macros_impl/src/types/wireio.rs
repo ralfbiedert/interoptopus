@@ -249,17 +249,17 @@ impl TypeModel {
                     let match_arms = enum_data.variants.iter().map(|variant| {
                         let vname = &variant.name;
                         quote_spanned! { vname.span() =>
-                            x if x == #name::#vname as u32 => ::std::result::Result::Ok(#name::#vname),
+                            x if x == #name::#vname as i32 => ::std::result::Result::Ok(#name::#vname),
                         }
                     });
 
                     quote_spanned! { self.name.span() =>
-                        let __discriminant = <u32 as ::interoptopus::lang::types::WireIO>::read(input)?;
+                        let __discriminant = <i32 as ::interoptopus::lang::types::WireIO>::read(input)?;
                         match __discriminant {
                             #(#match_arms)*
                             _ => ::std::result::Result::Err(::interoptopus::lang::types::SerializationError::InvalidDiscriminant(
                                 stringify!(#name).to_string(),
-                                __discriminant as usize,
+                                __discriminant as isize,
                             )),
                         }
                     }

@@ -47,7 +47,7 @@ impl Pass {
 
                     let mut m = HashMap::new();
                     m.insert("name", Value::String(v.name.clone()));
-                    m.insert("id", Value::Number(v.tag.into()));
+                    m.insert("id", Value::Number((v.tag as i64).into()));
                     m.insert("has_payload", Value::Bool(has_payload));
                     m.insert("type", Value::String(type_name));
                     m
