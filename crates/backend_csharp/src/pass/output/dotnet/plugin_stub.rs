@@ -124,10 +124,7 @@ fn render_class_stub(
             MethodKind::Regular => "public",
         };
 
-        members.push(format!(
-            "    {prefix} {rval_name} {}({args_str})\n    {{\n        throw new NotImplementedException();\n    }}",
-            method.name
-        ));
+        members.push(format!("    {prefix} {rval_name} {}({args_str})\n    {{\n        throw new NotImplementedException();\n    }}", method.name));
     }
 
     if members.is_empty() {

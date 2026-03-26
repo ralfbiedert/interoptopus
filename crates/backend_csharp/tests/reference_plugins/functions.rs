@@ -2,8 +2,8 @@ use crate::{define_plugin, load_plugin};
 use interoptopus_csharp::rt::dynamic::runtime as dotnet_runtime;
 use reference_project::plugins::functions::{Behavior, Primitives};
 use std::error::Error;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 #[test]
 fn define_plugins() -> Result<(), Box<dyn Error>> {

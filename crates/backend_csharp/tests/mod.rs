@@ -41,7 +41,6 @@ mod model {
     mod service_rval_result;
 }
 
-
 /// Generates interop files for `$plugin` into the `$base/$name` folder and snapshot-tests the output.
 #[macro_export]
 macro_rules! define_plugin {

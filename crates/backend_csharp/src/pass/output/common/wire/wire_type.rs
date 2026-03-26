@@ -19,7 +19,7 @@ pub struct Config {}
 pub struct Pass {
     info: PassInfo,
     wire_types: HashMap<Output, Vec<String>>,
-    /// C# TypeIds of Wire<T> inner types whose field definitions were rendered
+    /// C# `TypeIds` of `Wire<T>` inner types whose field definitions were rendered
     /// by this pass. The `helper_classes` pass checks this to avoid duplicates.
     rendered_inner_types: HashSet<TypeId>,
 }
@@ -123,7 +123,7 @@ impl Pass {
         self.wire_types.get(output).map(std::vec::Vec::as_slice)
     }
 
-    /// Returns true if the given C# TypeId is a Wire<T> inner type whose field
+    /// Returns true if the given C# `TypeId` is a Wire<T> inner type whose field
     /// definitions were already rendered by this pass.
     #[must_use]
     pub fn rendered_inner_type(&self, type_id: TypeId) -> bool {

@@ -6,8 +6,7 @@ use syn::Type;
 use syn::spanned::Spanned;
 
 use crate::plugin::model::{
-    PluginModel, PluginParam, ServiceBlock, direct_service_name, is_self_return, ref_service_name, replace_self, service_in_type,
-    transitive_returned_services,
+    PluginModel, PluginParam, ServiceBlock, direct_service_name, is_self_return, ref_service_name, replace_self, service_in_type, transitive_returned_services,
 };
 
 impl PluginModel {
@@ -100,9 +99,7 @@ impl PluginModel {
     fn emit_plugin_impl(&self, svc_names: &HashSet<String>) -> TokenStream {
         let name = &self.name;
 
-        let bare_methods = self.functions.iter().map(|f| {
-            emit_bare_method(f, &self.services, svc_names)
-        });
+        let bare_methods = self.functions.iter().map(|f| emit_bare_method(f, &self.services, svc_names));
 
         let ctor_methods = self.services.iter().flat_map(|s| {
             let prefix = s.prefix();
@@ -212,11 +209,7 @@ impl PluginModel {
         let name_str = name.to_string();
 
         let bare_registrations = self.functions.iter().map(|f| {
-            let ffi_ret = if f.is_async {
-                None
-            } else {
-                f.ret.as_ref().map(|ty| ffi_reg_ret(ty, svc_names))
-            };
+            let ffi_ret = if f.is_async { None } else { f.ret.as_ref().map(|ty| ffi_reg_ret(ty, svc_names)) };
             let cb_ty = if f.is_async {
                 let cb_inner = ffi_ret_or_unit(f.ret.as_ref(), svc_names);
                 Some(quote! { ::interoptopus::pattern::asynk::AsyncCallback<#cb_inner> })
@@ -251,18 +244,20 @@ impl PluginModel {
     // -----------------------------------------------------------------------
 
     fn emit_assert_guards(&self, svc_names: &HashSet<String>) -> TokenStream {
-        let bare_guards = self.functions.iter().flat_map(|f| {
-            emit_method_assert_guards(&f.params, f.ret.as_ref(), f.is_async, svc_names)
-        });
+        let bare_guards = self
+            .functions
+            .iter()
+            .flat_map(|f| emit_method_assert_guards(&f.params, f.ret.as_ref(), f.is_async, svc_names));
 
         let service_guards = self.services.iter().flat_map(|s| {
             let ctor_guards = s.ctors().into_iter().flat_map(|c| {
                 // Ctor return types contain Self — skip return type checks for ctors.
                 emit_method_assert_guards(&c.params, None, c.is_async, svc_names)
             });
-            let method_guards = s.instance_methods().into_iter().flat_map(|m| {
-                emit_method_assert_guards(&m.params, m.ret.as_ref(), m.is_async, svc_names)
-            });
+            let method_guards = s
+                .instance_methods()
+                .into_iter()
+                .flat_map(|m| emit_method_assert_guards(&m.params, m.ret.as_ref(), m.is_async, svc_names));
             ctor_guards.chain(method_guards)
         });
 
@@ -307,23 +302,24 @@ fn emit_method_assert_guards(params: &[PluginParam], ret: Option<&Type>, is_asyn
     }
 
     // Return type guards — skip service types (they become ServiceHandle at FFI level).
-    if let Some(ty) = ret {
-        if direct_service_name(ty, svc_names).is_none() && service_in_type(ty, svc_names).is_none() {
-            let span = ty.span();
+    if let Some(ty) = ret
+        && direct_service_name(ty, svc_names).is_none()
+        && service_in_type(ty, svc_names).is_none()
+    {
+        let span = ty.span();
 
+        guards.push(quote_spanned! { span =>
+            const _: () = const {
+                ::interoptopus::lang::types::assert_raw_safe::<#ty>();
+            };
+        });
+
+        if is_async {
             guards.push(quote_spanned! { span =>
-                const _: () = const {
-                    ::interoptopus::lang::types::assert_raw_safe::<#ty>();
-                };
+            const _: () = const {
+                ::interoptopus::lang::types::assert_async_safe::<#ty>();
+            };
             });
-
-            if is_async {
-                guards.push(quote_spanned! { span =>
-                    const _: () = const {
-                        ::interoptopus::lang::types::assert_async_safe::<#ty>();
-                    };
-                });
-            }
         }
     }
 
@@ -423,10 +419,7 @@ fn emit_ctor_method(
     } else {
         // Wrapped Self (e.g., Result<Self, E>, Try<Self>, Option<Self>)
         let user_ty = replace_self(c.ret.as_ref().unwrap(), svc_name);
-        (
-            quote! { <#user_ty as ::interoptopus::ffi::ServiceAs<#svc_name>>::FFI },
-            quote! { #user_ty },
-        )
+        (quote! { <#user_ty as ::interoptopus::ffi::ServiceAs<#svc_name>>::FFI }, quote! { #user_ty })
     };
 
     if c.is_async {
@@ -509,9 +502,7 @@ fn emit_service_impl(s: &ServiceBlock, all_services: &[ServiceBlock], svc_names:
     let prefix = s.prefix();
 
     let inst_methods = s.instance_methods();
-    let methods = inst_methods.iter().map(|m| {
-        emit_instance_method(&prefix, m, all_services, svc_names)
-    });
+    let methods = inst_methods.iter().map(|m| emit_instance_method(&prefix, m, all_services, svc_names));
 
     quote! {
         impl #name {
@@ -520,12 +511,7 @@ fn emit_service_impl(s: &ServiceBlock, all_services: &[ServiceBlock], svc_names:
     }
 }
 
-fn emit_instance_method(
-    prefix: &str,
-    m: &crate::plugin::model::PluginMethod,
-    all_services: &[ServiceBlock],
-    svc_names: &HashSet<String>,
-) -> TokenStream {
+fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, all_services: &[ServiceBlock], svc_names: &HashSet<String>) -> TokenStream {
     let method_name = &m.name;
     let field = prefixed_ident(prefix, &m.name);
     let params = typed_params(&m.params);
@@ -737,10 +723,7 @@ fn emit_service_registration(s: &ServiceBlock, svc_names: &HashSet<String>) -> T
     });
 
     // Destructor takes ServiceHandle<Service>.
-    let destructor_params = [PluginParam {
-        name: format_ident!("handle"),
-        ty: syn::parse_quote! { ::interoptopus::ffi::ServiceHandle<#svc_name> },
-    }];
+    let destructor_params = [PluginParam { name: format_ident!("handle"), ty: syn::parse_quote! { ::interoptopus::ffi::ServiceHandle<#svc_name> } }];
     let destructor_registration = emit_function_registration(&destructor_fn_name, &destructor_params, None, None, svc_names);
 
     let ctor_id_exprs = ctor_fn_names.iter().map(|n| function_id_expr(n));
@@ -894,19 +877,18 @@ fn ffi_ret_arrow(ret: Option<&Type>, svc_names: &HashSet<String>) -> TokenStream
 }
 
 fn ffi_ret_or_unit(ret: Option<&Type>, svc_names: &HashSet<String>) -> TokenStream {
-    match ret {
-        Some(ty) => {
-            if let Some(svc_name) = direct_service_name(ty, svc_names) {
-                let svc_ident = format_ident!("{}", svc_name);
-                quote! { ::interoptopus::ffi::ServiceHandle<#svc_ident> }
-            } else if let Some(svc_name) = service_in_type(ty, svc_names) {
-                let svc_ident = format_ident!("{}", svc_name);
-                quote! { <#ty as ::interoptopus::ffi::ServiceAs<#svc_ident>>::FFI }
-            } else {
-                quote! { #ty }
-            }
+    if let Some(ty) = ret {
+        if let Some(svc_name) = direct_service_name(ty, svc_names) {
+            let svc_ident = format_ident!("{}", svc_name);
+            quote! { ::interoptopus::ffi::ServiceHandle<#svc_ident> }
+        } else if let Some(svc_name) = service_in_type(ty, svc_names) {
+            let svc_ident = format_ident!("{}", svc_name);
+            quote! { <#ty as ::interoptopus::ffi::ServiceAs<#svc_ident>>::FFI }
+        } else {
+            quote! { #ty }
         }
-        None => quote! { () },
+    } else {
+        quote! { () }
     }
 }
 
@@ -1086,7 +1068,14 @@ fn ret_tokens(ret: Option<&Type>) -> TokenStream {
 }
 
 fn typed_params(params: &[PluginParam]) -> Vec<TokenStream> {
-    params.iter().map(|p| { let pname = &p.name; let pty = &p.ty; quote! { #pname: #pty } }).collect()
+    params
+        .iter()
+        .map(|p| {
+            let pname = &p.name;
+            let pty = &p.ty;
+            quote! { #pname: #pty }
+        })
+        .collect()
 }
 
 fn prefixed_ident(prefix: &str, name: &Ident) -> Ident {
@@ -1094,7 +1083,7 @@ fn prefixed_ident(prefix: &str, name: &Ident) -> Ident {
 }
 
 fn find_service<'a>(all_services: &'a [ServiceBlock], name: &str) -> &'a ServiceBlock {
-    all_services.iter().find(|s| s.name.to_string() == name).unwrap()
+    all_services.iter().find(|s| s.name == name).unwrap()
 }
 
 fn emit_load_field(field: &Ident, symbol: &str, fn_ty: TokenStream) -> TokenStream {

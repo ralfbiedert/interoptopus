@@ -93,9 +93,13 @@ fn map_visibility(visibility: lang::meta::Visibility) -> crate::lang::meta::Visi
     }
 }
 
-/// Returns true if `ty_id` is WireOnly or is a struct that transitively
-/// contains WireOnly fields. Such types cannot be represented as C# composites.
-fn contains_wireonly(ty_id: interoptopus::inventory::TypeId, rs_types: &interoptopus::inventory::Types, visited: &mut std::collections::HashSet<interoptopus::inventory::TypeId>) -> bool {
+/// Returns true if `ty_id` is `WireOnly` or is a struct that transitively
+/// contains `WireOnly` fields. Such types cannot be represented as C# composites.
+fn contains_wireonly(
+    ty_id: interoptopus::inventory::TypeId,
+    rs_types: &interoptopus::inventory::Types,
+    visited: &mut std::collections::HashSet<interoptopus::inventory::TypeId>,
+) -> bool {
     if !visited.insert(ty_id) {
         return false;
     }

@@ -48,9 +48,7 @@ impl Pass {
             let Some(func) = fns_all.get(entry.fn_id) else { continue };
 
             let pascal_name = rust_to_pascal(&func.name);
-            let Some((csharp_sig, rval_id, is_async)) = resolve_method_info(&func.signature.arguments, func.signature.rval, types) else {
-                return Ok(Unchanged);
-            };
+            let (csharp_sig, rval_id, is_async) = resolve_method_info(&func.signature.arguments, func.signature.rval, types);
 
             methods.push(Method { name: pascal_name, kind: MethodKind::Static, base: entry.fn_id, csharp: csharp_sig, rval_id, is_async });
         }

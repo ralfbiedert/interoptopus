@@ -1,6 +1,6 @@
 //! Builds service interface models (`IFoo<TSelf>`) from service definitions.
 //!
-//! Pointer-to-service types in return positions are resolved to service TypeIds.
+//! Pointer-to-service types in return positions are resolved to service `TypeIds`.
 //! Result types wrapping service handles are replaced with their managed siblings
 //! (created by the `service_type_siblings` pass).
 
@@ -56,18 +56,14 @@ impl Pass {
             for &fn_id in &svc.ctors {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
-                let Some((csharp_sig, rval_id, is_async)) = resolve_method_info(&func.signature.arguments, func.signature.rval, types) else {
-                    return Ok(Unchanged);
-                };
+                let (csharp_sig, rval_id, is_async) = resolve_method_info(&func.signature.arguments, func.signature.rval, types);
                 methods.push(Method { name: method_name, kind: MethodKind::Static, base: fn_id, csharp: csharp_sig, rval_id, is_async });
             }
 
             for &fn_id in &svc.methods {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
-                let Some((csharp_sig, rval_id, is_async)) = resolve_method_info(&func.signature.arguments, func.signature.rval, types) else {
-                    return Ok(Unchanged);
-                };
+                let (csharp_sig, rval_id, is_async) = resolve_method_info(&func.signature.arguments, func.signature.rval, types);
                 methods.push(Method { name: method_name, kind: MethodKind::Regular, base: fn_id, csharp: csharp_sig, rval_id, is_async });
             }
 

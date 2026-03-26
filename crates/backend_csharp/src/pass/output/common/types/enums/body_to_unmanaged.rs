@@ -16,7 +16,7 @@ pub struct Pass {
 
 impl Pass {
     #[must_use]
-    pub fn new(config: Config) -> Self {
+    pub fn new(_config: Config) -> Self {
         Self { info: PassInfo { name: file!() }, body_to_unmanaged: HashMap::default() }
     }
 

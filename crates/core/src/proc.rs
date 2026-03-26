@@ -132,7 +132,6 @@
 #[cfg(feature = "macros")]
 pub use interoptopus_proc::ffi;
 
-
 /// Derives the [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime) trait for a service struct
 /// by forwarding to one of its fields.
 ///
@@ -171,7 +170,6 @@ pub use interoptopus_proc::ffi;
 /// ```
 #[cfg(feature = "macros")]
 pub use interoptopus_proc::AsyncRuntime;
-
 
 /// Declares a plugin interface for reverse interop, e.g., loading a C# DLL from Rust.
 ///
@@ -261,7 +259,6 @@ pub use interoptopus_proc::AsyncRuntime;
 ///   is via function arguments, which takes care of their lifecycle requirements.
 #[cfg(all(feature = "macros", feature = "unstable-plugins"))]
 pub use interoptopus_proc::plugin;
-
 
 /// Strips module paths from a fully-qualified Rust type name, preserving generic structure.
 ///

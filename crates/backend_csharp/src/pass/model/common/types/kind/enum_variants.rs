@@ -51,7 +51,7 @@ impl Pass {
                             all_variants_available = false;
                             break;
                         };
-                        (index as isize, Some(cs_type_id))
+                        (index.cast_signed(), Some(cs_type_id))
                     }
                 };
 

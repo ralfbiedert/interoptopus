@@ -1,8 +1,8 @@
 use interoptopus_csharp::rt::dynamic::runtime as dotnet_runtime;
 use reference_project::plugins::functions::Behavior;
 use std::error::Error;
-use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU32, Ordering};
 
 const BASE: &str = "tests/reference_plugins";
 

@@ -3,8 +3,8 @@
 //!
 //! Service ctors return `TypeName.Unmanaged` via `.IntoUnmanaged()`.
 //! Methods dereference the `*const ServiceHandle` self pointer via
-//! `Marshal.ReadIntPtr(self)` to recover the GCHandle.
-//! Destructors receive the ServiceHandle by value and free it.
+//! `Marshal.ReadIntPtr(self)` to recover the `GCHandle`.
+//! Destructors receive the `ServiceHandle` by value and free it.
 //!
 //! Method names and type names are resolved from the service interface model pass.
 
@@ -32,6 +32,7 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, methods: HashMap::default() }
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn process(
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
@@ -119,7 +120,11 @@ impl Pass {
 
                     if let Some(inner_id) = async_inner {
                         let (args, forward) = service_aware_args_except_last(func, types, unmanaged_names, unmanaged_conversion);
-                        let self_args = if args.is_empty() { "nint self".to_string() } else { format!("IntPtr self, {args}") };
+                        let self_args = if args.is_empty() {
+                            "nint self".to_string()
+                        } else {
+                            format!("IntPtr self, {args}")
+                        };
 
                         let continuation = if let Some(svc_name) = resolve_ptr_to_service_name(inner_id, types) {
                             "ContinueWith(t => cb.UnsafeComplete(t.Result.IntoUnmanaged()))".to_string()
@@ -138,7 +143,11 @@ impl Pass {
                     } else if rval_is_service {
                         let ret_svc_name = resolve_ptr_to_service_name(func.signature.rval, types).unwrap();
                         let (args, forward) = service_aware_args(func, types, unmanaged_names, unmanaged_conversion);
-                        let self_args = if args.is_empty() { "nint self".to_string() } else { format!("IntPtr self, {args}") };
+                        let self_args = if args.is_empty() {
+                            "nint self".to_string()
+                        } else {
+                            format!("IntPtr self, {args}")
+                        };
                         let rval_type = format!("{ret_svc_name}.Unmanaged");
 
                         let mut ctx = Context::new();
@@ -154,7 +163,11 @@ impl Pass {
                         let rval_unmanaged = rval_unmanaged_name(func, rval_type, unmanaged_names);
                         let rval_suffix = unmanaged_conversion.to_unmanaged_suffix(func.signature.rval);
                         let is_void = rval_type == "void";
-                        let self_args = if args.is_empty() { "nint self".to_string() } else { format!("IntPtr self, {args}") };
+                        let self_args = if args.is_empty() {
+                            "nint self".to_string()
+                        } else {
+                            format!("IntPtr self, {args}")
+                        };
 
                         let mut ctx = Context::new();
                         ctx.insert("ffi_name", ffi_name);
@@ -224,7 +237,7 @@ fn resolve_double_ptr_to_service_name(type_id: crate::lang::TypeId, types: &mode
     None
 }
 
-/// Like `unmanaged_args` but handles pointer-to-service params by unwrapping GCHandle,
+/// Like `unmanaged_args` but handles pointer-to-service params by unwrapping `GCHandle`,
 /// and double-pointer-to-service params (ref params) by dereferencing first.
 fn service_aware_args(
     func: &crate::lang::functions::Function,
@@ -232,22 +245,32 @@ fn service_aware_args(
     unmanaged_names: &output::common::conversion::unmanaged_names::Pass,
     unmanaged_conversion: &output::common::conversion::unmanaged_conversion::Pass,
 ) -> (String, String) {
-    let args: Vec<String> = func.signature.arguments.iter().filter_map(|arg| {
-        let ty_name = unmanaged_names.name(arg.ty)?;
-        Some(format!("{ty_name} {}", arg.name))
-    }).collect();
+    let args: Vec<String> = func
+        .signature
+        .arguments
+        .iter()
+        .filter_map(|arg| {
+            let ty_name = unmanaged_names.name(arg.ty)?;
+            Some(format!("{ty_name} {}", arg.name))
+        })
+        .collect();
 
-    let forward: Vec<String> = func.signature.arguments.iter().map(|a| {
-        if let Some(svc_name) = resolve_ptr_to_service_name(a.ty, types) {
-            // Owned service param — ServiceHandle by value, unwrap GCHandle directly.
-            format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
-        } else if let Some(svc_name) = resolve_double_ptr_to_service_name(a.ty, types) {
-            // Ref service param — pointer-to-ServiceHandle, dereference then unwrap.
-            format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
-        } else {
-            format!("{}{}", a.name, unmanaged_conversion.to_managed_suffix(a.ty))
-        }
-    }).collect();
+    let forward: Vec<String> = func
+        .signature
+        .arguments
+        .iter()
+        .map(|a| {
+            if let Some(svc_name) = resolve_ptr_to_service_name(a.ty, types) {
+                // Owned service param — ServiceHandle by value, unwrap GCHandle directly.
+                format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
+            } else if let Some(svc_name) = resolve_double_ptr_to_service_name(a.ty, types) {
+                // Ref service param — pointer-to-ServiceHandle, dereference then unwrap.
+                format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
+            } else {
+                format!("{}{}", a.name, unmanaged_conversion.to_managed_suffix(a.ty))
+            }
+        })
+        .collect();
 
     (args.join(", "), forward.join(", "))
 }
@@ -261,20 +284,31 @@ fn service_aware_args_except_last(
 ) -> (String, String) {
     let n = func.signature.arguments.len().saturating_sub(1);
 
-    let args: Vec<String> = func.signature.arguments.iter().filter_map(|arg| {
-        let ty_name = unmanaged_names.name(arg.ty)?;
-        Some(format!("{ty_name} {}", arg.name))
-    }).collect();
+    let args: Vec<String> = func
+        .signature
+        .arguments
+        .iter()
+        .filter_map(|arg| {
+            let ty_name = unmanaged_names.name(arg.ty)?;
+            Some(format!("{ty_name} {}", arg.name))
+        })
+        .collect();
 
-    let forward: Vec<String> = func.signature.arguments.iter().take(n).map(|a| {
-        if let Some(svc_name) = resolve_ptr_to_service_name(a.ty, types) {
-            format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
-        } else if let Some(svc_name) = resolve_double_ptr_to_service_name(a.ty, types) {
-            format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
-        } else {
-            format!("{}{}", a.name, unmanaged_conversion.to_managed_suffix(a.ty))
-        }
-    }).collect();
+    let forward: Vec<String> = func
+        .signature
+        .arguments
+        .iter()
+        .take(n)
+        .map(|a| {
+            if let Some(svc_name) = resolve_ptr_to_service_name(a.ty, types) {
+                format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
+            } else if let Some(svc_name) = resolve_double_ptr_to_service_name(a.ty, types) {
+                format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
+            } else {
+                format!("{}{}", a.name, unmanaged_conversion.to_managed_suffix(a.ty))
+            }
+        })
+        .collect();
 
     (args.join(", "), forward.join(", "))
 }

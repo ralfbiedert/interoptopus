@@ -60,6 +60,7 @@ impl<T> ServiceHandle<T> {
     }
 
     /// Returns the underlying raw pointer.
+    #[must_use]
     pub fn as_ptr(self) -> *const T {
         self.0
     }
@@ -125,7 +126,7 @@ impl<S> ServiceHandleMap<S> for ServiceHandle<S> {
     type Mapped<T> = T;
 
     #[inline]
-    fn map_service_handle<T>(self, f: impl FnOnce(ServiceHandle<S>) -> T) -> T {
+    fn map_service_handle<T>(self, f: impl FnOnce(Self) -> T) -> T {
         f(self)
     }
 }

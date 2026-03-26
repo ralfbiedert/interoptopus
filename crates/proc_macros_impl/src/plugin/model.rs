@@ -150,12 +150,12 @@ pub fn replace_self(ty: &Type, replacement: &Ident) -> Type {
 
 /// If `ty` is a known service type name, return it.
 pub fn direct_service_name(ty: &Type, service_names: &HashSet<String>) -> Option<String> {
-    if let Type::Path(p) = ty {
-        if let Some(ident) = p.path.get_ident() {
-            let name = ident.to_string();
-            if service_names.contains(&name) {
-                return Some(name);
-            }
+    if let Type::Path(p) = ty
+        && let Some(ident) = p.path.get_ident()
+    {
+        let name = ident.to_string();
+        if service_names.contains(&name) {
+            return Some(name);
         }
     }
     None
@@ -163,16 +163,13 @@ pub fn direct_service_name(ty: &Type, service_names: &HashSet<String>) -> Option
 
 /// If `ty` is `ffi::Result<ServiceType, E>`, return the service name.
 pub fn result_service_name(ty: &Type, service_names: &HashSet<String>) -> Option<String> {
-    if let Type::Path(p) = ty {
-        if let Some(seg) = p.path.segments.last() {
-            if seg.ident == "Result" {
-                if let syn::PathArguments::AngleBracketed(args) = &seg.arguments {
-                    if let Some(syn::GenericArgument::Type(inner)) = args.args.first() {
-                        return direct_service_name(inner, service_names);
-                    }
-                }
-            }
-        }
+    if let Type::Path(p) = ty
+        && let Some(seg) = p.path.segments.last()
+        && seg.ident == "Result"
+        && let syn::PathArguments::AngleBracketed(args) = &seg.arguments
+        && let Some(syn::GenericArgument::Type(inner)) = args.args.first()
+    {
+        return direct_service_name(inner, service_names);
     }
     None
 }
@@ -202,16 +199,15 @@ pub fn service_in_type(ty: &Type, service_names: &HashSet<String>) -> Option<Str
     if let Some(name) = direct_service_name(ty, service_names) {
         return Some(name);
     }
-    if let Type::Path(p) = ty {
-        if let Some(seg) = p.path.segments.last() {
-            if let syn::PathArguments::AngleBracketed(args) = &seg.arguments {
-                for arg in &args.args {
-                    if let syn::GenericArgument::Type(inner) = arg {
-                        if let Some(name) = service_in_type(inner, service_names) {
-                            return Some(name);
-                        }
-                    }
-                }
+    if let Type::Path(p) = ty
+        && let Some(seg) = p.path.segments.last()
+        && let syn::PathArguments::AngleBracketed(args) = &seg.arguments
+    {
+        for arg in &args.args {
+            if let syn::GenericArgument::Type(inner) = arg
+                && let Some(name) = service_in_type(inner, service_names)
+            {
+                return Some(name);
             }
         }
     }
@@ -240,7 +236,7 @@ pub fn transitive_returned_services(s: &ServiceBlock, all_services: &[ServiceBlo
     while let Some(name) = queue.pop() {
         if visited.insert(name.clone()) {
             result.push(name.clone());
-            if let Some(other) = all_services.iter().find(|o| o.name.to_string() == name) {
+            if let Some(other) = all_services.iter().find(|o| o.name == name) {
                 for sub in other.returned_service_names(svc_names) {
                     if !visited.contains(&sub) {
                         queue.push(sub);

@@ -85,20 +85,19 @@ impl DotnetRuntime {
     /// loaded for a different plugin type.
     pub fn load<T: Plugin + Send + Sync + 'static>(&self, dll_path: impl AsRef<Path>) -> Result<Arc<T>, PluginLoadError> {
         let path = dll_path.as_ref().to_path_buf();
-        let mut inner = self.inner.lock().expect("runtime mutex poisoned");
 
-        inner.plugins.check_uniqueness::<T>(&path)?;
-
-        if let Some(arc) = inner.plugins.get_cached::<T>() {
-            return Ok(arc);
-        }
-
-        // Load assembly and resolve symbols.
-        let dll_pdc = PdCString::from_os_str(path.as_os_str()).expect("dll path contains null bytes");
-        let delegate_loader = inner
-            .context
-            .get_delegate_loader_for_assembly(dll_pdc)
-            .map_err(|e| PluginLoadError::LoadFailed(e.to_string()))?;
+        let delegate_loader = {
+            let inner = self.inner.lock().expect("runtime mutex poisoned");
+            inner.plugins.check_uniqueness::<T>(&path)?;
+            if let Some(arc) = inner.plugins.get_cached::<T>() {
+                return Ok(arc);
+            }
+            let dll_pdc = PdCString::from_os_str(path.as_os_str()).expect("dll path contains null bytes");
+            inner
+                .context
+                .get_delegate_loader_for_assembly(dll_pdc)
+                .map_err(|e| PluginLoadError::LoadFailed(e.to_string()))?
+        };
 
         let assembly_name = path
             .file_stem()
@@ -134,7 +133,10 @@ impl DotnetRuntime {
         }
 
         let arc = Arc::new(plugin);
-        inner.plugins.insert::<T>(path, Arc::clone(&arc));
+        {
+            let mut inner = self.inner.lock().expect("runtime mutex poisoned");
+            inner.plugins.insert::<T>(path, Arc::clone(&arc));
+        }
         Ok(arc)
     }
 }

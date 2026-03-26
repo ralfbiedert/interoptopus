@@ -198,7 +198,7 @@ impl Pass {
     }
 }
 
-/// If `ty` is a pointer to a service type, return the service TypeId.
+/// If `ty` is a pointer to a service type, return the service `TypeId`.
 fn resolve_ptr_to_service(ty: TypeId, types: &model::common::types::all::Pass) -> TypeId {
     let Some(t) = types.get(ty) else { return ty };
     let TypeKind::Pointer(p) = &t.kind else { return ty };

@@ -16,7 +16,7 @@ fn async_callback_inner(args: &[Argument], types: &TypesAll) -> Option<TypeId> {
     }
 }
 
-/// If `type_id` is a pointer whose target is a Service, return the service's TypeId.
+/// If `type_id` is a pointer whose target is a Service, return the service's `TypeId`.
 fn resolve_ptr_to_service_id(type_id: TypeId, types: &TypesAll) -> Option<TypeId> {
     let ty = types.get(type_id)?;
     if let TypeKind::Pointer(p) = &ty.kind {
@@ -28,9 +28,9 @@ fn resolve_ptr_to_service_id(type_id: TypeId, types: &TypesAll) -> Option<TypeId
     None
 }
 
-/// Resolve a return TypeId through pointer-to-service patterns.
+/// Resolve a return `TypeId` through pointer-to-service patterns.
 ///
-/// - If `rval_id` is pointer-to-service → returns the service TypeId (so the
+/// - If `rval_id` is pointer-to-service → returns the service `TypeId` (so the
 ///   interface can emit `TSelf`).
 /// - Otherwise → returns `rval_id` unchanged. Result types wrapping a service
 ///   pointer already have the correct managed name from the naming pass.
@@ -45,24 +45,16 @@ fn resolve_rval_type(rval_id: TypeId, types: &TypesAll) -> TypeId {
 ///
 /// Returns `(Signature, resolved_rval_id, is_async)`:
 /// - `Signature`: arguments with async callback stripped, rval set to the resolved type.
-/// - `resolved_rval_id`: the managed return TypeId (service or original).
+/// - `resolved_rval_id`: the managed return `TypeId` (service or original).
 /// - `is_async`: true if the original function uses `AsyncCallback<T>`.
-pub(super) fn resolve_method_info(
-    args: &[Argument],
-    rval: TypeId,
-    types: &TypesAll,
-) -> Option<(Signature, TypeId, bool)> {
+pub(super) fn resolve_method_info(args: &[Argument], rval: TypeId, types: &TypesAll) -> (Signature, TypeId, bool) {
     let async_inner = async_callback_inner(args, types);
     let is_async = async_inner.is_some();
 
     // For async functions, the rval may carry an override (service-specific TypeId) set by the
     // proc macro. Use it when available (non-void); otherwise fall back to the callback inner type.
     let rval_is_void = matches!(types.get(rval).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
-    let raw_rval_id = if is_async && rval_is_void {
-        async_inner.unwrap_or(rval)
-    } else {
-        rval
-    };
+    let raw_rval_id = if is_async && rval_is_void { async_inner.unwrap_or(rval) } else { rval };
     let resolved_rval_id = resolve_rval_type(raw_rval_id, types);
 
     let is_void = matches!(types.get(resolved_rval_id).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
@@ -71,5 +63,5 @@ pub(super) fn resolve_method_info(
     let arg_count = if is_async { args.len().saturating_sub(1) } else { args.len() };
     let arguments: Vec<Argument> = args.iter().take(arg_count).cloned().collect();
 
-    Some((Signature { arguments, rval: effective_rval }, resolved_rval_id, is_async))
+    (Signature { arguments, rval: effective_rval }, resolved_rval_id, is_async)
 }

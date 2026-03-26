@@ -56,7 +56,7 @@ impl Pass {
 
                     let line = match method.kind {
                         MethodKind::Static => {
-                            let is_bare_service = types.get(method.rval_id).map_or(false, |t| matches!(&t.kind, TypeKind::Service));
+                            let is_bare_service = types.get(method.rval_id).is_some_and(|t| matches!(&t.kind, TypeKind::Service));
                             if is_bare_service {
                                 let rval = if method.is_async { "Task<TSelf>" } else { "TSelf" };
                                 format!("    static abstract {rval} {}({args_str});", method.name)

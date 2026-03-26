@@ -23,7 +23,7 @@ pub struct Method {
     pub base: FunctionId,
     /// C#-ified signature (async callback stripped, args resolved).
     pub csharp: Signature,
-    /// Resolved C# return type (e.g. the sibling ResultTypeId, service TypeId, etc.).
+    /// Resolved C# return type (e.g. the sibling `ResultTypeId`, service `TypeId`, etc.).
     pub rval_id: TypeId,
     /// Whether this method is async (wraps return in `Task<>`).
     pub is_async: bool,

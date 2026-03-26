@@ -1,8 +1,8 @@
 use crate::{define_plugin, load_plugin};
 use interoptopus::lang::plugin::PluginInfo;
+use interoptopus_csharp::DotnetLibrary;
 use interoptopus_csharp::dispatch::Dispatch;
 use interoptopus_csharp::rt::Try;
-use interoptopus_csharp::DotnetLibrary;
 use reference_project::types::arrays::{Array, NestedArray};
 use reference_project::types::basic::Vec3f32;
 use reference_project::types::enums::{EnumPayload, EnumRenamedXYZ};

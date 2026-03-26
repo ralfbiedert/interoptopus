@@ -14,7 +14,7 @@ use std::sync::{Arc, Mutex, OnceLock};
 struct Inner {
     plugins: PluginCache,
     /// Keep loaded libraries alive for the lifetime of the runtime.
-    _libraries: Vec<libloading::Library>,
+    libraries: Vec<libloading::Library>,
 }
 
 /// AOT runtime that loads native plugin libraries.
@@ -32,7 +32,7 @@ unsafe impl Sync for AotRuntime {}
 
 impl AotRuntime {
     fn new() -> Self {
-        let inner = Mutex::new(Inner { plugins: PluginCache::new(), _libraries: Vec::new() });
+        let inner = Mutex::new(Inner { plugins: PluginCache::new(), libraries: Vec::new() });
         Self { inner, exception_handler: OnceLock::new() }
     }
 
@@ -58,12 +58,13 @@ impl AotRuntime {
     /// library at `lib_path` is compatible and well-formed.
     pub fn load<T: Plugin + Send + Sync + 'static>(&self, lib_path: impl AsRef<Path>) -> Result<Arc<T>, PluginLoadError> {
         let path = lib_path.as_ref().to_path_buf();
-        let mut inner = self.inner.lock().expect("runtime mutex poisoned");
 
-        inner.plugins.check_uniqueness::<T>(&path)?;
-
-        if let Some(arc) = inner.plugins.get_cached::<T>() {
-            return Ok(arc);
+        {
+            let inner = self.inner.lock().expect("runtime mutex poisoned");
+            inner.plugins.check_uniqueness::<T>(&path)?;
+            if let Some(arc) = inner.plugins.get_cached::<T>() {
+                return Ok(arc);
+            }
         }
 
         // Load the native library.
@@ -91,8 +92,11 @@ impl AotRuntime {
         }
 
         let arc = Arc::new(plugin);
-        inner.plugins.insert::<T>(path, Arc::clone(&arc));
-        inner._libraries.push(lib);
+        {
+            let mut inner = self.inner.lock().expect("runtime mutex poisoned");
+            inner.plugins.insert::<T>(path, Arc::clone(&arc));
+            inner.libraries.push(lib);
+        }
         Ok(arc)
     }
 }

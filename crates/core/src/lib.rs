@@ -20,7 +20,7 @@ pub mod wire;
 pub mod proc;
 
 #[cfg(feature = "macros")]
-pub use proc::{ffi, AsyncRuntime};
+pub use proc::{AsyncRuntime, ffi};
 
 #[cfg(all(feature = "macros", feature = "unstable-plugins"))]
 pub use proc::plugin;

@@ -51,7 +51,7 @@ impl Pass {
 
             // Managed-only types (e.g. Result<Service, Error> siblings) have no Unmanaged representation.
             let is_managed_only = match type_kind {
-                TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _)) | TypeKind::TypePattern(TypePattern::Option(ok_ty, _)) => {
+                TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _) | TypePattern::Option(ok_ty, _)) => {
                     types.get(*ok_ty).is_some_and(|t| matches!(&t.kind, TypeKind::Service))
                 }
                 _ => false,

@@ -13,7 +13,7 @@ use crate::lang::TypeId;
 use crate::lang::types::kind::TypeKind;
 use crate::pass::{OperationMode, model};
 
-/// If `ty` is a pointer to a service type, return the service TypeId so that
+/// If `ty` is a pointer to a service type, return the service `TypeId` so that
 /// enum rendering uses the managed service class and `Service.Unmanaged` instead
 /// of raw `IntPtr`. Only applicable for reverse interop (`Plugin` mode) where
 /// services are managed C# objects; in forward interop (`Rust` mode) services
