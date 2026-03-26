@@ -149,6 +149,37 @@ Output passes providing bool values for templates must not do via strings (e.g.,
 **Templates**: `.cs` template files are packed into a tar archive at build time (via `build.rs`), embedded in the binary, and rendered with the Tera engine from `interoptopus_backends`.
 
 
+### Reverse Interop / Plugin System
+
+The reverse interop system lets Rust load .NET DLLs as plugins. A Rust `plugin!` macro declares the expected interface (functions + service impl blocks), and the C# backend generates matching `[UnmanagedCallersOnly]` trampolines, interfaces, and types.
+
+**Key crates**:
+- `crates/core/src/plugin/` — `service_map.rs` (ServiceHandle, ServiceHandleMap, PluginService traits), `trampoline.rs`
+- `crates/proc_macros_impl/src/plugin/` — `model.rs` (parsing), `emit.rs` (code generation)
+- `crates/backend_csharp_rt/` — .NET runtime host, loads DLLs at runtime via `hostfxr`
+- `crates/backend_csharp/src/pipeline/dotnet/` — the dotnet codegen pipeline
+
+**Service handle model**: Services are opaque types represented by `ServiceHandle<T>` (`#[repr(transparent)]` over `*const T`). This type is `Send + Sync + Copy` and carries `TypeInfo` delegating to `*const T`. On the C# side, a `GCHandle` wraps the managed object and its `IntPtr` is the handle value.
+
+**Proc macro emission** (`emit.rs`): The `plugin!` macro generates:
+- A plugin struct holding all fn pointers (bare fns + service methods + destructors)
+- `impl Plugin` (symbol loading from DLL)
+- `impl PluginInfo` (type/function registration with the inventory)
+- Per-service: struct with `handle: ServiceHandle<S>` + method fn ptrs, `impl TypeInfo`, `unsafe impl Send + Sync`, `impl PluginService`, `impl Drop`
+- FFI signatures use `ServiceHandle<S>` for service params (by value), with `ServiceHandleMap` for unwrapping through `Result`/`Option` wrappers
+
+**C# codegen for services**: Each service type `Foo` gets:
+- A partial class with `struct Unmanaged { IntPtr _handle; }` and conversion methods:
+  - `IntoManaged()` — unwrap GCHandle + Free (ownership transfer to managed)
+  - `AsManaged()` — unwrap GCHandle without Free (borrow/view)
+  - `IntoUnmanaged()` — `GCHandle.Alloc` + `ToIntPtr` (ownership transfer to unmanaged)
+  - `AsUnmanaged()` — same as IntoUnmanaged for services
+- An interface `IFoo<TSelf>` with `static abstract` methods for ctors (returning `TSelf` or `Task<TSelf>` for async) and instance methods
+- Trampoline methods in `static class Interop` that dispatch between FFI and managed code
+
+
+**Testing reverse interop**: Tests in `crates/backend_csharp/tests/reference_plugins/service.rs`. The `define_plugin!` macro generates C# files, `just build-dotnet-plugins` (or `just _bdp <name>`) compiles them into DLLs placed in `_plugins/`, and `load_plugin!` loads them at runtime. Plugin DLLs need `partial class` on service types to merge with generated partial classes. User implementations live in `Plugin.cs` files under each `<name>.dll/` directory.
+
 
 ## Key Patterns
 

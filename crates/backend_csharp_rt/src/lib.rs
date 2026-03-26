@@ -88,7 +88,7 @@ impl DotnetRuntime {
     /// # Errors
     /// Can fail if `T` was previously loaded from a different path, or `path` was previously
     /// loaded for a different plugin type.
-    pub fn load<T: Plugin + Send + Sync + 'static>(&self, dll_path: impl AsRef<Path>) -> Result<&T, PluginLoadError> {
+    pub fn load<T: Plugin + Send + Sync + 'static>(&self, dll_path: impl AsRef<Path>) -> Result<Arc<T>, PluginLoadError> {
         let type_id = TypeId::of::<T>();
         let path = dll_path.as_ref().to_path_buf();
 
@@ -113,11 +113,8 @@ impl DotnetRuntime {
 
         // Return cached instance.
         if let Some(boxed) = inner.plugins.get(&type_id) {
-            let reference = boxed.downcast_ref::<T>().expect("type mismatch in plugin cache");
-            // SAFETY: The Box is heap-allocated inside a HashMap in the 'static singleton.
-            // Entries are never removed and the HashMap's growth only moves the Box pointer
-            // (a thin wrapper around a heap pointer), not the heap data it points to.
-            return Ok(unsafe { &*std::ptr::from_ref::<T>(reference) });
+            let arc = boxed.downcast_ref::<Arc<T>>().expect("type mismatch in plugin cache");
+            return Ok(Arc::clone(arc));
         }
 
         // Load assembly and resolve symbols.
@@ -161,15 +158,12 @@ impl DotnetRuntime {
         }
 
         // Cache and return.
+        let arc = Arc::new(plugin);
         inner.type_to_path.insert(type_id, path.clone());
         inner.path_to_type.insert(path, type_id);
-        inner.plugins.insert(type_id, Box::new(plugin));
+        inner.plugins.insert(type_id, Box::new(Arc::clone(&arc)));
 
-        let reference = inner.plugins.get(&type_id).unwrap().downcast_ref::<T>().unwrap();
-        // SAFETY: Same as above — heap-allocated, never removed, lives in a 'static singleton.
-        let ptr = unsafe { &*std::ptr::from_ref::<T>(reference) };
-        drop(inner);
-        Ok(ptr)
+        Ok(arc)
     }
 }
 
