@@ -9,7 +9,7 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-interoptopus = { workspace = true, features = ["tokio"] }
+interoptopus = { workspace = true, features = ["macros", "tokio"] }
 
 [dev-dependencies]
 interoptopus_csharp.workspace = true

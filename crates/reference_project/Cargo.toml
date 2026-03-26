@@ -17,7 +17,7 @@ path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-interoptopus = { workspace = true, features = ["serde", "tokio", "unstable-plugins"] }
+interoptopus = { workspace = true, features = ["macros", "serde", "tokio", "unstable-plugins"] }
 tokio = { version = "1", features = ["full"] }
 
 [dev-dependencies]

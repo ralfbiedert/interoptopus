@@ -15,8 +15,8 @@ repository.workspace = true
 workspace = true
 
 [features]
-default = ["derive"]
-derive = ["dep:interoptopus_proc"]
+default = ["macros"]
+macros = ["dep:interoptopus_proc"]
 unstable-plugins = []
 
 [dependencies]

@@ -12,7 +12,7 @@ version.workspace = true
 unstable-plugins = ["interoptopus/unstable-plugins", "dep:interoptopus_csharp_rt"]
 
 [dependencies]
-interoptopus.workspace = true
+interoptopus = { workspace = true }
 interoptopus_backends.workspace = true
 interoptopus_csharp_rt = { workspace = true, optional = true }
 
@@ -20,7 +20,7 @@ interoptopus_csharp_rt = { workspace = true, optional = true }
 interoptopus_backends.workspace = true
 
 [dev-dependencies]
-interoptopus = { workspace = true, features = ["serde"] }
+interoptopus = { workspace = true, features = ["macros", "serde"] }
 interoptopus_csharp = { path = ".", features = ["unstable-plugins"] }
 reference_project.workspace = true
 insta.workspace = true

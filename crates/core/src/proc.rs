@@ -129,7 +129,7 @@
 /// [`TypeInfo`]: crate::lang::rust::TypeInfo
 /// [`FunctionInfo`]: crate::lang::rust::FunctionInfo
 /// [`ConstantInfo`]: crate::lang::rust::ConstantInfo
-#[cfg(feature = "derive")]
+#[cfg(feature = "macros")]
 pub use interoptopus_proc::ffi;
 
 /// Derives the [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime) trait for a service struct
@@ -168,7 +168,7 @@ pub use interoptopus_proc::ffi;
 ///     rt: Tokio,
 /// }
 /// ```
-#[cfg(feature = "derive")]
+#[cfg(feature = "macros")]
 pub use interoptopus_proc::AsyncRuntime;
 
 /// Declares a plugin interface for reverse interop, e.g., loading a C# DLL from Rust.
@@ -236,7 +236,7 @@ pub use interoptopus_proc::AsyncRuntime;
 /// ```
 ///
 /// Note, this example is illustrative, the actual API is subject to change.
-#[cfg(all(feature = "derive", feature = "unstable-plugins"))]
+#[cfg(all(feature = "macros", feature = "unstable-plugins"))]
 pub use interoptopus_proc::plugin;
 
 /// Strips module paths from a fully-qualified Rust type name, preserving generic structure.

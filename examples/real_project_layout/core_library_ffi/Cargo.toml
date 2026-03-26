@@ -7,4 +7,4 @@ publish = false
 
 [dependencies]
 core_library = { path = "../core_library" }
-interoptopus.workspace = true
+interoptopus = { workspace = true, features = ["macros"] }

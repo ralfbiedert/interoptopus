@@ -18,10 +18,10 @@ pub mod wire;
 #[doc(hidden)]
 pub mod proc;
 
-#[cfg(feature = "derive")]
+#[cfg(feature = "macros")]
 pub use proc::{AsyncRuntime, ffi};
 
-#[cfg(all(feature = "derive", feature = "unstable-plugins"))]
+#[cfg(all(feature = "macros", feature = "unstable-plugins"))]
 pub use proc::plugin;
 
 #[cfg(feature = "tokio")]
