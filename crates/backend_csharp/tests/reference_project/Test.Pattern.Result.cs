@@ -30,7 +30,7 @@ public class TestPatternResult
     [Fact]
     public void pattern_result_4()
     {
-        Assert.True(Interop.pattern_result_4(ResultVoidError.Ok).IsOk);
+        Assert.True(Interop.pattern_result_4(ResultVoidVoid.Ok).IsOk);
     }
 
     [Fact]

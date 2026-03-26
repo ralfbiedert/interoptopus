@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using My.Company;
+using My.Company.Common;
 using Xunit;
-using DeeplyNestedWire2 = My.Company.DeeplyNestedWire2;
-using DeeplyNestedWire3 = My.Company.DeeplyNestedWire3;
-using DeeplyNestedWire4 = My.Company.DeeplyNestedWire4;
 using Interop = My.Company.Interop;
 
 public class TestWireNested
