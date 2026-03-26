@@ -141,7 +141,7 @@ The .NET runtime adds ~20 MB RSS on first plugin load.
 
 Gated behind **feature flags**, these enable:
 
-- `derive` - Proc macros such as `#[ffi]`.
+- `macros` - Proc macros such as `#[ffi]`.
 - `serde` - Serde attributes on internal types.
 - `tokio` - Convenience support for async services via Tokio.
 - `unstable-plugins` - Experimental 'reverse interop' plugins. Not semver stable!
