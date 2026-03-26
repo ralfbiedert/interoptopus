@@ -41,11 +41,10 @@ impl Pass {
             let mut all_fields_available = true;
 
             for rust_field in &rust_struct.fields {
-                // Skip structs with WireOnly fields — they are only used through Wire serialization
-                // and should not become C# composite types.
-                if let Some(field_rs_ty) = rs_types.get(&rust_field.ty)
-                    && matches!(&field_rs_ty.kind, lang::types::TypeKind::WireOnly(_))
-                {
+                // Skip structs that transitively contain WireOnly fields — they
+                // are only used through Wire serialization and should not become
+                // C# composite types.
+                if contains_wireonly(rust_field.ty, rs_types, &mut std::collections::HashSet::new()) {
                     all_fields_available = false;
                     break;
                 }
@@ -91,5 +90,19 @@ fn map_visibility(visibility: lang::meta::Visibility) -> crate::lang::meta::Visi
     match visibility {
         RsVis::Public => CsVis::Public,
         RsVis::Private => CsVis::Private,
+    }
+}
+
+/// Returns true if `ty_id` is WireOnly or is a struct that transitively
+/// contains WireOnly fields. Such types cannot be represented as C# composites.
+fn contains_wireonly(ty_id: interoptopus::inventory::TypeId, rs_types: &interoptopus::inventory::Types, visited: &mut std::collections::HashSet<interoptopus::inventory::TypeId>) -> bool {
+    if !visited.insert(ty_id) {
+        return false;
+    }
+    let Some(ty) = rs_types.get(&ty_id) else { return false };
+    match &ty.kind {
+        lang::types::TypeKind::WireOnly(_) => true,
+        lang::types::TypeKind::Struct(s) => s.fields.iter().any(|f| contains_wireonly(f.ty, rs_types, visited)),
+        _ => false,
     }
 }

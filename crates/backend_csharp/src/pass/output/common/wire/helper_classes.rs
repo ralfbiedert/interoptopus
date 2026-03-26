@@ -34,40 +34,60 @@ impl Pass {
         types: &model::common::types::all::Pass,
         id_map: &model::common::id_map::Pass,
         rs_types: &RsTypes,
+        wire_types: &output::common::wire::wire_type::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
         let codegen = WireCodeGen { rs_types };
 
-        for file in output_master.outputs_of(FileType::Csharp) {
-            let mut rendered = Vec::new();
+        // Render helper classes once, then assign to the correct output file.
+        // WireOnly::Composite types have no file routing, so we place them in the
+        // same file as their parent Wire type when possible.
+        let mut all_helpers = Vec::new();
 
-            for (_type_id, ty) in types.iter() {
-                let TypeKind::WireOnly(WireOnly::Composite(composite)) = &ty.kind else {
-                    continue;
-                };
+        for (type_id, ty) in types.iter() {
+            let TypeKind::WireOnly(WireOnly::Composite(composite)) = &ty.kind else {
+                continue;
+            };
 
-                // Resolve field type names. Fields may reference WireOnly types
-                // (String, Vec, Map) that don't exist in the C# type model, so
-                // we resolve names via the Rust type graph.
-                let field_decls: Vec<String> = composite
-                    .fields
-                    .iter()
-                    .map(|f| {
-                        let field_type_name = resolve_field_type_name(f.ty, types, id_map, &codegen);
-                        format!("public {field_type_name} {};", f.name)
-                    })
-                    .collect();
-
-                let mut ctx = Context::new();
-                ctx.insert("class_name", &ty.name);
-                ctx.insert("field_decls", &field_decls);
-
-                let result = templates.render("common/wire/wire_helper_class.cs", &ctx)?;
-                rendered.push(result);
+            // Skip types whose field definitions are already rendered by
+            // the wire_type pass as part of a Wire<T> block.
+            if wire_types.rendered_inner_type(*type_id) {
+                continue;
             }
 
-            rendered.sort();
-            self.helper_classes.insert(file.clone(), rendered);
+            // Resolve field type names. Fields may reference WireOnly types
+            // (String, Vec, Map) that don't exist in the C# type model, so
+            // we resolve names via the Rust type graph.
+            let field_decls: Vec<String> = composite
+                .fields
+                .iter()
+                .map(|f| {
+                    let field_type_name = resolve_field_type_name(f.ty, types, id_map, &codegen);
+                    format!("public {field_type_name} {};", f.name)
+                })
+                .collect();
+
+            let mut ctx = Context::new();
+            ctx.insert("class_name", &ty.name);
+            ctx.insert("field_decls", &field_decls);
+
+            let result = templates.render("common/wire/wire_helper_class.cs", &ctx)?;
+            all_helpers.push(result);
+        }
+
+        all_helpers.sort();
+
+        // Place all helpers into the first output file only — they are
+        // internal support types visible across partial classes and don't
+        // need to be duplicated in every file.
+        let mut first = true;
+        for file in output_master.outputs_of(FileType::Csharp) {
+            if first {
+                self.helper_classes.insert(file.clone(), all_helpers.clone());
+                first = false;
+            } else {
+                self.helper_classes.insert(file.clone(), Vec::new());
+            }
         }
 
         Ok(())

@@ -5,6 +5,7 @@ use crate::lang::meta::FileEmission;
 use crate::lang::types::Type;
 use crate::lang::{FunctionId, TypeId};
 use crate::output::Target;
+use interoptopus_backends::output::Overwrite;
 
 /// A dispatch function that maps an item to a file name.
 type DispatchFn = Box<dyn FnMut(Item, Meta) -> Target>;
@@ -32,11 +33,14 @@ impl Dispatch {
         use crate::lang::plugin::PLUGIN_DEFAULT_MODULE;
         let name = name.into();
         let name_common = format!("{name}.Common");
-        Self::custom(move |x, _| match x.emission {
-            FileEmission::Common => Target::new("Interop.Common.cs", name_common.clone()),
-            FileEmission::Default => Target::new("Interop.User.cs", name.clone()),
-            FileEmission::CustomModule(ref m) if *m == PLUGIN_DEFAULT_MODULE => Target::new("Interop.Plugin.cs", "Interoptopus.API"),
-            FileEmission::CustomModule(_) => Target::new("Interop.User.cs", name.clone()),
+        Self::custom(move |x, z| match x.kind {
+            ItemKind::PluginStub => Target::new("Plugin.cs", name.clone()).overwrite(Overwrite::Never),
+            _ => match x.emission {
+                FileEmission::Common => Target::new("Interop.Common.cs", name_common.clone()),
+                FileEmission::Default => Target::new("Interop.User.cs", name.clone()),
+                FileEmission::CustomModule(ref m) if *m == PLUGIN_DEFAULT_MODULE => Target::new("Interop.Plugin.cs", "Interoptopus.API"),
+                FileEmission::CustomModule(_) => Target::new("Interop.User.cs", name.clone()),
+            },
         })
     }
 
@@ -60,6 +64,8 @@ pub enum ItemKind {
     Function(FunctionId, Function),
     /// A plugin or service interface (e.g. `IPlugin`, `IFoo<TSelf>`).
     PluginInterface,
+    /// A Plugin.cs stub.
+    PluginStub,
 }
 
 /// Reserved for future dispatch metadata.

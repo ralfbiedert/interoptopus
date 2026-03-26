@@ -47,8 +47,10 @@ impl Pass {
             let wires = intermediary.wires.wires_for(file).unwrap_or(&[]);
 
             let usings = intermediary.using.using_for(file).unwrap_or("");
+            let plugin_stub = intermediary.plugin_stub.stub_for(file).unwrap_or("");
 
             context.insert("usings", usings);
+            context.insert("plugin_stub", plugin_stub);
             context.insert("namespace", file.target.namespace());
             context.insert("delegates", &delegates);
             context.insert("composites", &composites);

@@ -55,3 +55,7 @@ public static class Interop
 {% endfor %}
 }
 {%- endif %}
+{%- if plugin_stub %}
+
+{{ plugin_stub }}
+{%- endif %}

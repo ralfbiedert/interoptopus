@@ -72,6 +72,7 @@ pub struct DotnetLibraryConfig {
     pub output_enum_body: output::common::types::enums::body::Config,
     pub output_enum: output::common::types::enums::all::Config,
     pub output_util: output::common::types::util::Config,
+    pub output_plugin_stub: output::dotnet::plugin_stub::Config,
     pub output_using: output::dotnet::using::Config,
     pub output_final: output::dotnet::all::Config,
 }
@@ -148,6 +149,7 @@ pub struct IntermediateOutputPasses {
     pub enum_body: output::common::types::enums::body::Pass,
     pub enums: output::common::types::enums::all::Pass,
     pub util: output::common::types::util::Pass,
+    pub plugin_stub: output::dotnet::plugin_stub::Pass,
     pub using: output::dotnet::using::Pass,
 }
 
@@ -248,6 +250,7 @@ impl DotnetLibrary {
                 enum_body: output::common::types::enums::body::Pass::new(config.output_enum_body),
                 enums: output::common::types::enums::all::Pass::new(config.output_enum),
                 util: output::common::types::util::Pass::new(config.output_util),
+                plugin_stub: output::dotnet::plugin_stub::Pass::new(config.output_plugin_stub),
                 using: output::dotnet::using::Pass::new(config.output_using),
             },
             output_final: output::dotnet::all::Pass::new(config.output_final),
@@ -331,7 +334,7 @@ impl DotnetLibrary {
         o.pattern_bools.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.wire_buffer.process(&mut pass_meta, &self.output_master, &m.wire_helpers, &self.inventory.functions, &self.inventory.types)?;
         o.wire_types.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
-        o.wire_helper_classes.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
+        o.wire_helper_classes.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types, &o.wire_types)?;
         o.wires.process(&mut pass_meta, &self.output_master, &o.wire_types, &o.wire_helper_classes)?;
         o.interop_raw.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.plugin_interface, &m.fns_all, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
         o.interop_service.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.service_interfaces, &m.fns_all, &m.type_all, &m.service_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
@@ -339,6 +342,7 @@ impl DotnetLibrary {
         o.trampoline.process(&mut pass_meta, &self.output_master, &o.interop)?;
         o.plugin_interface.process(&mut pass_meta, &self.output_master, &m.plugin_interface, &m.type_all)?;
         o.service_interface.process(&mut pass_meta, &self.output_master, &m.service_interfaces, &m.type_all)?;
+        o.plugin_stub.process(&mut pass_meta, &self.output_master, &m.plugin_interface, &m.service_interfaces, &m.type_all)?;
 
         // Final output pass
         self.output_final.process(&mut pass_meta, &self.output_master, &self.output_passes, &mut self.output)?;

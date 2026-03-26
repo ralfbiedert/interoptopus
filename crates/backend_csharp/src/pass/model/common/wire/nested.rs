@@ -52,11 +52,15 @@ impl Pass {
             };
 
             let Some(inner_rust_ty) = rs_types.get(&inner_rust_id) else { continue };
-            let RsTypeKind::Struct(s) = &inner_rust_ty.kind else { continue };
 
-            // Walk the inner struct's type graph to find nested structs with WireOnly fields.
+            // Walk the inner type's graph to find nested structs with WireOnly fields.
             let mut nested = Vec::new();
-            collect_nested_structs(rs_types, s, &mut nested, &mut HashSet::new());
+            let mut visited = HashSet::new();
+            match &inner_rust_ty.kind {
+                RsTypeKind::Struct(s) => collect_nested_structs(rs_types, s, &mut nested, &mut visited),
+                // For Wire<Vec<T>>, Wire<Map<K,V>>, etc. — walk into the elements.
+                _ => collect_nested_from_type(rs_types, inner_rust_id, &mut nested, &mut visited),
+            }
             // Exclude the top-level inner type — it gets its own WireOf* treatment.
             nested.retain(|id| *id != inner_rust_id);
 

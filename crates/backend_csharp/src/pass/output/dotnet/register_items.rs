@@ -48,6 +48,9 @@ impl Pass {
             }
         }
 
+        // Register the Plugin.cs stub file.
+        output_master.register_item(Item { kind: ItemKind::PluginStub, emission: interoptopus::lang::meta::FileEmission::Default });
+
         Ok(())
     }
 }

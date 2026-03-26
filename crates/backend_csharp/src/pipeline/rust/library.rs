@@ -452,7 +452,7 @@ impl RustLibrary {
         o.pattern_utf8string.process(&mut pass_meta, &self.output_master, &m.pattern_string)?;
         o.pattern_wire_buffer.process(&mut pass_meta, &self.output_master, &m.wire_helpers, &self.inventory.functions, &self.inventory.types)?;
         o.wire_types.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
-        o.wire_helper_classes.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
+        o.wire_helper_classes.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types, &o.wire_types)?;
         o.wires.process(&mut pass_meta, &self.output_master, &o.wire_types, &o.wire_helper_classes)?;
         o.util.process(&mut pass_meta, &self.output_master)?;
         o.using.process(&mut pass_meta, &self.output_master)?;

@@ -1,4 +1,5 @@
 {%- if has_managed_class %}
+{%- if field_decls %}
 public partial class {{ inner_type }}
 {
 {%- for field in field_decls %}
@@ -6,6 +7,7 @@ public partial class {{ inner_type }}
 {%- endfor %}
 }
 
+{% endif -%}
 public partial class {{ inner_type }}
 {
     public {{ wire_name }} Wire()
