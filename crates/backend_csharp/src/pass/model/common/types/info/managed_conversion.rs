@@ -78,13 +78,16 @@ impl Pass {
                         TypePattern::AsyncCallback(_) => ManagedConversion::AsIs,
                         TypePattern::Wire(_) => ManagedConversion::Into,
 
-                        // Option/Result: inspect variant payloads (same logic as DataEnum)
+                        // Option/Result: inspect variant payloads (same logic as DataEnum).
+                        // Pointer-to-service variants are resolved to the service type so
+                        // that their `Into` semantics propagate to the container.
                         TypePattern::Option(_, e) | TypePattern::Result(_, _, e) => {
                             let mut has_into = false;
                             let mut pending = false;
                             for variant in &e.variants {
                                 if let Some(variant_ty) = variant.ty {
-                                    match self.managed_conversion.get(&variant_ty) {
+                                    let resolved = resolve_ptr_to_service(variant_ty, types);
+                                    match self.managed_conversion.get(&resolved) {
                                         Some(ManagedConversion::Into) => {
                                             has_into = true;
                                             break;
@@ -193,4 +196,12 @@ impl Pass {
     pub fn managed_conversion(&self, ty: TypeId) -> Option<ManagedConversion> {
         self.managed_conversion.get(&ty).copied()
     }
+}
+
+/// If `ty` is a pointer to a service type, return the service TypeId.
+fn resolve_ptr_to_service(ty: TypeId, types: &model::common::types::all::Pass) -> TypeId {
+    let Some(t) = types.get(ty) else { return ty };
+    let TypeKind::Pointer(p) = &t.kind else { return ty };
+    let Some(target) = types.get(p.target) else { return ty };
+    if matches!(&target.kind, TypeKind::Service) { p.target } else { ty }
 }

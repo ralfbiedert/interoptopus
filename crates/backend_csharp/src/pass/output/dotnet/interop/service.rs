@@ -69,12 +69,8 @@ impl Pass {
                         // Async ctor: strip callback from forwarded args, use continuation.
                         let (args, forward) = unmanaged_args_except_last(func, unmanaged_names, unmanaged_conversion);
                         let cb_inner = async_callback_inner(func, types);
-                        let is_bare = cb_inner.map_or(false, |id| resolve_ptr_to_service_name(id, types).is_some());
-                        let continuation = if is_bare {
-                            "ContinueWith(t => cb.UnsafeComplete(t.Result.IntoUnmanaged()))".to_string()
-                        } else {
-                            "ContinueWith(t => cb.UnsafeComplete(t.Result.ToUnmanaged()))".to_string()
-                        };
+                        let to_unmanaged = cb_inner.map_or("IntoUnmanaged", |id| unmanaged_conversion.to_unmanaged_name(id));
+                        let continuation = format!("ContinueWith(t => cb.UnsafeComplete(t.Result.{to_unmanaged}()))");
 
                         let mut ctx = Context::new();
                         ctx.insert("ffi_name", ffi_name);
