@@ -42,6 +42,7 @@ anyhow = "1.0.98"
 derive_builder = "0.20.2"
 heck = "0.5.0"
 include_dir = { version = "0.7.4", features = ["glob"] }
+libloading = "0.8"
 insta = "1.43.2"
 netcorehost = { version = "0.20", features = ["nethost-download", "net9_0"] }
 prettyplease = "0.2.35"

@@ -21,7 +21,11 @@ pub use error::Error;
 #[cfg(any(feature = "unstable-plugins", docsrs))]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable-plugins")))]
 #[doc(inline)]
-pub use interoptopus_csharp_rt::{DotnetRuntime, runtime};
+pub use interoptopus_csharp_rt::aot::{runtime as aot_runtime, AotRuntime};
+#[cfg(any(feature = "unstable-plugins", docsrs))]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable-plugins")))]
+#[doc(inline)]
+pub use interoptopus_csharp_rt::dynamic::{runtime as dotnet_runtime, DotnetRuntime};
 #[cfg(any(feature = "unstable-plugins", docsrs))]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable-plugins")))]
 pub use pipeline::{DotnetLibrary, DotnetLibraryBuilder};

@@ -1,4 +1,4 @@
-    [UnmanagedCallersOnly]
+    [UnmanagedCallersOnly(EntryPoint = "{{ ffi_name }}")]
     public static nint {{ ffi_name }}({{ args }})
     {
         try

@@ -1,6 +1,7 @@
 use crate::{define_plugin, load_plugin};
-use interoptopus::ffi;
 use interoptopus::wire::Wire;
+use interoptopus::{ffi, plugin};
+use interoptopus_csharp::dotnet_runtime;
 use reference_project::plugins::service::{ServiceAsync, ServiceBasic, ServiceNested};
 use std::collections::HashMap;
 use std::error::Error;

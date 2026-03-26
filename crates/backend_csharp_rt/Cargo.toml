@@ -11,6 +11,7 @@ rust-version.workspace = true
 
 [dependencies]
 interoptopus = { workspace = true, features = ["unstable-plugins"] }
+libloading.workspace = true
 netcorehost = { workspace = true, features = ["nethost-download", "net9_0"] }
 tempfile.workspace = true
 
