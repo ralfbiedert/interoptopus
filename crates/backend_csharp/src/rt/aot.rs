@@ -4,7 +4,7 @@
 //! Unlike the dynamic runtime, this loads ahead-of-time compiled native libraries
 //! using `libloading` instead of hosting the .NET CLR.
 
-use crate::shared::{self, HandlerShim, PluginCache};
+use super::shared::{self, HandlerShim, PluginCache};
 
 use interoptopus::lang::plugin::{Plugin, PluginLoadError};
 use interoptopus::trampoline::{TRAMPOLINE_UNCAUGHT_EXCEPTION, TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX};

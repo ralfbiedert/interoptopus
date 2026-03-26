@@ -9,12 +9,16 @@ rust-version.workspace = true
 version.workspace = true
 
 [features]
-unstable-plugins = ["interoptopus/unstable-plugins", "dep:interoptopus_csharp_rt"]
+unstable-plugins = ["interoptopus/unstable-plugins", "rt-dotnet", "rt-aot"]
+rt-dotnet = ["interoptopus/unstable-plugins", "dep:netcorehost", "dep:tempfile"]
+rt-aot = ["interoptopus/unstable-plugins", "dep:libloading"]
 
 [dependencies]
 interoptopus = { workspace = true }
 interoptopus_backends.workspace = true
-interoptopus_csharp_rt = { workspace = true, optional = true }
+libloading = { workspace = true, optional = true }
+netcorehost = { workspace = true, features = ["nethost-download", "net10_0"], optional = true }
+tempfile = { workspace = true, optional = true }
 
 [build-dependencies]
 interoptopus_backends.workspace = true

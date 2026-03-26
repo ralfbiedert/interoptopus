@@ -1,7 +1,7 @@
 use crate::{define_plugin, load_plugin};
 use interoptopus::wire::Wire;
 use interoptopus::{ffi, plugin};
-use interoptopus_csharp::dotnet_runtime;
+use interoptopus_csharp::rt::dynamic::runtime as dotnet_runtime;
 use reference_project::plugins::service::{ServiceAsync, ServiceBasic, ServiceNested};
 use std::collections::HashMap;
 use std::error::Error;
@@ -32,6 +32,13 @@ fn load_plugin_service_nested() -> Result<(), Box<dyn Error>> {
     // Test bare fn creating a service
     for i in 0..100u32 {
         let a = plugin.create_a(i);
+        assert_eq!(a.get_value(), i, "create_a({i}) should have value {i}");
+        assert_eq!(a.add(10), i + 10, "add(10) on value {i}");
+    }
+
+    // Test bare fn creating a service in a result
+    for i in 0..100u32 {
+        let a = plugin.create_a_result(i).unwrap();
         assert_eq!(a.get_value(), i, "create_a({i}) should have value {i}");
         assert_eq!(a.add(10), i + 10, "add(10) on value {i}");
     }

@@ -1,6 +1,6 @@
 use crate::reference_plugins::plugin_path_for;
 use crate::{define_plugin, load_plugin};
-use interoptopus_csharp::dotnet_runtime;
+use interoptopus_csharp::rt::dynamic::runtime as dotnet_runtime;
 use reference_project::plugins::functions::{Behavior, Primitives};
 use std::error::Error;
 use std::sync::atomic::{AtomicBool, Ordering};

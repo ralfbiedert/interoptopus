@@ -7,8 +7,8 @@
 //! The .NET CLR can only be loaded once per process, so this crate enforces that
 //! constraint by exposing a single shared instance.
 
-use crate::error::DotnetError;
-use crate::shared::{self, HandlerShim, PluginCache};
+use super::error::RuntimeError;
+use super::shared::{self, HandlerShim, PluginCache};
 
 use interoptopus::lang::plugin::{Plugin, PluginLoadError};
 use interoptopus::trampoline::{TRAMPOLINE_UNCAUGHT_EXCEPTION, TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX};
@@ -51,7 +51,7 @@ unsafe impl Send for DotnetRuntime {}
 unsafe impl Sync for DotnetRuntime {}
 
 impl DotnetRuntime {
-    fn new() -> Result<Self, DotnetError> {
+    fn new() -> Result<Self, RuntimeError> {
         let temp_dir = tempfile::tempdir()?;
         let config_path = temp_dir.path().join("interoptopus.runtimeconfig.json");
 
@@ -148,11 +148,11 @@ static RUNTIME: OnceLock<Result<DotnetRuntime, String>> = OnceLock::new();
 ///
 /// # Errors
 ///
-/// Returns [`DotnetError`] if the runtime failed to initialize.
+/// Returns [`RuntimeError`] if the runtime failed to initialize.
 /// Once successfully initialized, all subsequent calls return the same instance.
-pub fn runtime() -> Result<&'static DotnetRuntime, DotnetError> {
+pub fn runtime() -> Result<&'static DotnetRuntime, RuntimeError> {
     RUNTIME
         .get_or_init(|| DotnetRuntime::new().map_err(|e| e.to_string()))
         .as_ref()
-        .map_err(|msg| DotnetError::from(msg.clone()))
+        .map_err(|msg| RuntimeError::from(msg.clone()))
 }

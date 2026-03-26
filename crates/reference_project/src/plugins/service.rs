@@ -25,9 +25,12 @@ interoptopus::plugin!(ServiceAsync {
     }
 });
 
+type Try<T> = ffi::Result<T, Error>;
+
 interoptopus::plugin!(ServiceNested {
     fn create_a(value: u32) -> NestedA;
-    fn create_a_result(value: u32) -> ffi::Result<NestedA, Error>;
+    fn create_a_result(value: u32) -> Try<NestedA>;
+    // fn create_a_result(value: u32) -> ffi::Result<NestedA, Error>;
 
     impl NestedA {
         fn create(value: u32) -> Self;
