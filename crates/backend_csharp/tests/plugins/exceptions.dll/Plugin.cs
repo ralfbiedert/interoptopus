@@ -10,9 +10,9 @@ partial class Plugin : IPlugin
         throw new NotImplementedException();
     }
 
-    public static Task<ResultNestedAUint> CreateAAsync(uint value)
+    public async static Task<ResultNestedAUint> CreateAAsync(uint value)
     {
-        throw new NotImplementedException();
+        return ResultNestedAUint.Ok(new NestedA());
     }
 
     public static ResultUintUint GetValue()

@@ -41,9 +41,10 @@ impl Pass {
             let mut rendered_variants = Vec::new();
 
             for variant in &data_enum.variants {
-                let Some(variant_ty) = variant.ty else {
+                let Some(raw_ty) = variant.ty else {
                     continue;
                 };
+                let variant_ty = super::resolve_service_variant(raw_ty, types);
 
                 let Some(variant_type) = unmanaged_names.name(variant_ty) else {
                     continue;

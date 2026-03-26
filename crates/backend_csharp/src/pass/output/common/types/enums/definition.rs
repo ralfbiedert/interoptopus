@@ -51,7 +51,7 @@ impl Pass {
                 .variants
                 .iter()
                 .filter_map(|v| {
-                    let ty = v.ty?;
+                    let ty = super::resolve_service_variant(v.ty?, types);
                     let ty_name = types.get(ty).map(|t| &t.name)?;
                     let mut m = HashMap::new();
                     m.insert("name", v.name.clone());

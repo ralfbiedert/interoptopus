@@ -44,7 +44,7 @@ impl Pass {
                 .variants
                 .iter()
                 .filter_map(|v| {
-                    let variant_ty = v.ty?;
+                    let variant_ty = super::resolve_service_variant(v.ty?, types);
                     let as_unmanaged = managed.as_unmanaged_suffix(variant_ty).to_string();
 
                     let mut m = HashMap::new();

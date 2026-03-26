@@ -12,7 +12,7 @@ class Plugin : IPlugin
 
     public static ResultNestedAError CreateAResult(uint value)
     {
-        return ResultNestedAError.Ok(new NestedA(value).IntoUnmanaged()._handle);
+        return ResultNestedAError.Ok(new NestedA(value));
     }
 }
 

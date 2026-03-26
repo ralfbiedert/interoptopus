@@ -67,14 +67,13 @@ impl Pass {
                 }
 
                 let service_type_id = p.target;
-                let service_name = target.name.clone();
-                let err_name = names.get(err_ty).cloned().unwrap_or_else(|| "Error".to_string());
+                let original_name = ty.name.clone();
 
-                Some((service_type_id, service_name, err_name, err_ty, data_enum, ty.emission.clone(), ty.decorators.clone()))
+                Some((service_type_id, original_name, err_ty, data_enum, ty.emission.clone(), ty.decorators.clone()))
             })
             .collect();
 
-        for (service_type_id, service_name, err_name, err_ty, data_enum, emission, decorators) in candidates {
+        for (service_type_id, original_name, err_ty, data_enum, emission, decorators) in candidates {
             if self.processed.contains(&service_type_id) {
                 continue;
             }
@@ -97,7 +96,8 @@ impl Pass {
             let sibling_data_enum = crate::lang::types::kind::DataEnum { variants: sibling_variants };
             let sibling_kind = TypeKind::TypePattern(TypePattern::Result(service_type_id, err_ty, sibling_data_enum));
 
-            let sibling_name = format!("Result{service_name}{err_name}");
+            // Use the original Result type's name to ensure consistent casing.
+            let sibling_name = original_name;
 
             kinds.set(sibling_id, sibling_kind.clone());
             names.set(sibling_id, sibling_name.clone());

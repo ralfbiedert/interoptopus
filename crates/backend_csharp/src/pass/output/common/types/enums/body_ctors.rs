@@ -45,7 +45,7 @@ impl Pass {
                 .iter()
                 .map(|v| {
                     let has_payload = v.ty.is_some();
-                    let type_name = v.ty.and_then(|ty| types.get(ty).map(|t| &t.name)).cloned().unwrap_or_default();
+                    let type_name = v.ty.map(|ty| super::resolve_service_variant(ty, types)).and_then(|ty| types.get(ty).map(|t| &t.name)).cloned().unwrap_or_default();
 
                     let mut m = HashMap::new();
                     m.insert("name", Value::String(v.name.clone()));
