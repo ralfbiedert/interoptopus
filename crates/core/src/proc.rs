@@ -132,6 +132,7 @@
 #[cfg(feature = "macros")]
 pub use interoptopus_proc::ffi;
 
+
 /// Derives the [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime) trait for a service struct
 /// by forwarding to one of its fields.
 ///
@@ -170,6 +171,7 @@ pub use interoptopus_proc::ffi;
 /// ```
 #[cfg(feature = "macros")]
 pub use interoptopus_proc::AsyncRuntime;
+
 
 /// Declares a plugin interface for reverse interop, e.g., loading a C# DLL from Rust.
 ///
@@ -236,8 +238,30 @@ pub use interoptopus_proc::AsyncRuntime;
 /// ```
 ///
 /// Note, this example is illustrative, the actual API is subject to change.
+///
+/// # Design Guidelines
+///
+/// Think of your plugin API as a nanosecond-latency **web server**: the FFI boundary
+/// is a network boundary with benefits, and most types have pass-by-value semantics.
+///
+/// While simple data can have sub-nanosecond cost passing through it (essentially living in registers or
+/// a simple stack push), these serialization semantics are still the prevalent model to
+/// reason about your API. Extras like callbacks and pointers exist, but FFI and ownership
+/// constraints prevent them from
+/// nesting arbitrarily.
+///
+/// Some things to keep in mind:
+/// - While you can load multiple plugins, each process can only ever have one instance of
+///   a plugin.
+/// - Plugins usually cannot be unloaded.
+/// - Plugin methods therefore act like singletons / statics.
+/// - You can have services via `impl Service {}` blocks. They can be arbitrarily created
+///   and destroyed. However, due to the aforementioned pass-by-value semantics they cannot
+///   be arbitrarily nested inside other data structures. The only way to pass them around
+///   is via function arguments, which takes care of their lifecycle requirements.
 #[cfg(all(feature = "macros", feature = "unstable-plugins"))]
 pub use interoptopus_proc::plugin;
+
 
 /// Strips module paths from a fully-qualified Rust type name, preserving generic structure.
 ///

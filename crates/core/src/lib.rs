@@ -8,6 +8,7 @@ pub mod ffi;
 pub mod inventory;
 pub mod lang;
 pub mod pattern;
+#[doc(hidden)]
 #[cfg(feature = "unstable-plugins")]
 pub mod plugin;
 #[cfg(feature = "unstable-plugins")]
@@ -19,7 +20,7 @@ pub mod wire;
 pub mod proc;
 
 #[cfg(feature = "macros")]
-pub use proc::{AsyncRuntime, ffi};
+pub use proc::{ffi, AsyncRuntime};
 
 #[cfg(all(feature = "macros", feature = "unstable-plugins"))]
 pub use proc::plugin;
