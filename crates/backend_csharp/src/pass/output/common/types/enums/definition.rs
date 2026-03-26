@@ -20,7 +20,7 @@ pub struct Pass {
 
 impl Pass {
     #[must_use]
-    pub fn new(_: Config) -> Self {
+    pub fn new(config: Config) -> Self {
         Self { info: PassInfo { name: file!() }, enum_ty: HashMap::default() }
     }
 
@@ -30,6 +30,7 @@ impl Pass {
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
         struct_class: &model::common::types::info::struct_class::Pass,
+        mode: crate::pass::OperationMode,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -51,7 +52,7 @@ impl Pass {
                 .variants
                 .iter()
                 .filter_map(|v| {
-                    let ty = super::resolve_service_variant(v.ty?, types);
+                    let ty = super::resolve_service_variant(v.ty?, types, mode);
                     let ty_name = types.get(ty).map(|t| &t.name)?;
                     let mut m = HashMap::new();
                     m.insert("name", v.name.clone());

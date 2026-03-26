@@ -16,7 +16,7 @@ pub struct Pass {
 
 impl Pass {
     #[must_use]
-    pub fn new(_: Config) -> Self {
+    pub fn new(config: Config) -> Self {
         Self { info: PassInfo { name: file!() }, enum_body_unmanaged: HashMap::default() }
     }
 
@@ -26,6 +26,7 @@ impl Pass {
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
         unmanaged_names: &output::common::conversion::unmanaged_names::Pass,
+        mode: crate::pass::OperationMode,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -44,7 +45,7 @@ impl Pass {
                 let Some(raw_ty) = variant.ty else {
                     continue;
                 };
-                let variant_ty = super::resolve_service_variant(raw_ty, types);
+                let variant_ty = super::resolve_service_variant(raw_ty, types, mode);
 
                 let Some(variant_type) = unmanaged_names.name(variant_ty) else {
                     continue;

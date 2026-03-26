@@ -2,7 +2,7 @@
 public unsafe struct Unmanaged
 {
     [FieldOffset(0)]
-    internal uint _variant;
+    internal int _variant;
     {%- for v in variants %}
 
     [FieldOffset(0)]

@@ -1,6 +1,6 @@
 public partial {{ struct_or_class }} {{ name }}
 {
-    uint _variant;
+    int _variant;
     {%- for variant in variants %}
     {{ variant.type }} _{{ variant.name }};
     {%- endfor %}

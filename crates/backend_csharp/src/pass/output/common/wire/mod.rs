@@ -207,7 +207,7 @@ impl WireCodeGen<'_> {
             }
             RsTypeKind::Enum(_) => {
                 let enum_name = self.cs_type_name(ty_id);
-                lines.push(format!("{p}{{ var _u = new {enum_name}.Unmanaged(); _u._variant = reader.ReadUInt32(); {target} = _u.ToManaged(); }}"));
+                lines.push(format!("{p}{{ var _u = new {enum_name}.Unmanaged(); _u._variant = reader.ReadInt32(); {target} = _u.ToManaged(); }}"));
             }
             RsTypeKind::Struct(s) => {
                 let struct_name = self.cs_type_name(ty_id);

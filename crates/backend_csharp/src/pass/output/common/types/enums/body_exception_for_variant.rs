@@ -17,7 +17,7 @@ pub struct Pass {
 
 impl Pass {
     #[must_use]
-    pub fn new(_: Config) -> Self {
+    pub fn new(config: Config) -> Self {
         Self { info: PassInfo { name: file!() }, body_exception_for_variant: HashMap::default() }
     }
 
@@ -26,6 +26,7 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
+        mode: crate::pass::OperationMode,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -43,7 +44,7 @@ impl Pass {
                 .iter()
                 .map(|v| {
                     let has_payload = v.ty.is_some();
-                    let type_name = v.ty.map(|ty| super::resolve_service_variant(ty, types)).and_then(|ty| types.get(ty).map(|t| &t.name)).cloned().unwrap_or_default();
+                    let type_name = v.ty.map(|ty| super::resolve_service_variant(ty, types, mode)).and_then(|ty| types.get(ty).map(|t| &t.name)).cloned().unwrap_or_default();
 
                     let mut m = HashMap::new();
                     m.insert("name", Value::String(v.name.clone()));

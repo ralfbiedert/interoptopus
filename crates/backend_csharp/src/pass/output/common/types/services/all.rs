@@ -12,17 +12,21 @@ use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
 #[derive(Default)]
-pub struct Config {}
+pub struct Config {
+    /// Override the template used for rendering service types.
+    pub template: Option<String>,
+}
 
 pub struct Pass {
     info: PassInfo,
+    template: Option<String>,
     services: HashMap<Output, Vec<String>>,
 }
 
 impl Pass {
     #[must_use]
-    pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, services: HashMap::default() }
+    pub fn new(config: Config) -> Self {
+        Self { info: PassInfo { name: file!() }, template: config.template, services: HashMap::default() }
     }
 
     pub fn process(
@@ -47,7 +51,8 @@ impl Pass {
                 let mut ctx = Context::new();
                 ctx.insert("name", &ty.name);
 
-                let text = templates.render("common/types/service/all.cs", &ctx)?;
+                let template_name = self.template.as_deref().unwrap_or("common/types/service/all.cs");
+                let text = templates.render(template_name, &ctx)?;
                 rendered.push(text);
             }
 
