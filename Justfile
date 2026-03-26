@@ -74,10 +74,6 @@ ids:
     for i in $(seq 1 8); do od -An -tx1 -N16 /dev/urandom | tr -d ' \n' | sed 's/^/0x/' | tr 'a-f' 'A-F'; echo; done
 
 # Can be used by agents for the current task.
-test-agent:
+test-agent: (_bdp_p "exceptions")
     # Agents: Feel free to update the test logic here for the task at hand.
-    cargo test --test mod reference_plugins::service::define_plugins
-    dotnet build crates/backend_csharp/tests/reference_plugins/service_basic.dll/service_basic.csproj
-    dotnet build crates/backend_csharp/tests/reference_plugins/service_async.dll/service_async.csproj
-    dotnet build crates/backend_csharp/tests/reference_plugins/service_nested.dll/service_nested.csproj
-    cargo test --test mod reference_plugins::service -p interoptopus_csharp
+    cargo test --test mod plugins::exceptions::load_plugin

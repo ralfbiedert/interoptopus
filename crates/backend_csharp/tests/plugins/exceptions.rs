@@ -11,10 +11,14 @@ use std::error::Error;
 interoptopus::plugin!(ServiceTry {
     fn create_a(value: u32) -> Try<NestedA>;
     fn get_value() -> Try<u32>;
+    async fn create_a_async(value: u32) -> Try<NestedA>;
+    async fn get_value_async() -> Try<u32>;
 
     impl NestedA {
         fn create(value: u32) -> Try<Self>;
         fn get_value(&self) -> Try<u32>;
+        async fn create_async(value: u32) -> Try<Self>;
+        async fn get_value_async(&self) -> Try<u32>;
     }
 });
 
@@ -30,7 +34,7 @@ fn load_plugin() -> Result<(), Box<dyn Error>> {
 
     let a = plugin.create_a(0).unwrap();
     let b = plugin.get_value().unwrap();
-    let c = plugin.ne
-
+    // let c = plugin.ne
+    let x = plugin.nesteda_create(13);
     Ok(())
 }

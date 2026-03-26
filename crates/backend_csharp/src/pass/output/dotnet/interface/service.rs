@@ -13,6 +13,7 @@
 
 use crate::dispatch::{Item, ItemKind};
 use crate::lang::plugin::interface::MethodKind;
+use crate::lang::types::kind::TypeKind;
 use crate::output::{FileType, Output};
 use crate::pass::output::dotnet::interface::{format_args, rval_display_name};
 use crate::pass::{OutputResult, PassInfo, model, output};
@@ -55,8 +56,14 @@ impl Pass {
 
                     let line = match method.kind {
                         MethodKind::Static => {
-                            let rval = if method.is_async { "Task<TSelf>" } else { "TSelf" };
-                            format!("    static abstract {rval} {}({args_str});", method.name)
+                            let is_bare_service = types.get(method.rval_id).map_or(false, |t| matches!(&t.kind, TypeKind::Service));
+                            if is_bare_service {
+                                let rval = if method.is_async { "Task<TSelf>" } else { "TSelf" };
+                                format!("    static abstract {rval} {}({args_str});", method.name)
+                            } else {
+                                let rval = rval_display_name(method, types);
+                                format!("    static abstract {rval} {}({args_str});", method.name)
+                            }
                         }
                         MethodKind::Regular => {
                             let rval_name = rval_display_name(method, types);

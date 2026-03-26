@@ -68,9 +68,13 @@ impl Pass {
                     if is_async {
                         // Async ctor: strip callback from forwarded args, use continuation.
                         let (args, forward) = unmanaged_args_except_last(func, unmanaged_names, unmanaged_conversion);
-                        let continuation = format!(
-                            "ContinueWith(t => cb.UnsafeComplete(t.Result.IntoUnmanaged()))"
-                        );
+                        let cb_inner = async_callback_inner(func, types);
+                        let is_bare = cb_inner.map_or(false, |id| resolve_ptr_to_service_name(id, types).is_some());
+                        let continuation = if is_bare {
+                            "ContinueWith(t => cb.UnsafeComplete(t.Result.IntoUnmanaged()))".to_string()
+                        } else {
+                            "ContinueWith(t => cb.UnsafeComplete(t.Result.ToUnmanaged()))".to_string()
+                        };
 
                         let mut ctx = Context::new();
                         ctx.insert("ffi_name", ffi_name);
@@ -80,10 +84,23 @@ impl Pass {
                         ctx.insert("forward", &forward);
                         ctx.insert("continuation", &continuation);
                         templates.render("dotnet/interop/service_ctor_async.cs", &ctx)?
-                    } else {
-                        // Sync ctor: return TypeName.Unmanaged via .IntoUnmanaged().
+                    } else if resolve_ptr_to_service_name(func.signature.rval, types).is_some() {
+                        // Sync ctor returning bare ServiceHandle → nint.
                         let (args, forward) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
-                        let rval_type = format!("{type_name}.Unmanaged");
+
+                        let mut ctx = Context::new();
+                        ctx.insert("ffi_name", ffi_name);
+                        ctx.insert("args", &args);
+                        ctx.insert("type_name", type_name);
+                        ctx.insert("method_name", method_name);
+                        ctx.insert("forward", &forward);
+                        templates.render("dotnet/interop/service_ctor.cs", &ctx)?
+                    } else {
+                        // Sync ctor returning Result-wrapped handle (e.g., Try<Self>).
+                        let (args, forward) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
+                        let rval_type_name = types.get(func.signature.rval).map_or("void", |t| t.name.as_str());
+                        let rval_type = rval_unmanaged_name(func, rval_type_name, unmanaged_names);
+                        let rval_suffix = unmanaged_conversion.to_unmanaged_suffix(func.signature.rval);
 
                         let mut ctx = Context::new();
                         ctx.insert("ffi_name", ffi_name);
@@ -92,7 +109,8 @@ impl Pass {
                         ctx.insert("type_name", type_name);
                         ctx.insert("method_name", method_name);
                         ctx.insert("forward", &forward);
-                        templates.render("dotnet/interop/service_ctor.cs", &ctx)?
+                        ctx.insert("rval_suffix", &rval_suffix);
+                        templates.render("dotnet/interop/service_ctor_result.cs", &ctx)?
                     }
                 }
                 TrampolineKind::ServiceMethod { service_id } => {
