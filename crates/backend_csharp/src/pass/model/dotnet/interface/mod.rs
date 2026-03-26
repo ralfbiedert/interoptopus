@@ -4,7 +4,6 @@ pub mod service;
 use crate::lang::TypeId;
 use crate::lang::functions::{Argument, Signature};
 use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
-use crate::pass::model;
 use crate::pass::model::common::types::all::Pass as TypesAll;
 
 /// If the last argument is `AsyncCallback<T>`, returns the inner `TypeId`.
@@ -29,30 +28,16 @@ fn resolve_ptr_to_service_id(type_id: TypeId, types: &TypesAll) -> Option<TypeId
     None
 }
 
-/// Resolve a return TypeId through pointer-to-service and Result<ptr-to-service, E> patterns.
+/// Resolve a return TypeId through pointer-to-service patterns.
 ///
-/// - If `rval_id` is pointer-to-service → returns the service TypeId.
-/// - If `rval_id` is `Result<*const Service, E>` → returns the sibling TypeId (if registered).
-/// - Otherwise → returns `rval_id` unchanged.
-fn resolve_rval_type(rval_id: TypeId, types: &TypesAll, siblings: &model::dotnet::service_type_siblings::Pass) -> TypeId {
-    let Some(ty) = types.get(rval_id) else { return rval_id };
-
-    // Direct pointer-to-service
+/// - If `rval_id` is pointer-to-service → returns the service TypeId (so the
+///   interface can emit `TSelf`).
+/// - Otherwise → returns `rval_id` unchanged. Result types wrapping a service
+///   pointer already have the correct managed name from the naming pass.
+fn resolve_rval_type(rval_id: TypeId, types: &TypesAll) -> TypeId {
     if let Some(svc_id) = resolve_ptr_to_service_id(rval_id, types) {
         return svc_id;
     }
-
-    // Result wrapping pointer-to-service → use sibling type
-    if let TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _)) = &ty.kind {
-        if let Some(svc_id) = resolve_ptr_to_service_id(*ok_ty, types) {
-            if let Some(svc_siblings) = siblings.for_service(svc_id) {
-                if let Some(result_id) = svc_siblings.result {
-                    return result_id;
-                }
-            }
-        }
-    }
-
     rval_id
 }
 
@@ -60,13 +45,12 @@ fn resolve_rval_type(rval_id: TypeId, types: &TypesAll, siblings: &model::dotnet
 ///
 /// Returns `(Signature, resolved_rval_id, is_async)`:
 /// - `Signature`: arguments with async callback stripped, rval set to the resolved type.
-/// - `resolved_rval_id`: the managed return TypeId (service, sibling, or original).
+/// - `resolved_rval_id`: the managed return TypeId (service or original).
 /// - `is_async`: true if the original function uses `AsyncCallback<T>`.
 pub(super) fn resolve_method_info(
     args: &[Argument],
     rval: TypeId,
     types: &TypesAll,
-    siblings: &model::dotnet::service_type_siblings::Pass,
 ) -> Option<(Signature, TypeId, bool)> {
     let async_inner = async_callback_inner(args, types);
     let is_async = async_inner.is_some();
@@ -79,7 +63,7 @@ pub(super) fn resolve_method_info(
     } else {
         rval
     };
-    let resolved_rval_id = resolve_rval_type(raw_rval_id, types, siblings);
+    let resolved_rval_id = resolve_rval_type(raw_rval_id, types);
 
     let is_void = matches!(types.get(resolved_rval_id).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
     let effective_rval = if is_void && is_async { rval } else { resolved_rval_id };

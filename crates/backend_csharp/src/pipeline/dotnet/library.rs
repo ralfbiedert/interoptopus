@@ -31,7 +31,6 @@ pub struct DotnetLibraryConfig {
     pub model_fn_originals: model::common::fns::originals::Config,
     pub model_service_map: model::common::service::all::Config,
     pub model_type_util: model::common::types::util::Config,
-    pub model_service_type_siblings: model::dotnet::service_type_siblings::Config,
     pub model_trampoline: model::dotnet::trampoline::Config,
     pub model_plugin_interface: model::dotnet::interface::plugin::Config,
     pub model_service_interfaces: model::dotnet::interface::service::Config,
@@ -105,7 +104,6 @@ pub struct ModelPasses {
     pub fn_originals: model::common::fns::originals::Pass,
     pub service_all: model::common::service::all::Pass,
     pub type_util: model::common::types::util::Pass,
-    pub service_type_siblings: model::dotnet::service_type_siblings::Pass,
     pub trampoline: model::dotnet::trampoline::Pass,
     pub plugin_interface: model::dotnet::interface::plugin::Pass,
     pub service_interfaces: model::dotnet::interface::service::Pass,
@@ -207,7 +205,6 @@ impl DotnetLibrary {
                 fn_originals: model::common::fns::originals::Pass::new(config.model_fn_originals),
                 service_all: model::common::service::all::Pass::new(config.model_service_map),
                 type_util: model::common::types::util::Pass::new(config.model_type_util),
-                service_type_siblings: model::dotnet::service_type_siblings::Pass::new(config.model_service_type_siblings),
                 trampoline: model::dotnet::trampoline::Pass::new(config.model_trampoline),
                 plugin_interface: model::dotnet::interface::plugin::Pass::new(config.model_plugin_interface),
                 service_interfaces: model::dotnet::interface::service::Pass::new(config.model_service_interfaces),
@@ -294,10 +291,9 @@ impl DotnetLibrary {
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
             r.run(m.wire_helpers.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.wire_nested.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &mut m.type_names, &self.inventory.types))?;
-            r.run(m.service_type_siblings.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_all))?;
             r.run(m.trampoline.process(&mut pass_meta, &m.fns_all, &m.service_all))?;
-            r.run(m.plugin_interface.process(&mut pass_meta, &m.trampoline, &m.fns_all, &m.type_all, &m.service_type_siblings))?;
-            r.run(m.service_interfaces.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all, &m.service_type_siblings))?;
+            r.run(m.plugin_interface.process(&mut pass_meta, &m.trampoline, &m.fns_all, &m.type_all))?;
+            r.run(m.service_interfaces.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
 
             Ok(())
         })?;

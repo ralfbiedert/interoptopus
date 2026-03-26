@@ -29,7 +29,6 @@ impl Pass {
         trampoline_model: &model::dotnet::trampoline::Pass,
         fns_all: &model::common::fns::all::Pass,
         types: &model::common::types::all::Pass,
-        siblings: &model::dotnet::service_type_siblings::Pass,
     ) -> ModelResult {
         if self.done {
             return Ok(Unchanged);
@@ -49,7 +48,7 @@ impl Pass {
             let Some(func) = fns_all.get(entry.fn_id) else { continue };
 
             let pascal_name = rust_to_pascal(&func.name);
-            let Some((csharp_sig, rval_id, is_async)) = resolve_method_info(&func.signature.arguments, func.signature.rval, types, siblings) else {
+            let Some((csharp_sig, rval_id, is_async)) = resolve_method_info(&func.signature.arguments, func.signature.rval, types) else {
                 return Ok(Unchanged);
             };
 

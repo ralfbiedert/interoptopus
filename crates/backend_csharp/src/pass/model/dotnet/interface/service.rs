@@ -32,7 +32,6 @@ impl Pass {
         services: &model::common::service::all::Pass,
         fns_all: &model::common::fns::all::Pass,
         types: &model::common::types::all::Pass,
-        siblings: &model::dotnet::service_type_siblings::Pass,
     ) -> ModelResult {
         if self.done {
             return Ok(Unchanged);
@@ -57,7 +56,7 @@ impl Pass {
             for &fn_id in &svc.ctors {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
-                let Some((csharp_sig, rval_id, is_async)) = resolve_method_info(&func.signature.arguments, func.signature.rval, types, siblings) else {
+                let Some((csharp_sig, rval_id, is_async)) = resolve_method_info(&func.signature.arguments, func.signature.rval, types) else {
                     return Ok(Unchanged);
                 };
                 methods.push(Method { name: method_name, kind: MethodKind::Static, base: fn_id, csharp: csharp_sig, rval_id, is_async });
@@ -66,7 +65,7 @@ impl Pass {
             for &fn_id in &svc.methods {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
-                let Some((csharp_sig, rval_id, is_async)) = resolve_method_info(&func.signature.arguments, func.signature.rval, types, siblings) else {
+                let Some((csharp_sig, rval_id, is_async)) = resolve_method_info(&func.signature.arguments, func.signature.rval, types) else {
                     return Ok(Unchanged);
                 };
                 methods.push(Method { name: method_name, kind: MethodKind::Regular, base: fn_id, csharp: csharp_sig, rval_id, is_async });
