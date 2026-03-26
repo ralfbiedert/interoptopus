@@ -16,7 +16,7 @@
 //! transparent to the plugin code generator.
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::types::{Type, TypeInfo, TypeKind, WireIO, SerializationError};
+use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, WireIO};
 
 /// An opaque, FFI-safe handle to a service instance.
 ///
@@ -29,7 +29,9 @@ pub struct ServiceHandle<T>(*const T);
 // Manual impls so they don't require T: Copy/Clone/etc.
 impl<T> Copy for ServiceHandle<T> {}
 impl<T> Clone for ServiceHandle<T> {
-    fn clone(&self) -> Self { *self }
+    fn clone(&self) -> Self {
+        *self
+    }
 }
 impl<T> core::fmt::Debug for ServiceHandle<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -37,11 +39,15 @@ impl<T> core::fmt::Debug for ServiceHandle<T> {
     }
 }
 impl<T> PartialEq for ServiceHandle<T> {
-    fn eq(&self, other: &Self) -> bool { self.0 == other.0 }
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
 }
 impl<T> Eq for ServiceHandle<T> {}
 impl<T> core::hash::Hash for ServiceHandle<T> {
-    fn hash<H: core::hash::Hasher>(&self, state: &mut H) { self.0.hash(state); }
+    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+        self.0.hash(state);
+    }
 }
 
 unsafe impl<T> Send for ServiceHandle<T> {}
@@ -156,6 +162,28 @@ impl<Inner: ServiceHandleMap<S>, S> ServiceHandleMap<S> for crate::pattern::opti
             Self::None => crate::pattern::option::Option::None,
         }
     }
+}
+
+/// Computes the FFI representation of a type that wraps a service `S`,
+/// replacing `S` with [`ServiceHandle<S>`].
+///
+/// The compiler resolves type aliases *before* trait selection, so this works
+/// transparently through aliases such as `type Try<T> = ffi::Result<T, Error>`.
+///
+/// Only implemented for *wrapper* types ([`ffi::Result`](crate::ffi::Result),
+/// [`ffi::Option`](crate::ffi::Option)).  Bare service returns (`-> S`) are
+/// handled directly by the `plugin!` macro without this trait.
+pub trait ServiceAs<S> {
+    /// The FFI-safe representation with `S` replaced by `ServiceHandle<S>`.
+    type FFI;
+}
+
+impl<S, E> ServiceAs<S> for crate::pattern::result::Result<S, E> {
+    type FFI = crate::pattern::result::Result<ServiceHandle<S>, E>;
+}
+
+impl<S> ServiceAs<S> for crate::pattern::option::Option<S> {
+    type FFI = crate::pattern::option::Option<ServiceHandle<S>>;
 }
 
 /// Implemented by plugin-generated service structs to extract the opaque handle.

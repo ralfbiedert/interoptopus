@@ -99,25 +99,53 @@ pub fn is_self_return(ret: Option<&Type>) -> bool {
     }
 }
 
-/// Returns `true` if the return type is `ffi::Result<Self, E>`.
-pub fn is_result_self_return(ret: Option<&Type>) -> bool {
-    if let Some(Type::Path(p)) = ret {
-        if let Some(seg) = p.path.segments.last() {
-            if seg.ident == "Result" {
+/// Returns `true` if the return type contains `Self` anywhere (bare, or inside
+/// generic arguments like `Result<Self, E>`, `Try<Self>`, etc.).
+pub fn contains_self_return(ret: Option<&Type>) -> bool {
+    match ret {
+        Some(Type::Path(p)) => {
+            if p.path.is_ident("Self") {
+                return true;
+            }
+            p.path.segments.iter().any(|seg| {
                 if let syn::PathArguments::AngleBracketed(args) = &seg.arguments {
-                    if let Some(syn::GenericArgument::Type(inner)) = args.args.first() {
-                        return is_self_return(Some(inner));
+                    args.args.iter().any(|arg| {
+                        if let syn::GenericArgument::Type(inner) = arg {
+                            contains_self_return(Some(inner))
+                        } else {
+                            false
+                        }
+                    })
+                } else {
+                    false
+                }
+            })
+        }
+        _ => false,
+    }
+}
+
+/// Recursively replace every occurrence of `Self` in a type with `replacement`.
+pub fn replace_self(ty: &Type, replacement: &Ident) -> Type {
+    match ty {
+        Type::Path(p) => {
+            if p.path.is_ident("Self") {
+                return syn::parse_quote! { #replacement };
+            }
+            let mut p = p.clone();
+            for seg in &mut p.path.segments {
+                if let syn::PathArguments::AngleBracketed(args) = &mut seg.arguments {
+                    for arg in &mut args.args {
+                        if let syn::GenericArgument::Type(inner) = arg {
+                            *inner = replace_self(inner, replacement);
+                        }
                     }
                 }
             }
+            Type::Path(p)
         }
+        other => other.clone(),
     }
-    false
-}
-
-/// Returns `true` if the return type involves `Self` (bare or Result-wrapped).
-pub fn contains_self_return(ret: Option<&Type>) -> bool {
-    is_self_return(ret) || is_result_self_return(ret)
 }
 
 /// If `ty` is a known service type name, return it.
@@ -141,22 +169,6 @@ pub fn result_service_name(ty: &Type, service_names: &HashSet<String>) -> Option
                 if let syn::PathArguments::AngleBracketed(args) = &seg.arguments {
                     if let Some(syn::GenericArgument::Type(inner)) = args.args.first() {
                         return direct_service_name(inner, service_names);
-                    }
-                }
-            }
-        }
-    }
-    None
-}
-
-/// If `ty` is `ffi::Result<T, E>`, return the `E` type.
-pub fn result_err_type(ty: &Type) -> Option<&Type> {
-    if let Type::Path(p) = ty {
-        if let Some(seg) = p.path.segments.last() {
-            if seg.ident == "Result" {
-                if let syn::PathArguments::AngleBracketed(args) = &seg.arguments {
-                    if let Some(syn::GenericArgument::Type(e_ty)) = args.args.iter().nth(1) {
-                        return Some(e_ty);
                     }
                 }
             }

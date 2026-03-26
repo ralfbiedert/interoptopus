@@ -30,10 +30,10 @@ type Try<T> = ffi::Result<T, Error>;
 interoptopus::plugin!(ServiceNested {
     fn create_a(value: u32) -> NestedA;
     fn create_a_result(value: u32) -> Try<NestedA>;
-    // fn create_a_result(value: u32) -> ffi::Result<NestedA, Error>;
 
     impl NestedA {
         fn create(value: u32) -> Self;
+        fn create_result(value: u32) -> Try<Self>;
         fn get_value(&self) -> u32;
         fn add(&self, x: u32) -> u32;
         fn create_other(&self) -> NestedB;

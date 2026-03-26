@@ -5,8 +5,8 @@ use quote::{format_ident, quote};
 use syn::Type;
 
 use crate::plugin::model::{
-    PluginModel, PluginParam, ServiceBlock, direct_service_name, is_result_self_return, ref_service_name, result_err_type,
-    result_service_name, service_in_type, transitive_returned_services,
+    PluginModel, PluginParam, ServiceBlock, direct_service_name, is_self_return, ref_service_name, replace_self, service_in_type,
+    transitive_returned_services,
 };
 
 impl PluginModel {
@@ -330,14 +330,15 @@ fn emit_ctor_method(
     let forget_stmts = forget_owned_services(&c.params, svc_names);
 
     // Determine the FFI return type and user-facing return type
-    let (ffi_ret_ty, user_ret_ty) = if is_result_self_return(c.ret.as_ref()) {
-        let err_ty = result_err_type(c.ret.as_ref().unwrap()).unwrap();
-        (
-            quote! { ::interoptopus::ffi::Result<::interoptopus::ffi::ServiceHandle<#svc_name>, #err_ty> },
-            quote! { ::interoptopus::ffi::Result<#svc_name, #err_ty> },
-        )
-    } else {
+    let (ffi_ret_ty, user_ret_ty) = if is_self_return(c.ret.as_ref()) {
         (quote! { ::interoptopus::ffi::ServiceHandle<#svc_name> }, quote! { #svc_name })
+    } else {
+        // Wrapped Self (e.g., Result<Self, E>, Try<Self>, Option<Self>)
+        let user_ty = replace_self(c.ret.as_ref().unwrap(), svc_name);
+        (
+            quote! { <#user_ty as ::interoptopus::ffi::ServiceAs<#svc_name>>::FFI },
+            quote! { #user_ty },
+        )
     };
 
     if c.is_async {
@@ -606,12 +607,12 @@ fn emit_service_registration(s: &ServiceBlock, svc_names: &HashSet<String>) -> T
             let cb_inner = ffi_ctor_cb_ret(ctor, svc_name);
             let cb = Some(quote! { ::interoptopus::pattern::asynk::AsyncCallback<#cb_inner> });
             (None, cb)
-        } else if is_result_self_return(ctor.ret.as_ref()) {
-            let err_ty = result_err_type(ctor.ret.as_ref().unwrap()).unwrap();
-            let ret_ty: Type = syn::parse_quote! { ::interoptopus::ffi::Result<::interoptopus::ffi::ServiceHandle<#svc_name>, #err_ty> };
+        } else if is_self_return(ctor.ret.as_ref()) {
+            let ret_ty: Type = syn::parse_quote! { ::interoptopus::ffi::ServiceHandle<#svc_name> };
             (Some(ret_ty), None)
         } else {
-            let ret_ty: Type = syn::parse_quote! { ::interoptopus::ffi::ServiceHandle<#svc_name> };
+            let user_ty = replace_self(ctor.ret.as_ref().unwrap(), svc_name);
+            let ret_ty: Type = syn::parse_quote! { <#user_ty as ::interoptopus::ffi::ServiceAs<#svc_name>>::FFI };
             (Some(ret_ty), None)
         };
         emit_function_registration(fn_name, &ctor.params, ffi_ret.as_ref(), cb_ty, svc_names)
@@ -775,10 +776,9 @@ fn ffi_ret_arrow(ret: Option<&Type>, svc_names: &HashSet<String>) -> TokenStream
             if let Some(svc_name) = direct_service_name(ty, svc_names) {
                 let svc_ident = format_ident!("{}", svc_name);
                 quote! { -> ::interoptopus::ffi::ServiceHandle<#svc_ident> }
-            } else if let Some(svc_name) = result_service_name(ty, svc_names) {
+            } else if let Some(svc_name) = service_in_type(ty, svc_names) {
                 let svc_ident = format_ident!("{}", svc_name);
-                let err_ty = result_err_type(ty).unwrap();
-                quote! { -> ::interoptopus::ffi::Result<::interoptopus::ffi::ServiceHandle<#svc_ident>, #err_ty> }
+                quote! { -> <#ty as ::interoptopus::ffi::ServiceAs<#svc_ident>>::FFI }
             } else {
                 quote! { -> #ty }
             }
@@ -793,10 +793,9 @@ fn ffi_ret_or_unit(ret: Option<&Type>, svc_names: &HashSet<String>) -> TokenStre
             if let Some(svc_name) = direct_service_name(ty, svc_names) {
                 let svc_ident = format_ident!("{}", svc_name);
                 quote! { ::interoptopus::ffi::ServiceHandle<#svc_ident> }
-            } else if let Some(svc_name) = result_service_name(ty, svc_names) {
+            } else if let Some(svc_name) = service_in_type(ty, svc_names) {
                 let svc_ident = format_ident!("{}", svc_name);
-                let err_ty = result_err_type(ty).unwrap();
-                quote! { ::interoptopus::ffi::Result<::interoptopus::ffi::ServiceHandle<#svc_ident>, #err_ty> }
+                quote! { <#ty as ::interoptopus::ffi::ServiceAs<#svc_ident>>::FFI }
             } else {
                 quote! { #ty }
             }
@@ -809,10 +808,9 @@ fn ffi_reg_ret(ty: &Type, svc_names: &HashSet<String>) -> Type {
     if let Some(svc_name) = direct_service_name(ty, svc_names) {
         let svc_ident = format_ident!("{}", svc_name);
         syn::parse_quote! { ::interoptopus::ffi::ServiceHandle<#svc_ident> }
-    } else if let Some(svc_name) = result_service_name(ty, svc_names) {
+    } else if let Some(svc_name) = service_in_type(ty, svc_names) {
         let svc_ident = format_ident!("{}", svc_name);
-        let err_ty = result_err_type(ty).unwrap();
-        syn::parse_quote! { ::interoptopus::ffi::Result<::interoptopus::ffi::ServiceHandle<#svc_ident>, #err_ty> }
+        syn::parse_quote! { <#ty as ::interoptopus::ffi::ServiceAs<#svc_ident>>::FFI }
     } else {
         ty.clone()
     }
@@ -826,20 +824,20 @@ fn ctor_ffi_fn_ty(ffi_ptys: &[TokenStream], c: &crate::plugin::model::PluginMeth
     if c.is_async {
         let cb_ret = ffi_ctor_cb_ret(c, svc_ident);
         quote! { extern "C" fn(#(#ffi_ptys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) }
-    } else if is_result_self_return(c.ret.as_ref()) {
-        let err_ty = result_err_type(c.ret.as_ref().unwrap()).unwrap();
-        quote! { extern "C" fn(#(#ffi_ptys),*) -> ::interoptopus::ffi::Result<::interoptopus::ffi::ServiceHandle<#svc_ident>, #err_ty> }
-    } else {
+    } else if is_self_return(c.ret.as_ref()) {
         quote! { extern "C" fn(#(#ffi_ptys),*) -> ::interoptopus::ffi::ServiceHandle<#svc_ident> }
+    } else {
+        let user_ty = replace_self(c.ret.as_ref().unwrap(), svc_ident);
+        quote! { extern "C" fn(#(#ffi_ptys),*) -> <#user_ty as ::interoptopus::ffi::ServiceAs<#svc_ident>>::FFI }
     }
 }
 
 fn ffi_ctor_cb_ret(c: &crate::plugin::model::PluginMethod, svc_ident: &Ident) -> TokenStream {
-    if is_result_self_return(c.ret.as_ref()) {
-        let err_ty = result_err_type(c.ret.as_ref().unwrap()).unwrap();
-        quote! { ::interoptopus::ffi::Result<::interoptopus::ffi::ServiceHandle<#svc_ident>, #err_ty> }
-    } else {
+    if is_self_return(c.ret.as_ref()) {
         quote! { ::interoptopus::ffi::ServiceHandle<#svc_ident> }
+    } else {
+        let user_ty = replace_self(c.ret.as_ref().unwrap(), svc_ident);
+        quote! { <#user_ty as ::interoptopus::ffi::ServiceAs<#svc_ident>>::FFI }
     }
 }
 
