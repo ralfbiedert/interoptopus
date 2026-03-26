@@ -231,8 +231,11 @@ pub fn param_service_name(ty: &Type, service_names: &HashSet<String>) -> Option<
 ///
 /// If service A returns B and B returns C, then A transitively needs B and C.
 pub fn transitive_returned_services(s: &ServiceBlock, all_services: &[ServiceBlock], svc_names: &HashSet<String>) -> Vec<String> {
+    let own_name = s.name.to_string();
     let mut result = Vec::new();
     let mut visited = HashSet::new();
+    // Pre-mark self as visited so we never include our own methods as "extra" fields.
+    visited.insert(own_name);
     let mut queue: Vec<String> = s.returned_service_names(svc_names).into_iter().collect();
     while let Some(name) = queue.pop() {
         if visited.insert(name.clone()) {
