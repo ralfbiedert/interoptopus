@@ -153,13 +153,13 @@ pub const fn assert_raw_safe<T: TypeInfo>() {
 /// Compile-time assertion that `T` can appear in an async service method.
 #[track_caller]
 pub const fn assert_async_safe<T: TypeInfo>() {
-    assert!(T::ASYNC_SAFE);
+    assert!(T::ASYNC_SAFE, "This type cannot be used in async functions or methods.");
 }
 
 /// Compile-time assertion that `T` can appear in a service method.
 #[track_caller]
 pub const fn assert_service_safe<T: TypeInfo>() {
-    assert!(T::SERVICE_SAFE);
+    assert!(T::SERVICE_SAFE, "This type cannot be used in service methods.");
 }
 
 /// Compile-time assertion that `T` is `Send + Sync`.

@@ -1,8 +1,9 @@
 use std::collections::HashSet;
 
 use proc_macro2::{Ident, TokenStream};
-use quote::{format_ident, quote};
+use quote::{format_ident, quote, quote_spanned};
 use syn::Type;
+use syn::spanned::Spanned;
 
 use crate::plugin::model::{
     PluginModel, PluginParam, ServiceBlock, direct_service_name, is_self_return, ref_service_name, replace_self, service_in_type,
@@ -17,11 +18,13 @@ impl PluginModel {
         let plugin_trait = self.emit_plugin_trait(&svc_names);
         let plugin_info = self.emit_plugin_info(&svc_names);
         let service_type_infos: Vec<_> = self.services.iter().map(emit_service_type_info).collect();
+        let service_wire_ios: Vec<_> = self.services.iter().map(emit_service_wire_io).collect();
         let service_structs: Vec<_> = self.services.iter().map(|s| emit_service_struct(s, &self.services, &svc_names)).collect();
         let service_impls: Vec<_> = self.services.iter().map(|s| emit_service_impl(s, &self.services, &svc_names)).collect();
         let service_drops: Vec<_> = self.services.iter().map(emit_service_drop).collect();
         let service_send_syncs: Vec<_> = self.services.iter().map(emit_service_send_sync).collect();
         let service_traits: Vec<_> = self.services.iter().map(emit_service_trait).collect();
+        let assert_guards = self.emit_assert_guards(&svc_names);
 
         quote! {
             #plugin_struct
@@ -29,11 +32,13 @@ impl PluginModel {
             #plugin_trait
             #plugin_info
             #(#service_type_infos)*
+            #(#service_wire_ios)*
             #(#service_structs)*
             #(#service_send_syncs)*
             #(#service_impls)*
             #(#service_drops)*
             #(#service_traits)*
+            #assert_guards
         }
     }
 
@@ -240,6 +245,89 @@ impl PluginModel {
             }
         }
     }
+
+    // -----------------------------------------------------------------------
+    // Assert guards — compile-time checks for parameter safety
+    // -----------------------------------------------------------------------
+
+    fn emit_assert_guards(&self, svc_names: &HashSet<String>) -> TokenStream {
+        let bare_guards = self.functions.iter().flat_map(|f| {
+            emit_method_assert_guards(&f.params, f.ret.as_ref(), f.is_async, svc_names)
+        });
+
+        let service_guards = self.services.iter().flat_map(|s| {
+            let ctor_guards = s.ctors().into_iter().flat_map(|c| {
+                // Ctor return types contain Self — skip return type checks for ctors.
+                emit_method_assert_guards(&c.params, None, c.is_async, svc_names)
+            });
+            let method_guards = s.instance_methods().into_iter().flat_map(|m| {
+                emit_method_assert_guards(&m.params, m.ret.as_ref(), m.is_async, svc_names)
+            });
+            ctor_guards.chain(method_guards)
+        });
+
+        let all_guards: Vec<_> = bare_guards.chain(service_guards).collect();
+
+        quote! { #(#all_guards)* }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Assert guard helpers
+// ---------------------------------------------------------------------------
+
+/// Emit `const` assert guards for parameters and return type: `assert_raw_safe` for all,
+/// plus `assert_async_safe` for async functions/methods.
+/// Each guard uses `quote_spanned!` so errors point at the offending type.
+fn emit_method_assert_guards(params: &[PluginParam], ret: Option<&Type>, is_async: bool, svc_names: &HashSet<String>) -> Vec<TokenStream> {
+    let mut guards = Vec::new();
+
+    for p in params {
+        // Skip service types — they are handles at FFI level, not user types.
+        if direct_service_name(&p.ty, svc_names).is_some() || ref_service_name(&p.ty, svc_names).is_some() {
+            continue;
+        }
+
+        let ty = &p.ty;
+        let span = ty.span();
+
+        guards.push(quote_spanned! { span =>
+            const _: () = const {
+                ::interoptopus::lang::types::assert_raw_safe::<#ty>();
+            };
+        });
+
+        if is_async {
+            guards.push(quote_spanned! { span =>
+                const _: () = const {
+                    ::interoptopus::lang::types::assert_async_safe::<#ty>();
+                };
+            });
+        }
+    }
+
+    // Return type guards — skip service types (they become ServiceHandle at FFI level).
+    if let Some(ty) = ret {
+        if direct_service_name(ty, svc_names).is_none() && service_in_type(ty, svc_names).is_none() {
+            let span = ty.span();
+
+            guards.push(quote_spanned! { span =>
+                const _: () = const {
+                    ::interoptopus::lang::types::assert_raw_safe::<#ty>();
+                };
+            });
+
+            if is_async {
+                guards.push(quote_spanned! { span =>
+                    const _: () = const {
+                        ::interoptopus::lang::types::assert_async_safe::<#ty>();
+                    };
+                });
+            }
+        }
+    }
+
+    guards
 }
 
 // ---------------------------------------------------------------------------
