@@ -1,11 +1,5 @@
 use crate::{define_plugin, load_plugin};
-use interoptopus::lang::plugin::PluginInfo;
-use interoptopus_csharp::dispatch::Dispatch;
 use interoptopus_csharp::pattern::{Try, TryExtension};
-use interoptopus_csharp::DotnetLibrary;
-use reference_project::types::arrays::{Array, NestedArray};
-use reference_project::types::basic::Vec3f32;
-use reference_project::types::enums::{EnumPayload, EnumRenamedXYZ};
 use std::error::Error;
 
 interoptopus::plugin!(ServiceTry {
@@ -32,10 +26,10 @@ fn build_plugin() -> Result<(), Box<dyn Error>> {
 fn load_plugin() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(ServiceTry, "exceptions.dll", super::BASE);
 
-    plugin.get_value();
+    _ = plugin.get_value();
     //
-    let a = plugin.create_a(0).ok()?;
-    let b = plugin.get_value().ok()?;
-    let x = plugin.nested_a_create(13).ok()?;
+    let _ = plugin.create_a(0).ok()?;
+    let _ = plugin.get_value().ok()?;
+    let _ = plugin.nested_a_create(13).ok()?;
     Ok(())
 }

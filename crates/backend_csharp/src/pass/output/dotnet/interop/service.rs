@@ -82,7 +82,7 @@ impl Pass {
 
                     if is_async {
                         // Async ctor: strip callback from forwarded args, use continuation.
-                        let (args, forward) = unmanaged_args_except_last(func, unmanaged_names, unmanaged_conversion);
+                        let (args, forward) = service_aware_args_except_last(func, types, unmanaged_names, unmanaged_conversion);
                         let cb_inner = async_callback_inner(func, types);
                         let to_unmanaged = cb_inner.map_or("IntoUnmanaged", |id| unmanaged_conversion.to_unmanaged_name(id));
                         let continuation = format!("ContinueWith(t => cb.UnsafeComplete(t.Result.{to_unmanaged}()))");
@@ -98,7 +98,7 @@ impl Pass {
                         templates.render("dotnet/interop/service_ctor_async.cs", &ctx)?
                     } else if resolve_ptr_to_service_name(func.signature.rval, types).is_some() {
                         // Sync ctor returning bare ServiceHandle → nint.
-                        let (args, forward) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
+                        let (args, forward) = service_aware_args(func, types, unmanaged_names, unmanaged_conversion);
 
                         let mut ctx = Context::new();
                         ctx.insert("ffi_name", ffi_name);
@@ -109,7 +109,7 @@ impl Pass {
                         templates.render("dotnet/interop/service_ctor.cs", &ctx)?
                     } else {
                         // Sync ctor returning Result-wrapped handle (e.g., Try<Self>).
-                        let (args, forward) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
+                        let (args, forward) = service_aware_args(func, types, unmanaged_names, unmanaged_conversion);
                         let rval_type_name = types.get(func.signature.rval).map_or("void", |t| t.name.as_str());
                         let rval_type = rval_unmanaged_name(func, rval_type_name, unmanaged_names);
                         let rval_suffix = unmanaged_conversion.to_unmanaged_suffix(func.signature.rval);

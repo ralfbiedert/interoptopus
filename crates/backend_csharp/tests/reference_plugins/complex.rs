@@ -1,5 +1,4 @@
 use crate::{define_plugin, load_plugin};
-use interoptopus::lang::types::Primitive::U16;
 use reference_project::plugins::complex::Complex;
 use reference_project::types::arrays::{Array, NestedArray};
 use reference_project::types::basic::Vec3f32;

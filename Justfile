@@ -13,7 +13,7 @@ build verbose="":
     cargo build --all-features {{ verbose }}
 
 # Builds the .NET (reverse interop) plugins. Separate step, as .NET output is not reproducible.
-build-dotnet-plugins: (_bdp_ref "functions_primitive") (_bdp_ref "functions_behavior") (_bdp_ref "complex") (_bdp_ref "pattern") (_bdp_ref "service_basic") (_bdp_ref "service_async") (_bdp_ref "service_nested")  (_bdp_ref "wire") (_bdp_p "exceptions")
+build-dotnet-plugins: (_bdp_ref "functions_primitive") (_bdp_ref "functions_behavior") (_bdp_ref "complex") (_bdp_ref "pattern") (_bdp_ref "service_basic") (_bdp_ref "service_async") (_bdp_ref "service_nested")  (_bdp_ref "wire") (_bdp_p "exceptions") (_bdp_p "memory")
 
 # Helper to build a .NET `reference-plugins` plugin.
 _bdp_ref name:
@@ -22,8 +22,8 @@ _bdp_ref name:
 
 # Helper to build a .NET `plugins` plugin.
 _bdp_p name:
-    dotnet build -c Release crates/backend_csharp/tests/plugins/{{ name }}.dll/{{ name }}.csproj -v q
-    cp crates/backend_csharp/tests/plugins/{{ name }}.dll/bin/Release/net10.0/{{ name }}.dll crates/backend_csharp/tests/plugins/_plugins
+    dotnet build -c Release crates/backend_csharp/tests/backend_plugins/{{ name }}.dll/{{ name }}.csproj -v q
+    cp crates/backend_csharp/tests/backend_plugins/{{ name }}.dll/bin/Release/net10.0/{{ name }}.dll crates/backend_csharp/tests/backend_plugins/_plugins
 
 # Run unit tests, check semantic correctness.
 [arg("verbose", long="verbose", short="v", value="--verbose")]

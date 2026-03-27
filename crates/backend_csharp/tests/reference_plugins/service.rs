@@ -1,7 +1,5 @@
 use crate::{define_plugin, load_plugin};
 use interoptopus::wire::Wire;
-use interoptopus::{ffi, plugin};
-use interoptopus_csharp::rt::dynamic::runtime as dotnet_runtime;
 use reference_project::plugins::service::{ServiceAsync, ServiceBasic, ServiceNested};
 use std::collections::HashMap;
 use std::error::Error;
@@ -122,7 +120,7 @@ async fn load_plugin_service_async() -> Result<(), Box<dyn Error>> {
     assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
     assert_eq!(map.get("hello").map(String::as_str), Some("world"));
 
-    let mut result = plugin.wire_2(Wire::from(hashmap.clone())).await;
+    let result = plugin.wire_2(Wire::from(hashmap.clone())).await;
     let map = result.unwrap().unwire();
     assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
     assert_eq!(map.get("hello").map(String::as_str), Some("world"));
@@ -137,7 +135,7 @@ async fn load_plugin_service_async() -> Result<(), Box<dyn Error>> {
     assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
     assert_eq!(map.get("hello").map(String::as_str), Some("world"));
 
-    let mut result = svc.wire_2(Wire::from(hashmap)).await;
+    let result = svc.wire_2(Wire::from(hashmap)).await;
     let map = result.unwrap().unwire();
     assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
     assert_eq!(map.get("hello").map(String::as_str), Some("world"));
