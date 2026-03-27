@@ -1,10 +1,11 @@
 use crate::pattern::assert_looks_like_exception_name;
-use interoptopus::inventory::{Inventory, TypeId, hash_str};
+use interoptopus::inventory::{hash_str, Inventory, TypeId};
 use interoptopus::lang::meta::{Docs, Emission, FileEmission, Visibility};
 use interoptopus::lang::types::{Field, Repr, Struct, Type, TypeInfo, TypeKind};
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
 
+/// A C#-specific exception type that can be registered.
 pub struct Exception(u64, &'static str);
 
 impl Exception {
@@ -28,6 +29,7 @@ impl Exception {
     }
 }
 
+/// Observed error type for C#-specific exceptions on `Try<T>` methods.
 pub struct ExceptionError {
     exception_id: u64,
 }

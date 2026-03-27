@@ -40,7 +40,7 @@ static EMPTY: &[u8] = b"\0";
 ///
 /// Instead use [`CStrPtr`] alone since it already has a pointer that's nullable.
 /// In this case, [`CStrPtr::as_c_str()`] will return [`None`] and [`CStrPtr::as_str`]
-/// will return an [`Error::Null`].
+/// will return an [`Error`].
 #[repr(transparent)]
 #[derive(Debug)]
 pub struct CStrPtr<'a> {
@@ -75,7 +75,7 @@ impl<'a> CStrPtr<'a> {
     pub fn from_slice_with_nul(cstr_with_nul: &'a [u8]) -> Result<Self, Error> {
         // Check we actually contain one `0x0`.
         if !cstr_with_nul.contains(&0) {
-            return Err(Error::NulTerminated);
+            return Err(Error::nul_terminated());
         }
 
         // Can't do this, C# treats ASCII as extended and bytes > 127 might show up, which
@@ -111,7 +111,7 @@ impl<'a> CStrPtr<'a> {
     /// # Errors
     /// Can fail if the string was null.
     pub fn as_str(&self) -> Result<&'a str, Error> {
-        Ok(self.as_c_str().ok_or(Error::Null)?.to_str()?)
+        Ok(self.as_c_str().ok_or(Error::null())?.to_str()?)
     }
 }
 

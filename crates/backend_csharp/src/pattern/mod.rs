@@ -1,11 +1,14 @@
+//! C#-specific backend patterns, e.g., magic exception handling.
 use interoptopus::ffi;
 
 mod exception;
 pub use exception::{Exception, ExceptionError};
 
+/// Magic return type that enables transparent exception mapping.
 pub type Try<T> = ffi::Result<T, ExceptionError>;
 
 // This is sort of a hack until we get custom `?` handling in Rust.
+/// Helper to convert `Try<T>` to `Result<T, ExceptionError>`.
 pub trait TryExtension<T> {
     fn ok(self) -> Result<T, ExceptionError>;
 }
