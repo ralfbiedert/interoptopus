@@ -257,6 +257,11 @@ fn resolve_double_ptr_to_service_name(type_id: crate::lang::TypeId, types: &mode
 
 /// Like `unmanaged_args` but handles pointer-to-service params by unwrapping `GCHandle`,
 /// and double-pointer-to-service params (ref params) by dereferencing first.
+///
+/// - Owned service params (`ServiceHandle<T>`, single pointer): uses `T.Unmanaged` arg
+///   type and `.IntoManaged()` (frees GCHandle, ownership transfer).
+/// - Ref service params (`*const ServiceHandle<T>`, double pointer): uses `IntPtr` arg
+///   type and `T.Unmanaged { _handle = x }.AsManaged()` (no free, borrow).
 fn service_aware_args(
     func: &crate::lang::functions::Function,
     types: &model::common::types::all::Pass,
@@ -279,11 +284,11 @@ fn service_aware_args(
         .iter()
         .map(|a| {
             if let Some(svc_name) = resolve_ptr_to_service_name(a.ty, types) {
-                // Owned service param — ServiceHandle by value, unwrap GCHandle directly.
-                format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
+                // Owned service param — construct Unmanaged wrapper and IntoManaged (frees GCHandle).
+                format!("new {svc_name}.Unmanaged {{ _handle = {} }}.IntoManaged()", a.name)
             } else if let Some(svc_name) = resolve_double_ptr_to_service_name(a.ty, types) {
-                // Ref service param — pointer-to-ServiceHandle, dereference then unwrap.
-                format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
+                // Ref service param — dereference the pointer-to-handle, then AsManaged (no free).
+                format!("new {svc_name}.Unmanaged {{ _handle = Marshal.ReadIntPtr({}) }}.AsManaged()", a.name)
             } else {
                 format!("{}{}", a.name, unmanaged_conversion.to_managed_suffix(a.ty))
             }
@@ -303,7 +308,7 @@ fn service_aware_args_except_last(
     let n = func.signature.arguments.len().saturating_sub(1);
 
     let args: Vec<String> = func
-        .signature
+         .signature
         .arguments
         .iter()
         .filter_map(|arg| {
@@ -319,9 +324,9 @@ fn service_aware_args_except_last(
         .take(n)
         .map(|a| {
             if let Some(svc_name) = resolve_ptr_to_service_name(a.ty, types) {
-                format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
+                format!("new {svc_name}.Unmanaged {{ _handle = {} }}.IntoManaged()", a.name)
             } else if let Some(svc_name) = resolve_double_ptr_to_service_name(a.ty, types) {
-                format!("({svc_name})GCHandle.FromIntPtr({}).Target!", a.name)
+                format!("new {svc_name}.Unmanaged {{ _handle = Marshal.ReadIntPtr({}) }}.AsManaged()", a.name)
             } else {
                 format!("{}{}", a.name, unmanaged_conversion.to_managed_suffix(a.ty))
             }

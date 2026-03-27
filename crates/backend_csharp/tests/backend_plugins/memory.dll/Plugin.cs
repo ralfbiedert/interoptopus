@@ -65,6 +65,22 @@ partial class Fliparoo : IFliparoo<Fliparoo>
 
     public Heavy ReplaceRight2(Heavy heavy) { var old = _right; _right = heavy; return old; }
 
+    public async Task<Heavy> ReplaceLeftAsync(Heavy heavy)
+    {
+        await Task.Yield();
+        var old = _left;
+        _left = heavy;
+        return old;
+    }
+
+    public async Task<Heavy> ReplaceRightAsync(Heavy heavy)
+    {
+        await Task.Yield();
+        var old = _right;
+        _right = heavy;
+        return old;
+    }
+
     public Heavy GetLeft() => _left;
 
     public Heavy GetRight() => _right;

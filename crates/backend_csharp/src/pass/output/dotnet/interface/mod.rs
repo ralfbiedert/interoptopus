@@ -7,15 +7,28 @@ pub mod service;
 
 /// Format function arguments for interface declarations.
 /// Resolves pointer-to-service types to the service class name.
+/// Both owned (`*const T` → `T`) and ref (`*const *const T` → `T`) resolve
+/// to the managed service class name.
 pub(super) fn format_args(args: &[crate::lang::functions::Argument], types: &TypesAll) -> String {
     let parts: Vec<String> = args
         .iter()
         .filter_map(|arg| {
             let ty = types.get(arg.ty)?;
-            // If the arg is a pointer-to-service, use the target service class name.
             let name = if let TypeKind::Pointer(p) = &ty.kind {
                 if let Some(target) = types.get(p.target) {
-                    if matches!(&target.kind, TypeKind::Service) { &target.name } else { &ty.name }
+                    if matches!(&target.kind, TypeKind::Service) {
+                        // Single pointer-to-service (owned param).
+                        &target.name
+                    } else if let TypeKind::Pointer(inner_p) = &target.kind {
+                        // Double pointer-to-service (ref param).
+                        if let Some(inner_target) = types.get(inner_p.target) {
+                            if matches!(&inner_target.kind, TypeKind::Service) { &inner_target.name } else { &ty.name }
+                        } else {
+                            &ty.name
+                        }
+                    } else {
+                        &ty.name
+                    }
                 } else {
                     &ty.name
                 }

@@ -789,7 +789,7 @@ fn emit_function_registration(
                 quote! { <::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::register(inventory); }
             } else if let Some(svc_name) = ref_service_name(ty, svc_names) {
                 let svc_ident = format_ident!("{}", svc_name);
-                quote! { <::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::register(inventory); }
+                quote! { <*const ::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::register(inventory); }
             } else {
                 quote! { <#ty as ::interoptopus::lang::types::TypeInfo>::register(inventory); }
             }
@@ -815,7 +815,7 @@ fn emit_function_registration(
                 quote! { ::interoptopus::lang::function::Argument::new(#pname_str, <::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::id()) }
             } else if let Some(svc_name) = ref_service_name(pty, svc_names) {
                 let svc_ident = format_ident!("{}", svc_name);
-                quote! { ::interoptopus::lang::function::Argument::new(#pname_str, <::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::id()) }
+                quote! { ::interoptopus::lang::function::Argument::new(#pname_str, <*const ::interoptopus::ffi::ServiceHandle<#svc_ident> as ::interoptopus::lang::types::TypeInfo>::id()) }
             } else {
                 quote! { ::interoptopus::lang::function::Argument::new(#pname_str, <#pty as ::interoptopus::lang::types::TypeInfo>::id()) }
             }
@@ -865,7 +865,7 @@ fn ffi_param_ty(ty: &Type, svc_names: &HashSet<String>) -> TokenStream {
         quote! { ::interoptopus::ffi::ServiceHandle<#svc_ident> }
     } else if let Some(svc_name) = ref_service_name(ty, svc_names) {
         let svc_ident = format_ident!("{}", svc_name);
-        quote! { ::interoptopus::ffi::ServiceHandle<#svc_ident> }
+        quote! { *const ::interoptopus::ffi::ServiceHandle<#svc_ident> }
     } else {
         quote! { #ty }
     }
@@ -1045,8 +1045,8 @@ fn ffi_call_args(params: &[PluginParam], svc_names: &HashSet<String>) -> Vec<Tok
                 // Owned service — pass handle by value.
                 quote! { #pname.handle }
             } else if ref_service_name(&p.ty, svc_names).is_some() {
-                // Reference to service — pass handle by value (same as owned).
-                quote! { #pname.handle }
+                // Reference to service — pass pointer to handle.
+                quote! { &raw const #pname.handle }
             } else {
                 quote! { #pname }
             }
