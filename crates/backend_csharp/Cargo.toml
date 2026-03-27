@@ -11,13 +11,14 @@ version.workspace = true
 [features]
 unstable-plugins = ["interoptopus/unstable-plugins", "rt-dotnet", "rt-aot"]
 rt-dotnet = ["interoptopus/unstable-plugins", "dep:netcorehost", "dep:tempfile"]
+rt-dotnet-download = ["netcorehost/nethost-download"]
 rt-aot = ["interoptopus/unstable-plugins", "dep:libloading"]
 
 [dependencies]
 interoptopus = { workspace = true }
 interoptopus_backends.workspace = true
 libloading = { workspace = true, optional = true }
-netcorehost = { workspace = true, features = ["nethost-download", "net10_0"], optional = true }
+netcorehost = { workspace = true, features = ["nethost", "net10_0"], optional = true }
 tempfile = { workspace = true, optional = true }
 
 [build-dependencies]
@@ -25,7 +26,7 @@ interoptopus_backends.workspace = true
 
 [dev-dependencies]
 interoptopus = { workspace = true, features = ["macros", "serde"] }
-interoptopus_csharp = { path = ".", features = ["unstable-plugins"] }
+interoptopus_csharp = { path = ".", features = ["unstable-plugins", "rt-dotnet-download"] }
 reference_project.workspace = true
 insta.workspace = true
 tokio.workspace = true
@@ -35,7 +36,7 @@ memory-stats = "1.2.0"
 workspace = true
 
 [package.metadata.docs.rs]
-# Don't use all-features — `dotnet`/`unstable-plugins` pull in netcorehost
-# which requires nethost-download at build time and fails on docs.rs.
-features = []
+# Don't use all-features — `rt-dotnet-download` downloads the .NET runtime at build time
+# and fails on docs.rs. Enable everything else explicitly instead.
+features = ["unstable-plugins"]
 rustdoc-args = ["--cfg", "docsrs"]

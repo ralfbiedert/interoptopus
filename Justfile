@@ -13,7 +13,7 @@ build verbose="":
     cargo build --all-features {{ verbose }}
 
 # Builds the .NET (reverse interop) plugins. Separate step, as .NET output is not reproducible.
-build-dotnet-plugins: (_bdp_ref "functions_primitive") (_bdp_ref "functions_behavior") (_bdp_ref "complex") (_bdp_ref "pattern") (_bdp_ref "service_basic") (_bdp_ref "service_async") (_bdp_ref "service_nested")  (_bdp_ref "wire") (_bdp_p "exceptions") (_bdp_p "memory")
+build-dotnet-plugins: (_bdp_ref "functions_primitive") (_bdp_ref "functions_behavior") (_bdp_ref "complex") (_bdp_ref "pattern") (_bdp_ref "service_basic") (_bdp_ref "service_async") (_bdp_ref "service_nested") (_bdp_ref "wire") (_bdp_p "exceptions") (_bdp_p "memory")
 
 # Helper to build a .NET `reference-plugins` plugin.
 _bdp_ref name:
@@ -34,22 +34,22 @@ test verbose="" package="":
 # Runs .NET tests.
 test-dotnet:
     # Make sure the DLL + Interop files exist
-    cargo build -p reference_project
-    cargo test --test mod reference_project::interop
+    cargo build -p reference_project  --all-features
+    cargo test --test mod reference_project::interop  --all-features
     dotnet test crates/backend_csharp/tests/reference_project/reference_project_tests.csproj
 
 # Runs .NET benchmarks.
 bench-dotnet:
     # Make sure the DLL + Interop files exist
-    cargo build -p reference_project --release
-    cargo test --test mod reference_project::interop
+    cargo build -p reference_project --release  --all-features
+    cargo test --test mod reference_project::interop  --all-features
     dotnet run -c Release --project crates/backend_csharp/benches/dotnet/dotnet_benchmarks.csproj
 
 # Run linters, check tidiness.
 lint:
     cargo fmt --check
     cargo clippy -- -D warnings
-    RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
+    RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features
     diff -q crates/core/README.md README.md # Make sure top-level README is up to date.
 
 # Install all required tools, needs `binstall`, see https://github.com/cargo-bins/cargo-binstall
