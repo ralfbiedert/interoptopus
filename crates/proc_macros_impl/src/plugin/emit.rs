@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::{Group, Ident, Span, TokenStream, TokenTree};
 use quote::{format_ident, quote, quote_spanned};
 use syn::Type;
 use syn::spanned::Spanned;
@@ -1225,6 +1225,7 @@ fn find_service<'a>(all_services: &'a [ServiceBlock], name: &str) -> &'a Service
 }
 
 fn emit_load_field(field: &Ident, symbol: &str, fn_ty: TokenStream) -> TokenStream {
+    let fn_ty = respan(fn_ty);
     quote! {
         #field: {
             let ptr = loader(#symbol);
@@ -1234,6 +1235,25 @@ fn emit_load_field(field: &Ident, symbol: &str, fn_ty: TokenStream) -> TokenStre
             unsafe { ::std::mem::transmute::<*const u8, #fn_ty>(ptr) }
         }
     }
+}
+
+/// Recursively resets all token spans to `call_site`, so that IDE diagnostics
+/// originating from within the `transmute` type argument don't trace back to
+/// user-written type tokens inside the `plugin!` invocation.
+fn respan(ts: TokenStream) -> TokenStream {
+    ts.into_iter()
+        .map(|tt| match tt {
+            TokenTree::Group(g) => {
+                let mut new_g = Group::new(g.delimiter(), respan(g.stream()));
+                new_g.set_span(Span::call_site());
+                TokenTree::Group(new_g)
+            }
+            mut tt => {
+                tt.set_span(Span::call_site());
+                tt
+            }
+        })
+        .collect()
 }
 
 fn function_id_expr(fn_name: &str) -> TokenStream {
