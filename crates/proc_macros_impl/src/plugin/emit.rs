@@ -502,7 +502,7 @@ fn emit_ctor_method(
     svc_names: &HashSet<String>,
     inst_map: &HashMap<String, usize>,
 ) -> TokenStream {
-    let method_name = Ident::new(&format!("{}_{}", prefix, c.name), c.name.span());
+    let method_name = prefixed_ident(prefix, &c.name);
     let ctor_field = prefixed_ident(prefix, &c.name);
     let params = typed_params(&c.params);
     let ffi_args = ffi_call_args(&c.params, svc_names);
@@ -611,8 +611,27 @@ fn emit_service_impl(s: &ServiceBlock, all_services: &[ServiceBlock], svc_names:
     let inst_methods = s.instance_methods();
     let methods = inst_methods.iter().map(|m| emit_instance_method(&prefix, m, all_services, svc_names, inst_map));
 
+    // Dead-code stubs for constructors so the IDE maps each ctor name back to a
+    // function definition in this impl block, giving correct semantic highlighting.
+    let ctor_stubs = s.ctors().into_iter().map(|c| {
+        let stub_name = &c.name;
+        let params = typed_params(&c.params);
+        let ret = match c.ret.as_ref() {
+            Some(ty) => {
+                let ty = replace_self(ty, name);
+                quote! { -> #ty }
+            }
+            None => quote! {},
+        };
+        quote! {
+            #[allow(dead_code, unused_variables)]
+            fn #stub_name(#(#params),*) #ret { unreachable!() }
+        }
+    });
+
     quote! {
         impl #name {
+            #(#ctor_stubs)*
             #(#methods)*
         }
     }

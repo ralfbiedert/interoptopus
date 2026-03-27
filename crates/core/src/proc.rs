@@ -245,7 +245,7 @@ pub use interoptopus_proc::AsyncRuntime;
 /// | Type | Arg | Ret | Field | Async | Notes |
 /// |------|:---:|:---:|:-----:|:-----:|-------|
 /// | `u8`, `u16`, `u32`, ... | ✅ | ✅ | ✅ | ✅ | Always work everywhere. |
-/// | `[T; N]`  | ❌ | ❌ | ✅ | ✅ | Arrays only supported in fields. |
+/// | `[T; N]`  | ❌ | ❌ | ✅ | ❌ | Arrays only supported in fields. |
 /// | `#[ffi] struct MyStruct { .. }` | ✅ | ✅ | ✅ | ✅ | All fields must themselves be FFI-safe. |
 /// | `#[ffi] enum MyEnum { .. }` | ✅ | ✅ | ✅ | ✅ | Same as structs.  |
 /// | `String`, `Vec<T>`, `HashMap<K, V>` | ✅ | ✅ | ✅ | ✅ | Only if self or parent within `Wire<T>`. |
