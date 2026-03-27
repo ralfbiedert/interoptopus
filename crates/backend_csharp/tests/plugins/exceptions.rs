@@ -1,8 +1,8 @@
 use crate::{define_plugin, load_plugin};
 use interoptopus::lang::plugin::PluginInfo;
-use interoptopus_csharp::DotnetLibrary;
 use interoptopus_csharp::dispatch::Dispatch;
-use interoptopus_csharp::rt::Try;
+use interoptopus_csharp::pattern::{Try, TryExtension};
+use interoptopus_csharp::DotnetLibrary;
 use reference_project::types::arrays::{Array, NestedArray};
 use reference_project::types::basic::Vec3f32;
 use reference_project::types::enums::{EnumPayload, EnumRenamedXYZ};
@@ -23,7 +23,7 @@ interoptopus::plugin!(ServiceTry {
 });
 
 #[test]
-fn build_plugin() -> Result<(), Box<dyn std::error::Error>> {
+fn build_plugin() -> Result<(), Box<dyn Error>> {
     define_plugin!(ServiceTry, "exceptions.dll", super::BASE);
     Ok(())
 }
@@ -32,8 +32,9 @@ fn build_plugin() -> Result<(), Box<dyn std::error::Error>> {
 fn load_plugin() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(ServiceTry, "exceptions.dll", super::BASE);
 
-    let a = plugin.create_a(0).unwrap();
-    let b = plugin.get_value().unwrap();
-    let x = plugin.nested_a_create(13);
+    plugin.get_value();
+    let a = plugin.create_a(0).ok()?;
+    let b = plugin.get_value().ok()?;
+    let x = plugin.nested_a_create(13).ok()?;
     Ok(())
 }

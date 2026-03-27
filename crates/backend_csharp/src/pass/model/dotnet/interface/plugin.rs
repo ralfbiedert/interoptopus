@@ -5,7 +5,7 @@ use crate::lang::plugin::TrampolineKind;
 use crate::pass::model::dotnet::interface::resolve_method_info;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
-use crate::rt::ErrorXXX;
+use crate::pattern::ExceptionError;
 use interoptopus::lang::meta::{Emission, FileEmission};
 use interoptopus::lang::types::TypeInfo;
 use interoptopus_backends::casing::rust_to_pascal;
@@ -36,7 +36,7 @@ impl Pass {
             return Ok(Unchanged);
         }
 
-        let unwrap_error_id = id_maps.ty(ErrorXXX::id());
+        let unwrap_error_id = id_maps.ty(ExceptionError::id());
         let mut methods = Vec::new();
 
         for entry in trampoline_model.entries() {

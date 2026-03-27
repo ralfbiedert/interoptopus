@@ -35,12 +35,12 @@ impl ServiceCallbacks {
     }
 
     pub fn callback_ffi_return(&mut self, callback: SumDelegateReturn) -> ffi::Result<(), Error> {
-        callback.call(0, 0);
+        _ = callback.call(0, 0);
         ffi::Ok(())
     }
 
     pub fn callback_with_slice(&mut self, callback: SumDelegateReturn, input: ffi::Slice<i32>) -> ffi::Result<(), Error> {
-        callback.call(input.as_slice()[0], input.as_slice()[1]);
+        _ = callback.call(input.as_slice()[0], input.as_slice()[1]);
         ffi::Ok(())
     }
 
@@ -56,7 +56,7 @@ impl ServiceCallbacks {
         table.my_callback.call(123);
         table.sum_delegate_1.call();
         table.sum_delegate_2.call(123, 123);
-        table.sum_delegate_return.call(123, 123);
+        _ = table.sum_delegate_return.call(123, 123);
 
         ffi::Ok(())
     }

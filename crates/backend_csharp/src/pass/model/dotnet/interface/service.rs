@@ -8,7 +8,7 @@ use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKin
 use crate::pass::model::dotnet::interface::resolve_method_info;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{model, ModelResult, PassInfo};
-use crate::rt::ErrorXXX;
+use crate::pattern::ExceptionError;
 use interoptopus::lang::meta::{Emission, FileEmission};
 use interoptopus::lang::types::TypeInfo;
 use interoptopus_backends::casing::service_method_name;
@@ -39,7 +39,7 @@ impl Pass {
             return Ok(Unchanged);
         }
 
-        let unwrap_error_id = id_maps.ty(ErrorXXX::id());
+        let unwrap_error_id = id_maps.ty(ExceptionError::id());
         let mut sorted_services: Vec<_> = services.iter().collect();
         sorted_services.sort_by_key(|(_, svc)| types.get(svc.ty).map_or("", |t| t.name.as_str()));
 

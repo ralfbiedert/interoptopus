@@ -29,6 +29,7 @@ use serde::{Deserialize, Serialize};
 #[repr(u32)]
 #[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, Deserialize, Serialize))]
 #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]
+#[must_use]
 pub enum Option<T> {
     Some(T),
     #[default]

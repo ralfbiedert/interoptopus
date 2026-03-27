@@ -22,12 +22,12 @@
 //! ```
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Visibility, common_or_module_emission};
+use crate::lang::meta::{common_or_module_emission, Visibility};
 use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::any::Any;
 use std::fmt::Debug;
 use std::io::{Read, Write};
-use std::panic::{AssertUnwindSafe, catch_unwind};
+use std::panic::{catch_unwind, AssertUnwindSafe};
 
 /// Extracts a string message from a panic unwind.
 pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
@@ -42,6 +42,7 @@ pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
 
 #[repr(u32)]
 #[derive(Debug, Clone)]
+#[must_use]
 pub enum Result<T, E> {
     Ok(T),
     Err(E),

@@ -427,7 +427,8 @@ impl RustLibrary {
         o.enum_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, OperationMode::Rust)?;
         o.enum_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, OperationMode::Rust)?;
         o.enum_body_ctors.process(&mut pass_meta, &self.output_master, &m.type_all, OperationMode::Rust)?;
-        o.enum_body_from_call.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, OperationMode::Rust)?;
+        let no_exceptions = model::common::exceptions::Pass::new(model::common::exceptions::Config::default());
+        o.enum_body_from_call.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &no_exceptions, OperationMode::Rust)?;
         o.enum_body_exception_for_variant.process(&mut pass_meta, &self.output_master, &m.type_all, OperationMode::Rust)?;
         o.enum_body_tostring.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_from_call, &o.enum_body_exception_for_variant, &o.enum_body_tostring, &o.unmanaged_conversion)?;

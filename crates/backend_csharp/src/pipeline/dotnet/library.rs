@@ -36,6 +36,7 @@ pub struct DotnetLibraryConfig {
     pub model_service_interfaces: model::dotnet::interface::service::Config,
     pub model_wire_helpers: model::common::wire::helpers::Config,
     pub model_wire_nested: model::common::wire::nested::Config,
+    pub model_exceptions: model::common::exceptions::Config,
     pub output_master: output::common::master::Config,
     pub output_unmanaged_conversion: output::common::conversion::unmanaged_conversion::Config,
     pub output_unmanaged_names: output::common::conversion::unmanaged_names::Config,
@@ -111,6 +112,7 @@ pub struct ModelPasses {
     pub service_interfaces: model::dotnet::interface::service::Pass,
     pub wire_helpers: model::common::wire::helpers::Pass,
     pub wire_nested: model::common::wire::nested::Pass,
+    pub exceptions: model::common::exceptions::Pass,
 }
 
 /// Intermediate output passes for the dotnet pipeline.
@@ -214,6 +216,7 @@ impl DotnetLibrary {
                 service_interfaces: model::dotnet::interface::service::Pass::new(config.model_service_interfaces),
                 wire_helpers: model::common::wire::helpers::Pass::new(config.model_wire_helpers),
                 wire_nested: model::common::wire::nested::Pass::new(config.model_wire_nested),
+                exceptions: model::common::exceptions::Pass::new(config.model_exceptions),
             },
             output_master: output::common::master::Pass::new(config.output_master),
             output_passes: IntermediateOutputPasses {
@@ -327,7 +330,7 @@ impl DotnetLibrary {
         o.enum_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, OperationMode::Plugin)?;
         o.enum_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, OperationMode::Plugin)?;
         o.enum_body_ctors.process(&mut pass_meta, &self.output_master, &m.type_all, OperationMode::Plugin)?;
-        o.enum_body_from_call.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, OperationMode::Plugin)?;
+        o.enum_body_from_call.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &m.exceptions, OperationMode::Plugin)?;
         o.enum_body_exception_for_variant.process(&mut pass_meta, &self.output_master, &m.type_all, OperationMode::Plugin)?;
         o.enum_body_tostring.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_from_call, &o.enum_body_exception_for_variant, &o.enum_body_tostring, &o.unmanaged_conversion)?;

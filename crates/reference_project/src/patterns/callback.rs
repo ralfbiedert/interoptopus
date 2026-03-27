@@ -64,7 +64,7 @@ pub fn pattern_callback_7(c1: SumDelegateReturn, c2: SumDelegateReturn2, x: i32,
     // by doing some exception handling ping-pong; see the interoptopus_backend_csharp
     // config setting `config.work_around_exception_in_callback_no_reentry`.
     //
-    c1.call(x, x); // In a real world you'd also want to check the result here.
+    _ = c1.call(x, x); // In a real world you'd also want to check the result here.
     c2.call(x, x);
 
     *o = i + 1;

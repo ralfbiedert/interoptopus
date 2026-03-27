@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+use interoptopus_csharp::pattern::Exception;
 use std::path::{Path, PathBuf};
 
 #[macro_use]
@@ -8,12 +9,14 @@ mod output;
 mod plugins;
 mod reference_plugins;
 
+pub const FILE_NOT_FOUND_EXCEPTION: Exception = Exception::new("System.IO.FileNotFoundException");
+
 mod reference_project {
-    use interoptopus_csharp::RustLibrary;
     use interoptopus_csharp::config::HeaderConfig;
     use interoptopus_csharp::dispatch::Dispatch;
     use interoptopus_csharp::lang::meta::FileEmission;
     use interoptopus_csharp::output::Target;
+    use interoptopus_csharp::RustLibrary;
 
     #[test]
     fn interop() -> Result<(), Box<dyn std::error::Error>> {
@@ -49,6 +52,7 @@ macro_rules! define_plugin {
 
         let multibuf = ::interoptopus_csharp::DotnetLibrary::builder(<$plugin as ::interoptopus::lang::plugin::PluginInfo>::inventory())
             .dispatch(Dispatch::plugin_defaults_with("My.Company"))
+            .exception(crate::FILE_NOT_FOUND_EXCEPTION)
             .build()
             .process()?;
 

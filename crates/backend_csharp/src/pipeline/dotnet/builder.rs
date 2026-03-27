@@ -3,6 +3,7 @@ use crate::dispatch::Dispatch;
 use crate::lang::plugin::PLUGIN_DEFAULT_MODULE;
 use crate::output::Target;
 use crate::pass::output;
+use crate::pattern::Exception;
 use interoptopus::inventory::ForeignInventory;
 use interoptopus::lang::meta::FileEmission;
 
@@ -31,6 +32,13 @@ impl DotnetLibraryBuilder {
     #[must_use]
     pub fn dispatch(mut self, dispatch: Dispatch) -> Self {
         self.config.output_master.dispatch = dispatch;
+        self
+    }
+
+    /// Registers a named C# exception type for structured error mapping in `FromCall`.
+    #[must_use]
+    pub fn exception(mut self, exception: Exception) -> Self {
+        self.config.model_exceptions.exceptions.push(exception);
         self
     }
 

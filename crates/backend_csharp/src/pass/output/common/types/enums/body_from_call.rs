@@ -3,7 +3,7 @@
 //! These static methods wrap a user-provided lambda in a try/catch block and
 //! convert exceptions into the appropriate Result variant:
 //!
-//! - For `Result<T, ErrorXXX>` ("try error"): exceptions map to `Err(…)`.
+//! - For `Result<T, DotnetException>` ("try error"): exceptions map to `Err(…)`.
 //! - For any other `Result<T, E>`: exceptions map to `Panic`.
 //!
 //! ```csharp
@@ -17,9 +17,9 @@
 use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::lang::TypeId;
 use crate::pass::{model, output, OutputResult, PassInfo};
-use crate::rt::ErrorXXX;
+use crate::pattern::ExceptionError;
 use interoptopus::lang::types::TypeInfo;
-use interoptopus_backends::template::Context;
+use interoptopus_backends::template::{Context, Value};
 use std::collections::HashMap;
 
 #[derive(Default)]
@@ -32,7 +32,7 @@ pub struct Pass {
 
 impl Pass {
     #[must_use]
-    pub fn new(_config: Config) -> Self {
+    pub fn new(config: Config) -> Self {
         Self { info: PassInfo { name: file!() }, body_from_call: HashMap::default() }
     }
 
@@ -42,10 +42,22 @@ impl Pass {
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
         id_maps: &model::common::id_map::Pass,
+        exceptions_model: &model::common::exceptions::Pass,
         mode: crate::pass::OperationMode,
     ) -> OutputResult {
         let templates = output_master.templates();
-        let try_error_id = { id_maps.ty(ErrorXXX::id()) };
+        let try_error_id = { id_maps.ty(ExceptionError::id()) };
+
+        let exceptions: Vec<HashMap<&str, Value>> = exceptions_model
+            .exceptions()
+            .iter()
+            .map(|e| {
+                let mut m = HashMap::new();
+                m.insert("name", Value::String(e.name().to_string()));
+                m.insert("id", Value::String(format!("0x{:X}UL", e.id())));
+                m
+            })
+            .collect();
 
         for (type_id, ty) in types.iter() {
             let (ok_id, err_id) = match &ty.kind {
@@ -84,6 +96,7 @@ impl Pass {
             ctx.insert("ok_has_payload", &ok_has_payload);
             ctx.insert("is_try_error", &is_try_error);
             ctx.insert("err_type", &err_type);
+            ctx.insert("exceptions", &exceptions);
 
             let rendered = templates.render("common/types/enums/body_from_call.cs", &ctx)?;
             self.body_from_call.insert(*type_id, rendered);
