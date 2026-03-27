@@ -340,6 +340,7 @@ fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[Serv
     let forget_stmts = forget_owned_services(&f.params, svc_names);
 
     let ret_svc_name = f.ret.as_ref().and_then(|ty| service_in_type(ty, svc_names));
+    let must_use: TokenStream = if ret_svc_name.is_some() || f.is_async || f.ret.is_some() { quote! { #[must_use] } } else { quote! {} };
 
     if let Some(ref svc_name) = ret_svc_name {
         let svc_block = find_service(all_services, svc_name);
@@ -351,6 +352,7 @@ fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[Serv
             let field_src_lets = svc_field_src_lets(svc_block, all_services, svc_names, &quote! { self });
             let construct = svc_construct_expr(svc_block, all_services, svc_names);
             quote! {
+                #must_use
                 pub fn #fn_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                     #(#forget_stmts)*
                     let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
@@ -365,6 +367,7 @@ fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[Serv
         } else {
             let field_copies = svc_field_copies(svc_block, all_services, svc_names, &quote! { self });
             quote! {
+                #must_use
                 pub fn #fn_name(&self, #(#params),*) -> #ret_ty {
                     #(#forget_stmts)*
                     let raw = (self.#fn_name)(#(#ffi_args),*);
@@ -376,6 +379,7 @@ fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[Serv
         // async fn with no service return
         let ret_ty = ffi_ret_or_unit(f.ret.as_ref(), svc_names);
         quote! {
+            #must_use
             pub fn #fn_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                 #(#forget_stmts)*
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new();
@@ -387,6 +391,7 @@ fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[Serv
         // sync fn with no service involvement
         let ret = ret_tokens(f.ret.as_ref());
         quote! {
+            #must_use
             pub fn #fn_name(&self, #(#params),*) #ret {
                 #(#forget_stmts)*
                 (self.#fn_name)(#(#ffi_args),*)
@@ -426,6 +431,7 @@ fn emit_ctor_method(
         let field_src_lets = svc_field_src_lets(svc_block, all_services, svc_names, &quote! { self });
         let construct = svc_construct_expr(svc_block, all_services, svc_names);
         quote! {
+            #[must_use]
             pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #user_ret_ty> + 'static {
                 #(#forget_stmts)*
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
@@ -440,6 +446,7 @@ fn emit_ctor_method(
     } else {
         let field_copies = svc_field_copies(svc_block, all_services, svc_names, &quote! { self });
         quote! {
+            #[must_use]
             pub fn #method_name(&self, #(#params),*) -> #user_ret_ty {
                 #(#forget_stmts)*
                 let raw: #ffi_ret_ty = (self.#ctor_field)(#(#ffi_args),*);
@@ -519,6 +526,7 @@ fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, al
     let forget_stmts = forget_owned_services(&m.params, svc_names);
 
     let ret_svc_name = m.ret.as_ref().and_then(|ty| service_in_type(ty, svc_names));
+    let must_use: TokenStream = if ret_svc_name.is_some() || m.is_async || m.ret.is_some() { quote! { #[must_use] } } else { quote! {} };
 
     if let Some(ref svc_name) = ret_svc_name {
         let svc_block = find_service(all_services, svc_name);
@@ -530,6 +538,7 @@ fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, al
             let field_src_lets = svc_field_src_lets(svc_block, all_services, svc_names, &quote! { self });
             let construct = svc_construct_expr(svc_block, all_services, svc_names);
             quote! {
+                #must_use
                 pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                     #(#forget_stmts)*
                     let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
@@ -544,6 +553,7 @@ fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, al
         } else {
             let field_copies = svc_field_copies(svc_block, all_services, svc_names, &quote! { self });
             quote! {
+                #must_use
                 pub fn #method_name(&self, #(#params),*) -> #ret_ty {
                     #(#forget_stmts)*
                     let raw: #ffi_ret_ty = (self.#field)(self.handle, #(#ffi_args),*);
@@ -554,6 +564,7 @@ fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, al
     } else if m.is_async {
         let ret_ty = ffi_ret_or_unit(m.ret.as_ref(), svc_names);
         quote! {
+            #must_use
             pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                 #(#forget_stmts)*
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new();
@@ -564,6 +575,7 @@ fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, al
     } else {
         let ret = ret_tokens(m.ret.as_ref());
         quote! {
+            #must_use
             pub fn #method_name(&self, #(#params),*) #ret {
                 #(#forget_stmts)*
                 (self.#field)(self.handle, #(#ffi_args),*)

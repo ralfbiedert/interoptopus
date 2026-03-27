@@ -33,6 +33,7 @@ fn load_plugin() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(ServiceTry, "exceptions.dll", super::BASE);
 
     plugin.get_value();
+    //
     let a = plugin.create_a(0).ok()?;
     let b = plugin.get_value().ok()?;
     let x = plugin.nested_a_create(13).ok()?;
