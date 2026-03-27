@@ -340,7 +340,11 @@ fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[Serv
     let forget_stmts = forget_owned_services(&f.params, svc_names);
 
     let ret_svc_name = f.ret.as_ref().and_then(|ty| service_in_type(ty, svc_names));
-    let must_use: TokenStream = if ret_svc_name.is_some() || f.is_async || f.ret.is_some() { quote! { #[must_use] } } else { quote! {} };
+    let must_use: TokenStream = if ret_svc_name.is_some() || f.is_async || f.ret.is_some() {
+        quote! { #[must_use] }
+    } else {
+        quote! {}
+    };
 
     if let Some(ref svc_name) = ret_svc_name {
         let svc_block = find_service(all_services, svc_name);
@@ -526,7 +530,11 @@ fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, al
     let forget_stmts = forget_owned_services(&m.params, svc_names);
 
     let ret_svc_name = m.ret.as_ref().and_then(|ty| service_in_type(ty, svc_names));
-    let must_use: TokenStream = if ret_svc_name.is_some() || m.is_async || m.ret.is_some() { quote! { #[must_use] } } else { quote! {} };
+    let must_use: TokenStream = if ret_svc_name.is_some() || m.is_async || m.ret.is_some() {
+        quote! { #[must_use] }
+    } else {
+        quote! {}
+    };
 
     if let Some(ref svc_name) = ret_svc_name {
         let svc_block = find_service(all_services, svc_name);

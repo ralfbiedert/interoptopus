@@ -5,9 +5,9 @@
 //! (created by the `service_type_siblings` pass).
 
 use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
-use crate::pass::model::dotnet::interface::resolve_method_info;
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::model::dotnet::interface::resolve_method_info;
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::pattern::ExceptionError;
 use interoptopus::lang::meta::{Emission, FileEmission};
 use interoptopus::lang::types::TypeInfo;

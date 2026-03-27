@@ -1,10 +1,10 @@
 //! Builds the `IPlugin` interface model from raw (non-service) trampoline entries.
 
-use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
 use crate::lang::plugin::TrampolineKind;
-use crate::pass::model::dotnet::interface::resolve_method_info;
+use crate::lang::plugin::interface::{Interface, InterfaceKind, Method, MethodKind};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::model::dotnet::interface::resolve_method_info;
+use crate::pass::{ModelResult, PassInfo, model};
 use crate::pattern::ExceptionError;
 use interoptopus::lang::meta::{Emission, FileEmission};
 use interoptopus::lang::types::TypeInfo;

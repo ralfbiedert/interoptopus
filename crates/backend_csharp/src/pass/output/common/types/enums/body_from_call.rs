@@ -14,9 +14,9 @@
 //! }
 //! ```
 
-use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::lang::TypeId;
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::lang::types::kind::{TypeKind, TypePattern};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use crate::pattern::ExceptionError;
 use interoptopus::lang::types::TypeInfo;
 use interoptopus_backends::template::{Context, Value};

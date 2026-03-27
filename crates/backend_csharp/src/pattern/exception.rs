@@ -1,5 +1,5 @@
 use crate::pattern::assert_looks_like_exception_name;
-use interoptopus::inventory::{hash_str, Inventory, TypeId};
+use interoptopus::inventory::{Inventory, TypeId, hash_str};
 use interoptopus::lang::meta::{Docs, Emission, FileEmission, Visibility};
 use interoptopus::lang::types::{Field, Repr, Struct, Type, TypeInfo, TypeKind};
 use std::error::Error;

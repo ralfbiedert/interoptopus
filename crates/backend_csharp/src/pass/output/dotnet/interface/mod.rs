@@ -22,7 +22,11 @@ pub(super) fn format_args(args: &[crate::lang::functions::Argument], types: &Typ
                     } else if let TypeKind::Pointer(inner_p) = &target.kind {
                         // Double pointer-to-service (ref param).
                         if let Some(inner_target) = types.get(inner_p.target) {
-                            if matches!(&inner_target.kind, TypeKind::Service) { &inner_target.name } else { &ty.name }
+                            if matches!(&inner_target.kind, TypeKind::Service) {
+                                &inner_target.name
+                            } else {
+                                &ty.name
+                            }
                         } else {
                             &ty.name
                         }

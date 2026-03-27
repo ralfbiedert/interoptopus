@@ -308,7 +308,7 @@ fn service_aware_args_except_last(
     let n = func.signature.arguments.len().saturating_sub(1);
 
     let args: Vec<String> = func
-         .signature
+        .signature
         .arguments
         .iter()
         .filter_map(|arg| {

@@ -1,9 +1,9 @@
 pub mod plugin;
 pub mod service;
 
+use crate::lang::TypeId;
 use crate::lang::functions::{Argument, Signature};
 use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
-use crate::lang::TypeId;
 use crate::pass::model::common::types::all::Pass as TypesAll;
 use interoptopus::lang::types::TypeInfo;
 
