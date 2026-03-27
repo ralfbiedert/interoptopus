@@ -10,7 +10,7 @@ static int {{ load_fn }}(const char* path, {{ api_name }}* api)
 {%- if fn.separator %}
     /* internal helpers */
 {%- endif %}
-    sym = dlsym(lib, "{{ fn.name }}");
+    sym = dlsym(lib, "{{ fn.symbol }}");
     if (!sym) return -1;
     memcpy(&api->{{ fn.name }}, &sym, sizeof(sym));
 {%- endfor %}

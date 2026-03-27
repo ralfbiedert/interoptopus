@@ -1,7 +1,7 @@
 typedef enum {{ tag_name }}
 {
-    {{ name }}_OK = 0,
-    {{ name }}_ERR = 1,
+    {{ ok_variant }} = 0,
+    {{ err_variant }} = 1,
 } {{ tag_name }};
 
 typedef struct {{ name }}

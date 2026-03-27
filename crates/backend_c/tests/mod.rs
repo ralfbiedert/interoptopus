@@ -1,7 +1,22 @@
 mod reference_project {
+    use interoptopus_c::{CLibrary, NamingStyle};
+
     #[test]
     fn interop() -> Result<(), Box<dyn std::error::Error>> {
-        interoptopus_c::generate("reference_project_c", &reference_project_c::inventory(), "tests/reference_project/reference_project.h")?;
+        let inv = reference_project_c::inventory();
+        let multibuf = CLibrary::builder(&inv)
+            .loader_name("reference_project_c")
+            .filename("reference_project.h")
+            .prefix("rp_")
+            .type_naming(NamingStyle::Snake)
+            .enum_variant_naming(NamingStyle::Snake)
+            .function_naming(NamingStyle::Snake)
+            .function_parameter_naming(NamingStyle::Snake)
+            .const_naming(NamingStyle::Snake)
+            .build()
+            .process()
+            .map_err(|e| Box::new(std::io::Error::other(e.to_string())))?;
+        multibuf.write_buffer_to(std::path::Path::new("tests/reference_project"), "reference_project.h")?;
         Ok(())
     }
 }
@@ -135,16 +150,77 @@ mod snapshots {
 
         #[ffi(export = unique)]
         pub fn unwrap_option(opt: ffi::Option<f32>) -> f32 {
-            match opt.into_option() {
-                Some(v) => v,
-                None => 0.0,
-            }
+            opt.into_option().unwrap_or(0.0)
         }
 
         #[test]
         fn snapshot() {
             let inv = RustInventory::new().register(function!(sum_slice)).register(function!(unwrap_option)).validate();
             insta::assert_snapshot!(generate("patterns", &inv));
+        }
+    }
+
+    /// End-to-end test exercising prefix + non-default naming styles.
+    mod custom_naming {
+        use interoptopus::inventory::RustInventory;
+        use interoptopus::{callback, ffi, function};
+        use interoptopus_c::{CLibrary, NamingStyle};
+
+        #[ffi]
+        #[derive(Copy, Clone)]
+        pub struct Vec2 {
+            pub x: f32,
+            pub y: f32,
+        }
+
+        #[ffi]
+        #[derive(Copy, Clone)]
+        #[allow(dead_code)]
+        pub enum Shape {
+            Circle(f32),
+            Rectangle(Vec2),
+        }
+
+        callback!(ShapeCallback(shape: Shape) -> f32);
+
+        #[ffi(export = unique)]
+        pub fn shape_area(shape: Shape) -> f32 {
+            match shape {
+                Shape::Circle(r) => std::f32::consts::PI * r * r,
+                Shape::Rectangle(v) => v.x * v.y,
+            }
+        }
+
+        #[ffi(export = unique)]
+        pub fn invoke_cb(cb: ShapeCallback) -> f32 {
+            cb.call(Shape::Circle(1.0))
+        }
+
+        #[ffi(export = unique)]
+        pub fn get_optional(opt: ffi::Option<f32>) -> f32 {
+            opt.into_option().unwrap_or(0.0)
+        }
+
+        #[test]
+        fn prefixed_upper_camel() {
+            let inv = RustInventory::new()
+                .register(function!(shape_area))
+                .register(function!(invoke_cb))
+                .register(function!(get_optional))
+                .validate();
+            let multibuf = CLibrary::builder(&inv)
+                .loader_name("mylib")
+                .prefix("mylib_")
+                .type_naming(NamingStyle::UpperCamel)
+                .enum_variant_naming(NamingStyle::ScreamingSnake)
+                .function_naming(NamingStyle::Snake)
+                .function_parameter_naming(NamingStyle::Snake)
+                .const_naming(NamingStyle::ScreamingSnake)
+                .build()
+                .process()
+                .unwrap();
+            let output = multibuf.buffer("mylib.h").unwrap().clone();
+            insta::assert_snapshot!(output);
         }
     }
 }

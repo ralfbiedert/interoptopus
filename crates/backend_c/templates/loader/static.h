@@ -5,7 +5,7 @@ static int {{ load_fn }}({{ api_name }}* api)
 {%- if fn.separator %}
     /* internal helpers */
 {%- endif %}
-    api->{{ fn.name }} = {{ fn.name }};
+    api->{{ fn.name }} = {{ fn.symbol }};
 {%- endfor %}
     return 0;
 }

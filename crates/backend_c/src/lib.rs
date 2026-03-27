@@ -4,6 +4,7 @@ pub mod lang;
 pub mod pass;
 pub mod pipeline;
 
+pub use lang::{NamingConfig, NamingStyle, apply_naming_style, apply_prefix};
 pub use pipeline::{CLibrary, CLibraryBuilder};
 
 use interoptopus::inventory::RustInventory;
