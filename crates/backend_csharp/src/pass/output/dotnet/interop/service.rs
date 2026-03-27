@@ -55,9 +55,23 @@ impl Pass {
             .flat_map(|iface| iface.methods.iter().map(|m| (m.base, m.name.as_str())))
             .collect();
 
+        // Build FunctionId → Result type name lookup for methods with unwrapped Try<T> returns.
+        let result_wraps: HashMap<FunctionId, &str> = service_interfaces
+            .interfaces()
+            .iter()
+            .flat_map(|iface| {
+                iface.methods.iter().filter_map(|m| {
+                    let result_id = m.unwrapped_result_id?;
+                    let name = types.get(result_id).map(|t| t.name.as_str())?;
+                    Some((m.base, name))
+                })
+            })
+            .collect();
+
         for entry in trampoline_model.entries() {
             let Some(func) = fns_all.get(entry.fn_id) else { continue };
             let ffi_name = &func.name;
+            let result_wrap_type = result_wraps.get(&entry.fn_id).copied().unwrap_or("");
 
             let rendered = match &entry.kind {
                 TrampolineKind::ServiceCtor { service_id } => {
@@ -80,6 +94,7 @@ impl Pass {
                         ctx.insert("method_name", method_name);
                         ctx.insert("forward", &forward);
                         ctx.insert("continuation", &continuation);
+                        ctx.insert("result_wrap_type", result_wrap_type);
                         templates.render("dotnet/interop/service_ctor_async.cs", &ctx)?
                     } else if resolve_ptr_to_service_name(func.signature.rval, types).is_some() {
                         // Sync ctor returning bare ServiceHandle → nint.
@@ -107,6 +122,7 @@ impl Pass {
                         ctx.insert("method_name", method_name);
                         ctx.insert("forward", &forward);
                         ctx.insert("rval_suffix", &rval_suffix);
+                        ctx.insert("result_wrap_type", result_wrap_type);
                         templates.render("dotnet/interop/service_ctor_result.cs", &ctx)?
                     }
                 }
@@ -139,6 +155,7 @@ impl Pass {
                         ctx.insert("method_name", method_name);
                         ctx.insert("forward", &forward);
                         ctx.insert("continuation", &continuation);
+                        ctx.insert("result_wrap_type", result_wrap_type);
                         templates.render("dotnet/interop/service_method_async.cs", &ctx)?
                     } else if rval_is_service {
                         let ret_svc_name = resolve_ptr_to_service_name(func.signature.rval, types).unwrap();
@@ -178,6 +195,7 @@ impl Pass {
                         ctx.insert("forward", &forward);
                         ctx.insert("rval_suffix", &rval_suffix);
                         ctx.insert("is_void", &is_void);
+                        ctx.insert("result_wrap_type", result_wrap_type);
                         templates.render("dotnet/interop/service_method_sync.cs", &ctx)?
                     }
                 }

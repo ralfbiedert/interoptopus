@@ -7,6 +7,8 @@
             var obj = (I{{ type_name }}<{{ type_name }}>)handle.Target!;
 {%- if is_void %}
             obj.{{ method_name }}({{ forward }});
+{%- elif result_wrap_type %}
+            return {{ result_wrap_type }}.FromCall(() => obj.{{ method_name }}({{ forward }})){{ rval_suffix }};
 {%- else %}
             return obj.{{ method_name }}({{ forward }}){{ rval_suffix }};
 {%- endif %}

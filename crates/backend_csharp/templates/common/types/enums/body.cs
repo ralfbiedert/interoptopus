@@ -17,7 +17,9 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
     {{ exception_for_variant | indent }}
 
     {{ ctors | indent }}
-
+{% if from_call %}
+    {{ from_call | indent }}
+{% endif %}
     {{ to_string | indent }}
 {% if is_disposable %}
     public void Dispose()

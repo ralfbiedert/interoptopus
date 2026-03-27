@@ -3,6 +3,7 @@ use crate::lang::TypeId;
 use crate::lang::functions::Signature;
 use interoptopus::lang::meta::Emission;
 
+#[derive(Debug, PartialEq)]
 pub enum InterfaceKind {
     Plugin,
     Service,
@@ -14,6 +15,7 @@ pub enum MethodKind {
     Static,
 }
 
+#[derive(Debug, PartialEq)]
 pub struct Method {
     /// C# method name (e.g. `"PrimitiveU32"`, `"ServiceaCreate"`).
     pub name: String,
@@ -27,8 +29,13 @@ pub struct Method {
     pub rval_id: TypeId,
     /// Whether this method is async (wraps return in `Task<>`).
     pub is_async: bool,
+    /// If the original return type was `Result<T, ErrorXXX>` (a `Try<T>`), stores the
+    /// Result's C# `TypeId` so trampolines can wrap calls with `FromCall`. When set,
+    /// `rval_id` holds the unwrapped `T` instead of the full Result type.
+    pub unwrapped_result_id: Option<TypeId>,
 }
 
+#[derive(Debug, PartialEq)]
 pub struct Interface {
     pub name: String,
     pub emission: Emission,

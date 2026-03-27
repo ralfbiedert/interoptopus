@@ -32,6 +32,7 @@ impl Pass {
         enum_body_to_unmanaged: &output::common::types::enums::body_to_unmanaged::Pass,
         enum_body_as_unmanaged: &output::common::types::enums::body_as_unmanaged::Pass,
         enum_body_ctors: &output::common::types::enums::body_ctors::Pass,
+        enum_body_from_call: &output::common::types::enums::body_from_call::Pass,
         enum_body_exception_for_variant: &output::common::types::enums::body_exception_for_variant::Pass,
         enum_body_tostring: &output::common::types::enums::body_tostring::Pass,
         managed: &output::common::conversion::unmanaged_conversion::Pass,
@@ -66,6 +67,7 @@ impl Pass {
             let to_unmanaged = enum_body_to_unmanaged.get(*type_id).map_or("", std::string::String::as_str);
             let as_unmanaged = enum_body_as_unmanaged.get(*type_id).map_or("", std::string::String::as_str);
             let ctors = enum_body_ctors.get(*type_id).map_or("", std::string::String::as_str);
+            let from_call = enum_body_from_call.get(*type_id).map_or("", std::string::String::as_str);
             let exception_for_variant = enum_body_exception_for_variant.get(*type_id).map_or("", std::string::String::as_str);
             let to_string = enum_body_tostring.get(*type_id).map_or("", std::string::String::as_str);
 
@@ -105,6 +107,7 @@ impl Pass {
             context.insert("to_unmanaged", &to_unmanaged);
             context.insert("as_unmanaged", &as_unmanaged);
             context.insert("ctors", &ctors);
+            context.insert("from_call", &from_call);
             context.insert("exception_for_variant", &exception_for_variant);
             context.insert("to_string", &to_string);
             context.insert("marshaller_to_unmanaged", marshaller_to_unmanaged);

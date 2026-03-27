@@ -9,6 +9,7 @@
 //! Method names are resolved from the plugin interface model pass.
 
 use crate::lang::FunctionId;
+use crate::lang::TypeId;
 use crate::lang::plugin::TrampolineKind;
 use crate::lang::types::kind::TypeKind;
 use crate::pass::output::dotnet::interop::{async_callback_inner, async_continuation, rval_unmanaged_name, unmanaged_args, unmanaged_args_except_last};
@@ -49,6 +50,22 @@ impl Pass {
             .map(|iface| iface.methods.iter().map(|m| (m.base, m.name.as_str())).collect())
             .unwrap_or_default();
 
+        // Build FunctionId → Result type name lookup for methods with unwrapped Try<T> returns.
+        let result_wraps: HashMap<FunctionId, &str> = plugin_interface
+            .interface()
+            .map(|iface| {
+                iface
+                    .methods
+                    .iter()
+                    .filter_map(|m| {
+                        let result_id = m.unwrapped_result_id?;
+                        let name = types.get(result_id).map(|t| t.name.as_str())?;
+                        Some((m.base, name))
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
+
         for entry in trampoline_model.entries() {
             if !matches!(entry.kind, TrampolineKind::Raw) {
                 continue;
@@ -61,6 +78,7 @@ impl Pass {
             let rval_type = types.get(func.signature.rval).map_or("void", |t| t.name.as_str());
             let async_inner = async_callback_inner(func, types);
             let rval_is_service = resolve_ptr_to_service_name(func.signature.rval, types).is_some();
+            let result_wrap_type = result_wraps.get(&entry.fn_id).copied().unwrap_or("");
 
             let rendered = if let Some(inner_id) = async_inner {
                 let (args, forward) = unmanaged_args_except_last(func, unmanaged_names, unmanaged_conversion);
@@ -78,6 +96,7 @@ impl Pass {
                 ctx.insert("pascal_name", pascal_name);
                 ctx.insert("forward", &forward);
                 ctx.insert("continuation", &continuation);
+                ctx.insert("result_wrap_type", result_wrap_type);
                 templates.render("dotnet/interop/raw_async.cs", &ctx)?
             } else if rval_is_service {
                 // Sync raw function returning a service.
@@ -93,6 +112,7 @@ impl Pass {
                 ctx.insert("forward", &forward);
                 ctx.insert("rval_suffix", ".IntoUnmanaged()");
                 ctx.insert("is_void", &false);
+                ctx.insert("result_wrap_type", result_wrap_type);
                 templates.render("dotnet/interop/raw_sync.cs", &ctx)?
             } else {
                 let (args, forward) = unmanaged_args(func, unmanaged_names, unmanaged_conversion);
@@ -108,6 +128,7 @@ impl Pass {
                 ctx.insert("forward", &forward);
                 ctx.insert("rval_suffix", &rval_suffix);
                 ctx.insert("is_void", &is_void);
+                ctx.insert("result_wrap_type", result_wrap_type);
                 templates.render("dotnet/interop/raw_sync.cs", &ctx)?
             };
 

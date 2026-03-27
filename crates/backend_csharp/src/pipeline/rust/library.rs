@@ -60,6 +60,7 @@ pub struct RustLibraryConfig {
     pub output_enum_body_to_unmanaged: output::common::types::enums::body_to_unmanaged::Config,
     pub output_enum_body_as_unmanaged: output::common::types::enums::body_as_unmanaged::Config,
     pub output_enum_body_ctors: output::common::types::enums::body_ctors::Config,
+    pub output_enum_body_from_call: output::common::types::enums::body_from_call::Config,
     pub output_enum_body_exception_for_variant: output::common::types::enums::body_exception_for_variant::Config,
     pub output_enum_body_tostring: output::common::types::enums::body_tostring::Config,
     pub output_enum: output::common::types::enums::all::Config,
@@ -142,6 +143,7 @@ pub struct IntermediateOutputPasses {
     pub enum_body_to_unmanaged: output::common::types::enums::body_to_unmanaged::Pass,
     pub enum_body_as_unmanaged: output::common::types::enums::body_as_unmanaged::Pass,
     pub enum_body_ctors: output::common::types::enums::body_ctors::Pass,
+    pub enum_body_from_call: output::common::types::enums::body_from_call::Pass,
     pub enum_body_exception_for_variant: output::common::types::enums::body_exception_for_variant::Pass,
     pub enum_body_tostring: output::common::types::enums::body_tostring::Pass,
     pub enum_body: output::common::types::enums::body::Pass,
@@ -292,6 +294,7 @@ impl RustLibrary {
                 enum_body_to_unmanaged: output::common::types::enums::body_to_unmanaged::Pass::new(config.output_enum_body_to_unmanaged),
                 enum_body_as_unmanaged: output::common::types::enums::body_as_unmanaged::Pass::new(config.output_enum_body_as_unmanaged),
                 enum_body_ctors: output::common::types::enums::body_ctors::Pass::new(config.output_enum_body_ctors),
+                enum_body_from_call: output::common::types::enums::body_from_call::Pass::new(config.output_enum_body_from_call),
                 enum_body_exception_for_variant: output::common::types::enums::body_exception_for_variant::Pass::new(config.output_enum_body_exception_for_variant),
                 enum_body_tostring: output::common::types::enums::body_tostring::Pass::new(config.output_enum_body_tostring),
                 enum_body: output::common::types::enums::body::Pass::new(config.output_enum_body),
@@ -424,9 +427,10 @@ impl RustLibrary {
         o.enum_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, OperationMode::Rust)?;
         o.enum_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, OperationMode::Rust)?;
         o.enum_body_ctors.process(&mut pass_meta, &self.output_master, &m.type_all, OperationMode::Rust)?;
+        o.enum_body_from_call.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, OperationMode::Rust)?;
         o.enum_body_exception_for_variant.process(&mut pass_meta, &self.output_master, &m.type_all, OperationMode::Rust)?;
         o.enum_body_tostring.process(&mut pass_meta, &self.output_master, &m.type_all)?;
-        o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_exception_for_variant, &o.enum_body_tostring, &o.unmanaged_conversion)?;
+        o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_from_call, &o.enum_body_exception_for_variant, &o.enum_body_tostring, &o.unmanaged_conversion)?;
         o.enums.process(&mut pass_meta, &self.output_master, &m.type_all, &o.enum_ty, &o.enum_body)?;
         o.conversion_fields.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.composite_ty.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class)?;

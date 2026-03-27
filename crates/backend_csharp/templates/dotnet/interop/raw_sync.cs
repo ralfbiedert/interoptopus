@@ -5,6 +5,8 @@
         {
 {%- if is_void %}
             Plugin.{{ pascal_name }}({{ forward }}){{ rval_suffix }};
+{%- elif result_wrap_type %}
+            return {{ result_wrap_type }}.FromCall(() => Plugin.{{ pascal_name }}({{ forward }})){{ rval_suffix }};
 {%- else %}
             return Plugin.{{ pascal_name }}({{ forward }}){{ rval_suffix }};
 {%- endif %}
