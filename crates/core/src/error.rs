@@ -6,17 +6,17 @@ pub struct Error(String);
 
 impl Error {
     /// Create a new error with the given message.
-    pub fn new(msg: impl Into<String>) -> Self {
+    pub(crate) fn new(msg: impl Into<String>) -> Self {
         Self(msg.into())
     }
 
     /// A null pointer was observed where it wasn't expected.
-    pub fn null() -> Self {
+    pub(crate) fn null() -> Self {
         Self("null pointer".into())
     }
 
     /// Given string is not nul terminated.
-    pub fn nul_terminated() -> Self {
+    pub(crate) fn nul_terminated() -> Self {
         Self("string is not nul terminated".into())
     }
 }

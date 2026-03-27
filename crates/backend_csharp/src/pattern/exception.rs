@@ -5,7 +5,14 @@ use interoptopus::lang::types::{Field, Repr, Struct, Type, TypeInfo, TypeKind};
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
 
-/// A C#-specific exception type that can be registered.
+/// A registered C# exception type for structured error mapping.
+///
+/// Each instance pairs a fully-qualified C# class name (e.g.
+/// `"System.IO.FileNotFoundException"`) with a deterministic hash-based ID.
+/// The backend uses these to generate typed `catch` clauses in `FromCall`
+/// helpers — see the [module-level docs](super) for details.
+///
+/// Construct with [`Exception::new`] and pass to the builder via `.exception(…)`.
 pub struct Exception(u64, &'static str);
 
 impl Exception {
@@ -29,7 +36,17 @@ impl Exception {
     }
 }
 
-/// Observed error type for C#-specific exceptions on `Try<T>` methods.
+/// Wire-level error type carried inside [`Try<T>`](super::Try).
+///
+/// On the C# side this is emitted as `DotnetException`, a struct with a single
+/// `exception_id` field.  The ID is either:
+///
+/// - The hash of a registered [`Exception`] name (set by a typed `catch` block), or
+/// - `0` for unknown / unregistered exceptions.
+///
+/// On the Rust side this type is mainly encountered when calling plugin methods
+/// that return `Try<T>` — use [`TryExtension::ok()`](super::TryExtension::ok)
+/// to convert the result for `?`-based error propagation.
 pub struct ExceptionError {
     exception_id: u64,
 }

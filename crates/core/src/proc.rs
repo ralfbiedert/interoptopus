@@ -237,7 +237,33 @@ pub use interoptopus_proc::AsyncRuntime;
 ///
 /// Note, this example is illustrative, the actual API is subject to change.
 ///
-/// # Design Guidelines
+/// # Supported types
+///
+/// Not every Rust type can appear in every position. The table below summarises what
+/// works where. Positions are: **Arg** (function/method parameter), **Ret** (return
+/// type), **Field** (inside an `#[ffi]` struct/enum passed across the boundary), and
+/// **Async** (usable in `async fn` signatures).
+///
+/// | Type | Arg | Ret | Field | Async | Notes |
+/// |------|:---:|:---:|:-----:|:-----:|-------|
+/// | `u8`, `u16`, `u32`, ... | ✅ | ✅ | ✅ | ✅ | Always work everywhere. |
+/// | `[T; N]`  | ❌ | ❌ | ✅ | ✅ | Arrays only supported in fields. |
+/// | `#[ffi] struct MyStruct { .. }` | ✅ | ✅ | ✅ | ✅ | All fields must themselves be FFI-safe. |
+/// | `#[ffi] enum MyEnum { .. }` | ✅ | ✅ | ✅ | ✅ | Same as structs.  |
+/// | `String`, `Vec<T>`, `HashMap<K, V>` | ✅ | ✅ | ✅ | ✅ | Only if self or parent within `Wire<T>`. |
+/// | `&T` | ✅ | ❌ | ❌ | ❌️ | Only supported for services for now. |
+/// | `&mut T` | ❌ | ❌ | ❌ | ❌️ | For now unsupported. |
+/// | `MyService` (an `impl` block) | ✅ | ✅️ | ❌ | ✅ | Cannot be embedded in fields. |
+/// | [`Wire<T>`](crate::wire::Wire) | ✅ | ✅ | ❌️ | ✅ | Can only be used on functions, not in fields. |
+/// | [`ffi::Result<T, E>`](crate::pattern::result::Result) | ✅ | ✅ | ✅ | ✅ | Same as enum w.r.t, `T`, `E`. |
+/// | [`ffi::Option<T>`](crate::pattern::option::Option) | ✅ | ✅ | ✅ | ✅ | Same as enum w.r.t. `T`. |
+/// | `Try<T>` (from `interoptopus_csharp`) | ❌ | ✅ | ❌ | ✅ | Magic C# exception converter. |
+///
+/// This list is not exhaustive and there might be subtleties involved.
+/// However, there should be a compile error if you accidentally try to use a type that is not supported.
+/// If not, please file a bug.
+///
+/// # Design guidelines
 ///
 /// Think of your plugin API as a nanosecond-latency **web server**: the FFI boundary
 /// is a network boundary with benefits, and most types have pass-by-value semantics.
