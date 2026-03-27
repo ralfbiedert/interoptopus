@@ -1,6 +1,6 @@
 use crate::telemetry::ringbuffer::RingBuffer;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
 
 /// Performance report covering all instrumented functions.
@@ -54,7 +54,7 @@ impl MetricsRecorder {
         if !self.enabled.load(Ordering::Relaxed) {
             return 0;
         }
-        self.epoch.elapsed().as_nanos() as u64
+        u64::try_from(self.epoch.elapsed().as_nanos()).unwrap_or(u64::MAX)
     }
 
     /// Records a function call duration. Does nothing if disabled or if

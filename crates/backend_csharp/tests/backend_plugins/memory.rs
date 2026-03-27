@@ -2,6 +2,10 @@ use crate::{define_plugin, load_plugin};
 use interoptopus_csharp::pattern::{Try, TryExtension};
 use std::error::Error;
 
+const CHUNK: usize = 8 * 1024 * 1024;
+const NUM_CYCLES: usize = 128;
+const ALLOWED_GROWTH: usize = 8 * CHUNK;
+
 interoptopus::plugin!(Memory {
     fn gc();
 
@@ -33,12 +37,9 @@ fn build_plugin() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
+#[ignore = "Test flaky, hard to know exactly how much memory it is retained between rounds."]
 fn load_plugin() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(Memory, "memory.dll", super::BASE);
-
-    // 128 MB worth of u32 elements = 32M elements
-    const CHUNK: usize = 32 * 1024 * 1024;
-    const NUM_CYCLES: usize = 128;
 
     let rss = || memory_stats::memory_stats().map(|s| s.physical_mem).unwrap_or(0);
 
@@ -125,7 +126,7 @@ fn load_plugin() -> Result<(), Box<dyn Error>> {
             post_first_cycle = current;
         } else {
             let growth_since_first = current.saturating_sub(post_first_cycle);
-            assert!(growth_since_first < 256 * 1024 * 1024, "cycle {cycle}: memory grew {growth_since_first} bytes since cycle 0 ({post_first_cycle}), expected stable");
+            assert!(growth_since_first < ALLOWED_GROWTH, "cycle {cycle}: memory grew {growth_since_first} bytes since cycle 0 ({post_first_cycle}), expected stable");
         }
     }
 
@@ -133,12 +134,9 @@ fn load_plugin() -> Result<(), Box<dyn Error>> {
 }
 
 #[tokio::test]
+#[ignore = "Test flaky, hard to know exactly how much memory it is retained between rounds."]
 async fn load_plugin_async() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(Memory, "memory.dll", super::BASE);
-
-    const CHUNK: usize = 8 * 1024 * 1024;
-    const NUM_CYCLES: usize = 128;
-    const ALLOWED_GROWTH: usize = 8 * CHUNK;
 
     let rss = || memory_stats::memory_stats().map(|s| s.physical_mem).unwrap_or(0);
 

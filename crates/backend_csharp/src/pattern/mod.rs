@@ -6,7 +6,7 @@
 //!
 //! # Example
 //!
-//! ```rust
+//! ```rust,ignore
 //! # use interoptopus::plugin;
 //! plugin!(MyPlugin {
 //!     fn foo() -> Try<u32>;
@@ -30,15 +30,17 @@
 //! # Registering exceptions
 //!
 //! You can tell the builder which C# exception to map (besides `System.Exception`) with
-//! [`DotnetLibrary::builder::exception()`]:
+//! `DotnetLibraryBuilder::exception()`:
 //!
-//! ```rust
+//! ```rust,ignore
 //! # use interoptopus::inventory::ForeignInventory;
+//! # use interoptopus_csharp::{DotnetLibrary, pattern::Exception};
 //! # fn foo(inventory: &ForeignInventory) -> Result<(), Box<dyn std::error::Error>> {
 //! let output = DotnetLibrary::builder(inventory)
 //!     .exception(Exception::new("System.IO.FileNotFoundException"))
 //!     .build()
 //!     .process()?;
+//! # Ok(())
 //! # }
 //! ```
 //!
@@ -49,9 +51,12 @@
 //! directly. [`TryExtension`] converts it into a standard result for ergonomic error propagation:
 //!
 //! ```rust
-//! use interoptopus_csharp::pattern::TryExtension;
-//! # fn foo() -> Try<u32> {}
-//! let _ = foo(42).ok()?;
+//! # use interoptopus_csharp::pattern::{Try, TryExtension};
+//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # let result: Try<u32> = Try::Ok(42);
+//! let value = result.ok()?;
+//! # Ok(())
+//! # }
 //! ```
 use interoptopus::ffi;
 

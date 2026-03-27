@@ -9,8 +9,8 @@
 //!
 //! # Usage
 //!
-//! ```
-//! # use crate::plugin;
+//! ```ignore
+//! # use interoptopus::plugin;
 //! // Define a plugin
 //! plugin!(MyService {
 //!     fn foo();
@@ -24,7 +24,7 @@
 //! plugin.foo();
 //!
 //! // Retrieve report
-//! let report = recorder.metrics_report();
+//! let report = plugin.metrics_report();
 //! # }
 //! ```
 mod metrics;

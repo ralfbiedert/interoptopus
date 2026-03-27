@@ -396,7 +396,12 @@ fn emit_method_assert_guards(params: &[PluginParam], ret: Option<&Type>, is_asyn
 ///
 /// Uses `ServiceHandleMap::map_service_handle` for any return type containing a service.
 /// Each call is wrapped with instrumentation timing.
-fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[ServiceBlock], svc_names: &HashSet<String>, inst_map: &HashMap<String, usize>) -> TokenStream {
+fn emit_bare_method(
+    f: &crate::plugin::model::PluginMethod,
+    all_services: &[ServiceBlock],
+    svc_names: &HashSet<String>,
+    inst_map: &HashMap<String, usize>,
+) -> TokenStream {
     let fn_name = &f.name;
     let params = typed_params(&f.params);
     let ffi_args = ffi_call_args(&f.params, svc_names);
@@ -608,7 +613,13 @@ fn emit_service_impl(s: &ServiceBlock, all_services: &[ServiceBlock], svc_names:
     }
 }
 
-fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, all_services: &[ServiceBlock], svc_names: &HashSet<String>, inst_map: &HashMap<String, usize>) -> TokenStream {
+fn emit_instance_method(
+    prefix: &str,
+    m: &crate::plugin::model::PluginMethod,
+    all_services: &[ServiceBlock],
+    svc_names: &HashSet<String>,
+    inst_map: &HashMap<String, usize>,
+) -> TokenStream {
     let method_name = &m.name;
     let field = prefixed_ident(prefix, &m.name);
     let params = typed_params(&m.params);

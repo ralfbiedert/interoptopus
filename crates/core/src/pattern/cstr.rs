@@ -111,7 +111,7 @@ impl<'a> CStrPtr<'a> {
     /// # Errors
     /// Can fail if the string was null.
     pub fn as_str(&self) -> Result<&'a str, Error> {
-        Ok(self.as_c_str().ok_or(Error::null())?.to_str()?)
+        Ok(self.as_c_str().ok_or_else(Error::null)?.to_str()?)
     }
 }
 

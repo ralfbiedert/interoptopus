@@ -5,11 +5,6 @@ use std::fmt::{Display, Formatter};
 pub struct Error(String);
 
 impl Error {
-    /// Create a new error with the given message.
-    pub(crate) fn new(msg: impl Into<String>) -> Self {
-        Self(msg.into())
-    }
-
     /// A null pointer was observed where it wasn't expected.
     pub(crate) fn null() -> Self {
         Self("null pointer".into())
