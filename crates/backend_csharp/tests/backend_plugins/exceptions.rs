@@ -1,5 +1,4 @@
 use crate::{define_plugin, load_plugin};
-use interoptopus_csharp::dispatch::Dispatch;
 use interoptopus_csharp::pattern::{Try, TryExtension};
 use std::error::Error;
 

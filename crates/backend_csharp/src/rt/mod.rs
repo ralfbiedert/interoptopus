@@ -11,8 +11,10 @@ pub mod aot;
 pub mod dynamic;
 #[cfg(feature = "rt-dotnet")]
 mod error;
+#[cfg(any(feature = "rt-aot", feature = "rt-dotnet"))]
 mod shared;
 
+#[cfg(feature = "rt-dotnet")]
 pub use error::RuntimeError;
 use interoptopus::inventory::Inventory;
 use interoptopus::lang::types::TypeInfo;

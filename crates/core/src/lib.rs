@@ -20,10 +20,11 @@ pub mod wire;
 pub mod proc;
 
 #[cfg(feature = "macros")]
-pub use proc::{AsyncRuntime, ffi};
+pub use proc::{ffi, AsyncRuntime};
 
 #[cfg(all(feature = "macros", feature = "unstable-plugins"))]
 pub use proc::plugin;
 
 #[cfg(feature = "tokio")]
 pub mod rt;
+pub mod telemetry;

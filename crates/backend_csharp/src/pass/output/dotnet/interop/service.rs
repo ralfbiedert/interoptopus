@@ -259,7 +259,7 @@ fn resolve_double_ptr_to_service_name(type_id: crate::lang::TypeId, types: &mode
 /// and double-pointer-to-service params (ref params) by dereferencing first.
 ///
 /// - Owned service params (`ServiceHandle<T>`, single pointer): uses `T.Unmanaged` arg
-///   type and `.IntoManaged()` (frees GCHandle, ownership transfer).
+///   type and `.IntoManaged()` (frees `GCHandle`, ownership transfer).
 /// - Ref service params (`*const ServiceHandle<T>`, double pointer): uses `IntPtr` arg
 ///   type and `T.Unmanaged { _handle = x }.AsManaged()` (no free, borrow).
 fn service_aware_args(

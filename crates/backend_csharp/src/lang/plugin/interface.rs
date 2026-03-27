@@ -3,7 +3,7 @@ use crate::lang::TypeId;
 use crate::lang::functions::Signature;
 use interoptopus::lang::meta::Emission;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum InterfaceKind {
     Plugin,
     Service,
@@ -15,7 +15,7 @@ pub enum MethodKind {
     Static,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Method {
     /// C# method name (e.g. `"PrimitiveU32"`, `"ServiceaCreate"`).
     pub name: String,
@@ -35,7 +35,7 @@ pub struct Method {
     pub unwrapped_result_id: Option<TypeId>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Interface {
     pub name: String,
     pub emission: Emission,

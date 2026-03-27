@@ -132,6 +132,7 @@
 #[cfg(feature = "macros")]
 pub use interoptopus_proc::ffi;
 
+
 /// Derives the [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime) trait for a service struct
 /// by forwarding to one of its fields.
 ///
@@ -170,6 +171,7 @@ pub use interoptopus_proc::ffi;
 /// ```
 #[cfg(feature = "macros")]
 pub use interoptopus_proc::AsyncRuntime;
+
 
 /// Declares a plugin interface for reverse interop, e.g., loading a C# DLL from Rust.
 ///
@@ -224,15 +226,13 @@ pub use interoptopus_proc::AsyncRuntime;
 /// # Loading a plugin
 ///
 /// To instantiate a plugin a backend-specific loader is needed. For example,
-/// the `interoptopus_csharp` crate provides `DotNetRuntime` and `DllLoader` for
+/// the `interoptopus_csharp` crate provides both a `DotnetRuntime` and an `AotRuntime` for
 /// loading `.NET` assemblies:
 ///
 /// ```rust,ignore
-/// let loader = DotNetRuntime::new()?
+/// let plugin = aot::runtime()?
 ///     .exception_handler(|msg| eprintln!("plugin error: {msg}"))
-///     .dll_loader("path/to/my_plugin.dll")?;
-///
-/// let plugin = MyPlugin::new(&loader)?;
+///     .load::<MyPlugin>("path/to/my_plugin.dll")?;
 /// ```
 ///
 /// Note, this example is illustrative, the actual API is subject to change.
@@ -259,6 +259,7 @@ pub use interoptopus_proc::AsyncRuntime;
 ///   is via function arguments, which takes care of their lifecycle requirements.
 #[cfg(all(feature = "macros", feature = "unstable-plugins"))]
 pub use interoptopus_proc::plugin;
+
 
 /// Strips module paths from a fully-qualified Rust type name, preserving generic structure.
 ///

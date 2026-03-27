@@ -2,8 +2,8 @@ use crate::{define_plugin, load_plugin};
 use interoptopus_csharp::rt::dynamic::runtime as dotnet_runtime;
 use reference_project::plugins::functions::{Behavior, Primitives};
 use std::error::Error;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
 #[test]
 fn define_plugins() -> Result<(), Box<dyn Error>> {
@@ -15,7 +15,6 @@ fn define_plugins() -> Result<(), Box<dyn Error>> {
 #[test]
 fn load_plugin_functions_primitive() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(Primitives, "functions_primitive.dll", super::BASE);
-
     plugin.primitive_void();
     assert_eq!(plugin.primitive_u8(1), 2);
     assert_eq!(plugin.primitive_u16(1), 2);

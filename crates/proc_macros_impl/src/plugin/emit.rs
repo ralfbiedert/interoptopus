@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, quote_spanned};
@@ -12,14 +12,17 @@ use crate::plugin::model::{
 impl PluginModel {
     pub fn emit(&self) -> TokenStream {
         let svc_names = self.service_names();
+        let inst_map = self.instrument_map();
+
         let plugin_struct = self.emit_plugin_struct(&svc_names);
-        let plugin_impl = self.emit_plugin_impl(&svc_names);
-        let plugin_trait = self.emit_plugin_trait(&svc_names);
+        let plugin_impl = self.emit_plugin_impl(&svc_names, &inst_map);
+        let plugin_trait = self.emit_plugin_trait(&svc_names, &inst_map);
         let plugin_info = self.emit_plugin_info(&svc_names);
+        let plugin_instrument = self.emit_plugin_instrument();
         let service_type_infos: Vec<_> = self.services.iter().map(emit_service_type_info).collect();
         let service_wire_ios: Vec<_> = self.services.iter().map(emit_service_wire_io).collect();
         let service_structs: Vec<_> = self.services.iter().map(|s| emit_service_struct(s, &self.services, &svc_names)).collect();
-        let service_impls: Vec<_> = self.services.iter().map(|s| emit_service_impl(s, &self.services, &svc_names)).collect();
+        let service_impls: Vec<_> = self.services.iter().map(|s| emit_service_impl(s, &self.services, &svc_names, &inst_map)).collect();
         let service_drops: Vec<_> = self.services.iter().map(emit_service_drop).collect();
         let service_send_syncs: Vec<_> = self.services.iter().map(emit_service_send_sync).collect();
         let service_traits: Vec<_> = self.services.iter().map(emit_service_trait).collect();
@@ -30,6 +33,7 @@ impl PluginModel {
             #plugin_impl
             #plugin_trait
             #plugin_info
+            #plugin_instrument
             #(#service_type_infos)*
             #(#service_wire_ios)*
             #(#service_structs)*
@@ -39,6 +43,31 @@ impl PluginModel {
             #(#service_traits)*
             #assert_guards
         }
+    }
+
+    /// Returns all instrumented function names in deterministic order.
+    ///
+    /// Order: bare functions, then for each service: ctors, instance methods.
+    fn instrument_names(&self) -> Vec<String> {
+        let mut names = Vec::new();
+        for f in &self.functions {
+            names.push(f.name.to_string());
+        }
+        for s in &self.services {
+            let prefix = s.prefix();
+            for c in s.ctors() {
+                names.push(format!("{}_{}", prefix, c.name));
+            }
+            for m in s.instance_methods() {
+                names.push(format!("{}_{}", prefix, m.name));
+            }
+        }
+        names
+    }
+
+    /// Returns a map from function name to its index in the instrumentor.
+    fn instrument_map(&self) -> HashMap<String, usize> {
+        self.instrument_names().into_iter().enumerate().map(|(i, n)| (n, i)).collect()
     }
 
     // -----------------------------------------------------------------------
@@ -89,24 +118,31 @@ impl PluginModel {
             register_trampoline: ::interoptopus::lang::plugin::RegisterTrampolineFn
         };
 
-        quote! { pub struct #name { #(#bare_fields,)* #(#service_fields,)* #register_trampoline_field, } }
+        quote! {
+            pub struct #name {
+                #(#bare_fields,)*
+                #(#service_fields,)*
+                #register_trampoline_field,
+                instrumentor: ::std::sync::Arc<::interoptopus::telemetry::MetricsRecorder>,
+            }
+        }
     }
 
     // -----------------------------------------------------------------------
     // Plugin impl — bare fn delegates + service ctor methods
     // -----------------------------------------------------------------------
 
-    fn emit_plugin_impl(&self, svc_names: &HashSet<String>) -> TokenStream {
+    fn emit_plugin_impl(&self, svc_names: &HashSet<String>, inst_map: &HashMap<String, usize>) -> TokenStream {
         let name = &self.name;
 
-        let bare_methods = self.functions.iter().map(|f| emit_bare_method(f, &self.services, svc_names));
+        let bare_methods = self.functions.iter().map(|f| emit_bare_method(f, &self.services, svc_names, inst_map));
 
         let ctor_methods = self.services.iter().flat_map(|s| {
             let prefix = s.prefix();
             let svc_name = &s.name;
             s.ctors()
                 .into_iter()
-                .map(move |c| emit_ctor_method(&prefix, svc_name, c, s, &self.services, svc_names))
+                .map(move |c| emit_ctor_method(&prefix, svc_name, c, s, &self.services, svc_names, inst_map))
                 .collect::<Vec<_>>()
         });
 
@@ -135,7 +171,7 @@ impl PluginModel {
     // Plugin trait impl — loads all symbols
     // -----------------------------------------------------------------------
 
-    fn emit_plugin_trait(&self, svc_names: &HashSet<String>) -> TokenStream {
+    fn emit_plugin_trait(&self, svc_names: &HashSet<String>, inst_map: &HashMap<String, usize>) -> TokenStream {
         let name = &self.name;
 
         let bare_loads = self.functions.iter().map(|f| {
@@ -183,6 +219,11 @@ impl PluginModel {
         let register_trampoline_field = format_ident!("register_trampoline");
         let register_trampoline_load = emit_load_field(&register_trampoline_field, "register_trampoline", quote! { ::interoptopus::lang::plugin::RegisterTrampolineFn });
 
+        // Instrumentor initialization with all function names.
+        let inst_names = self.instrument_names();
+        let inst_name_lits: Vec<_> = inst_names.iter().map(|n| quote! { #n }).collect();
+        let _ = inst_map; // used by caller, not here directly
+
         quote! {
             impl ::interoptopus::lang::plugin::Plugin for #name {
                 fn load_from(loader: impl Fn(&str) -> *const u8) -> Result<Self, ::interoptopus::lang::plugin::PluginLoadError> {
@@ -190,11 +231,32 @@ impl PluginModel {
                         #(#bare_loads,)*
                         #(#service_loads,)*
                         #register_trampoline_load,
+                        instrumentor: ::std::sync::Arc::new(
+                            ::interoptopus::telemetry::MetricsRecorder::from(&[#(#inst_name_lits),*])
+                        ),
                     })
                 }
 
                 fn register_trampoline_fn(&self) -> ::interoptopus::lang::plugin::RegisterTrampolineFn {
                     self.register_trampoline
+                }
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Instrument trait impl — delegates to the inner Instrumentor
+    // -----------------------------------------------------------------------
+
+    fn emit_plugin_instrument(&self) -> TokenStream {
+        let name = &self.name;
+        quote! {
+            impl ::interoptopus::telemetry::Metrics for #name {
+                fn metrics_report(&self) -> ::interoptopus::telemetry::Report {
+                    self.instrumentor.report()
+                }
+                fn metrics_enable(&self, enabled: bool) {
+                    self.instrumentor.record(enabled);
                 }
             }
         }
@@ -333,11 +395,13 @@ fn emit_method_assert_guards(params: &[PluginParam], ret: Option<&Type>, is_asyn
 /// Emit a public method on the plugin struct for a bare (non-service) function.
 ///
 /// Uses `ServiceHandleMap::map_service_handle` for any return type containing a service.
-fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[ServiceBlock], svc_names: &HashSet<String>) -> TokenStream {
+/// Each call is wrapped with instrumentation timing.
+fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[ServiceBlock], svc_names: &HashSet<String>, inst_map: &HashMap<String, usize>) -> TokenStream {
     let fn_name = &f.name;
     let params = typed_params(&f.params);
     let ffi_args = ffi_call_args(&f.params, svc_names);
     let forget_stmts = forget_owned_services(&f.params, svc_names);
+    let index = inst_map[&f.name.to_string()];
 
     let ret_svc_name = f.ret.as_ref().and_then(|ty| service_in_type(ty, svc_names));
     let must_use: TokenStream = if ret_svc_name.is_some() || f.is_async || f.ret.is_some() {
@@ -359,11 +423,13 @@ fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[Serv
                 #must_use
                 pub fn #fn_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                     #(#forget_stmts)*
+                    let _inst_start = self.instrumentor.time_ns();
                     let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
                     (self.#fn_name)(#(#ffi_args,)* cb);
                     #(#field_src_lets)*
                     async move {
                         let raw = future.await;
+                        instrumentor.record_call(#index, _inst_start, instrumentor.time_ns());
                         ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, #construct)
                     }
                 }
@@ -374,8 +440,11 @@ fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[Serv
                 #must_use
                 pub fn #fn_name(&self, #(#params),*) -> #ret_ty {
                     #(#forget_stmts)*
+                    let _inst_start = self.instrumentor.time_ns();
                     let raw = (self.#fn_name)(#(#ffi_args),*);
-                    ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, |handle| #svc_ident { handle, #(#field_copies,)* })
+                    let _inst_result = ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, |handle| #svc_ident { handle, #(#field_copies,)* });
+                    self.instrumentor.record_call(#index, _inst_start, self.instrumentor.time_ns());
+                    _inst_result
                 }
             }
         }
@@ -386,9 +455,15 @@ fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[Serv
             #must_use
             pub fn #fn_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                 #(#forget_stmts)*
+                let _inst_start = self.instrumentor.time_ns();
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new();
                 (self.#fn_name)(#(#ffi_args,)* cb);
-                future
+                let _inst = self.instrumentor.clone();
+                async move {
+                    let _inst_result = future.await;
+                    _inst.record_call(#index, _inst_start, _inst.time_ns());
+                    _inst_result
+                }
             }
         }
     } else {
@@ -398,7 +473,10 @@ fn emit_bare_method(f: &crate::plugin::model::PluginMethod, all_services: &[Serv
             #must_use
             pub fn #fn_name(&self, #(#params),*) #ret {
                 #(#forget_stmts)*
-                (self.#fn_name)(#(#ffi_args),*)
+                let _inst_start = self.instrumentor.time_ns();
+                let _inst_result = (self.#fn_name)(#(#ffi_args),*);
+                self.instrumentor.record_call(#index, _inst_start, self.instrumentor.time_ns());
+                _inst_result
             }
         }
     }
@@ -415,12 +493,14 @@ fn emit_ctor_method(
     svc_block: &ServiceBlock,
     all_services: &[ServiceBlock],
     svc_names: &HashSet<String>,
+    inst_map: &HashMap<String, usize>,
 ) -> TokenStream {
     let method_name = prefixed_ident(prefix, &c.name);
     let ctor_field = prefixed_ident(prefix, &c.name);
     let params = typed_params(&c.params);
     let ffi_args = ffi_call_args(&c.params, svc_names);
     let forget_stmts = forget_owned_services(&c.params, svc_names);
+    let index = inst_map[&format!("{}_{}", prefix, c.name)];
 
     // Determine the FFI return type and user-facing return type
     let (ffi_ret_ty, user_ret_ty) = if is_self_return(c.ret.as_ref()) {
@@ -438,11 +518,13 @@ fn emit_ctor_method(
             #[must_use]
             pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #user_ret_ty> + 'static {
                 #(#forget_stmts)*
+                let _inst_start = self.instrumentor.time_ns();
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
                 (self.#ctor_field)(#(#ffi_args,)* cb);
                 #(#field_src_lets)*
                 async move {
                     let raw = future.await;
+                    instrumentor.record_call(#index, _inst_start, instrumentor.time_ns());
                     ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, #construct)
                 }
             }
@@ -453,8 +535,11 @@ fn emit_ctor_method(
             #[must_use]
             pub fn #method_name(&self, #(#params),*) -> #user_ret_ty {
                 #(#forget_stmts)*
+                let _inst_start = self.instrumentor.time_ns();
                 let raw: #ffi_ret_ty = (self.#ctor_field)(#(#ffi_args),*);
-                ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, |handle| #svc_name { handle, #(#field_copies,)* })
+                let _inst_result = ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, |handle| #svc_name { handle, #(#field_copies,)* });
+                self.instrumentor.record_call(#index, _inst_start, self.instrumentor.time_ns());
+                _inst_result
             }
         }
     }
@@ -501,6 +586,7 @@ fn emit_service_struct(s: &ServiceBlock, all_services: &[ServiceBlock], svc_name
     quote! {
         pub struct #name {
             handle: ::interoptopus::ffi::ServiceHandle<#name>,
+            instrumentor: ::std::sync::Arc<::interoptopus::telemetry::MetricsRecorder>,
             #(#own_method_fields,)*
             #own_drop_field: extern "C" fn(::interoptopus::ffi::ServiceHandle<#name>),
             #(#extra_fields,)*
@@ -508,12 +594,12 @@ fn emit_service_struct(s: &ServiceBlock, all_services: &[ServiceBlock], svc_name
     }
 }
 
-fn emit_service_impl(s: &ServiceBlock, all_services: &[ServiceBlock], svc_names: &HashSet<String>) -> TokenStream {
+fn emit_service_impl(s: &ServiceBlock, all_services: &[ServiceBlock], svc_names: &HashSet<String>, inst_map: &HashMap<String, usize>) -> TokenStream {
     let name = &s.name;
     let prefix = s.prefix();
 
     let inst_methods = s.instance_methods();
-    let methods = inst_methods.iter().map(|m| emit_instance_method(&prefix, m, all_services, svc_names));
+    let methods = inst_methods.iter().map(|m| emit_instance_method(&prefix, m, all_services, svc_names, inst_map));
 
     quote! {
         impl #name {
@@ -522,12 +608,13 @@ fn emit_service_impl(s: &ServiceBlock, all_services: &[ServiceBlock], svc_names:
     }
 }
 
-fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, all_services: &[ServiceBlock], svc_names: &HashSet<String>) -> TokenStream {
+fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, all_services: &[ServiceBlock], svc_names: &HashSet<String>, inst_map: &HashMap<String, usize>) -> TokenStream {
     let method_name = &m.name;
     let field = prefixed_ident(prefix, &m.name);
     let params = typed_params(&m.params);
     let ffi_args = ffi_call_args(&m.params, svc_names);
     let forget_stmts = forget_owned_services(&m.params, svc_names);
+    let index = inst_map[&format!("{}_{}", prefix, m.name)];
 
     let ret_svc_name = m.ret.as_ref().and_then(|ty| service_in_type(ty, svc_names));
     let must_use: TokenStream = if ret_svc_name.is_some() || m.is_async || m.ret.is_some() {
@@ -549,11 +636,13 @@ fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, al
                 #must_use
                 pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                     #(#forget_stmts)*
+                    let _inst_start = self.instrumentor.time_ns();
                     let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
                     (self.#field)(self.handle, #(#ffi_args,)* cb);
                     #(#field_src_lets)*
                     async move {
                         let raw = future.await;
+                        instrumentor.record_call(#index, _inst_start, instrumentor.time_ns());
                         ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, #construct)
                     }
                 }
@@ -564,8 +653,11 @@ fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, al
                 #must_use
                 pub fn #method_name(&self, #(#params),*) -> #ret_ty {
                     #(#forget_stmts)*
+                    let _inst_start = self.instrumentor.time_ns();
                     let raw: #ffi_ret_ty = (self.#field)(self.handle, #(#ffi_args),*);
-                    ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, |handle| #ret_svc_ident { handle, #(#field_copies,)* })
+                    let _inst_result = ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, |handle| #ret_svc_ident { handle, #(#field_copies,)* });
+                    self.instrumentor.record_call(#index, _inst_start, self.instrumentor.time_ns());
+                    _inst_result
                 }
             }
         }
@@ -575,9 +667,15 @@ fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, al
             #must_use
             pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                 #(#forget_stmts)*
+                let _inst_start = self.instrumentor.time_ns();
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new();
                 (self.#field)(self.handle, #(#ffi_args,)* cb);
-                future
+                let _inst = self.instrumentor.clone();
+                async move {
+                    let _inst_result = future.await;
+                    _inst.record_call(#index, _inst_start, _inst.time_ns());
+                    _inst_result
+                }
             }
         }
     } else {
@@ -586,7 +684,10 @@ fn emit_instance_method(prefix: &str, m: &crate::plugin::model::PluginMethod, al
             #must_use
             pub fn #method_name(&self, #(#params),*) #ret {
                 #(#forget_stmts)*
-                (self.#field)(self.handle, #(#ffi_args),*)
+                let _inst_start = self.instrumentor.time_ns();
+                let _inst_result = (self.#field)(self.handle, #(#ffi_args),*);
+                self.instrumentor.record_call(#index, _inst_start, self.instrumentor.time_ns());
+                _inst_result
             }
         }
     }
@@ -965,6 +1066,8 @@ fn method_ffi_fn_ty(ffi_ptys: &[TokenStream], ret: Option<&Type>, is_async: bool
 
 fn svc_field_copies(svc: &ServiceBlock, all_services: &[ServiceBlock], svc_names: &HashSet<String>, source: &TokenStream) -> Vec<TokenStream> {
     let mut copies = Vec::new();
+    // Propagate the shared instrumentor.
+    copies.push(quote! { instrumentor: #source.instrumentor.clone() });
     let prefix = svc.prefix();
     for m in svc.instance_methods() {
         let field = prefixed_ident(&prefix, &m.name);
@@ -988,6 +1091,8 @@ fn svc_field_copies(svc: &ServiceBlock, all_services: &[ServiceBlock], svc_names
 
 fn svc_field_src_lets(svc: &ServiceBlock, all_services: &[ServiceBlock], svc_names: &HashSet<String>, source: &TokenStream) -> Vec<TokenStream> {
     let mut lets = Vec::new();
+    // Capture the shared instrumentor for use in async blocks.
+    lets.push(quote! { let instrumentor = #source.instrumentor.clone(); });
     let prefix = svc.prefix();
     for m in svc.instance_methods() {
         let field = prefixed_ident(&prefix, &m.name);
@@ -1011,6 +1116,8 @@ fn svc_field_src_lets(svc: &ServiceBlock, all_services: &[ServiceBlock], svc_nam
 
 fn svc_field_inits(svc: &ServiceBlock, all_services: &[ServiceBlock], svc_names: &HashSet<String>) -> Vec<TokenStream> {
     let mut inits = Vec::new();
+    // Include the instrumentor in struct init (shorthand: `instrumentor` = `instrumentor: instrumentor`).
+    inits.push(quote! { instrumentor });
     let prefix = svc.prefix();
     for m in svc.instance_methods() {
         let field = prefixed_ident(&prefix, &m.name);
@@ -1032,7 +1139,7 @@ fn svc_field_inits(svc: &ServiceBlock, all_services: &[ServiceBlock], svc_names:
     inits
 }
 
-/// Generate a closure expression `|handle| ServiceName { handle, field1, field2, ... }`
+/// Generate a closure expression `|handle| ServiceName { handle, instrumentor, field1, field2, ... }`
 /// suitable for use inside `async move` blocks (where field names are already captured).
 fn svc_construct_expr(svc: &ServiceBlock, all_services: &[ServiceBlock], svc_names: &HashSet<String>) -> TokenStream {
     let svc_ident = &svc.name;
