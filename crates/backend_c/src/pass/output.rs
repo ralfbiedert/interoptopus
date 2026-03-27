@@ -39,6 +39,7 @@ fn fn_entries_value(entries: &[FnEntry<'_>]) -> Value {
         .map(|e| {
             let mut m = tera::Map::new();
             m.insert("name".into(), Value::String(e.func.name.clone()));
+            m.insert("symbol".into(), Value::String(e.func.symbol.clone()));
             m.insert("rval".into(), Value::String(e.func.rval.clone()));
             m.insert("param_types".into(), Value::String(e.func.param_types.clone()));
             m.insert("params".into(), Value::String(e.func.params.clone()));
@@ -98,11 +99,10 @@ fn render_type(engine: &TemplateEngine, name: &str, kind: &CTypeKind) -> Result<
                 .variants
                 .iter()
                 .map(|v| {
-                    let field_name = v.name.strip_prefix(&format!("{name}_")).unwrap_or(&v.name).to_lowercase();
                     let mut m = tera::Map::new();
                     m.insert("name".into(), Value::String(v.name.clone()));
                     m.insert("tag".into(), Value::Number(v.tag.into()));
-                    m.insert("field_name".into(), Value::String(field_name));
+                    m.insert("field_name".into(), Value::String(v.field_name.clone()));
                     if let Some(dt) = &v.data_type {
                         m.insert("data_type".into(), Value::String(dt.clone()));
                     }
@@ -162,6 +162,8 @@ fn render_type(engine: &TemplateEngine, name: &str, kind: &CTypeKind) -> Result<
             ctx.insert("tag_name", &o.tag_name);
             ctx.insert("tag_c_type", &o.tag_c_type);
             ctx.insert("inner_type", &o.inner_type);
+            ctx.insert("some_variant", &o.some_variant);
+            ctx.insert("none_variant", &o.none_variant);
             engine.render("types/option.h", &ctx)
         }
 
@@ -172,6 +174,8 @@ fn render_type(engine: &TemplateEngine, name: &str, kind: &CTypeKind) -> Result<
             ctx.insert("tag_c_type", &r.tag_c_type);
             ctx.insert("ok_type", &r.ok_type);
             ctx.insert("err_type", &r.err_type);
+            ctx.insert("ok_variant", &r.ok_variant);
+            ctx.insert("err_variant", &r.err_variant);
             engine.render("types/result.h", &ctx)
         }
 
@@ -218,7 +222,7 @@ pub fn render_header(engine: &TemplateEngine, model: &CModel, loader_name: &str,
         }
         let mut ctx = Context::new();
         ctx.insert("rval", &e.func.rval);
-        ctx.insert("name", &e.func.name);
+        ctx.insert("name", &e.func.symbol);
         ctx.insert("params", &e.func.params);
         out.push_str(&engine.render("fns/declaration.h", &ctx)?);
     }

@@ -1,6 +1,6 @@
 typedef {{ tag_c_type }} {{ tag_name }};
-#define {{ name }}_OK (({{ tag_name }})0)
-#define {{ name }}_ERR (({{ tag_name }})1)
+#define {{ ok_variant }} (({{ tag_name }})0)
+#define {{ err_variant }} (({{ tag_name }})1)
 
 typedef struct {{ name }}
 {

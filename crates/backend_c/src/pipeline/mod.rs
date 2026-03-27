@@ -3,6 +3,7 @@
 //! The pipeline runs model passes to build the C language model, then
 //! output passes to render it into a `.h` header file via Tera templates.
 
+use crate::lang::{NamingConfig, NamingStyle};
 use crate::pass::{model, output};
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::Error;
@@ -21,6 +22,7 @@ pub struct CLibrary<'a> {
     loader_name: String,
     ifndef: String,
     filename: String,
+    naming: NamingConfig,
 }
 
 /// Builder for [`CLibrary`].
@@ -29,6 +31,7 @@ pub struct CLibraryBuilder<'a> {
     loader_name: String,
     ifndef: String,
     filename: String,
+    naming: NamingConfig,
 }
 
 impl<'a> CLibraryBuilder<'a> {
@@ -55,6 +58,55 @@ impl<'a> CLibraryBuilder<'a> {
         self
     }
 
+    /// Set a prefix prepended to all generated type and function names.
+    #[must_use]
+    pub fn prefix(mut self, prefix: impl Into<String>) -> Self {
+        self.naming.prefix = Some(prefix.into());
+        self
+    }
+
+    /// Set the naming style for type names (structs, enums, opaques, patterns).
+    #[must_use]
+    pub fn type_naming(mut self, style: NamingStyle) -> Self {
+        self.naming.type_naming = style;
+        self
+    }
+
+    /// Set the naming style for enum variant names.
+    #[must_use]
+    pub fn enum_variant_naming(mut self, style: NamingStyle) -> Self {
+        self.naming.enum_variant_naming = style;
+        self
+    }
+
+    /// Set the naming style for function names.
+    #[must_use]
+    pub fn function_naming(mut self, style: NamingStyle) -> Self {
+        self.naming.function_naming = style;
+        self
+    }
+
+    /// Set the naming style for function parameter names.
+    #[must_use]
+    pub fn function_parameter_naming(mut self, style: NamingStyle) -> Self {
+        self.naming.function_parameter_naming = style;
+        self
+    }
+
+    /// Set the naming style for constant names (e.g. `_TAG` tag enums).
+    #[must_use]
+    pub fn const_naming(mut self, style: NamingStyle) -> Self {
+        self.naming.const_naming = style;
+        self
+    }
+
+    /// Replace the entire naming configuration at once.
+    #[must_use]
+    pub fn naming_config(mut self, config: NamingConfig) -> Self {
+        self.naming = config;
+        self
+    }
+
     /// Build the pipeline.
     #[must_use]
     pub fn build(self) -> CLibrary<'a> {
@@ -63,7 +115,7 @@ impl<'a> CLibraryBuilder<'a> {
         } else {
             self.filename
         };
-        CLibrary { inventory: self.inventory, loader_name: self.loader_name, ifndef: self.ifndef, filename }
+        CLibrary { inventory: self.inventory, loader_name: self.loader_name, ifndef: self.ifndef, filename, naming: self.naming }
     }
 }
 
@@ -71,7 +123,7 @@ impl CLibrary<'_> {
     /// Create a new builder.
     #[must_use]
     pub fn builder(inventory: &RustInventory) -> CLibraryBuilder<'_> {
-        CLibraryBuilder { inventory, loader_name: String::new(), ifndef: "interoptopus_generated".to_string(), filename: String::new() }
+        CLibraryBuilder { inventory, loader_name: String::new(), ifndef: "interoptopus_generated".to_string(), filename: String::new(), naming: NamingConfig::default() }
     }
 
     /// Run the full pipeline: model passes → output passes → assemble header.
@@ -79,7 +131,7 @@ impl CLibrary<'_> {
         let engine = TemplateEngine::from_bytes(TEMPLATES)?;
 
         // Model pass: build the C model from the Rust inventory.
-        let c_model = model::build_model(self.inventory);
+        let c_model = model::build_model(self.inventory, &self.naming);
 
         // Output pass: render the model into a complete header.
         let header = output::render_header(&engine, &c_model, &self.loader_name, &self.ifndef)?;

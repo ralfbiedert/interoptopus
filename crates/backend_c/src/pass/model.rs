@@ -6,7 +6,7 @@
 
 use crate::lang::{
     CArray, CCallback, CEnumVariant, CField, CFnPointer, CFunction, CModel, COption, CPointer, CPrimitive, CResult, CSimpleEnum, CSlice, CStruct, CTaggedUnion,
-    CTaggedUnionVariant, CType, CTypeKind, CVec,
+    CTaggedUnionVariant, CType, CTypeKind, CVec, NamingConfig, NamingStyle, apply_naming_style, apply_prefix,
 };
 use interoptopus::inventory::{RustInventory, TypeId};
 use interoptopus::lang::function::Function;
@@ -15,12 +15,12 @@ use std::collections::{HashMap, HashSet};
 
 /// Build the complete C model from a Rust inventory.
 #[must_use]
-pub fn build_model(inv: &RustInventory) -> CModel {
+pub fn build_model(inv: &RustInventory, naming: &NamingConfig) -> CModel {
     let mut types = HashMap::new();
 
     // First pass: map every Rust type to a C type.
     for (&tid, ty) in &inv.types {
-        if let Some(ctype) = map_type(inv, ty) {
+        if let Some(ctype) = map_type(inv, ty, naming) {
             types.insert(tid, ctype);
         }
     }
@@ -29,40 +29,82 @@ pub fn build_model(inv: &RustInventory) -> CModel {
     let types_ordered = topo_sort(inv);
 
     // Map functions.
-    let functions = build_functions(inv);
+    let functions = build_functions(inv, naming);
 
     CModel { types_ordered, types, functions }
 }
 
-/// Turn a Rust type name (e.g. `Option<Vec2>`) into a valid C identifier (`OPTIONVEC2`).
-fn c_name(name: &str) -> String {
-    name.chars()
-        .filter(|c| c.is_ascii_alphanumeric() || *c == '_')
-        .map(|c| c.to_ascii_uppercase())
-        .collect()
+// ── Category-specific name helpers ──
+
+/// Apply type naming style + prefix.
+fn c_type_name(rust_name: &str, naming: &NamingConfig) -> String {
+    let styled = apply_naming_style(rust_name, naming.type_naming);
+    apply_prefix(&styled, &naming.prefix)
+}
+
+/// Build a qualified enum variant name: `{prefixed_type}_{styled_variant}`.
+fn c_variant_name(prefixed_type_name: &str, variant_name: &str, naming: &NamingConfig) -> String {
+    let styled_variant = apply_naming_style(variant_name, naming.enum_variant_naming);
+    format!("{prefixed_type_name}_{styled_variant}")
+}
+
+/// Apply function naming style + prefix.
+fn c_function_name(rust_name: &str, naming: &NamingConfig) -> String {
+    let styled = apply_naming_style(rust_name, naming.function_naming);
+    apply_prefix(&styled, &naming.prefix)
+}
+
+/// Apply parameter naming style (no prefix — parameters are local).
+fn c_param_name(rust_name: &str, naming: &NamingConfig) -> String {
+    apply_naming_style(rust_name, naming.function_parameter_naming)
+}
+
+/// Apply const naming style + prefix (for tag enum names like `SHAPE_TAG`).
+///
+/// The `suffix_word` is the logical word to append (e.g. `"Tag"`). It is
+/// cased to match `const_naming`: `_TAG` for `ScreamingSnake`, `Tag` for
+/// `UpperCamel`, `_tag` for `Snake`/`Raw`.
+fn c_const_name(rust_name: &str, suffix_word: &str, naming: &NamingConfig) -> String {
+    let styled = apply_naming_style(rust_name, naming.const_naming);
+    let with_suffix = match naming.const_naming {
+        NamingStyle::ScreamingSnake => format!("{styled}_{}", suffix_word.to_ascii_uppercase()),
+        NamingStyle::UpperCamel => format!("{styled}{suffix_word}"),
+        NamingStyle::Snake | NamingStyle::Raw => format!("{styled}_{}", suffix_word.to_ascii_lowercase()),
+    };
+    apply_prefix(&with_suffix, &naming.prefix)
+}
+
+/// Build the callback function typedef name: `{type_name}_fn`, with suffix
+/// cased to match the type naming style.
+fn c_callback_fn_typedef(type_name: &str, naming: &NamingConfig) -> String {
+    match naming.type_naming {
+        NamingStyle::ScreamingSnake => format!("{type_name}_FN"),
+        NamingStyle::UpperCamel => format!("{type_name}Fn"),
+        NamingStyle::Snake | NamingStyle::Raw => format!("{type_name}_fn"),
+    }
 }
 
 /// Resolve the C type name for a Rust `TypeId`.
-fn type_name(inv: &RustInventory, tid: &TypeId) -> String {
+fn type_name(inv: &RustInventory, tid: &TypeId, naming: &NamingConfig) -> String {
     let ty = &inv.types[tid];
     match &ty.kind {
         TypeKind::Primitive(p) => map_primitive(*p).c_name().to_string(),
-        TypeKind::ReadPointer(inner) => format!("const {}*", type_name(inv, inner)),
-        TypeKind::ReadWritePointer(inner) => format!("{}*", type_name(inv, inner)),
+        TypeKind::ReadPointer(inner) => format!("const {}*", type_name(inv, inner, naming)),
+        TypeKind::ReadWritePointer(inner) => format!("{}*", type_name(inv, inner, naming)),
         TypeKind::TypePattern(TypePattern::CChar) => "char".to_string(),
         TypeKind::TypePattern(TypePattern::Bool) => "bool".to_string(),
         TypeKind::TypePattern(TypePattern::CVoid) => "void".to_string(),
-        _ => c_name(&ty.name),
+        _ => c_type_name(&ty.name, naming),
     }
 }
 
 /// Resolve the C type specifier (maps void primitives to `"void"`).
-fn type_spec(inv: &RustInventory, tid: &TypeId) -> String {
+fn type_spec(inv: &RustInventory, tid: &TypeId, naming: &NamingConfig) -> String {
     let ty = &inv.types[tid];
     if matches!(ty.kind, TypeKind::Primitive(Primitive::Void)) {
         "void".to_string()
     } else {
-        type_name(inv, tid)
+        type_name(inv, tid, naming)
     }
 }
 
@@ -97,14 +139,14 @@ fn map_primitive(p: Primitive) -> CPrimitive {
     }
 }
 
-fn map_type(inv: &RustInventory, ty: &Type) -> Option<CType> {
-    let name = c_name(&ty.name);
+fn map_type(inv: &RustInventory, ty: &Type, naming: &NamingConfig) -> Option<CType> {
+    let name = c_type_name(&ty.name, naming);
     let kind = match &ty.kind {
         TypeKind::Primitive(p) => CTypeKind::Primitive(map_primitive(*p)),
 
-        TypeKind::ReadPointer(inner) => CTypeKind::Pointer(CPointer { target_name: type_name(inv, inner), is_const: true }),
+        TypeKind::ReadPointer(inner) => CTypeKind::Pointer(CPointer { target_name: type_name(inv, inner, naming), is_const: true }),
 
-        TypeKind::ReadWritePointer(inner) => CTypeKind::Pointer(CPointer { target_name: type_name(inv, inner), is_const: false }),
+        TypeKind::ReadWritePointer(inner) => CTypeKind::Pointer(CPointer { target_name: type_name(inv, inner, naming), is_const: false }),
 
         TypeKind::Struct(s) => {
             let fields = s
@@ -113,9 +155,9 @@ fn map_type(inv: &RustInventory, ty: &Type) -> Option<CType> {
                 .map(|f| {
                     let resolved = &inv.types[&f.ty];
                     if let TypeKind::Array(arr) = &resolved.kind {
-                        CField { name: f.name.clone(), type_name: type_spec(inv, &arr.ty), array_len: Some(arr.len) }
+                        CField { name: f.name.clone(), type_name: type_spec(inv, &arr.ty, naming), array_len: Some(arr.len) }
                     } else {
-                        CField { name: f.name.clone(), type_name: type_spec(inv, &f.ty), array_len: None }
+                        CField { name: f.name.clone(), type_name: type_spec(inv, &f.ty, naming), array_len: None }
                     }
                 })
                 .collect();
@@ -126,17 +168,17 @@ fn map_type(inv: &RustInventory, ty: &Type) -> Option<CType> {
             let tag_c_type = repr_to_c_tag_type(&e.repr);
             let has_data = e.variants.iter().any(|v| matches!(v.kind, VariantKind::Tuple(_)));
             if has_data {
-                let tag_name = format!("{name}_TAG");
+                let tag_name = c_const_name(&ty.name, "Tag", naming);
                 let variants = e
                     .variants
                     .iter()
                     .enumerate()
                     .map(|(i, v)| {
                         let data_type = match &v.kind {
-                            VariantKind::Tuple(tid) => Some(type_spec(inv, tid)),
+                            VariantKind::Tuple(tid) => Some(type_spec(inv, tid, naming)),
                             VariantKind::Unit(_) => None,
                         };
-                        CTaggedUnionVariant { name: format!("{}_{}", name, v.name.to_uppercase()), tag: i, data_type }
+                        CTaggedUnionVariant { name: c_variant_name(&name, &v.name, naming), field_name: v.name.to_lowercase(), tag: i, data_type }
                     })
                     .collect();
                 CTypeKind::TaggedUnion(CTaggedUnion { tag_name, variants, tag_c_type })
@@ -145,52 +187,65 @@ fn map_type(inv: &RustInventory, ty: &Type) -> Option<CType> {
                     .variants
                     .iter()
                     .enumerate()
-                    .map(|(i, v)| CEnumVariant { name: format!("{}_{}", name, v.name.to_uppercase()), value: i })
+                    .map(|(i, v)| CEnumVariant { name: c_variant_name(&name, &v.name, naming), value: i })
                     .collect();
                 CTypeKind::SimpleEnum(CSimpleEnum { variants, tag_c_type })
             }
         }
 
         TypeKind::TypePattern(TypePattern::NamedCallback(sig)) => {
-            let rval = type_spec(inv, &sig.rval);
-            let mut params: Vec<String> = sig.arguments.iter().map(|a| type_spec(inv, &a.ty)).collect();
+            let rval = type_spec(inv, &sig.rval, naming);
+            let mut params: Vec<String> = sig.arguments.iter().map(|a| type_spec(inv, &a.ty, naming)).collect();
             params.push("const void*".to_string());
-            CTypeKind::Callback(CCallback { fn_typedef: format!("{name}_fn"), rval, params: params.join(", ") })
+            CTypeKind::Callback(CCallback { fn_typedef: c_callback_fn_typedef(&name, naming), rval, params: params.join(", ") })
         }
 
-        TypeKind::TypePattern(TypePattern::Slice(inner)) => CTypeKind::Slice(CSlice { inner_type: type_spec(inv, inner), is_const: true }),
+        TypeKind::TypePattern(TypePattern::Slice(inner)) => CTypeKind::Slice(CSlice { inner_type: type_spec(inv, inner, naming), is_const: true }),
 
-        TypeKind::TypePattern(TypePattern::SliceMut(inner)) => CTypeKind::SliceMut(CSlice { inner_type: type_spec(inv, inner), is_const: false }),
+        TypeKind::TypePattern(TypePattern::SliceMut(inner)) => CTypeKind::SliceMut(CSlice { inner_type: type_spec(inv, inner, naming), is_const: false }),
 
-        TypeKind::TypePattern(TypePattern::Vec(inner)) => CTypeKind::Vec(CVec { inner_type: type_spec(inv, inner) }),
+        TypeKind::TypePattern(TypePattern::Vec(inner)) => CTypeKind::Vec(CVec { inner_type: type_spec(inv, inner, naming) }),
 
         TypeKind::TypePattern(TypePattern::Utf8String) => CTypeKind::Utf8String,
 
         TypeKind::TypePattern(TypePattern::Option(inner)) => {
-            let tag_name = format!("{name}_TAG");
+            let tag_name = c_const_name(&ty.name, "Tag", naming);
             // ffi::Option is #[repr(u32)]
-            CTypeKind::Option(COption { tag_name, inner_type: type_spec(inv, inner), tag_c_type: "uint32_t".to_string() })
+            CTypeKind::Option(COption {
+                tag_name,
+                inner_type: type_spec(inv, inner, naming),
+                tag_c_type: "uint32_t".to_string(),
+                some_variant: c_variant_name(&name, "Some", naming),
+                none_variant: c_variant_name(&name, "None", naming),
+            })
         }
 
         TypeKind::TypePattern(TypePattern::Result(ok, err)) => {
-            let tag_name = format!("{name}_TAG");
+            let tag_name = c_const_name(&ty.name, "Tag", naming);
             // ffi::Result is #[repr(u32)]
-            CTypeKind::Result(CResult { tag_name, ok_type: type_spec(inv, ok), err_type: type_spec(inv, err), tag_c_type: "uint32_t".to_string() })
+            CTypeKind::Result(CResult {
+                tag_name,
+                ok_type: type_spec(inv, ok, naming),
+                err_type: type_spec(inv, err, naming),
+                tag_c_type: "uint32_t".to_string(),
+                ok_variant: c_variant_name(&name, "Ok", naming),
+                err_variant: c_variant_name(&name, "Err", naming),
+            })
         }
 
         TypeKind::FnPointer(sig) => {
-            let rval = type_spec(inv, &sig.rval);
+            let rval = type_spec(inv, &sig.rval, naming);
             let params = if sig.arguments.is_empty() {
                 "void".to_string()
             } else {
-                sig.arguments.iter().map(|a| type_spec(inv, &a.ty)).collect::<Vec<_>>().join(", ")
+                sig.arguments.iter().map(|a| type_spec(inv, &a.ty, naming)).collect::<Vec<_>>().join(", ")
             };
             CTypeKind::FnPointer(CFnPointer { rval, params })
         }
 
         TypeKind::Opaque | TypeKind::Service => CTypeKind::Opaque,
 
-        TypeKind::Array(arr) => CTypeKind::Array(CArray { element_type: type_spec(inv, &arr.ty), len: arr.len }),
+        TypeKind::Array(arr) => CTypeKind::Array(CArray { element_type: type_spec(inv, &arr.ty, naming), len: arr.len }),
 
         TypeKind::TypePattern(TypePattern::CChar | TypePattern::Bool | TypePattern::CVoid) => CTypeKind::Primitive(match &ty.kind {
             TypeKind::TypePattern(TypePattern::CChar) => CPrimitive::I8,
@@ -204,35 +259,36 @@ fn map_type(inv: &RustInventory, ty: &Type) -> Option<CType> {
     Some(CType { name, kind })
 }
 
-fn param_list(inv: &RustInventory, f: &Function) -> String {
+fn param_list(inv: &RustInventory, f: &Function, naming: &NamingConfig) -> String {
     if f.signature.arguments.is_empty() {
         return "void".to_string();
     }
     f.signature
         .arguments
         .iter()
-        .map(|a| format!("{} {}", type_spec(inv, &a.ty), a.name))
+        .map(|a| format!("{} {}", type_spec(inv, &a.ty, naming), c_param_name(&a.name, naming)))
         .collect::<Vec<_>>()
         .join(", ")
 }
 
-fn param_types(inv: &RustInventory, f: &Function) -> String {
+fn param_types(inv: &RustInventory, f: &Function, naming: &NamingConfig) -> String {
     if f.signature.arguments.is_empty() {
         return "void".to_string();
     }
-    f.signature.arguments.iter().map(|a| type_spec(inv, &a.ty)).collect::<Vec<_>>().join(", ")
+    f.signature.arguments.iter().map(|a| type_spec(inv, &a.ty, naming)).collect::<Vec<_>>().join(", ")
 }
 
-fn build_functions(inv: &RustInventory) -> Vec<CFunction> {
+fn build_functions(inv: &RustInventory, naming: &NamingConfig) -> Vec<CFunction> {
     let mut fns: Vec<&Function> = inv.functions.values().collect();
     fns.sort_by_key(|f| &f.name);
 
     fns.iter()
         .map(|f| CFunction {
-            name: f.name.clone(),
-            rval: type_spec(inv, &f.signature.rval),
-            params: param_list(inv, f),
-            param_types: param_types(inv, f),
+            name: c_function_name(&f.name, naming),
+            symbol: f.name.clone(),
+            rval: type_spec(inv, &f.signature.rval, naming),
+            params: param_list(inv, f, naming),
+            param_types: param_types(inv, f, naming),
             is_internal: f.name.starts_with("interoptopus_"),
         })
         .collect()

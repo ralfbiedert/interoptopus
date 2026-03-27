@@ -12,7 +12,7 @@ static int {{ load_fn }}(const char* path, {{ api_name }}* api)
 {%- if fn.separator %}
     /* internal helpers */
 {%- endif %}
-    api->{{ fn.name }} = ({{ fn.rval }} (*)({{ fn.param_types }}))(void*)GetProcAddress(lib, "{{ fn.name }}");
+    api->{{ fn.name }} = ({{ fn.rval }} (*)({{ fn.param_types }}))(void*)GetProcAddress(lib, "{{ fn.symbol }}");
     if (!api->{{ fn.name }}) return -1;
 {%- endfor %}
     return 0;

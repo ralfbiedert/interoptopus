@@ -4,6 +4,10 @@
 //! reflecting C's simpler type system: no generics, no managed/unmanaged
 //! split, no namespaces, no overloads, no services.
 
+mod naming;
+
+pub use naming::{NamingConfig, NamingStyle, apply_naming_style, apply_prefix};
+
 use interoptopus::inventory::TypeId as RustTypeId;
 use std::collections::HashMap;
 
@@ -124,6 +128,8 @@ pub struct CSimpleEnum {
 #[derive(Debug, Clone)]
 pub struct CTaggedUnionVariant {
     pub name: String,
+    /// Lowercased variant name used as the union field name (e.g. `circle`).
+    pub field_name: String,
     pub tag: usize,
     /// The type name of the data field, if this variant carries data.
     pub data_type: Option<String>,
@@ -173,6 +179,10 @@ pub struct COption {
     pub inner_type: String,
     /// The fixed-width C integer type matching the Rust `#[repr(...)]` (e.g. `uint32_t`).
     pub tag_c_type: String,
+    /// Styled variant name for the `Some` tag value (e.g. `OPTION_F32_SOME`).
+    pub some_variant: String,
+    /// Styled variant name for the `None` tag value (e.g. `OPTION_F32_NONE`).
+    pub none_variant: String,
 }
 
 /// A result struct: tag enum + union with `ok` / `err` members.
@@ -183,6 +193,10 @@ pub struct CResult {
     pub err_type: String,
     /// The fixed-width C integer type matching the Rust `#[repr(...)]` (e.g. `uint32_t`).
     pub tag_c_type: String,
+    /// Styled variant name for the `Ok` tag value (e.g. `RESULT_I32_ERROR_OK`).
+    pub ok_variant: String,
+    /// Styled variant name for the `Err` tag value (e.g. `RESULT_I32_ERROR_ERR`).
+    pub err_variant: String,
 }
 
 /// A C pointer (`const T*` or `T*`).
@@ -203,6 +217,8 @@ pub struct CArray {
 #[derive(Debug, Clone)]
 pub struct CFunction {
     pub name: String,
+    /// The original symbol name exported by the Rust cdylib (used in `dlsym`/`GetProcAddress`).
+    pub symbol: String,
     pub rval: String,
     pub params: String,
     pub param_types: String,
