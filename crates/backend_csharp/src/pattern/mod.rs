@@ -6,14 +6,17 @@
 //!
 //! # Example
 //!
-//! ```rust,ignore
+//! ```rust
 //! # use interoptopus::plugin;
+//! # use interoptopus_csharp::pattern::Try;
+//! # use crate::interoptopus_csharp::pattern::TryExtension;
 //! plugin!(MyPlugin {
 //!     fn foo() -> Try<u32>;
 //! });
 //!
-//! # fn foo(plugin: &MyPlugin) {
+//! # fn foo(plugin: &MyPlugin) -> Result<(), Box<dyn std::error::Error>>{
 //! plugin.foo().ok()?;
+//! # Ok(())
 //! # }
 //! ```
 //!
