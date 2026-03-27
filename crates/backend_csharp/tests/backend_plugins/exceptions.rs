@@ -1,4 +1,5 @@
 use crate::{define_plugin, load_plugin};
+use interoptopus_csharp::dispatch::Dispatch;
 use interoptopus_csharp::pattern::{Try, TryExtension};
 use std::error::Error;
 
@@ -12,7 +13,10 @@ interoptopus::plugin!(ServiceTry {
         fn create(value: u32) -> Try<Self>;
         fn get_value(&self) -> Try<u32>;
         async fn create_async(value: u32) -> Try<Self>;
+
         async fn get_value_async(&self) -> Try<u32>;
+        // #[allow_untry(reason="asdasd")]
+        // async fn get_value_async_3(&self) -> u32;
     }
 });
 
