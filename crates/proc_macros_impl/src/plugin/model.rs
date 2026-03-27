@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use proc_macro2::Span;
+use std::collections::HashSet;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::{Ident, Token, Type, braced, token};
