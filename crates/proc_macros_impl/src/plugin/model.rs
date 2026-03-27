@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use proc_macro2::Span;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::{Ident, Token, Type, braced, token};
@@ -26,6 +27,7 @@ pub struct ServiceBlock {
 pub struct PluginMethod {
     pub name: Ident,
     pub is_async: bool,
+    pub async_span: Option<Span>,
     pub has_self: bool,
     pub params: Vec<PluginParam>,
     pub ret: Option<Type>,
@@ -309,10 +311,13 @@ impl Parse for ServiceBlock {
 
 impl Parse for PluginMethod {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let is_async = input.peek(Token![async]);
-        if is_async {
-            input.parse::<Token![async]>()?;
-        }
+        let async_span = if input.peek(Token![async]) {
+            let tok = input.parse::<Token![async]>()?;
+            Some(tok.span)
+        } else {
+            None
+        };
+        let is_async = async_span.is_some();
         input.parse::<Token![fn]>()?;
         let name: Ident = input.parse()?;
 
@@ -332,7 +337,7 @@ impl Parse for PluginMethod {
         let ret = parse_return_type(input)?;
         input.parse::<Token![;]>()?;
 
-        Ok(Self { name, is_async, has_self, params, ret })
+        Ok(Self { name, is_async, async_span, has_self, params, ret })
     }
 }
 

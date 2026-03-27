@@ -78,7 +78,7 @@ impl PluginModel {
         let name = &self.name;
 
         let bare_fields = self.functions.iter().map(|f| {
-            let field_name = &f.name;
+            let field_name = Ident::new(&f.name.to_string(), Span::call_site());
             let ffi_ptys: Vec<_> = f.params.iter().map(|p| ffi_param_ty(&p.ty, svc_names)).collect();
             if f.is_async {
                 let cb_ret = ffi_ret_or_unit(f.ret.as_ref(), svc_names);
@@ -408,6 +408,8 @@ fn emit_bare_method(
     let forget_stmts = forget_owned_services(&f.params, svc_names);
     let index = inst_map[&f.name.to_string()];
 
+    let async_kw = quote_spanned! { f.async_span.unwrap_or_else(Span::call_site) => async };
+
     let ret_svc_name = f.ret.as_ref().and_then(|ty| service_in_type(ty, svc_names));
     let must_use: TokenStream = if ret_svc_name.is_some() || f.is_async || f.ret.is_some() {
         quote! { #[must_use] }
@@ -432,7 +434,7 @@ fn emit_bare_method(
                     let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
                     (self.#fn_name)(#(#ffi_args,)* cb);
                     #(#field_src_lets)*
-                    async move {
+                    #async_kw move {
                         let raw = future.await;
                         instrumentor.record_call(#index, _inst_start, instrumentor.time_ns());
                         ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, #construct)
@@ -464,7 +466,7 @@ fn emit_bare_method(
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new();
                 (self.#fn_name)(#(#ffi_args,)* cb);
                 let _inst = self.instrumentor.clone();
-                async move {
+                #async_kw move {
                     let _inst_result = future.await;
                     _inst.record_call(#index, _inst_start, _inst.time_ns());
                     _inst_result
@@ -500,12 +502,14 @@ fn emit_ctor_method(
     svc_names: &HashSet<String>,
     inst_map: &HashMap<String, usize>,
 ) -> TokenStream {
-    let method_name = prefixed_ident(prefix, &c.name);
+    let method_name = Ident::new(&format!("{}_{}", prefix, c.name), c.name.span());
     let ctor_field = prefixed_ident(prefix, &c.name);
     let params = typed_params(&c.params);
     let ffi_args = ffi_call_args(&c.params, svc_names);
     let forget_stmts = forget_owned_services(&c.params, svc_names);
     let index = inst_map[&format!("{}_{}", prefix, c.name)];
+
+    let async_kw = quote_spanned! { c.async_span.unwrap_or_else(Span::call_site) => async };
 
     // Determine the FFI return type and user-facing return type
     let (ffi_ret_ty, user_ret_ty) = if is_self_return(c.ret.as_ref()) {
@@ -527,7 +531,7 @@ fn emit_ctor_method(
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
                 (self.#ctor_field)(#(#ffi_args,)* cb);
                 #(#field_src_lets)*
-                async move {
+                #async_kw move {
                     let raw = future.await;
                     instrumentor.record_call(#index, _inst_start, instrumentor.time_ns());
                     ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, #construct)
@@ -589,6 +593,7 @@ fn emit_service_struct(s: &ServiceBlock, all_services: &[ServiceBlock], svc_name
         .collect();
 
     quote! {
+        #[allow(clippy::struct_field_names)]
         pub struct #name {
             handle: ::interoptopus::ffi::ServiceHandle<#name>,
             instrumentor: ::std::sync::Arc<::interoptopus::telemetry::MetricsRecorder>,
@@ -627,6 +632,8 @@ fn emit_instance_method(
     let forget_stmts = forget_owned_services(&m.params, svc_names);
     let index = inst_map[&format!("{}_{}", prefix, m.name)];
 
+    let async_kw = quote_spanned! { m.async_span.unwrap_or_else(Span::call_site) => async };
+
     let ret_svc_name = m.ret.as_ref().and_then(|ty| service_in_type(ty, svc_names));
     let must_use: TokenStream = if ret_svc_name.is_some() || m.is_async || m.ret.is_some() {
         quote! { #[must_use] }
@@ -651,7 +658,7 @@ fn emit_instance_method(
                     let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
                     (self.#field)(self.handle, #(#ffi_args,)* cb);
                     #(#field_src_lets)*
-                    async move {
+                    #async_kw move {
                         let raw = future.await;
                         instrumentor.record_call(#index, _inst_start, instrumentor.time_ns());
                         ::interoptopus::ffi::ServiceHandleMap::map_service_handle(raw, #construct)
@@ -682,7 +689,7 @@ fn emit_instance_method(
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new();
                 (self.#field)(self.handle, #(#ffi_args,)* cb);
                 let _inst = self.instrumentor.clone();
-                async move {
+                #async_kw move {
                     let _inst_result = future.await;
                     _inst.record_call(#index, _inst_start, _inst.time_ns());
                     _inst_result

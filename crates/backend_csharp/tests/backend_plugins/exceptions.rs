@@ -12,8 +12,8 @@ interoptopus::plugin!(ServiceTry {
         fn create(value: u32) -> Try<Self>;
         fn get_value(&self) -> Try<u32>;
         async fn create_async(value: u32) -> Try<Self>;
-
         async fn get_value_async(&self) -> Try<u32>;
+
         // #[allow_untry(reason="asdasd")]
         // async fn get_value_async_3(&self) -> u32;
     }
