@@ -13,6 +13,11 @@ name = "plugin"
 harness = false
 required-features = ["unstable-plugins"]
 
+[[bench]]
+name = "plugin_memory"
+harness = false
+required-features = ["unstable-plugins"]
+
 [features]
 unstable-plugins = ["interoptopus/unstable-plugins", "rt-dotnet", "rt-aot"]
 rt-dotnet = ["interoptopus/unstable-plugins", "dep:netcorehost", "dep:tempfile"]
