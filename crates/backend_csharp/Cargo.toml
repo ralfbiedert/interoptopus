@@ -35,7 +35,7 @@ interoptopus = { workspace = true, features = ["macros", "serde"] }
 interoptopus_csharp = { path = ".", features = ["unstable-plugins", "rt-dotnet-download"] }
 reference_project.workspace = true
 insta.workspace = true
-tokio.workspace = true
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 memory-stats = "1.2.0"
 
 [lints]
