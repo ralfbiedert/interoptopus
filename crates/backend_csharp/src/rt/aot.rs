@@ -67,7 +67,7 @@ impl AotRuntime {
 
         let plugin = T::load_from(|symbol| {
             let symbol_bytes: Vec<u8> = symbol.bytes().chain(std::iter::once(0)).collect();
-            match unsafe { lib.get::<extern "system" fn()>(&symbol_bytes) } {
+            match unsafe { lib.get::<extern "system" fn()>(&*symbol_bytes) } {
                 Ok(f) => *f as *const u8,
                 Err(_) => std::ptr::null(),
             }

@@ -4,5 +4,8 @@
 //! to load foreign plugins (e.g., .NET DLLs) and call their functions
 //! from Rust.
 
-pub mod service_map;
+mod service_map;
 pub mod trampoline;
+
+#[doc(hidden)]
+pub use service_map::{PluginService, ServiceAs, ServiceHandle, ServiceHandleMap};

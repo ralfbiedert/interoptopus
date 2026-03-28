@@ -16,7 +16,8 @@
 //! transparent to the plugin code generator.
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, WireIO};
+use crate::wire::SerializationError;
+use crate::lang::types::{Type, TypeInfo, TypeKind, WireIO};
 
 /// An opaque, FFI-safe handle to a service instance.
 ///
@@ -66,7 +67,7 @@ impl<T> ServiceHandle<T> {
     }
 }
 
-impl<T: TypeInfo> TypeInfo for ServiceHandle<T> {
+unsafe impl<T: TypeInfo> TypeInfo for ServiceHandle<T> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = false;
     const ASYNC_SAFE: bool = false;
@@ -92,7 +93,7 @@ impl<T: TypeInfo> TypeInfo for ServiceHandle<T> {
     }
 }
 
-impl<T: WireIO> WireIO for ServiceHandle<T> {
+unsafe impl<T: WireIO> WireIO for ServiceHandle<T> {
     fn write(&self, _: &mut impl std::io::Write) -> Result<(), SerializationError> {
         crate::bad_wire!()
     }

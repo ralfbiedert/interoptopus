@@ -3,7 +3,8 @@ use crate::inventory::Inventory;
 use crate::lang::function::{Argument, Signature};
 use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::wire::WireIO;
-use crate::lang::types::{SerializationError, Type, TypeId, TypeInfo, TypeKind};
+use crate::wire::SerializationError;
+use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
 use std::io::{Read, Write};
 
 // Generate implementations for function pointers with different arities
@@ -11,7 +12,7 @@ macro_rules! impl_fnptr {
     // No arguments: extern "C" fn() -> R
     ($r:ident) => {
         #[allow(non_snake_case)]
-        impl<$r: TypeInfo> TypeInfo for extern "C" fn() -> $r {
+        unsafe impl<$r: TypeInfo> TypeInfo for extern "C" fn() -> $r {
             const WIRE_SAFE: bool = false;
             const RAW_SAFE: bool = true;
             const ASYNC_SAFE: bool = true;
@@ -54,7 +55,7 @@ macro_rules! impl_fnptr {
         }
 
         #[allow(non_snake_case)]
-        impl<$r: TypeInfo> WireIO for extern "C" fn() -> $r {
+        unsafe impl<$r: TypeInfo> WireIO for extern "C" fn() -> $r {
             fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
@@ -69,7 +70,7 @@ macro_rules! impl_fnptr {
         }
 
         #[allow(non_snake_case)]
-        impl<$r: TypeInfo> TypeInfo for Option<extern "C" fn() -> $r> {
+        unsafe impl<$r: TypeInfo> TypeInfo for Option<extern "C" fn() -> $r> {
             const WIRE_SAFE: bool = false;
             const RAW_SAFE: bool = true;
             const ASYNC_SAFE: bool = true;
@@ -94,7 +95,7 @@ macro_rules! impl_fnptr {
         }
 
         #[allow(non_snake_case)]
-        impl<$r: WireIO> WireIO for extern "C" Option<extern "C" fn() -> $r> {
+        unsafe impl<$r: WireIO> WireIO for extern "C" Option<extern "C" fn() -> $r> {
             fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
@@ -115,7 +116,7 @@ macro_rules! impl_fnptr {
     // With arguments: extern "C" fn(T1, T2, ...) -> R
     ($r:ident, $($t:ident),+) => {
         #[allow(unused_assignments, non_snake_case)]
-        impl<$r, $($t),+> TypeInfo for extern "C" fn($($t),+) -> $r
+        unsafe impl<$r, $($t),+> TypeInfo for extern "C" fn($($t),+) -> $r
         where
             $($t: TypeInfo,)+
             $r: TypeInfo,
@@ -200,7 +201,7 @@ macro_rules! impl_fnptr {
         }
 
         #[allow(unused_assignments, non_snake_case)]
-        impl<$r, $($t),+> WireIO for extern "C" fn($($t),+) -> $r
+        unsafe impl<$r, $($t),+> WireIO for extern "C" fn($($t),+) -> $r
         where
             $($t: WireIO,)+
             $r: WireIO,
@@ -219,7 +220,7 @@ macro_rules! impl_fnptr {
         }
 
         #[allow(unused_assignments, non_snake_case)]
-        impl<$r, $($t),+> TypeInfo for Option<extern "C" fn($($t),+) -> $r>
+        unsafe impl<$r, $($t),+> TypeInfo for Option<extern "C" fn($($t),+) -> $r>
         where
             $($t: TypeInfo,)+
             $r: TypeInfo,
@@ -248,7 +249,7 @@ macro_rules! impl_fnptr {
         }
 
         #[allow(unused_assignments, non_snake_case)]
-        impl<$r, $($t),+> WireIO for Option<extern "C" fn($($t),+) -> $r>
+        unsafe impl<$r, $($t),+> WireIO for Option<extern "C" fn($($t),+) -> $r>
         where
             $($t: WireIO,)+
             $r: WireIO,

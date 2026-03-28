@@ -1,7 +1,7 @@
 use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
-use crate::lang::types::SerializationError;
+use crate::wire::SerializationError;
 use crate::lang::types::wire::WireIO;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
 use std::collections::HashMap;
@@ -10,7 +10,7 @@ use std::mem::MaybeUninit;
 
 macro_rules! impl_ptr {
     ($t:ty, $name:expr, $kind:tt, $id:expr) => {
-        impl<T: TypeInfo> TypeInfo for $t {
+        unsafe impl<T: TypeInfo> TypeInfo for $t {
             const WIRE_SAFE: bool = false;
             const RAW_SAFE: bool = T::RAW_SAFE;
             const ASYNC_SAFE: bool = false;
@@ -36,7 +36,7 @@ macro_rules! impl_ptr {
             }
         }
 
-        impl<T: WireIO> WireIO for $t {
+        unsafe impl<T: WireIO> WireIO for $t {
             fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
                 bad_wire!()
             }
@@ -81,7 +81,7 @@ pub fn type_id_ptr_mut(x: TypeId) -> TypeId {
     x.derive(0x7EE1DB481C7FEAD63EB329E9812A2F68)
 }
 
-impl<T: TypeInfo> TypeInfo for MaybeUninit<T> {
+unsafe impl<T: TypeInfo> TypeInfo for MaybeUninit<T> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = T::RAW_SAFE;
     const ASYNC_SAFE: bool = T::ASYNC_SAFE;
@@ -107,7 +107,7 @@ impl<T: TypeInfo> TypeInfo for MaybeUninit<T> {
     }
 }
 
-impl<T: WireIO> WireIO for MaybeUninit<T> {
+unsafe impl<T: WireIO> WireIO for MaybeUninit<T> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }
@@ -121,7 +121,7 @@ impl<T: WireIO> WireIO for MaybeUninit<T> {
     }
 }
 
-impl TypeInfo for String {
+unsafe impl TypeInfo for String {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = false;
     const ASYNC_SAFE: bool = false;
@@ -151,7 +151,7 @@ impl TypeInfo for String {
     }
 }
 
-impl WireIO for String {
+unsafe impl WireIO for String {
     fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
         u32::try_from(self.len())?.write(out)?;
         out.write_all(self.as_bytes())?;
@@ -162,7 +162,7 @@ impl WireIO for String {
         let len = u32::read(input)? as usize;
         let mut buf = vec![0u8; len];
         input.read_exact(&mut buf)?;
-        Self::from_utf8(buf).map_err(|e| SerializationError::Io(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))
+        Self::from_utf8(buf).map_err(|e| SerializationError::new(e.to_string()))
     }
 
     fn live_size(&self) -> usize {
@@ -170,7 +170,7 @@ impl WireIO for String {
     }
 }
 
-impl<T: TypeInfo> TypeInfo for Vec<T> {
+unsafe impl<T: TypeInfo> TypeInfo for Vec<T> {
     const WIRE_SAFE: bool = T::WIRE_SAFE;
     const RAW_SAFE: bool = false;
     const ASYNC_SAFE: bool = false;
@@ -197,7 +197,7 @@ impl<T: TypeInfo> TypeInfo for Vec<T> {
     }
 }
 
-impl<T: WireIO> WireIO for Vec<T> {
+unsafe impl<T: WireIO> WireIO for Vec<T> {
     fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
         u32::try_from(self.len())?.write(out)?;
         for item in self {
@@ -220,7 +220,7 @@ impl<T: WireIO> WireIO for Vec<T> {
     }
 }
 
-impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap<K, V, S> {
+unsafe impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap<K, V, S> {
     const WIRE_SAFE: bool = K::WIRE_SAFE && V::WIRE_SAFE;
     const RAW_SAFE: bool = false;
     const ASYNC_SAFE: bool = false;
@@ -249,7 +249,7 @@ impl<K: TypeInfo, V: TypeInfo, S: ::std::hash::BuildHasher> TypeInfo for HashMap
     }
 }
 
-impl<K: WireIO + Eq + core::hash::Hash, V: WireIO, S: ::std::hash::BuildHasher + Default> WireIO for HashMap<K, V, S> {
+unsafe impl<K: WireIO + Eq + core::hash::Hash, V: WireIO, S: ::std::hash::BuildHasher + Default> WireIO for HashMap<K, V, S> {
     fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
         u32::try_from(self.len())?.write(out)?;
         for (k, v) in self {
@@ -275,7 +275,7 @@ impl<K: WireIO + Eq + core::hash::Hash, V: WireIO, S: ::std::hash::BuildHasher +
     }
 }
 
-impl TypeInfo for ::std::ffi::c_void {
+unsafe impl TypeInfo for ::std::ffi::c_void {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
@@ -299,7 +299,7 @@ impl TypeInfo for ::std::ffi::c_void {
     }
 }
 
-impl WireIO for ::std::ffi::c_void {
+unsafe impl WireIO for ::std::ffi::c_void {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }
@@ -316,7 +316,7 @@ impl WireIO for ::std::ffi::c_void {
 macro_rules! impl_tuple_wireio {
     ( $( $name:ident )+ ) => {
         #[allow(non_snake_case)]
-        impl<$($name: WireIO),+> WireIO for ($($name,)+)
+        unsafe impl<$($name: WireIO),+> WireIO for ($($name,)+)
         {
             fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
                 let ($($name,)+) = self;

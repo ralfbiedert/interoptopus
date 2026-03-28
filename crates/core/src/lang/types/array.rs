@@ -1,7 +1,8 @@
 use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::wire::WireIO;
-use crate::lang::types::{SerializationError, Type, TypeId, TypeInfo, TypeKind};
+use crate::wire::SerializationError;
+use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
 use std::io::{Read, Write};
 use std::mem::MaybeUninit;
 
@@ -15,7 +16,7 @@ pub struct Array {
     pub len: usize,
 }
 
-impl<T, const N: usize> TypeInfo for [T; N]
+unsafe impl<T, const N: usize> TypeInfo for [T; N]
 where
     T: TypeInfo + Copy,
 {
@@ -46,7 +47,7 @@ where
     }
 }
 
-impl<T, const N: usize> WireIO for [T; N]
+unsafe impl<T, const N: usize> WireIO for [T; N]
 where
     T: WireIO + Copy,
 {

@@ -31,7 +31,15 @@ pub use wire::{WireIO, WireOnly};
 ///
 /// The `#[ffi]` attribute generates this for annotated structs and enums.
 /// Primitive types and built-in patterns have hand-written implementations.
-pub trait TypeInfo {
+///
+/// # Safety
+///
+/// The metadata returned by this trait drives FFI code generation and
+/// runtime type dispatch. An incorrect implementation — wrong `id()`,
+/// mismatched `kind()`, or inaccurate safety flags — will cause the
+/// generated bindings to misinterpret memory layouts, leading to
+/// undefined behaviour during FFI calls.
+pub unsafe trait TypeInfo {
     /// Whether this type can be used inside a [`Wire<T>`](crate::lang::types::WireOnly).
     const WIRE_SAFE: bool;
     /// Whether this type can be passed directly over the FFI boundary.
@@ -169,24 +177,4 @@ pub const fn assert_send_sync<T: Send + Sync>() {}
 #[track_caller]
 pub const fn assert_service_ctor_safe<T: TypeInfo>() {
     assert!(T::SERVICE_CTOR_SAFE, "This method looks like a constructor, but does not return ffi::Result<Self, _>");
-}
-
-/// Error returned when a wire-format serialization or deserialization fails.
-#[derive(Debug)]
-pub enum SerializationError {
-    Io(::std::io::Error),
-    InvalidData(String),
-    InvalidDiscriminant(String, isize),
-}
-
-impl From<::std::io::Error> for SerializationError {
-    fn from(e: ::std::io::Error) -> Self {
-        Self::Io(e)
-    }
-}
-
-impl From<::std::num::TryFromIntError> for SerializationError {
-    fn from(e: ::std::num::TryFromIntError) -> Self {
-        Self::Io(::std::io::Error::new(::std::io::ErrorKind::InvalidData, e))
-    }
 }

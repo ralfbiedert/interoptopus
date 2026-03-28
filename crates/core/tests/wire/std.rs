@@ -1,5 +1,4 @@
-use interoptopus::lang::types::SerializationError;
-use interoptopus::wire::Wire;
+use interoptopus::wire::{SerializationError, Wire};
 use std::collections::HashMap;
 
 #[test]

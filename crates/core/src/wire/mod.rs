@@ -182,8 +182,8 @@ mod buffer;
 
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
-use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use buffer::WireBuffer;
 use std::marker::PhantomData;
 
@@ -246,7 +246,7 @@ impl<T: TypeInfo + WireIO> Wire<T> {
     }
 }
 
-impl<T: TypeInfo + WireIO> TypeInfo for Wire<T> {
+unsafe impl<T: TypeInfo + WireIO> TypeInfo for Wire<T> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
@@ -278,7 +278,7 @@ impl<T: TypeInfo + WireIO> TypeInfo for Wire<T> {
     }
 }
 
-impl<T: WireIO> WireIO for Wire<T> {
+unsafe impl<T: WireIO> WireIO for Wire<T> {
     fn write(&self, _: &mut impl std::io::Write) -> Result<(), SerializationError> {
         bad_wire!()
     }
@@ -406,4 +406,32 @@ macro_rules! register_wire_trampolines {
         __register($crate::trampoline::TRAMPOLINE_WIRE_CREATE, __wire_create as *const u8);
         __register($crate::trampoline::TRAMPOLINE_WIRE_DESTROY, __wire_destroy as *const u8);
     }};
+}
+
+/// Error returned when a wire-format serialization or deserialization fails.
+#[derive(Debug)]
+pub struct SerializationError {
+    pub message: String,
+}
+
+impl SerializationError {
+    pub fn new(message: impl Into<String>) -> Self {
+        Self { message: message.into() }
+    }
+
+    pub fn invalid_discriminant(type_name: &str, discriminant: isize) -> Self {
+        Self { message: format!("invalid discriminant for {type_name}: {discriminant}") }
+    }
+}
+
+impl From<::std::io::Error> for SerializationError {
+    fn from(e: ::std::io::Error) -> Self {
+        Self { message: e.to_string() }
+    }
+}
+
+impl From<::std::num::TryFromIntError> for SerializationError {
+    fn from(e: ::std::num::TryFromIntError) -> Self {
+        Self { message: e.to_string() }
+    }
 }

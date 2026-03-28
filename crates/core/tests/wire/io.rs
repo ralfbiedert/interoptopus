@@ -1,4 +1,5 @@
-use interoptopus::lang::types::{SerializationError, WireIO};
+use interoptopus::lang::types::WireIO;
+use interoptopus::wire::SerializationError;
 use std::collections::HashMap;
 use std::io::{Read, Seek, SeekFrom};
 

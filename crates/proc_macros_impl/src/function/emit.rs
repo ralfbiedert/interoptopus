@@ -101,7 +101,7 @@ impl FunctionModel {
         quote_spanned! { struct_name.span() =>
             #validation_guards
 
-            impl #generics ::interoptopus::lang::function::FunctionInfo for #struct_name #generics #where_clause {
+            unsafe impl #generics ::interoptopus::lang::function::FunctionInfo for #struct_name #generics #where_clause {
                 fn id() -> ::interoptopus::inventory::FunctionId {
                     ::interoptopus::inventory::FunctionId::from_id(::interoptopus::id!(#struct_name))
                 }

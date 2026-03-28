@@ -1,10 +1,10 @@
 use crate::lang::types::Primitive;
-use crate::lang::types::SerializationError;
+use crate::wire::SerializationError;
 use std::io::{Read, Write};
 
 macro_rules! impl_primitive {
     ($t:ty, $t_str:expr, $primitive:expr, $id:expr) => {
-        impl $crate::lang::types::TypeInfo for $t {
+        unsafe impl $crate::lang::types::TypeInfo for $t {
             const WIRE_SAFE: bool = true;
             const RAW_SAFE: bool = true;
             const ASYNC_SAFE: bool = true;
@@ -36,7 +36,7 @@ macro_rules! impl_primitive {
             }
         }
 
-        impl $crate::lang::types::wire::WireIO for $t {
+        unsafe impl $crate::lang::types::wire::WireIO for $t {
             fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
                 out.write_all(&self.to_le_bytes())?;
                 Ok(())

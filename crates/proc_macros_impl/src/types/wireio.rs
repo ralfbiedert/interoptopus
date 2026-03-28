@@ -38,12 +38,12 @@ impl TypeModel {
 
         quote_spanned! { name.span() =>
             #[allow(clippy::used_underscore_binding, clippy::type_repetition_in_bounds)]
-            impl #impl_generics ::interoptopus::lang::types::WireIO for #name #ty_generics #wireio_where_clause {
-                fn write(&self, #write_param: &mut impl ::std::io::Write) -> ::std::result::Result<(), ::interoptopus::lang::types::SerializationError> {
+            unsafe impl #impl_generics ::interoptopus::lang::types::WireIO for #name #ty_generics #wireio_where_clause {
+                fn write(&self, #write_param: &mut impl ::std::io::Write) -> ::std::result::Result<(), ::interoptopus::wire::SerializationError> {
                     #write_impl
                 }
 
-                fn read(#read_param: &mut impl ::std::io::Read) -> ::std::result::Result<Self, ::interoptopus::lang::types::SerializationError>
+                fn read(#read_param: &mut impl ::std::io::Read) -> ::std::result::Result<Self, ::interoptopus::wire::SerializationError>
                 where
                     Self: Sized
                 {
@@ -257,8 +257,8 @@ impl TypeModel {
                         let __discriminant = <i32 as ::interoptopus::lang::types::WireIO>::read(input)?;
                         match __discriminant {
                             #(#match_arms)*
-                            _ => ::std::result::Result::Err(::interoptopus::lang::types::SerializationError::InvalidDiscriminant(
-                                stringify!(#name).to_string(),
+                            _ => ::std::result::Result::Err(::interoptopus::wire::SerializationError::invalid_discriminant(
+                                stringify!(#name),
                                 __discriminant as isize,
                             )),
                         }

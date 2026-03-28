@@ -20,7 +20,8 @@
 //!
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
-use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::wire::SerializationError;
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use crate::{Error, bad_wire};
 use std::ffi::CStr;
 use std::io::{Read, Write};
@@ -115,7 +116,7 @@ impl<'a> CStrPtr<'a> {
     }
 }
 
-impl TypeInfo for CStrPtr<'_> {
+unsafe impl TypeInfo for CStrPtr<'_> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = false;
@@ -145,7 +146,7 @@ impl TypeInfo for CStrPtr<'_> {
     }
 }
 
-impl WireIO for CStrPtr<'_> {
+unsafe impl WireIO for CStrPtr<'_> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }

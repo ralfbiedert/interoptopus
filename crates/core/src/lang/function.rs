@@ -7,7 +7,14 @@ use crate::lang::meta::{Docs, Emission, Visibility};
 ///
 /// You do not implement this manually — the `#[ffi]` attribute on a `fn` item
 /// generates a zero-sized struct that implements this trait.
-pub trait FunctionInfo {
+///
+/// # Safety
+///
+/// The metadata returned by this trait is used to generate foreign-language
+/// bindings and to wire up function pointers at runtime. Returning a wrong
+/// `id()`, incorrect `signature()`, or misregistering referenced types will
+/// cause call-site mismatches and undefined behaviour in FFI calls.
+pub unsafe trait FunctionInfo {
     /// The unique identifier for this function.
     fn id() -> FunctionId;
     /// Returns the function's call signature.

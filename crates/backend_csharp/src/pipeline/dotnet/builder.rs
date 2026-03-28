@@ -4,18 +4,18 @@ use crate::lang::plugin::PLUGIN_DEFAULT_MODULE;
 use crate::output::Target;
 use crate::pass::output;
 use crate::pattern::Exception;
-use interoptopus::inventory::ForeignInventory;
+use interoptopus::inventory::PluginInventory;
 use interoptopus::lang::meta::FileEmission;
 
 /// Builder for configuring and constructing a [`DotnetLibrary`].
 #[derive(Default)]
 pub struct DotnetLibraryBuilder {
-    inventory: ForeignInventory,
+    inventory: PluginInventory,
     config: DotnetLibraryConfig,
 }
 
 impl DotnetLibraryBuilder {
-    pub(crate) fn new(inventory: ForeignInventory) -> Self {
+    pub(crate) fn new(inventory: PluginInventory) -> Self {
         let default_dispatch = Dispatch::custom(|x, _| match x.emission {
             FileEmission::Common => Target::new("Interop.Common.cs", "My.Company.Common"),
             FileEmission::Default => Target::new("Interop.User.cs", "My.Company"),

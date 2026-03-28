@@ -72,7 +72,7 @@ impl ExceptionError {
     }
 }
 
-impl TypeInfo for ExceptionError {
+unsafe impl TypeInfo for ExceptionError {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;

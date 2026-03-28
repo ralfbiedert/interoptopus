@@ -18,8 +18,8 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::Visibility;
-use crate::lang::types::{SerializationError, TypeInfo};
-use crate::lang::types::{TypeKind, WireIO};
+use crate::wire::SerializationError;
+use crate::lang::types::{TypeInfo, TypeKind, WireIO};
 use std::io::{Read, Write};
 
 #[cfg(feature = "serde")]
@@ -112,7 +112,7 @@ impl<T> From<Option<T>> for std::option::Option<T> {
     }
 }
 
-impl<T: TypeInfo> TypeInfo for Option<T> {
+unsafe impl<T: TypeInfo> TypeInfo for Option<T> {
     const WIRE_SAFE: bool = T::WIRE_SAFE;
     const RAW_SAFE: bool = T::RAW_SAFE;
     const ASYNC_SAFE: bool = T::ASYNC_SAFE;
@@ -145,7 +145,7 @@ impl<T: TypeInfo> TypeInfo for Option<T> {
     }
 }
 
-impl<T: WireIO> WireIO for Option<T> {
+unsafe impl<T: WireIO> WireIO for Option<T> {
     fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
         match self {
             Self::None => 0u8.write(out),

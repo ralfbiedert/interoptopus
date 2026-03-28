@@ -6,9 +6,12 @@ use crate::lang::types::Type;
 use std::marker::PhantomData;
 use std::mem::swap;
 
+/// Inventory used for reverse interop (plugins).
+///
+/// In most cases you never have to deal with this type yourself.
 #[derive(Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct ForeignInventory {
+pub struct PluginInventory {
     pub types: Types,
     pub functions: Functions,
     pub constants: Constants,
@@ -17,7 +20,7 @@ pub struct ForeignInventory {
     _guard: PhantomData<()>,
 }
 
-impl ForeignInventory {
+impl PluginInventory {
     #[must_use]
     pub fn new() -> Self {
         Self::default()
@@ -53,7 +56,7 @@ impl ForeignInventory {
     }
 }
 
-impl Inventory for ForeignInventory {
+impl Inventory for PluginInventory {
     fn register_type(&mut self, id: TypeId, ty: Type) {
         self.types.entry(id).or_insert(ty);
     }

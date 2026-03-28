@@ -40,5 +40,3 @@ pub use crate::pattern::result::{Result, Result::Err, Result::Ok};
 pub use crate::pattern::slice::{Slice, SliceMut};
 pub use crate::pattern::string::String;
 pub use crate::pattern::vec::Vec;
-#[cfg(feature = "unstable-plugins")]
-pub use crate::plugin::service_map::{PluginService, ServiceAs, ServiceHandle, ServiceHandleMap};

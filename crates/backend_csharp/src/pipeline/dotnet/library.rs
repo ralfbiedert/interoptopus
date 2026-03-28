@@ -1,7 +1,7 @@
-use crate::Error;
-use crate::pass::{OperationMode, PassMeta, model, output};
+use crate::pass::{model, output, OperationMode, PassMeta};
 use crate::pipeline::loop_model_passes_until_done;
-use interoptopus::inventory::ForeignInventory;
+use crate::Error;
+use interoptopus::inventory::PluginInventory;
 use interoptopus_backends::output::Multibuf;
 
 /// Configuration for the .NET codegen pipeline.
@@ -160,10 +160,10 @@ pub struct IntermediateOutputPasses {
 /// Code generation pipeline for .NET plugins (reverse interop).
 ///
 /// Analogous to [`RustLibrary`](crate::pipeline::RustLibrary) but takes a
-/// [`ForeignInventory`] describing types and functions exposed *by* a .NET
+/// [`PluginInventory`] describing types and functions exposed *by* a .NET
 /// assembly rather than *to* one.
 pub struct DotnetLibrary {
-    inventory: ForeignInventory,
+    inventory: PluginInventory,
     model_passes: ModelPasses,
     output_master: output::common::master::Pass,
     output_passes: IntermediateOutputPasses,
@@ -173,17 +173,17 @@ pub struct DotnetLibrary {
 
 impl DotnetLibrary {
     #[must_use]
-    pub fn new(inventory: ForeignInventory) -> Self {
+    pub fn new(inventory: PluginInventory) -> Self {
         Self::with_config(inventory, DotnetLibraryConfig::default())
     }
 
     #[must_use]
-    pub fn builder(inventory: ForeignInventory) -> DotnetLibraryBuilder {
+    pub fn builder(inventory: PluginInventory) -> DotnetLibraryBuilder {
         DotnetLibraryBuilder::new(inventory)
     }
 
     #[allow(clippy::default_trait_access)]
-    pub(crate) fn with_config(inventory: ForeignInventory, config: DotnetLibraryConfig) -> Self {
+    pub(crate) fn with_config(inventory: PluginInventory, config: DotnetLibraryConfig) -> Self {
         Self {
             inventory,
             model_passes: ModelPasses {

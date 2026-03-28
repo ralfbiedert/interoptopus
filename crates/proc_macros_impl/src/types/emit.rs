@@ -23,7 +23,7 @@ impl TypeModel {
 
         Ok(quote_spanned! { name.span() =>
             #[allow(clippy::eq_op, clippy::type_repetition_in_bounds, clippy::used_underscore_binding)]
-            impl #impl_generics ::interoptopus::lang::types::TypeInfo for #name #ty_generics #where_clause {
+            unsafe impl #impl_generics ::interoptopus::lang::types::TypeInfo for #name #ty_generics #where_clause {
                 const WIRE_SAFE: bool = #wire_safe;
                 const RAW_SAFE: bool = #raw_safe;
                 const ASYNC_SAFE: bool = #async_safe;

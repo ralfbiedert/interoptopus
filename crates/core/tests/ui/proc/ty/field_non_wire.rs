@@ -7,7 +7,7 @@ use interoptopus::lang::types::{Type, TypeInfo, TypeKind};
 
 struct Bar;
 
-impl TypeInfo for Bar {
+unsafe impl TypeInfo for Bar {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = false;
     const ASYNC_SAFE: bool = false;

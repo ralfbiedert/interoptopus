@@ -190,7 +190,7 @@ macro_rules! callback {
         }
 
 
-        impl $crate::lang::types::TypeInfo for $name {
+        unsafe impl $crate::lang::types::TypeInfo for $name {
             const WIRE_SAFE: bool = <$rval>::WIRE_SAFE $(&& <$ty>::WIRE_SAFE)*;
             const RAW_SAFE: bool = <$rval>::RAW_SAFE $(&& <$ty>::RAW_SAFE)*;
             const ASYNC_SAFE: bool = <$rval>::ASYNC_SAFE $(&& <$ty>::ASYNC_SAFE)*;
@@ -253,12 +253,12 @@ macro_rules! callback {
 
         }
 
-        impl $crate::lang::types::WireIO for $name {
-            fn write(&self, _: &mut impl ::std::io::Write) -> Result<(), $crate::lang::types::SerializationError> {
+        unsafe impl $crate::lang::types::WireIO for $name {
+            fn write(&self, _: &mut impl ::std::io::Write) -> Result<(), $crate::wire::SerializationError> {
                 $crate::bad_wire!()
             }
 
-            fn read(_: &mut impl ::std::io::Read) -> Result<Self, $crate::lang::types::SerializationError> {
+            fn read(_: &mut impl ::std::io::Read) -> Result<Self, $crate::wire::SerializationError> {
                 $crate::bad_wire!()
             }
 

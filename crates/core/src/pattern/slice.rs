@@ -38,7 +38,8 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
-use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::wire::SerializationError;
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::io::{Read, Write};
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
@@ -118,7 +119,7 @@ impl<T> Deref for Slice<'_, T> {
     }
 }
 
-impl<T: TypeInfo> TypeInfo for Slice<'_, T> {
+unsafe impl<T: TypeInfo> TypeInfo for Slice<'_, T> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = T::RAW_SAFE;
     const ASYNC_SAFE: bool = false;
@@ -145,7 +146,7 @@ impl<T: TypeInfo> TypeInfo for Slice<'_, T> {
     }
 }
 
-impl<T: WireIO> WireIO for Slice<'_, T> {
+unsafe impl<T: WireIO> WireIO for Slice<'_, T> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }
@@ -241,7 +242,7 @@ impl<T> DerefMut for SliceMut<'_, T> {
     }
 }
 
-impl<T: TypeInfo> TypeInfo for SliceMut<'_, T> {
+unsafe impl<T: TypeInfo> TypeInfo for SliceMut<'_, T> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = T::RAW_SAFE;
     const ASYNC_SAFE: bool = false;
@@ -268,7 +269,7 @@ impl<T: TypeInfo> TypeInfo for SliceMut<'_, T> {
     }
 }
 
-impl<T: WireIO> WireIO for SliceMut<'_, T> {
+unsafe impl<T: WireIO> WireIO for SliceMut<'_, T> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }

@@ -633,7 +633,7 @@ impl ServiceModel {
         let destructor_name = format_ident!("{}_destroy", service_name_snake);
 
         quote_spanned! { self.service_name.span() =>
-            impl #generics ::interoptopus::lang::service::ServiceInfo for #service_type {
+            unsafe impl #generics ::interoptopus::lang::service::ServiceInfo for #service_type {
                 fn id() -> ::interoptopus::inventory::ServiceId {
                     ::interoptopus::inventory::ServiceId::from_id(::interoptopus::id!(#service_type))
                 }

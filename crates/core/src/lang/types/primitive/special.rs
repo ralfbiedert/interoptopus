@@ -1,11 +1,11 @@
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
-use crate::lang::types::wire::WireIO;
-use crate::lang::types::{Primitive, SerializationError, Type, TypeInfo, TypeKind};
+use crate::wire::SerializationError;
+use crate::lang::types::{Primitive, Type, TypeInfo, TypeKind, WireIO};
 use std::io::{Read, Write};
 
-impl TypeInfo for () {
+unsafe impl TypeInfo for () {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
@@ -29,7 +29,7 @@ impl TypeInfo for () {
     }
 }
 
-impl WireIO for () {
+unsafe impl WireIO for () {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }
@@ -43,7 +43,7 @@ impl WireIO for () {
     }
 }
 
-impl TypeInfo for bool {
+unsafe impl TypeInfo for bool {
     const WIRE_SAFE: Self = true;
     const RAW_SAFE: Self = true;
     const ASYNC_SAFE: Self = true;
@@ -67,7 +67,7 @@ impl TypeInfo for bool {
     }
 }
 
-impl WireIO for bool {
+unsafe impl WireIO for bool {
     fn write(&self, w: &mut impl Write) -> Result<(), SerializationError> {
         u8::from(*self).write(w)
     }

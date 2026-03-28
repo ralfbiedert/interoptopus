@@ -1,5 +1,5 @@
 //! Reverse interop plugin definitions.
-use crate::inventory::{ForeignInventory, Inventory, PluginId};
+use crate::inventory::{Inventory, PluginId, PluginInventory};
 
 /// Signature of the `register_trampoline` function exported by every plugin assembly.
 ///
@@ -7,7 +7,16 @@ use crate::inventory::{ForeignInventory, Inventory, PluginId};
 /// the second is the function or data pointer to register.
 pub type RegisterTrampolineFn = extern "C" fn(i64, *const u8);
 
-pub trait PluginInfo {
+/// Registers the full type and function surface of a reverse-interop plugin.
+///
+/// # Safety
+///
+/// This trait registers the full type and function surface of a reverse-
+/// interop plugin. An incorrect `id()` or a `register()` that omits or
+/// misrepresents types and functions will cause symbol resolution to target
+/// the wrong addresses, leading to undefined behaviour when the plugin is
+/// loaded and called across the FFI boundary.
+pub unsafe trait PluginInfo {
     /// The unique identifier for this plugin.
     fn id() -> PluginId;
 
@@ -16,11 +25,11 @@ pub trait PluginInfo {
     /// Registers this plugin (and all referenced types) with the given inventory.
     fn register(inventory: &mut impl Inventory);
 
-    /// Returns a [`ForeignInventory`] populated with all types, functions, and
+    /// Returns a [`PluginInventory`] populated with all types, functions, and
     /// services declared by this plugin.
     #[must_use]
-    fn inventory() -> ForeignInventory {
-        let mut inventory = ForeignInventory::new();
+    fn inventory() -> PluginInventory {
+        let mut inventory = PluginInventory::new();
         Self::register(&mut inventory);
         inventory
     }

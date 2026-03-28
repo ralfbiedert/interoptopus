@@ -44,7 +44,8 @@
 use crate::inventory::RustInventory;
 use crate::inventory::TypeId;
 use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
-use crate::lang::types::{SerializationError, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::wire::SerializationError;
+use crate::lang::types::{TypeInfo, TypeKind, TypePattern, WireIO};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::io::{Read, Write};
@@ -72,7 +73,7 @@ impl ApiVersion {
     }
 }
 
-impl TypeInfo for ApiVersion {
+unsafe impl TypeInfo for ApiVersion {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
@@ -102,7 +103,7 @@ impl TypeInfo for ApiVersion {
     }
 }
 
-impl WireIO for ApiVersion {
+unsafe impl WireIO for ApiVersion {
     fn write(&self, w: &mut impl Write) -> Result<(), SerializationError> {
         <u64 as WireIO>::write(&self.version, w)
     }
@@ -186,8 +187,7 @@ impl ApiHash {
 /// fn ffi_inventory() -> RustInventory {
 ///     RustInventory::new()
 ///         .register(api_guard!(ffi_inventory)) // <- You must name the current function.
-///         .validate()                          //    since it will be called at runtime
-///                                      //    but cannot be inferred.
+///         .validate()                          
 /// }
 /// ```
 #[macro_export]

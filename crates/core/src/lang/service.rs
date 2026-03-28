@@ -6,7 +6,15 @@ use crate::inventory::{FunctionId, Inventory, ServiceId, TypeId};
 ///
 /// You do not implement this manually — the `#[ffi]` attribute on an `impl` block
 /// generates this implementation.
-pub trait ServiceInfo {
+///
+/// # Safety
+///
+/// The metadata returned by this trait drives code generation for
+/// class-like service types and the vtable-style dispatch used at runtime.
+/// A wrong `id()`, incorrect `service()` description, or misregistered
+/// functions will corrupt the generated interface and cause undefined
+/// behaviour during FFI calls into or out of the service.
+pub unsafe trait ServiceInfo {
     /// The unique identifier for this service.
     fn id() -> ServiceId;
     /// Returns the full service description.

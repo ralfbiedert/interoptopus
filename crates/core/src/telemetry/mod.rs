@@ -9,8 +9,9 @@
 //!
 //! # Usage
 //!
-//! ```ignore
+//! ```
 //! # use interoptopus::plugin;
+//! # use crate::interoptopus::telemetry::Metrics;
 //! // Define a plugin
 //! plugin!(MyService {
 //!     fn foo();

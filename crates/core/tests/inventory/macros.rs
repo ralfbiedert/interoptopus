@@ -1,5 +1,5 @@
 use interoptopus::extra_type;
-use interoptopus::inventory::{ForeignInventory, RustInventory};
+use interoptopus::inventory::{PluginInventory, RustInventory};
 use interoptopus_proc::ffi;
 
 #[allow(clippy::used_underscore_binding)]
@@ -15,5 +15,5 @@ fn rust_inventory() {
 
 #[test]
 fn foreign_inventory() {
-    let _ = ForeignInventory::new().register(extra_type!(Foo)).validate();
+    let _ = PluginInventory::new().register(extra_type!(Foo)).validate();
 }

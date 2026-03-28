@@ -23,8 +23,9 @@
 //! ```
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
-use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::wire::SerializationError;
 use std::io::{Read, Write};
 use std::mem::forget;
 
@@ -101,7 +102,7 @@ impl<T: TypeInfo> From<Vec<T>> for std::vec::Vec<T> {
     }
 }
 
-impl<T: TypeInfo> TypeInfo for Vec<T> {
+unsafe impl<T: TypeInfo> TypeInfo for Vec<T> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
@@ -133,7 +134,7 @@ impl<T: TypeInfo> TypeInfo for Vec<T> {
     }
 }
 
-impl<T: WireIO> WireIO for Vec<T> {
+unsafe impl<T: WireIO> WireIO for Vec<T> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }
@@ -173,7 +174,7 @@ impl<T> Drop for Vec<T> {
 /// # #[derive(Copy, Clone, Debug)]
 /// # #[repr(C)]
 /// # pub struct Vec3f32 { pub x: f32, pub y: f32, pub z: f32 }
-/// # impl interoptopus::lang::types::TypeInfo for Vec3f32 {
+/// # unsafe impl interoptopus::lang::types::TypeInfo for Vec3f32 {
 /// #     const WIRE_SAFE: bool = false; const RAW_SAFE: bool = true; const ASYNC_SAFE: bool = true;
 /// #     const SERVICE_SAFE: bool = false; const SERVICE_CTOR_SAFE: bool = false;
 /// #     fn id() -> interoptopus::inventory::TypeId { interoptopus::inventory::TypeId::new(0) }

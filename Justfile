@@ -67,6 +67,7 @@ update-readme:
 
 # Update UI snapshots (.snap and .stderr) files
 update-snapshots:
+    find . -name "*.snap" -delete
     INSTA_UPDATE=always TRYBUILD=overwrite cargo nextest run --all-features
 
 # Generate 8 random 128-bit IDs in hex format.

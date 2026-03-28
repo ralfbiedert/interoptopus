@@ -48,8 +48,8 @@
 
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::types::{SerializationError, TypeInfo, WireIO};
-use crate::lang::types::{Type, TypeKind};
+use crate::wire::SerializationError;
+use crate::lang::types::{Type, TypeInfo, TypeKind, WireIO};
 use std::io::{Read, Write};
 use std::marker::PhantomData;
 use std::mem::{ManuallyDrop, transmute};
@@ -72,7 +72,7 @@ pub struct Surrogate<T, L> {
     _marker: PhantomData<L>,
 }
 
-impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
+unsafe impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = L::RAW_SAFE;
     const ASYNC_SAFE: bool = L::ASYNC_SAFE;
@@ -96,7 +96,7 @@ impl<T, L: TypeInfo + CorrectSurrogate<T>> TypeInfo for Surrogate<T, L> {
     }
 }
 
-impl<T, L: WireIO + CorrectSurrogate<T>> WireIO for Surrogate<T, L> {
+unsafe impl<T, L: WireIO + CorrectSurrogate<T>> WireIO for Surrogate<T, L> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }

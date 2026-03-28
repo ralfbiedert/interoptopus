@@ -23,7 +23,8 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Visibility, common_or_module_emission};
-use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::wire::SerializationError;
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::any::Any;
 use std::fmt::Debug;
 use std::io::{Read, Write};
@@ -95,7 +96,7 @@ where
     }
 }
 
-impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
+unsafe impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
     const WIRE_SAFE: bool = T::WIRE_SAFE && E::WIRE_SAFE;
     const RAW_SAFE: bool = T::RAW_SAFE && E::RAW_SAFE;
     const ASYNC_SAFE: bool = T::ASYNC_SAFE && E::ASYNC_SAFE;
@@ -130,7 +131,7 @@ impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
     }
 }
 
-impl<T: WireIO, E: WireIO> WireIO for Result<T, E> {
+unsafe impl<T: WireIO, E: WireIO> WireIO for Result<T, E> {
     fn write(&self, _: &mut impl Write) -> std::result::Result<(), SerializationError> {
         todo!()
     }

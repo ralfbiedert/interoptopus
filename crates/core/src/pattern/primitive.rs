@@ -6,7 +6,8 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
-use crate::lang::types::{SerializationError, Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::wire::SerializationError;
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
@@ -60,7 +61,7 @@ impl From<Bool> for bool {
     }
 }
 
-impl TypeInfo for Bool {
+unsafe impl TypeInfo for Bool {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
@@ -84,7 +85,7 @@ impl TypeInfo for Bool {
     }
 }
 
-impl WireIO for Bool {
+unsafe impl WireIO for Bool {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }
@@ -123,7 +124,7 @@ impl From<CChar> for c_char {
     }
 }
 
-impl TypeInfo for CChar {
+unsafe impl TypeInfo for CChar {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
@@ -147,7 +148,7 @@ impl TypeInfo for CChar {
     }
 }
 
-impl WireIO for CChar {
+unsafe impl WireIO for CChar {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         todo!()
     }

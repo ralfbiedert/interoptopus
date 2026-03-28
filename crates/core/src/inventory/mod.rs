@@ -23,9 +23,9 @@
 //!         .validate()
 //! }
 //! ```
-mod foreign;
 mod id;
 mod macros;
+mod plugin;
 mod rust;
 
 use crate::lang::constant::Constant;
@@ -34,9 +34,8 @@ use crate::lang::service::Service;
 use crate::lang::types::Type;
 use std::collections::HashMap;
 
-#[doc(hidden)]
-pub use foreign::ForeignInventory;
-pub use id::{ConstantId, FunctionId, Id, PluginId, ServiceId, TypeId, hash_str};
+pub use id::{hash_str, ConstantId, FunctionId, Id, PluginId, ServiceId, TypeId};
+pub use plugin::PluginInventory;
 pub use rust::RustInventory;
 
 /// All registered types.

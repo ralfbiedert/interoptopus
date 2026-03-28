@@ -68,7 +68,8 @@
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::Visibility;
-use crate::lang::types::{SerializationError, TypeInfo, TypeKind, WireIO};
+use crate::wire::SerializationError;
+use crate::lang::types::{TypeInfo, TypeKind, WireIO};
 use std::ffi::c_void;
 use std::future::Future;
 use std::io::{Read, Write};
@@ -145,7 +146,7 @@ impl<T: TypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(*const T, *con
     }
 }
 
-impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
+unsafe impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
     const WIRE_SAFE: bool = false;
     const RAW_SAFE: bool = T::RAW_SAFE;
     const ASYNC_SAFE: bool = T::ASYNC_SAFE;
@@ -178,7 +179,7 @@ impl<T: TypeInfo> TypeInfo for AsyncCallback<T> {
     }
 }
 
-impl<T: WireIO> WireIO for AsyncCallback<T> {
+unsafe impl<T: WireIO> WireIO for AsyncCallback<T> {
     fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
         bad_wire!()
     }

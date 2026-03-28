@@ -18,7 +18,7 @@ impl ConstantModel {
             #[allow(clippy::redundant_pub_crate)]
             pub struct #name_ident {}
 
-            impl ::interoptopus::lang::constant::ConstantInfo for #name_ident {
+            unsafe impl ::interoptopus::lang::constant::ConstantInfo for #name_ident {
                 fn id() -> ::interoptopus::inventory::ConstantId {
                     ::interoptopus::inventory::ConstantId::from_id(::interoptopus::id!(#name_ident))
                 }

@@ -8,7 +8,14 @@ use crate::lang::types::PrimitiveValue;
 ///
 /// You do not implement this manually — the `#[ffi]` attribute on a `const` item
 /// generates a zero-sized struct that implements this trait.
-pub trait ConstantInfo {
+///
+/// # Safety
+///
+/// The metadata returned by this trait is embedded verbatim into generated
+/// bindings. An incorrect `id()` or a `constant()` that misrepresents the
+/// actual value or type will silently propagate wrong data across the FFI
+/// boundary, leading to undefined behaviour in consuming code.
+pub unsafe trait ConstantInfo {
     /// The unique identifier for this constant.
     fn id() -> ConstantId;
     /// Returns the full constant description.
