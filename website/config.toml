@@ -47,8 +47,6 @@ disable_toc = true
 
 footer_html = "<div style='display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap;'><span>Powered by <a href='https://www.getzola.org' class='font-medium text-base-content/70 hover:text-base-content transition-colors duration-200'>Zola</a> and <a href='https://github.com/hahwul/goyo' class='font-medium text-base-content/70 hover:text-base-content transition-colors duration-200'>Goyo</a></span></div>"
 
-edit_url = "https://github.com/ralfbiedert/interoptopus/edit/master/website"
-issue_url = "https://github.com/ralfbiedert/interoptopus/issues"
 
 nav = [
     { name = "Learn", url = "/docs", type = "url", icon = "book" },
@@ -57,14 +55,14 @@ nav = [
 ]
 
 [extra.logo]
-text = "Interoptopus"
+text = "Interoptopus 🐙"
 
 [extra.theme]
 colorset = "dark"
 brightness = "normal"
 disable_toggle = false
-default_theme_dark = "goyo-dark"
-default_theme_light = "goyo-light"
+default_theme_dark = "business"
+default_theme_light = "corporate"
 
 [extra.sidebar]
 expand_depth = 1

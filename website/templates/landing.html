@@ -1,0 +1,408 @@
+{% extends "index.html" %}
+
+{# Define macros for each section #}
+{% macro render_hero(section) %}
+    {# Hero Section - Ashen Minimalist Style #}
+    {% if section.extra.hero %}
+        <div class="relative min-h-[calc(100vh-theme(spacing.16))] flex items-center justify-center text-center overflow-hidden">
+            <!-- Subtle Animated Background -->
+            <div class="absolute inset-0">
+                <div class="absolute inset-0 hero-background"></div>
+                {# Opacity values should be TailwindCSS compatible (0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100) #}
+                {% set gradient_opacity = section.extra.hero.gradient_opacity | default(value=20) %}
+                <div class="absolute inset-0 opacity-{{ gradient_opacity }}">
+                    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-gray-500/10 to-slate-500/10 rounded-full filter blur-3xl animate-pulse"></div>
+                    <div class="absolute top-3/4 right-1/4 w-80 h-80 bg-gradient-to-r from-slate-500/10 to-gray-400/10 rounded-full filter blur-3xl animate-pulse delay-2000"></div>
+                </div>
+                {% if section.extra.hero.image %}
+                {% set image_opacity = section.extra.hero.image_opacity | default(value=20) %}
+<!--                <img src="{{ section.extra.hero.image | safe }}" alt="Hero Background" class="w-full h-full rounded-none object-cover object-center opacity-{{ image_opacity }}" fetchpriority="high">-->
+                    <picture>
+                        {% if section.extra.hero.image_mobile %}
+                        <source srcset="{{ section.extra.hero.image_mobile | safe }}" media="(max-width: 576px)">
+                        {% endif %}
+
+                        <img src="{{ section.extra.hero.image | safe }}"
+                             alt="Hero Background"
+                             class="w-full h-full rounded-none object-cover object-center opacity-{{ image_opacity }}"
+                             fetchpriority="high">
+                    </picture>
+
+                {% endif %}
+            </div>
+            <div class="relative z-10 p-8 max-w-6xl mx-auto">
+                {% if section.extra.hero.badge %}
+                <div class="mb-8">
+                    <span class="inline-block px-6 py-2 rounded-full text-sm font-medium hero-badge mb-6">
+                        {{ section.extra.hero.badge }}
+                    </span>
+                </div>
+                {% endif %}
+                {% if section.extra.hero.title %}
+                <h1 class="text-6xl md:text-8xl font-black tracking-tight mb-8">
+                    <span class="hero-title">
+                        {{ section.extra.hero.title }}
+                    </span>
+                </h1>
+                {% endif %}
+                {% if section.extra.hero.description %}
+                <p class="max-w-3xl mx-auto text-xl md:text-2xl hero-description mb-12 leading-relaxed font-light">
+                    {{ section.extra.hero.description }}
+                </p>
+                {% endif %}
+                {% if section.extra.hero.cta_buttons %}
+                    <div class="flex justify-center gap-6 flex-wrap">
+                        {% for button in section.extra.hero.cta_buttons %}
+                            <a href="{% if button.url is matching('^https?://') %}{{ button.url | safe }}{% else %}{{ get_url(path=button.url) | safe }}{% endif %}"
+                               class="group relative px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105
+                                      {% if button.style == 'primary' %}
+                                        hero-cta-primary
+                                      {% else %}
+                                        hero-cta-secondary
+                                      {% endif %}">
+                                <span class="relative z-10">{{ button.text }}</span>
+                                {% if button.style == 'primary' %}
+                                <div class="absolute inset-0 rounded-lg bg-gradient-to-r from-slate-500 to-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                {% endif %}
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_features(section) %}
+    {# Feature Grid - Ashen Minimal Design #}
+    {# Support both extra.features_section.features (new) and extra.features (legacy) for backward compatibility #}
+    {% set features = false %}
+    {% if section.extra.features_section is defined and section.extra.features_section.features is defined %}
+        {% set features = section.extra.features_section.features %}
+    {% elif section.extra.features is defined %}
+        {% set features = section.extra.features %}
+    {% endif %}
+
+    {% if features %}
+        <div class="py-20 md:py-40 relative">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-500/5 to-transparent"></div>
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-20">
+                    <h2 class="text-5xl font-black mb-6">
+                        <span class="hero-title">
+                            {% if section.extra.features_section is defined and section.extra.features_section.title is defined %}
+                                {{ section.extra.features_section.title }}
+                            {% else %}
+                                Essential Features
+                            {% endif %}
+                        </span>
+                    </h2>
+                    <p class="text-xl hero-description max-w-2xl mx-auto">
+                        {% if section.extra.features_section is defined and section.extra.features_section.description is defined %}
+                            {{ section.extra.features_section.description }}
+                        {% else %}
+                            Clean, minimal, and focused on content
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {% for feature in features %}
+                        <div class="group relative">
+                            <div class="absolute inset-0 bg-gradient-to-r from-slate-500/5 to-gray-500/5 rounded-xl blur-lg group-hover:blur-xl transition-all duration-300"></div>
+                            <div class="relative feature-card rounded-xl p-8 h-full transition-all duration-300 group-hover:scale-105">
+                                {% if feature.icon %}
+                                    <div class="mb-6">
+                                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-lg feature-icon-bg">
+                                            {{ icons::icon(name=feature.icon, class="text-2xl feature-icon") }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <h3 class="text-2xl font-bold mb-4 feature-title">{{ feature.title }}</h3>
+                                <p class="feature-description leading-relaxed">{{ feature.desc }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_trust(section) %}
+    {# Trust Section - Modern Glass Effect #}
+    {% if section.extra.trust_section %}
+        <div class="py-20 md:py-40 relative">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold mb-16 trust-section-title">{{ section.extra.trust_section.title }}</h2>
+                <div class="flex justify-center items-center gap-16 flex-wrap">
+                    {% if section.extra.trust_section.logos %}
+                        {% for logo in section.extra.trust_section.logos %}
+                            <div class="group">
+                                <img src="{{ logo.src | safe }}" alt="{{ logo.alt }}"
+                                     class="h-12 md:h-16 w-auto trust-section-logo transition-all duration-500 group-hover:scale-110" />
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_easy_command(section) %}
+    {# Easy Command Section - Tabbed Code Blocks #}
+    {% if section.extra.easy_command_section %}
+        <div class="py-20 md:py-40 relative">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-500/5 to-transparent"></div>
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl font-black mb-6">
+                        <span class="hero-title">
+                            {{ section.extra.easy_command_section.title }}
+                        </span>
+                    </h2>
+                    {% if section.extra.easy_command_section.description %}
+                        <p class="text-xl hero-description max-w-2xl mx-auto">
+                            {{ section.extra.easy_command_section.description }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                {% if section.extra.easy_command_section.tabs %}
+                    <div class="flex justify-center">
+                        <div class="tabs tabs-lift max-w-4xl">
+                            {% for tab in section.extra.easy_command_section.tabs %}
+                                {% if tab.link %}
+                                    <a href="{{ tab.link | safe }}" class="tab install-tab-link">{{ icons::icon(name="arrow-up-right-from-square", class="text-xs mr-1 text-base-content/50") }}{{ tab.name }}</a>
+                                {% else %}
+                                    <input type="radio" name="easy_command_tabs" id="easy-command-tab-{{ loop.index0 }}" class="tab" aria-label="{{ tab.name }}" {% if loop.index0 == 0 %}checked="checked"{% endif %} />
+                                    <div class="tab-content install-tab-content bg-base-100 border-base-300 p-6 rounded-b-lg" role="tabpanel" aria-labelledby="easy-command-tab-{{ loop.index0 }}">
+                                        <div class="install-code-block">
+                                            <code class="install-code">{{ tab.command }}</code>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_showcase(section) %}
+    {# Showcase Section - Tabbed Content #}
+    {% if section.extra.showcase_section %}
+        <div class="py-20 md:py-40 relative">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-500/5 to-transparent"></div>
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl font-black mb-6">
+                        <span class="hero-title">
+                            {{ section.extra.showcase_section.title }}
+                        </span>
+                    </h2>
+                    {% if section.extra.showcase_section.subtitle %}
+                        <p class="text-xl hero-description max-w-2xl mx-auto">
+                            {{ section.extra.showcase_section.subtitle }}
+                        </p>
+                    {% endif %}
+                </div>
+                {% if section.extra.showcase_section.tabs %}
+                <div class="w-full">
+                    {# Tab Navigation #}
+                    <div class="tabs tabs-lifted tabs-lg justify-center mb-0">
+                        {% for tab in section.extra.showcase_section.tabs %}
+                        <input type="radio" name="showcase_tabs"
+                               id="tab-{{ loop.index0 }}"
+                               class="tab text-lg font-semibold"
+                               aria-label="{{ tab.name }}"
+                               {% if loop.index0 == 0 %}checked="checked"{% endif %} />
+                        <div class="tab-content rounded-box p-8 md:p-12">
+                            {% if tab.image %}
+                            {# Show only image when image is provided #}
+                            <div class="flex justify-center">
+                                <img src="{{ tab.image | safe }}"
+                                     alt="{{ tab.title }}"
+                                     class="rounded-xl shadow-2xl w-[1024px] h-auto object-cover border border-slate-600/30" />
+                            </div>
+                            {% else %}
+                            {# Show only text when no image is provided #}
+                            <div class="text-center max-w-3xl mx-auto">
+                                <h3 class="text-3xl font-bold mb-4 hero-title">{{ tab.title }}</h3>
+                                <p class="text-lg hero-description leading-relaxed">{{ tab.description }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_social_proof(section) %}
+    {# Social Proof Section - Clean Minimalist Cards #}
+    {% if section.extra.social_proof_section %}
+        <div class="py-20 md:py-40 relative">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-500/3 to-transparent"></div>
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-20">
+                    <h2 class="text-4xl font-black mb-4">
+                        <span class="hero-title">
+                            {{ section.extra.social_proof_section.title }}
+                        </span>
+                    </h2>
+                </div>
+                <div class="flex flex-wrap justify-center gap-6 md:gap-8">
+                    {% if section.extra.social_proof_section.testimonials %}
+                        {% for testimonial in section.extra.social_proof_section.testimonials %}
+                            <div class="group relative testimonial-card-wrapper">
+                                <div class="absolute inset-0 bg-gradient-to-r from-slate-500/5 to-gray-500/5 rounded-xl blur-lg group-hover:blur-xl transition-all duration-300"></div>
+                                <div class="relative testimonial-card rounded-xl p-6 md:p-8 flex flex-col transition-all duration-300 group-hover:scale-105">
+                                    <div class="flex flex-col items-center text-center mb-6">
+                                        {% if testimonial.avatar %}
+                                            <div class="mb-4">
+                                                <div class="w-16 h-16 rounded-full testimonial-avatar-border p-0.5">
+                                                    <img src="{{ testimonial.avatar | safe }}" alt="Profile picture of {{ testimonial.author }}" class="w-full h-full rounded-full object-cover" />
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        <div class="mb-4">
+                                            <p class="font-bold testimonial-author text-base mb-1">{{ testimonial.author }}</p>
+                                            <p class="testimonial-role text-sm">{{ testimonial.role }}</p>
+                                        </div>
+                                    </div>
+                                    <p class="testimonial-quote text-base leading-relaxed">"{{ testimonial.quote }}"</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_final_cta(section) %}
+    {# Final CTA Section - Ashen Gradient Design #}
+    {% if section.extra.final_cta_section %}
+        <div class="py-20 md:py-40 relative overflow-hidden">
+            <div class="absolute inset-0">
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-800/20 via-gray-800/20 to-slate-700/20"></div>
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full">
+                    <div class="w-96 h-96 bg-gradient-to-r from-slate-500/20 to-gray-500/20 rounded-full filter blur-3xl animate-pulse"></div>
+                </div>
+            </div>
+            <div class="container mx-auto px-6 text-center relative z-10">
+                <h2 class="text-5xl md:text-6xl font-black mb-8">
+                    <span class="hero-title">
+                        {{ section.extra.final_cta_section.title }}
+                    </span>
+                </h2>
+                <p class="max-w-3xl mx-auto text-xl hero-description mb-12 leading-relaxed">
+                    {{ section.extra.final_cta_section.description }}
+                </p>
+                {% if section.extra.final_cta_section.image %}
+                    <div class="mb-12">
+                        <img src="{{ section.extra.final_cta_section.image | safe }}" alt="CTA Image"
+                             class="mx-auto max-w-4xl rounded-xl shadow-2xl" />
+                    </div>
+                {% endif %}
+                {% if section.extra.final_cta_section.button %}
+                    <a href="{{ section.extra.final_cta_section.button.url | safe }}"
+                       class="btn-final-cta-section group relative inline-flex items-center px-12 py-4 text-xl font-bold text-slate-200 bg-gradient-to-r from-slate-600 to-gray-700 rounded-xl shadow-2xl shadow-slate-500/25 transition-all duration-300 transform hover:scale-105 hover:shadow-slate-500/40">
+                        <span class="relative z-10">{{ section.extra.final_cta_section.button.text }}</span>
+                        <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-slate-500 to-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <svg class="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_code_tabs(section) %}
+    {# Code Tabs Section - Syntax-highlighted tabbed code blocks #}
+    {% if section.extra.code_tabs_section %}
+        <div class="py-20 md:py-40 relative">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-500/5 to-transparent"></div>
+            <div class="container mx-auto px-6 relative z-10">
+                {% if section.extra.code_tabs_section.title %}
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl font-black mb-6">
+                        <span class="hero-title">
+                            {{ section.extra.code_tabs_section.title }}
+                        </span>
+                    </h2>
+                    {% if section.extra.code_tabs_section.description %}
+                        <p class="text-xl hero-description max-w-2xl mx-auto">
+                            {{ section.extra.code_tabs_section.description }}
+                        </p>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if section.extra.code_tabs_section.tabs %}
+                    <div class="flex justify-center">
+                        <div class="tabs tabs-lift max-w-4xl w-full">
+                            {% for tab in section.extra.code_tabs_section.tabs %}
+                                <input type="radio" name="code_tabs" id="code-tab-{{ loop.index0 }}" class="tab" aria-label="{{ tab.name }}" {% if loop.index0 == 0 %}checked="checked"{% endif %} />
+                                <div class="tab-content bg-base-100 border-base-300 rounded-b-lg" role="tabpanel">
+                                    {{ tab.code | markdown | safe }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_content(section) %}
+    {% if section.content %}
+        <div class="py-16 relative">
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="prose prose-lg max-w-4xl mx-auto">
+                    {{ section.content | safe }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% block content %}
+    {# Define default section order for backward compatibility #}
+    {% set default_order = ["hero", "features", "trust", "easy_command", "showcase", "social_proof", "final_cta"] %}
+
+    {# Use custom section_order if defined, otherwise use default order #}
+    {% set section_order = section.extra.section_order | default(value=default_order) %}
+
+    {# Render sections in the specified order. Unknown section names are silently ignored. #}
+    {% for section_name in section_order %}
+        {% if section_name == "hero" %}
+            {{ self::render_hero(section=section) }}
+        {% elif section_name == "features" %}
+            {{ self::render_features(section=section) }}
+        {% elif section_name == "trust" %}
+            {{ self::render_trust(section=section) }}
+        {% elif section_name == "easy_command" %}
+            {{ self::render_easy_command(section=section) }}
+        {% elif section_name == "showcase" %}
+            {{ self::render_showcase(section=section) }}
+        {% elif section_name == "social_proof" %}
+            {{ self::render_social_proof(section=section) }}
+        {% elif section_name == "final_cta" %}
+            {{ self::render_final_cta(section=section) }}
+        {% elif section_name == "code_tabs" %}
+            {{ self::render_code_tabs(section=section) }}
+        {% elif section_name == "content" %}
+            {{ self::render_content(section=section) }}
+        {% endif %}
+    {% endfor %}
+{% endblock content %}
