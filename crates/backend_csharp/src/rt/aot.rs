@@ -6,7 +6,7 @@
 
 use super::shared::{self, HandlerShim, PluginCache};
 
-use interoptopus::lang::plugin::{Plugin, PluginLoadError};
+use interoptopus::lang::plugin::{Plugin as PluginTrait, PluginLoadError};
 use interoptopus::trampoline::{TRAMPOLINE_UNCAUGHT_EXCEPTION, TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX};
 use std::path::Path;
 use std::sync::{Arc, Mutex, OnceLock};
@@ -46,24 +46,19 @@ impl AotRuntime {
 
     /// Loads a plugin of type `T` from the given native library path.
     ///
-    /// Each plugin type `T` and each library path may only be used in one combination.
-    /// Calling with the same `(T, path)` returns the previously loaded instance.
+    /// The same type `T` may be loaded from multiple paths, yielding independent instances.
+    /// Calling with the same `(T, path)` pair returns the previously loaded instance.
     ///
     /// # Errors
-    /// Can fail if `T` was previously loaded from a different path, or `path` was previously
-    /// loaded for a different plugin type.
-    ///
-    /// # Safety
-    /// Loading a native library is inherently unsafe — the caller must ensure the
-    /// library at `lib_path` is compatible and well-formed.
-    pub fn load<T: Plugin + Send + Sync + 'static>(&self, lib_path: impl AsRef<Path>) -> Result<Arc<T>, PluginLoadError> {
+    /// Can fail if `path` was previously loaded for a different plugin type.
+    pub fn load<T: PluginTrait + Send + Sync + 'static>(&self, lib_path: impl AsRef<Path>) -> Result<super::Plugin<T>, PluginLoadError> {
         let path = lib_path.as_ref().to_path_buf();
 
         {
             let inner = self.inner.lock().expect("runtime mutex poisoned");
             inner.plugins.check_uniqueness::<T>(&path)?;
-            if let Some(arc) = inner.plugins.get_cached::<T>() {
-                return Ok(arc);
+            if let Some(arc) = inner.plugins.get_cached::<T>(&path) {
+                return Ok(super::Plugin::new(arc));
             }
         }
 
@@ -97,7 +92,7 @@ impl AotRuntime {
             inner.plugins.insert::<T>(path, Arc::clone(&arc));
             inner.libraries.push(lib);
         }
-        Ok(arc)
+        Ok(super::Plugin::new(arc))
     }
 }
 

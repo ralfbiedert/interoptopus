@@ -6,45 +6,35 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-/// Cache of loaded plugins, enforcing one-to-one mapping between plugin types and DLL paths.
+/// Cache of loaded plugins, keyed by `(TypeId, path)`.
+///
+/// The same plugin type may be loaded from multiple DLL paths, yielding independent instances.
+/// A single DLL path may only be used for one plugin type.
 pub struct PluginCache {
-    plugins: HashMap<TypeId, Box<dyn Any + Send + Sync>>,
-    type_to_path: HashMap<TypeId, PathBuf>,
+    plugins: HashMap<(TypeId, PathBuf), Box<dyn Any + Send + Sync>>,
     path_to_type: HashMap<PathBuf, TypeId>,
 }
 
 impl PluginCache {
     pub fn new() -> Self {
-        Self { plugins: HashMap::new(), type_to_path: HashMap::new(), path_to_type: HashMap::new() }
+        Self { plugins: HashMap::new(), path_to_type: HashMap::new() }
     }
 
-    /// Checks that the `(T, path)` combination doesn't conflict with existing entries.
+    /// Checks that `path` has not already been loaded for a different plugin type.
     pub fn check_uniqueness<T: 'static>(&self, path: &PathBuf) -> Result<(), PluginLoadError> {
         let type_id = TypeId::of::<T>();
-
-        if let Some(existing_path) = self.type_to_path.get(&type_id)
-            && *existing_path != *path
-        {
-            return Err(PluginLoadError::LoadFailed(format!(
-                "plugin {} already loaded from {}, cannot load from {}",
-                std::any::type_name::<T>(),
-                existing_path.display(),
-                path.display()
-            )));
-        }
         if let Some(existing_type) = self.path_to_type.get(path)
             && *existing_type != type_id
         {
             return Err(PluginLoadError::LoadFailed(format!("DLL {} already loaded for a different plugin type", path.display())));
         }
-
         Ok(())
     }
 
-    /// Returns a cached plugin instance if one exists for type `T`.
-    pub fn get_cached<T: Send + Sync + 'static>(&self) -> Option<Arc<T>> {
-        let type_id = TypeId::of::<T>();
-        self.plugins.get(&type_id).map(|boxed| {
+    /// Returns a cached plugin instance if `T` was already loaded from `path`.
+    pub fn get_cached<T: Send + Sync + 'static>(&self, path: &PathBuf) -> Option<Arc<T>> {
+        let key = (TypeId::of::<T>(), path.clone());
+        self.plugins.get(&key).map(|boxed| {
             let arc = boxed.downcast_ref::<Arc<T>>().expect("type mismatch in plugin cache");
             Arc::clone(arc)
         })
@@ -53,9 +43,8 @@ impl PluginCache {
     /// Inserts a newly loaded plugin into the cache.
     pub fn insert<T: Send + Sync + 'static>(&mut self, path: PathBuf, arc: Arc<T>) {
         let type_id = TypeId::of::<T>();
-        self.type_to_path.insert(type_id, path.clone());
-        self.path_to_type.insert(path, type_id);
-        self.plugins.insert(type_id, Box::new(arc));
+        self.path_to_type.insert(path.clone(), type_id);
+        self.plugins.insert((type_id, path), Box::new(arc));
     }
 }
 
