@@ -1,5 +1,5 @@
-use crate::telemetry::report::FunctionReport;
 use crate::telemetry::MAX_RECORDED_DURATIONS;
+use crate::telemetry::report::FunctionReport;
 use std::fmt;
 
 /// Pre-allocated fixed-size ring buffer. Avoids all heap allocation on push.

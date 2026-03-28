@@ -1,8 +1,8 @@
 use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, Visibility};
 use crate::lang::types::wire::WireIO;
-use crate::wire::SerializationError;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
+use crate::wire::SerializationError;
 use std::io::{Read, Write};
 use std::mem::MaybeUninit;
 

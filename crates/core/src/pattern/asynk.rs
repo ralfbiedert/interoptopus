@@ -68,8 +68,8 @@
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::Visibility;
-use crate::wire::SerializationError;
 use crate::lang::types::{TypeInfo, TypeKind, WireIO};
+use crate::wire::SerializationError;
 use std::ffi::c_void;
 use std::future::Future;
 use std::io::{Read, Write};

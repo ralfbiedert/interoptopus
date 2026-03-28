@@ -1,9 +1,9 @@
 use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
-use crate::wire::SerializationError;
 use crate::lang::types::wire::WireIO;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind, TypePattern, WireOnly};
+use crate::wire::SerializationError;
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::mem::MaybeUninit;

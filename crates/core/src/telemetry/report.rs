@@ -26,7 +26,7 @@ impl Report {
             let name = format!("\x1b[1m{:<col$}\x1b[0m", f.name);
             println!("{}  {}  {}  {}  {}  {}  {:>12}", name, unit.fmt(avg), unit.fmt(p50), unit.fmt(p95), unit.fmt(p99), unit.fmt(p999), f.lifetime_calls);
         }
-        println!("* Timings reflect last {} calls only.", MAX_RECORDED_DURATIONS);
+        println!("* Timings reflect last {MAX_RECORDED_DURATIONS} calls only.");
     }
 
     /// Report per function.
@@ -39,11 +39,28 @@ impl Report {
 /// Report for a single instrumented function.
 #[derive(Debug)]
 pub struct FunctionReport {
-    pub name: &'static str,
+    pub(crate) name: &'static str,
     /// Recent durations in chronological order (last N calls).
-    pub recent_durations_ns: Vec<u64>,
+    pub(crate) recent_durations_ns: Vec<u64>,
     /// Total number of recorded calls (may exceed window size).
-    pub lifetime_calls: u64,
+    pub(crate) lifetime_calls: u64,
+}
+
+impl FunctionReport {
+    #[must_use]
+    pub fn name(&self) -> &'static str {
+        self.name
+    }
+
+    #[must_use]
+    pub fn recent_durations_ns(&self) -> &[u64] {
+        &self.recent_durations_ns
+    }
+
+    #[must_use]
+    pub fn lifetime_calls(&self) -> u64 {
+        self.lifetime_calls
+    }
 }
 
 const RESET: &str = "\x1b[0m";
@@ -101,7 +118,9 @@ impl Unit {
 
     /// Returns a fixed 10-visual-char cell: `"NNN.NN Xu"` with colored unit suffix.
     fn fmt(self, ns: u64) -> String {
-        format!("{:7.2} {}{}{}", ns as f64 / self.factor(), self.color(), self.suffix(), RESET)
+        #[allow(clippy::cast_precision_loss)]
+        let v = ns as f64 / self.factor();
+        format!("{v:7.2} {}{}{}", self.color(), self.suffix(), RESET)
     }
 }
 

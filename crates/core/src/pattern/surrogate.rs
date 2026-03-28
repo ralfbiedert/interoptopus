@@ -48,8 +48,8 @@
 
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
-use crate::wire::SerializationError;
 use crate::lang::types::{Type, TypeInfo, TypeKind, WireIO};
+use crate::wire::SerializationError;
 use std::io::{Read, Write};
 use std::marker::PhantomData;
 use std::mem::{ManuallyDrop, transmute};

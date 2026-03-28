@@ -3,8 +3,8 @@ use crate::inventory::Inventory;
 use crate::lang::function::{Argument, Signature};
 use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::wire::WireIO;
-use crate::wire::SerializationError;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
+use crate::wire::SerializationError;
 use std::io::{Read, Write};
 
 // Generate implementations for function pointers with different arities

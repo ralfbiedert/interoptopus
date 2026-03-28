@@ -38,14 +38,14 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
-use crate::wire::SerializationError;
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::wire::SerializationError;
 use std::io::{Read, Write};
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::ptr::{null, null_mut};
 
-/// A representation of an array passed over an FFI boundary
+/// A representation of an array passed over an FFI boundary.
 #[repr(C)]
 pub struct Slice<'a, T> {
     data: *const T,
@@ -160,7 +160,7 @@ unsafe impl<T: WireIO> WireIO for Slice<'_, T> {
     }
 }
 
-/// A representation of a mutable array passed over an FFI boundary
+/// A representation of a mutable array passed over an FFI boundary.
 #[repr(C)]
 pub struct SliceMut<'a, T> {
     data: *mut T,

@@ -34,7 +34,7 @@ use crate::lang::service::Service;
 use crate::lang::types::Type;
 use std::collections::HashMap;
 
-pub use id::{hash_str, ConstantId, FunctionId, Id, PluginId, ServiceId, TypeId};
+pub use id::{ConstantId, FunctionId, Id, PluginId, ServiceId, TypeId, hash_str};
 pub use plugin::PluginInventory;
 pub use rust::RustInventory;
 

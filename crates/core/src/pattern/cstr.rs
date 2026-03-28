@@ -20,8 +20,8 @@
 //!
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
-use crate::wire::SerializationError;
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::wire::SerializationError;
 use crate::{Error, bad_wire};
 use std::ffi::CStr;
 use std::io::{Read, Write};

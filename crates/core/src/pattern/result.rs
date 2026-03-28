@@ -23,8 +23,8 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Visibility, common_or_module_emission};
-use crate::wire::SerializationError;
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::wire::SerializationError;
 use std::any::Any;
 use std::fmt::Debug;
 use std::io::{Read, Write};
@@ -41,7 +41,9 @@ pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
     }
 }
 
-/// FFI-safe result type. See the [module documentation](crate::pattern::result) for more details and examples.
+/// FFI-safe result type.
+///
+/// See the [module documentation](crate::pattern::result) for more details and examples.
 #[repr(u32)]
 #[derive(Debug, Clone)]
 #[must_use]

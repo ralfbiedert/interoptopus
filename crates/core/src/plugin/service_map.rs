@@ -16,8 +16,8 @@
 //! transparent to the plugin code generator.
 
 use crate::inventory::{Inventory, TypeId};
-use crate::wire::SerializationError;
 use crate::lang::types::{Type, TypeInfo, TypeKind, WireIO};
+use crate::wire::SerializationError;
 
 /// An opaque, FFI-safe handle to a service instance.
 ///

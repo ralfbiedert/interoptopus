@@ -6,8 +6,8 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
-use crate::wire::SerializationError;
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::wire::SerializationError;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};

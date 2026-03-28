@@ -182,7 +182,7 @@ mod buffer;
 
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
+use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use buffer::WireBuffer;
 use std::marker::PhantomData;
@@ -418,6 +418,7 @@ impl SerializationError {
         Self { message: message.into() }
     }
 
+    #[must_use]
     pub fn invalid_discriminant(type_name: &str, discriminant: isize) -> Self {
         Self { message: format!("invalid discriminant for {type_name}: {discriminant}") }
     }

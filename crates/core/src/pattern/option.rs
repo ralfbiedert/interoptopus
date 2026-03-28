@@ -18,14 +18,16 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::Visibility;
-use crate::wire::SerializationError;
 use crate::lang::types::{TypeInfo, TypeKind, WireIO};
+use crate::wire::SerializationError;
 use std::io::{Read, Write};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-/// An option-like type at the FFI boundary where a regular [`Option`] doesn't work. See the [module documentation](crate::pattern::option) for more details and examples.
+/// An option-like type at the FFI boundary where a regular [`Option`] doesn't work.
+///
+/// See the [module documentation](crate::pattern::option) for more details and examples.
 #[repr(u32)]
 #[cfg_attr(feature = "serde", derive(Debug, Copy, Clone, PartialEq, Eq, Default, Deserialize, Serialize))]
 #[cfg_attr(not(feature = "serde"), derive(Debug, Copy, Clone, PartialEq, Eq, Default))]

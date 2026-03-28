@@ -1,8 +1,8 @@
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Emission, Visibility};
-use crate::wire::SerializationError;
 use crate::lang::types::{Primitive, Type, TypeInfo, TypeKind, WireIO};
+use crate::wire::SerializationError;
 use std::io::{Read, Write};
 
 unsafe impl TypeInfo for () {
