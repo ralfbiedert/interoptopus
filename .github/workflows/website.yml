@@ -28,6 +28,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
           AWS_ENDPOINT_URL: ${{ vars.S3_ENDPOINT_URL }}
           AWS_DEFAULT_REGION: auto
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
         run: |
           aws s3 sync website/public/ s3://${{ vars.S3_BUCKET }} \
             --delete \
