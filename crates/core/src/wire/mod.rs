@@ -411,7 +411,7 @@ macro_rules! register_wire_trampolines {
 /// Error returned when a wire-format serialization or deserialization fails.
 #[derive(Debug)]
 pub struct SerializationError {
-    pub message: String,
+    message: String,
 }
 
 impl SerializationError {
@@ -421,6 +421,12 @@ impl SerializationError {
 
     pub fn invalid_discriminant(type_name: &str, discriminant: isize) -> Self {
         Self { message: format!("invalid discriminant for {type_name}: {discriminant}") }
+    }
+}
+
+impl ::std::fmt::Display for SerializationError {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.write_str(&self.message)
     }
 }
 

@@ -21,7 +21,29 @@
 /// pub enum Status { Ok, Err }
 /// ```
 ///
-/// **Attributes:**
+/// <br>
+///
+/// The following field types are supported in `#[ffi]` structs and enums:
+///
+/// | Type | Field | Notes |
+/// |------|:-----:|-------|
+/// | `u8`, `u16`, `u32`, ... | ✅ | Always supported. |
+/// | `[T; N]` | ✅ | Fixed-size arrays. |
+/// | `#[ffi] struct MyStruct { .. }` | ✅ | All fields must themselves be FFI-safe. |
+/// | `#[ffi] enum MyEnum { .. }` | ✅ | Same as structs. |
+/// | `String`, `Vec<T>`, `HashMap<K, V>` | ✅ | Only if self or parent is within `Wire<T>`. |
+/// | `&T` / `&mut T` | ✅ | For `T` same a structs. |
+/// | `MyService` | ❌ | Cannot be embedded in fields. |
+/// | [`Wire<T>`](crate::wire::Wire) | ❌ | Only usable on functions, not in fields. |
+/// | [`ffi::Result<T, E>`](crate::pattern::result::Result) | ✅ | Same as enum w.r.t. `T`, `E`. |
+/// | [`ffi::Option<T>`](crate::pattern::option::Option) | ✅ | Same as enum w.r.t. `T`. |
+/// | [`ffi::Vec<T>`](crate::pattern::vec::Vec), [`ffi::String`](crate::pattern::string::String) | ✅ | Same as struct w.r.t. `T`. |
+/// | [`ffi::Slice<T>`](crate::pattern::slice::Slice), [`ffi::SliceMut<T>`](crate::pattern::slice::SliceMut) | ✅ | Same as struct w.r.t. `T`. |
+/// | [`ffi::CStrPtr`](crate::pattern::cstr::CStrPtr) | ✅ |  |
+///
+/// <br>
+///
+/// In addition, the macro accepts the following options:
 ///
 /// | Attribute | Description |
 /// |-----------|-------------|
@@ -43,7 +65,29 @@
 /// pub fn sum(a: u32, b: u32) -> u32 { a + b }
 /// ```
 ///
-/// **Attributes:**
+/// <br>
+///
+/// The following types are supported in `#[ffi]` function signatures:
+///
+/// | Type | Arg | Ret | Async | Notes |
+/// |------|:---:|:---:|:-----:|-------|
+/// | `u8`, `u16`, `u32`, ... | ✅ | ✅ | ✅ | Always supported. |
+/// | `[T; N]` | ❌ | ❌ | ❌ | Arrays only supported in struct fields. |
+/// | `#[ffi] struct MyStruct { .. }` | ✅ | ✅ | ✅ | All fields must be FFI-safe. |
+/// | `#[ffi] enum MyEnum { .. }` | ✅ | ✅ | ✅ | Same as structs. |
+/// | `String`, `Vec<T>`, `HashMap<K, V>` | ✅ | ✅ | ✅ | Only within `Wire<T>`. |
+/// | `&T` / `&mut T` | ✅ | ✅ | ❌ | Caller must uphold `&mut` guarantee! |
+/// | `MyService` | ✅ | ❌ | ❌ | May only appear as `&MyService`. |
+/// | [`Wire<T>`](crate::wire::Wire) | ✅ | ✅ | ✅ | Serialized transfer. |
+/// | [`ffi::Result<T, E>`](crate::pattern::result::Result) | ✅ | ✅ | ✅ | Same as enum w.r.t. `T`, `E`. |
+/// | [`ffi::Option<T>`](crate::pattern::option::Option) | ✅ | ✅ | ✅ | Same as enum w.r.t. `T`. |
+/// | [`ffi::Vec<T>`](crate::pattern::vec::Vec), [`ffi::String`](crate::pattern::string::String) | ✅ | ✅ | ✅ | Same as struct w.r.t. `T`. |
+/// | [`ffi::Slice<T>`](crate::pattern::slice::Slice), [`ffi::SliceMut<T>`](crate::pattern::slice::SliceMut) | ✅ | ✅ | ✅ | Same as struct w.r.t. `T`. |
+/// | [`ffi::CStrPtr`](crate::pattern::cstr::CStrPtr) | ✅ | ✅ | ❌ |  |
+///
+/// <br>
+///
+/// In addition, the macro accepts the following options:
 ///
 /// | Attribute | Description |
 /// |-----------|-------------|
@@ -68,7 +112,20 @@
 /// pub const MAX_ITEMS: u32 = 1024;
 /// ```
 ///
-/// **Attributes:**
+/// <br>
+///
+/// The following types are supported as `#[ffi]` constant values:
+///
+/// | Type | Value | Notes |
+/// |------|:-----:|-------|
+/// | `u8`, `u16`, `u32`, `u64`, `i8`, `i16`, `i32`, `i64` | ✅ | Integer literals. |
+/// | `f32`, `f64` | ✅ | Floating-point literals. |
+/// | `bool` | ✅ | Boolean literals. |
+/// | Everything else | ❌ | Only primitive scalar types are supported. |
+///
+/// <br>
+///
+/// In addition, the macro accepts the following options:
 ///
 /// | Attribute | Description |
 /// |-----------|-------------|
@@ -101,12 +158,36 @@
 /// }
 /// ```
 ///
-/// **Attributes:**
+/// <br>
+///
+/// The following types are supported in `#[ffi]` service method signatures:
+///
+/// | Type | Arg | Ret | Async | Notes |
+/// |------|:---:|:---:|:-----:|-------|
+/// | `u8`, `u16`, `u32`, ... | ✅ | ✅ | ✅ | Always supported. |
+/// | `[T; N]` | ❌ | ❌ | ❌ | Arrays only supported in struct fields. |
+/// | `#[ffi] struct MyStruct { .. }` | ✅ | ✅ | ✅ | All fields must be FFI-safe. |
+/// | `#[ffi] enum MyEnum { .. }` | ✅ | ✅ | ✅ | Same as structs. |
+/// | `String`, `Vec<T>`, `HashMap<K, V>` | ✅ | ✅ | ✅ | Only within `Wire<T>`. |
+/// | `&T`, `&mut T` | ✅ | ✅ | ❌ | Caller must uphold `&mut` guarantee! |
+/// | `&self`, `&mut self` | ✅ | ✅ | ❌ | Caller must uphold `&mut self` guarantee! |
+/// | `Async<Self>` | ✅ | ❌ | ✅ | Only inside `async` methods. |
+/// | `Self` | ❌ | ✅ | ✅ | Valid as ctor rval, must be `ffi::Result<Self, E>`. |
+/// | [`Wire<T>`](crate::wire::Wire) | ✅ | ✅ | ✅ | Serialized transfer. |
+/// | [`ffi::Result<T, E>`](crate::pattern::result::Result) | ✅ | ✅ | ✅ | Same as enum w.r.t. `T`, `E`. |
+/// | [`ffi::Option<T>`](crate::pattern::option::Option) | ✅ | ✅ | ✅ | Same as enum w.r.t. `T`. |
+/// | [`ffi::Vec<T>`](crate::pattern::vec::Vec), [`ffi::String`](crate::pattern::string::String) | ✅ | ✅ | ✅ | Same as struct w.r.t. `T`. |
+/// | [`ffi::Slice<T>`](crate::pattern::slice::Slice), [`ffi::SliceMut<T>`](crate::pattern::slice::SliceMut) | ✅ | ✅ | ❌ | Same as struct w.r.t. `T`. |
+/// | [`ffi::CStrPtr`](crate::pattern::cstr::CStrPtr) | ✅ | ✅ | ❌ |  |
+///
+/// <br>
+///
+/// In addition, the macro accepts the following options:
 ///
 /// | Attribute | Description |
 /// |-----------|-------------|
 /// | `prefix = "name"` | Override the `snake_case` prefix used for generated FFI function names. |
-/// | `export = unique` | Generate unique export names for all emitted methods to avoid symbol clashes.  |
+/// | `export = unique` | Generate unique export names for all emitted methods to avoid symbol clashes. |
 /// | `debug` | Print the generated code to stderr during compilation. |
 ///
 /// # Skipping Fields
@@ -131,6 +212,7 @@
 /// [`ConstantInfo`]: crate::lang::rust::ConstantInfo
 #[cfg(feature = "macros")]
 pub use interoptopus_proc::ffi;
+
 
 /// Derives the [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime) trait for a service struct
 /// by forwarding to one of its fields.
@@ -170,6 +252,7 @@ pub use interoptopus_proc::ffi;
 /// ```
 #[cfg(feature = "macros")]
 pub use interoptopus_proc::AsyncRuntime;
+
 
 /// Declares a plugin interface for reverse interop, e.g., loading a C# DLL from Rust.
 ///
@@ -255,6 +338,9 @@ pub use interoptopus_proc::AsyncRuntime;
 /// | [`Wire<T>`](crate::wire::Wire) | ✅ | ✅ | ❌️ | ✅ | Can only be used on functions, not in fields. |
 /// | [`ffi::Result<T, E>`](crate::pattern::result::Result) | ✅ | ✅ | ✅ | ✅ | Same as enum w.r.t, `T`, `E`. |
 /// | [`ffi::Option<T>`](crate::pattern::option::Option) | ✅ | ✅ | ✅ | ✅ | Same as enum w.r.t. `T`. |
+/// | [`ffi::Vec<T>`](crate::pattern::vec::Vec), [`ffi::String`](crate::pattern::string::String) | ❌ | ❌ | ❌ | ❌ | WIP,  not yet supported. |
+/// | [`ffi::Slice<T>`](crate::pattern::slice::Slice), [`ffi::SliceMut<T>`](crate::pattern::slice::SliceMut) | ❌ | ❌ | ❌ | ❌ | WIP,  not yet supported. |
+/// | [`ffi::CStrPtr`](crate::pattern::cstr::CStrPtr) | ❌ | ❌ | ❌ | ❌ | WIP,  not yet supported. |
 /// | `Try<T>` (from `interoptopus_csharp`) | ❌ | ✅ | ❌ | ✅ | Magic C# exception converter. |
 ///
 /// This list is not exhaustive and there might be subtleties involved.
@@ -283,6 +369,7 @@ pub use interoptopus_proc::AsyncRuntime;
 ///   is via function arguments, which takes care of their lifecycle requirements.
 #[cfg(all(feature = "macros", feature = "unstable-plugins"))]
 pub use interoptopus_proc::plugin;
+
 
 /// Strips module paths from a fully-qualified Rust type name, preserving generic structure.
 ///
