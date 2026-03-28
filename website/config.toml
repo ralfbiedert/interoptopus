@@ -1,4 +1,4 @@
-base_url = "https://interoptopus.dev"
+base_url = "https://interoptopus.rs"
 title = "Interoptopus"
 description = "A polyglot FFI bindings generator for Rust libraries."
 
