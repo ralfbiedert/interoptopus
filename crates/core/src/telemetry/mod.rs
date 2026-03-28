@@ -28,11 +28,13 @@
 //! # }
 //! ```
 mod metrics;
+mod report;
 mod ringbuffer;
 
 const MAX_RECORDED_DURATIONS: usize = 16 * 1024;
 
-pub use metrics::{MetricsRecorder, Report};
+pub use metrics::MetricsRecorder;
+pub use report::Report;
 
 /// A trait for things that can record performance metrics.
 pub trait Metrics {
