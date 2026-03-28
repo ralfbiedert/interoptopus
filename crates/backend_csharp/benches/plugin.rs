@@ -1,5 +1,5 @@
+use interoptopus::telemetry::Metrics;
 use interoptopus::wire::Wire;
-use interoptopus_csharp::plugin::DotNetRuntime;
 use reference_project::plugins::functions::Primitives;
 use reference_project::plugins::service::ServiceBasic;
 use reference_project::plugins::wire::Wired;
@@ -50,22 +50,15 @@ struct Entry {
 fn main() {
     println!("Running plugin benchmarks (Rust → .NET) ...");
 
-    let runtime = DotNetRuntime::new().expect("Failed to create .NET runtime");
+    let rt = interoptopus_csharp::rt::dynamic::runtime().expect("Failed to create .NET runtime");
 
-    let primitives_loader = runtime
-        .dll_loader_with_namespace(dll_path("functions_primitive.dll"), "My.Company")
-        .expect("Failed to load functions_primitive.dll");
-    let primitives = Primitives::new(&primitives_loader).expect("Failed to load Primitives plugin");
+    let primitives = rt.load::<Primitives>(dll_path("functions_primitive.dll")).expect("Failed to load Primitives plugin");
+    let wired = rt.load::<Wired>(dll_path("wire.dll")).expect("Failed to load Wired plugin");
+    let service = rt.load::<ServiceBasic>(dll_path("service_basic.dll")).expect("Failed to load ServiceBasic plugin");
 
-    let wire_loader = runtime
-        .dll_loader_with_namespace(dll_path("wire.dll"), "My.Company")
-        .expect("Failed to load wire.dll");
-    let wired = Wired::new(&wire_loader).expect("Failed to load Wired plugin");
-
-    let service_loader = runtime
-        .dll_loader_with_namespace(dll_path("service_basic.dll"), "My.Company")
-        .expect("Failed to load service_basic.dll");
-    let service = ServiceBasic::new(&service_loader).expect("Failed to load ServiceBasic plugin");
+    // primitives.metrics_enable(true);
+    wired.metrics_enable(true);
+    service.metrics_enable(true);
 
     let baseline = calibrate();
     let mut entries: Vec<Entry> = Vec::new();
@@ -75,13 +68,17 @@ fn main() {
     println!("primitive_void(): {ns:.0}");
     entries.push(Entry { name: "primitive_void()".to_string(), ns });
 
-    let t = measure(ITERATIONS, || { let _ = primitives.primitive_u32(42); });
+    let t = measure(ITERATIONS, || {
+        let _ = primitives.primitive_u32(42);
+    });
     let ns = ns_per_call(t, baseline, ITERATIONS);
     println!("primitive_u32(42): {ns:.0}");
     entries.push(Entry { name: "primitive_u32(42)".to_string(), ns });
 
-    let svc = service.servicea_create();
-    let t = measure(ITERATIONS, || { let _ = svc.call(5); });
+    let svc = service.service_a_create();
+    let t = measure(ITERATIONS, || {
+        let _ = svc.call(5);
+    });
     let ns = ns_per_call(t, baseline, ITERATIONS);
     println!("svc.call(5): {ns:.0}");
     entries.push(Entry { name: "svc.call(5)".to_string(), ns });
@@ -94,9 +91,7 @@ fn main() {
     println!("wire_string(Wire::from(\"{{}}\")).unwire(): {ns:.0}");
     entries.push(Entry { name: r#"wire_string(Wire::from("{}")).unwire()"#.to_string(), ns });
 
-    let map16: HashMap<String, String> = (0..16)
-        .map(|i| (format!("{:016}", i), format!("{:016}", i)))
-        .collect();
+    let map16: HashMap<String, String> = (0..16).map(|i| (format!("{:016}", i), format!("{:016}", i))).collect();
     let t = measure(ITERATIONS, || {
         let _ = wired.wire_hashmap_string(Wire::from(map16.clone())).unwire();
     });
@@ -118,4 +113,6 @@ fn main() {
     let results_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("benches/PLUGIN_RESULTS.md");
     std::fs::write(&results_path, &md).expect("failed to write PLUGIN_RESULTS.md");
     println!("\nResults written to {}", results_path.display());
+
+    dbg!(wired.metrics_report());
 }
