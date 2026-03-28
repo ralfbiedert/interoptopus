@@ -1,0 +1,79 @@
+base_url = "https://interoptopus.dev"
+title = "Interoptopus"
+description = "A polyglot FFI bindings generator for Rust libraries."
+
+build_search_index = true
+default_language = "en"
+generate_feeds = false
+generate_sitemap = true
+theme = "goyo"
+
+taxonomies = [
+    { name = "tags", feed = false },
+]
+
+[markdown]
+bottom_footnotes = true
+highlight_code = true
+
+[markdown.highlighting]
+theme = "github"
+
+[translations]
+errata_section = "Errata & Updates"
+sidebar_feeds = "Feeds"
+global_feed = "Global Feed"
+category_feeds = "Category Feeds"
+all_posts = "All Posts"
+copy = "Copy"
+copied = "Copied!"
+failed_to_copy = "Failed to copy!"
+next = "Next"
+back_to = "Back to"
+previous = "Previous"
+edit_page = "Edit this page"
+found_error_alert = "Found an error or it needs a clarification?"
+open_issue = "Open an issue on GitHub."
+attribution = "Corrections will be incorporated with attribution."
+found_typo_alert = "Found a typo?"
+fork_and_pr = "Fork, modify and open a PR."
+copy_url_msg = "Copy URL"
+share_on_x = "Share on X"
+toc_title = "ON THIS PAGE"
+
+[extra]
+enable_custom_css = false
+disable_toc = true
+
+footer_html = "<div style='display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap;'><span>Powered by <a href='https://www.getzola.org' class='font-medium text-base-content/70 hover:text-base-content transition-colors duration-200'>Zola</a> and <a href='https://github.com/hahwul/goyo' class='font-medium text-base-content/70 hover:text-base-content transition-colors duration-200'>Goyo</a></span></div>"
+
+edit_url = "https://github.com/ralfbiedert/interoptopus/edit/master/website"
+issue_url = "https://github.com/ralfbiedert/interoptopus/issues"
+
+nav = [
+    { name = "Learn", url = "/docs", type = "url", icon = "book" },
+    { name = "API", url = "/docs", type = "url", icon = "book" },
+    { name = "", url = "https://github.com/ralfbiedert/interoptopus", type = "url", icon = "github" },
+]
+
+[extra.logo]
+text = "Interoptopus"
+
+[extra.theme]
+colorset = "dark"
+brightness = "normal"
+disable_toggle = false
+default_theme_dark = "goyo-dark"
+default_theme_light = "goyo-light"
+
+[extra.sidebar]
+expand_depth = 1
+disable_root_hide = false
+enable_desktop_menu = true
+
+[extra.share]
+copy_url = false
+x = false
+
+[extra.lang]
+rtl = []
