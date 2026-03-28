@@ -42,7 +42,7 @@ share_on_x = "Share on X"
 toc_title = "ON THIS PAGE"
 
 [extra]
-enable_custom_css = false
+enable_custom_css = true
 disable_toc = true
 
 footer_html = "<div style='display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap;'><span>Powered by <a href='https://www.getzola.org' class='font-medium text-base-content/70 hover:text-base-content transition-colors duration-200'>Zola</a> and <a href='https://github.com/hahwul/goyo' class='font-medium text-base-content/70 hover:text-base-content transition-colors duration-200'>Goyo</a></span></div>"
@@ -50,7 +50,7 @@ footer_html = "<div style='display: flex; align-items: center; justify-content: 
 
 nav = [
     { name = "Learn", url = "/docs", type = "url", icon = "book" },
-    { name = "API", url = "/docs", type = "url", icon = "book" },
+    { name = "API", url = "https://docs.rs/interoptopus/latest/interoptopus/", type = "url", icon = "book" },
     { name = "", url = "https://github.com/ralfbiedert/interoptopus", type = "url", icon = "github" },
 ]
 

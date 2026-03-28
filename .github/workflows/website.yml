@@ -1,0 +1,43 @@
+name: Website
+
+on:
+  push:
+    branches:
+      - website
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Zola
+        uses: taiki-e/install-action@v2
+        with:
+          tool: zola@0.20.0
+
+      - name: Build Site
+        run: cd website && zola build
+
+      - name: Deploy to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL: ${{ vars.S3_ENDPOINT_URL }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          aws s3 sync website/public/ s3://${{ vars.S3_BUCKET }} \
+            --delete \
+            --no-progress
+
+      - name: Purge Cloudflare
+        run: |
+          curl -s -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}' \
+            | jq -e '.success'

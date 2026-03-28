@@ -56,9 +56,6 @@ del service
 """
 
 
-
-
-
 [extra.easy_command_section]
 title = "One attribute. Every language."
 description = "Annotate your Rust types and functions with #[ffi], register them in an inventory, and generate bindings."
@@ -68,19 +65,19 @@ tabs = [
 ]
 
 [extra.features_section]
-title = "Zero-cost. Idiomatic. Decoupled."
-description = "Generated bindings are as clean as if you had written them by hand — without the tedium."
+title = "More than just performance."
+description = "Made to support real-world interop and rich APIs."
 features = [
-    { icon = "circle-nodes", title = "Zero Cost", desc = "Bindings have nanosecond overhead, and anything that doesn't you'd have a hard time writing it faster." },
-    { icon = "shield-halved", title = "Works Both Ways", desc = "Define a Rust library to be used from other languages; or a plugin API to load other languages into Rust." },
-    { icon = "cubes", title = "Expressive", desc = "Supports functions, structs, services (classes), data enums, callbacks, transparent async calls, and much more." },
+    { icon = "bolt", title = "Zero Cost", desc = "Simple calls add nanosecond overhead. For complex patterns, the generated marshaling is as fast as anything you would have written yourself." },
+    { icon = "right-left", title = "Works Both Ways", desc = "Need to expose your Rust library to other languages? Or load legacy code into Rust as a plugin? Doesn't matter, we got you covered." },
+    { icon = "layer-group", title = "Expressive", desc = "Go beyond structs and ints. Use services, data enums, callbacks, idiomatic error handling, and transparent async calls from Rust, and in any language that supports it." },
 ]
 
 
 
 [extra.final_cta_section]
-title = "Ready to ship your Rust library everywhere?"
-description = "One library. Any language. Zero compromises."
+title = "Ready to deliver Rust?"
+description = "Stop writing glue code. Start shipping."
 button = { text = "Read the Docs", url = "/docs/introduction" }
 +++
 
