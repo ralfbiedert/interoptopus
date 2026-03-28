@@ -29,7 +29,7 @@ use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use std::io::{Read, Write};
 use std::mem::forget;
 
-/// FFI analog of [`std::string::String`].
+/// FFI analog of [`std::string::String`]. See the [module documentation](crate::pattern::string) for more details and examples.
 #[derive(Debug)]
 #[repr(C)]
 pub struct String {

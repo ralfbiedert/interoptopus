@@ -266,11 +266,11 @@ pub use interoptopus_proc::AsyncRuntime;
 /// services:
 ///
 /// ```rust
-/// use interoptopus::ffi;
-/// use interoptopus::lang::meta::Visibility::Public;
-/// use interoptopus::lang::types::TypeKind::Enum;
-/// use interoptopus::wire::Wire;
-///
+/// # use interoptopus::ffi;
+/// # use interoptopus::lang::meta::Visibility::Public;
+/// # use interoptopus::lang::types::TypeKind::Enum;
+/// # use interoptopus::wire::Wire;
+/// #
 /// # #[ffi]
 /// # #[derive(Clone)]
 /// # enum Error { A }
@@ -318,6 +318,27 @@ pub use interoptopus_proc::AsyncRuntime;
 ///
 /// Note, this example is illustrative, the actual API is subject to change.
 ///
+/// # Design guidelines
+///
+/// Think of your plugin API as a nanosecond-latency **web server**: the FFI boundary
+/// is a network boundary with benefits, and most types have pass-by-value semantics.
+///
+/// While simple data can have sub-nanosecond cost passing through it (essentially living in registers or
+/// a simple stack push), these serialization semantics are still the prevalent model to
+/// reason about your API. Extras like callbacks and pointers exist, but FFI and ownership
+/// constraints prevent them from
+/// nesting arbitrarily.
+///
+/// Some things to keep in mind:
+/// - While you can load multiple plugins, each process can only ever have one instance of
+///   a plugin.
+/// - Plugins usually cannot be unloaded.
+/// - Plugin methods therefore act like singletons / statics.
+/// - You can have services via `impl Service {}` blocks. They can be arbitrarily created
+///   and destroyed. However, due to the aforementioned pass-by-value semantics they cannot
+///   be arbitrarily nested inside other data structures. The only way to pass them around
+///   is via function arguments, which takes care of their lifecycle requirements.
+///
 /// # Supported types
 ///
 /// Not every Rust type can appear in every position. The table below summarises what
@@ -347,26 +368,18 @@ pub use interoptopus_proc::AsyncRuntime;
 /// However, there should be a compile error if you accidentally try to use a type that is not supported.
 /// If not, please file a bug.
 ///
-/// # Design guidelines
+/// # Instrumentation
 ///
-/// Think of your plugin API as a nanosecond-latency **web server**: the FFI boundary
-/// is a network boundary with benefits, and most types have pass-by-value semantics.
+/// Plugins come with built-in [`telemetry`](crate::telemetry) support and implement the
+/// [`Metrics`](crate::telemetry::Metrics) trait. Since plugins may run on a
+/// dynamic runtime such as the .NET CLR, they can introduce latency spikes caused by garbage
+/// collection, JIT compilation, or other runtime activity. The telemetry integration lets you
+/// observe call durations, helping diagnose performance issues.
 ///
-/// While simple data can have sub-nanosecond cost passing through it (essentially living in registers or
-/// a simple stack push), these serialization semantics are still the prevalent model to
-/// reason about your API. Extras like callbacks and pointers exist, but FFI and ownership
-/// constraints prevent them from
-/// nesting arbitrarily.
-///
-/// Some things to keep in mind:
-/// - While you can load multiple plugins, each process can only ever have one instance of
-///   a plugin.
-/// - Plugins usually cannot be unloaded.
-/// - Plugin methods therefore act like singletons / statics.
-/// - You can have services via `impl Service {}` blocks. They can be arbitrarily created
-///   and destroyed. However, due to the aforementioned pass-by-value semantics they cannot
-///   be arbitrarily nested inside other data structures. The only way to pass them around
-///   is via function arguments, which takes care of their lifecycle requirements.
+/// Tick resolution is platform-dependent and works best for calls
+/// longer than ~1 µs. If telemetry is disabled the overhead is a few CPU instructions. Synchronous
+/// calls are instrumented end-to-end, `async` calls until `Future` readiness (i.e, the time
+/// the future result can be successfully obtained via `.await`, not until you eventually do it).
 #[cfg(all(feature = "macros", feature = "unstable-plugins"))]
 pub use interoptopus_proc::plugin;
 

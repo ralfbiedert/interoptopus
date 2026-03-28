@@ -190,8 +190,7 @@ use std::marker::PhantomData;
 /// Wraps and transfers complex objects over FFI.
 ///
 /// The backing storage uses a (ptr, size) representation that can safely cross
-/// FFI boundaries.
-///
+/// FFI boundaries. See the [module documentation](crate::wire) for more details and examples.
 #[repr(C)]
 pub struct Wire<T>
 where
