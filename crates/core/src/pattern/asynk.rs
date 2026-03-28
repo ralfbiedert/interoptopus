@@ -197,6 +197,7 @@ unsafe impl<T: WireIO> WireIO for AsyncCallback<T> {
 struct FutureState<T> {
     result: Option<T>,
     waker: Option<Waker>,
+    on_complete: Option<Box<dyn FnOnce() + Send + 'static>>,
 }
 
 extern "C" fn async_callback_complete<T: Send + 'static>(value: *const T, context: *const c_void) {
@@ -208,6 +209,9 @@ extern "C" fn async_callback_complete<T: Send + 'static>(value: *const T, contex
     // Safety: The caller guarantees `value` is valid and that the pointee will not
     // be used afterwards (the caller forgets the original to prevent double-drop).
     lock.result = Some(unsafe { std::ptr::read(value) });
+    if let Some(on_complete) = lock.on_complete.take() {
+        on_complete();
+    }
     if let Some(waker) = lock.waker.take() {
         waker.wake();
     }
@@ -232,12 +236,21 @@ pub struct AsyncCallbackFuture<T> {
 impl<T: Send + 'static + TypeInfo> AsyncCallbackFuture<T> {
     /// Creates a `(future, callback)` pair.
     pub fn new() -> (Self, AsyncCallback<T>) {
-        let state = Arc::new(Mutex::new(FutureState { result: None, waker: None }));
-
-        // Crate async callback with state stored and one extra strong count on the context pointer.
+        let state = Arc::new(Mutex::new(FutureState { result: None, waker: None, on_complete: None }));
         let raw = Arc::into_raw(Arc::clone(&state)).cast::<c_void>();
         let cb = AsyncCallback::with_context(async_callback_complete::<T>, raw);
+        (Self { state }, cb)
+    }
 
+    /// Creates a `(future, callback)` pair with a completion hook.
+    ///
+    /// `on_complete` is called inside the callback — i.e., at the moment the
+    /// foreign side delivers the result — before the waiting future is woken.
+    /// This measures true round-trip latency rather than executor scheduling latency.
+    pub fn new_with_on_complete(on_complete: impl FnOnce() + Send + 'static) -> (Self, AsyncCallback<T>) {
+        let state = Arc::new(Mutex::new(FutureState { result: None, waker: None, on_complete: Some(Box::new(on_complete)) }));
+        let raw = Arc::into_raw(Arc::clone(&state)).cast::<c_void>();
+        let cb = AsyncCallback::with_context(async_callback_complete::<T>, raw);
         (Self { state }, cb)
     }
 }

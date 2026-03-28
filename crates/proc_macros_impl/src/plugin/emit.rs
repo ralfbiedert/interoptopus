@@ -431,12 +431,14 @@ fn emit_bare_method(
                 pub fn #fn_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                     #(#forget_stmts)*
                     let _inst_start = self.instrumentor.time_ns();
-                    let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
+                    let _inst_cb = self.instrumentor.clone();
+                    let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new_with_on_complete(
+                        move || { _inst_cb.record_call(#index, _inst_start, _inst_cb.time_ns()); }
+                    );
                     (self.#fn_name)(#(#ffi_args,)* cb);
                     #(#field_src_lets)*
                     #async_kw move {
                         let raw = future.await;
-                        instrumentor.record_call(#index, _inst_start, instrumentor.time_ns());
                         ::interoptopus::plugin::ServiceHandleMap::map_service_handle(raw, #construct)
                     }
                 }
@@ -463,13 +465,13 @@ fn emit_bare_method(
             pub fn #fn_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                 #(#forget_stmts)*
                 let _inst_start = self.instrumentor.time_ns();
-                let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new();
-                (self.#fn_name)(#(#ffi_args,)* cb);
                 let _inst = self.instrumentor.clone();
+                let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new_with_on_complete(
+                    move || { _inst.record_call(#index, _inst_start, _inst.time_ns()); }
+                );
+                (self.#fn_name)(#(#ffi_args,)* cb);
                 #async_kw move {
-                    let _inst_result = future.await;
-                    _inst.record_call(#index, _inst_start, _inst.time_ns());
-                    _inst_result
+                    future.await
                 }
             }
         }
@@ -528,12 +530,14 @@ fn emit_ctor_method(
             pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #user_ret_ty> + 'static {
                 #(#forget_stmts)*
                 let _inst_start = self.instrumentor.time_ns();
-                let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
+                let _inst_cb = self.instrumentor.clone();
+                let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new_with_on_complete(
+                    Box::new(move || { _inst_cb.record_call(#index, _inst_start, _inst_cb.time_ns()); })
+                );
                 (self.#ctor_field)(#(#ffi_args,)* cb);
                 #(#field_src_lets)*
                 #async_kw move {
                     let raw = future.await;
-                    instrumentor.record_call(#index, _inst_start, instrumentor.time_ns());
                     ::interoptopus::plugin::ServiceHandleMap::map_service_handle(raw, #construct)
                 }
             }
@@ -674,12 +678,14 @@ fn emit_instance_method(
                 pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                     #(#forget_stmts)*
                     let _inst_start = self.instrumentor.time_ns();
-                    let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new();
+                    let _inst_cb = self.instrumentor.clone();
+                    let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new_with_on_complete(
+                        move || { _inst_cb.record_call(#index, _inst_start, _inst_cb.time_ns()); }
+                    );
                     (self.#field)(self.handle, #(#ffi_args,)* cb);
                     #(#field_src_lets)*
                     #async_kw move {
                         let raw = future.await;
-                        instrumentor.record_call(#index, _inst_start, instrumentor.time_ns());
                         ::interoptopus::plugin::ServiceHandleMap::map_service_handle(raw, #construct)
                     }
                 }
@@ -705,13 +711,13 @@ fn emit_instance_method(
             pub fn #method_name(&self, #(#params),*) -> impl ::std::future::Future<Output = #ret_ty> + 'static {
                 #(#forget_stmts)*
                 let _inst_start = self.instrumentor.time_ns();
-                let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new();
-                (self.#field)(self.handle, #(#ffi_args,)* cb);
                 let _inst = self.instrumentor.clone();
+                let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new_with_on_complete(
+                    move || { _inst.record_call(#index, _inst_start, _inst.time_ns()); }
+                );
+                (self.#field)(self.handle, #(#ffi_args,)* cb);
                 #async_kw move {
-                    let _inst_result = future.await;
-                    _inst.record_call(#index, _inst_start, _inst.time_ns());
-                    _inst_result
+                    future.await
                 }
             }
         }
