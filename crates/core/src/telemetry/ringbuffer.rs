@@ -1,5 +1,5 @@
 use crate::telemetry::MAX_RECORDED_DURATIONS;
-use crate::telemetry::metrics::FunctionReport;
+use crate::telemetry::report::FunctionReport;
 use std::fmt;
 
 /// Pre-allocated fixed-size ring buffer. Avoids all heap allocation on push.
@@ -54,6 +54,7 @@ impl RingBuffer {
             name,
             recent_durations_ns: durations,
             lifetime_calls: self.lifetime_calls,
+            lifetime_calls_saturated: self.len >= MAX_RECORDED_DURATIONS,
             recent_sum_ns: sum,
             recent_min_ns: if self.len > 0 { min_ns } else { 0 },
             recent_max_ns: max_ns,

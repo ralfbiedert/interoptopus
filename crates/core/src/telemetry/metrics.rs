@@ -1,29 +1,8 @@
+use crate::telemetry::report::Report;
 use crate::telemetry::ringbuffer::RingBuffer;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Instant;
-
-/// Performance report covering all instrumented functions.
-#[derive(Debug)]
-pub struct Report {
-    pub functions: Vec<FunctionReport>,
-}
-
-/// Report for a single instrumented function.
-#[derive(Debug)]
-pub struct FunctionReport {
-    pub name: &'static str,
-    /// Recent durations in chronological order (last N calls).
-    pub recent_durations_ns: Vec<u64>,
-    /// Total number of recorded calls (may exceed window size).
-    pub lifetime_calls: u64,
-    /// Sum of durations in the recent window.
-    pub recent_sum_ns: u64,
-    /// Minimum duration in the recent window (0 if empty).
-    pub recent_min_ns: u64,
-    /// Maximum duration in the recent window.
-    pub recent_max_ns: u64,
-}
 
 #[derive(Debug)]
 pub struct Function {
