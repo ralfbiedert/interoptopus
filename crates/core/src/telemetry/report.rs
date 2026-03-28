@@ -20,9 +20,11 @@ impl Report {
             let p99 = percentile(&f.recent_durations_ns, 99, 100);
             let p999 = percentile(&f.recent_durations_ns, 999, 1000);
             let unit = Unit::pick(&[avg, p50, p95, p99, p999]);
-            let calls = if f.lifetime_calls_saturated { format!(">{}", f.lifetime_calls) } else { f.lifetime_calls.to_string() };
             let name = format!("\x1b[1m{:<col$}\x1b[0m", f.name);
-            println!("{}  {}  {}  {}  {}  {}  {:>12}", name, unit.fmt(avg), unit.fmt(p50), unit.fmt(p95), unit.fmt(p99), unit.fmt(p999), calls);
+            println!("{}  {}  {}  {}  {}  {}  {:>12}", name, unit.fmt(avg), unit.fmt(p50), unit.fmt(p95), unit.fmt(p99), unit.fmt(p999), f.lifetime_calls);
+        }
+        if let Some(f) = self.functions.iter().find(|f| f.lifetime_calls_saturated) {
+            println!("* Timings reflect last {} calls only.", f.recent_durations_ns.len());
         }
     }
 }
