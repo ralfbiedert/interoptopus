@@ -76,6 +76,6 @@ features = [
 [extra.final_cta_section]
 title = "Ready to deliver Rust?"
 description = ""
-button = { text = "Read the Docs", url = "/docs/introduction" }
+button = { text = "Read the Docs", url = "/docs" }
 +++
 
