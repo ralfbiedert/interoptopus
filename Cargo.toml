@@ -19,6 +19,7 @@ authors = ["Ralf Biedert <rb@xr.io>"]
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/ralfbiedert/interoptopus"
+homepage = "https://interoptopus.rs"
 rust-version = "1.93"
 version = "0.16.0-alpha.11"
 
