@@ -37,7 +37,7 @@ Its key features include:
 
 ## Getting Started 
 
-Read our [documentation here](interoptopus.rs/docs).
+Read our [documentation here](https://interoptopus.rs/docs).
 
 ## Feature Flags
 
@@ -67,14 +67,14 @@ Gated behind **feature flags**, these enable:
 
 In essence, plain calls are near-zero overhead (1-10ns), as are most structs, enums and services. If serialization is involved it scales with payload size. Using the .NET runtime as a plugin adds ~20 MB overhead.  
 
-For more details see [our benchmark numbers here](interoptopus.rs/benchmarks).
+For more details see [our benchmark numbers here](https://interoptopus.rs/benchmarks).
 
 
 
 ## Further Reading
 
-- See our [changelog](interoptopus.rs/changelog).
-- Read the [FAQ](interoptopus.rs/faq).
+- See our [changelog](https://interoptopus.rs/changelog).
+- Read the [FAQ](https://interoptopus.rs/faq).
 
 
 ## Contributing
