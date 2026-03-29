@@ -14,10 +14,8 @@ taxonomies = [
 
 [markdown]
 bottom_footnotes = true
-highlight_code = true
-
 [markdown.highlighting]
-theme = "github"
+theme = "github-light"
 
 [translations]
 errata_section = "Errata & Updates"
