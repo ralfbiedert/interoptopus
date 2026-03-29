@@ -14,8 +14,9 @@ taxonomies = [
 
 [markdown]
 bottom_footnotes = true
+
 [markdown.highlighting]
-theme = "github-light"
+theme = "tokyo-night"
 
 [translations]
 errata_section = "Errata & Updates"
@@ -38,6 +39,7 @@ fork_and_pr = "Fork, modify and open a PR."
 copy_url_msg = "Copy URL"
 share_on_x = "Share on X"
 toc_title = "ON THIS PAGE"
+
 
 [extra]
 enable_custom_css = true
