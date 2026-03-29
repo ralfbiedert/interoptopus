@@ -9,7 +9,7 @@
 Productive, performant, robust interop for Rust. Pick three.
 
 
-With Interoptopus yo can write code like this:
+With Interoptopus you can write code like this:
 
 ```rust,ignore
 #[ffi(service)]
@@ -21,7 +21,7 @@ impl Hello {
 }
 ```
 
-and then call it from your other language like that:
+and then call it from your other language like this:
 
 ```csharp
 var service = Hello.World();
@@ -60,14 +60,14 @@ Gated behind **feature flags**, these enable:
 
 <sup>✅</sup> Tier 1 target. Active maintenance and production use. Full support of all features.<br/>
 <sup>⏯️</sup> Tier 2 target. Currently suspended, contributors wanted!<br/>
-<sup>1</sup> You can implement basic support for new language in just a few hours, no pull request needed.<br/>
+<sup>1</sup> You can implement basic support for a new language in just a few hours, no pull request needed.<br/>
 
 
 ## Performance
 
 In essence, plain calls are near-zero overhead (1-10ns), as are most structs, enums and services. If serialization is involved it scales with payload size. Using the .NET runtime as a plugin adds ~20 MB overhead.  
 
-For more details see [our benchmarks numbers here](interoptopus.rs/benchmarks).
+For more details see [our benchmark numbers here](interoptopus.rs/benchmarks).
 
 
 
@@ -83,7 +83,7 @@ PRs are very welcome!
 
 - Submit small bug fixes directly. Major changes should be issues first.
 - New features or patterns must be materialized in the reference project and accompanied by
-  at least an C# interop test.
+  at least a C# interop test.
 
 [crates.io-badge]: https://img.shields.io/crates/v/interoptopus.svg
 [crates.io-url]: https://crates.io/crates/interoptopus

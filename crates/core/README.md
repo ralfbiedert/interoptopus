@@ -11,7 +11,7 @@ Productive, performant, robust interop for Rust. Pick three.
 
 With Interoptopus you can write code like this:
 
-```rust
+```rust,ignore
 #[ffi(service)]
 pub struct Hello {}
 
