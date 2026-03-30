@@ -16,7 +16,8 @@ taxonomies = [
 bottom_footnotes = true
 
 [markdown.highlighting]
-theme = "tokyo-night"
+light_theme = "github-light"
+dark_theme = "tokyo-night"
 
 [translations]
 errata_section = "Errata & Updates"

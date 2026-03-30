@@ -1,3 +1,10 @@
 h2::after {
     display: none;
 }
+
+/* Giallo sets color-scheme: light dark on <pre> via inline style, which makes
+   light-dark() follow OS preference instead of the DaisyUI theme. Override with
+   !important so the site's theme toggle controls syntax highlighting colors. */
+pre.giallo {
+    color-scheme: inherit !important;
+}
