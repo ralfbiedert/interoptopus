@@ -17,12 +17,13 @@ public partial class {{ inner_type }}
 }
 
 {% endif -%}
+{{ _types_docs_owned }}
 [NativeMarshalling(typeof(MarshallerMeta))]
 public partial class {{ wire_name }} : IDisposable
 {
-    public WireBuffer Buffer;
+    internal WireBuffer Buffer;
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public static {{ wire_name }} From({{ inner_type }} value)
     {
         var size = CalculateSize(value);
@@ -41,14 +42,14 @@ public partial class {{ wire_name }} : IDisposable
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public {{ inner_type }} Unwire()
     {
         using var reader = Buffer.Reader();
         {{ deserialize_body | indent(prefix = "        ") }}
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     static int CalculateSize({{ inner_type }} value)
     {
         {{ size_body | indent(prefix = "        ") }}
@@ -59,7 +60,8 @@ public partial class {{ wire_name }} : IDisposable
         Buffer.Dispose();
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal Unmanaged IntoUnmanaged()
     {
         var rval = new Unmanaged { Buffer = Buffer };
@@ -67,7 +69,8 @@ public partial class {{ wire_name }} : IDisposable
         return rval;
     }
     
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal Unmanaged AsUnmanaged()
     {
         var rval = new Unmanaged { Buffer = Buffer };
@@ -82,7 +85,8 @@ public partial class {{ wire_name }} : IDisposable
     {
         public WireBuffer Buffer;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_internal | indent(prefix="        ") }}
         internal {{ wire_name }} IntoManaged()
         {
             return new {{ wire_name }} { Buffer = Buffer };
@@ -94,25 +98,25 @@ public partial class {{ wire_name }} : IDisposable
         private {{ wire_name }} _managed;
         private Unmanaged _unmanaged;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller({{ wire_name }} managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromManaged({{ wire_name }} managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public {{ wire_name }} ToManaged() { return _unmanaged.IntoManaged(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void Free() {}
     }
 }

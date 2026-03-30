@@ -4,6 +4,7 @@ public partial class {{ name }}
     ulong _len;
 }
 
+{{ _types_docs_owned }}
 [NativeMarshalling(typeof(MarshallerMeta))]
 public partial class {{ name }} : IDisposable
 {
@@ -11,7 +12,7 @@ public partial class {{ name }} : IDisposable
 
     public unsafe {{ element_type }} this[int i]
     {
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         get
         {
             if (i >= (int) _len) throw new IndexOutOfRangeException();
@@ -23,10 +24,10 @@ public partial class {{ name }} : IDisposable
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     {{ name }}() { }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public static unsafe {{ name }} From({{ element_type }}[] managed)
     {
         var rval = new {{ name }}();
@@ -42,7 +43,7 @@ public partial class {{ name }} : IDisposable
         return rval;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public void Dispose()
     {
         if (_data == IntPtr.Zero) return;
@@ -50,6 +51,8 @@ public partial class {{ name }} : IDisposable
         _data = IntPtr.Zero;
     }
 
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal Unmanaged ToUnmanaged()
     {
         var unmanaged = new Unmanaged();
@@ -58,6 +61,8 @@ public partial class {{ name }} : IDisposable
         return unmanaged;
     }
 
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal Unmanaged AsUnmanaged() => ToUnmanaged();
 
     [CustomMarshaller(typeof({{ name }}), MarshalMode.Default, typeof(Marshaller))]
@@ -69,7 +74,8 @@ public partial class {{ name }} : IDisposable
         public IntPtr _data;
         public ulong _len;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_internal | indent(prefix="        ") }}
         internal {{ name }} ToManaged()
         {
             var _managed = new {{ name }}();

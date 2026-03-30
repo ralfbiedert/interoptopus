@@ -12,7 +12,7 @@ public partial class {{ name }} : IDisposable
     {{ method | indent(prefix="    ") }}
     {% endfor %}
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public void Dispose()
     {
         Interop.{{ dtor }}(_context);

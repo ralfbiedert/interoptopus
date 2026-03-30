@@ -1,9 +1,9 @@
 public partial class {{ name }}
 {
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     private {{ name }}() { }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public static unsafe {{ name }} Empty()
     {
         InteropHelper.interoptopus_vec_create(IntPtr.Zero, 0, out var _out);
@@ -12,11 +12,12 @@ public partial class {{ name }}
 
     public int Count
     {
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         get { if (_ptr == IntPtr.Zero) { throw new NullReferenceException(); } else { return (int) _len; } }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal Unmanaged IntoUnmanaged()
     {
         if (_ptr == IntPtr.Zero) throw new NullReferenceException();
@@ -28,7 +29,8 @@ public partial class {{ name }}
         return rval;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal Unmanaged AsUnmanaged()
     {
         if (_ptr == IntPtr.Zero) throw new NullReferenceException();
@@ -39,7 +41,7 @@ public partial class {{ name }}
         return rval;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public void Dispose()
     {
         if (_ptr == IntPtr.Zero) return;
@@ -53,7 +55,7 @@ public partial class {{ name }}
         _capacity = 0;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public override string ToString()
     {
         return "{{ name }} { ... }";
@@ -77,7 +79,8 @@ public partial class {{ name }}
         internal ulong _len;
         internal ulong _capacity;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_internal | indent(prefix="        ") }}
         internal {{ name }} IntoManaged()
         {
             var rval = new {{ name }}();
@@ -93,25 +96,25 @@ public partial class {{ name }}
         private {{ name }} _managed;
         private Unmanaged _unmanaged;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller({{ name }} managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromManaged({{ name }} managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public {{ name }} ToManaged() { return _unmanaged.IntoManaged(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void Free() {}
     }
 }

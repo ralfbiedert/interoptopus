@@ -16,7 +16,7 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
         {%- endfor %}
     }
 {% endif %}
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public override string ToString()
     {
         return "{{name}} { ... }";
@@ -29,25 +29,25 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
         private {{ name }} _managed;
         private Unmanaged _unmanaged;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller({{ name }} managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromManaged({{ name }} managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Unmanaged ToUnmanaged() { return _managed.{{ marshaller_to_unmanaged }}(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public {{ name }} ToManaged() { return _unmanaged.{{ marshaller_to_managed }}(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void Free() {}
     }
 

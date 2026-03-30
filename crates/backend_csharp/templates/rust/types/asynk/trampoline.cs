@@ -5,14 +5,15 @@ internal class {{ trampoline_name }}
     private AsyncCallbackCommon _delegate;
     private IntPtr _callback_ptr;
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal {{ trampoline_name }}()
     {
         _delegate = Call;
         _callback_ptr = Marshal.GetFunctionPointerForDelegate(_delegate);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     private static void Call(IntPtr data, IntPtr csPtr)
     {
         TaskCompletionSource<{% if is_task_void %}bool{% else %}{{ task_inner_ty }}{% endif %}> tcs;
@@ -25,7 +26,8 @@ internal class {{ trampoline_name }}
         else { tcs.SetException(managed.ExceptionForVariant()); }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal (AsyncCallbackCommonNative, Task{% if not is_task_void %}<{{ task_inner_ty }}>{% endif %}) NewCall()
     {
         var tcs = new TaskCompletionSource<{% if is_task_void %}bool{% else %}{{ task_inner_ty }}{% endif %}>();

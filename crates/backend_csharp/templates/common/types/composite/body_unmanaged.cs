@@ -13,7 +13,8 @@ internal unsafe struct Unmanaged
     {%- endif %}
     {%- endfor %}
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal {{ name }} {{ to_managed_method }}()
     {
         var _managed = new {{ name }}();

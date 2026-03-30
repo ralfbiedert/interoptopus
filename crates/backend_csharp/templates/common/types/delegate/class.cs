@@ -19,9 +19,11 @@ public partial class {{ name }}
 public partial class {{ name }} : IDisposable
 {
 
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal {{ name }}() { }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public {{ name }}({{ name }}Delegate managed)
     {
         _managed = managed;
@@ -29,7 +31,7 @@ public partial class {{ name }} : IDisposable
         _ptr = Marshal.GetFunctionPointerForDelegate(_native);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     private {{ rval_unmanaged_name }} CallTrampoline({% for arg in args %}{{ arg.unmanaged_name }} {{ arg.name }}, {% endfor %}IntPtr callback_data)
     {
         try
@@ -51,7 +53,8 @@ public partial class {{ name }} : IDisposable
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal {{ rval_managed }} Call({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %})
     {
         var __target = Marshal.GetDelegateForFunctionPointer<{{ name }}Native>(_ptr);
@@ -62,7 +65,7 @@ public partial class {{ name }} : IDisposable
         {% endif %}
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public void Dispose()
     {
         if (_exception != null) throw _exception;
@@ -73,7 +76,8 @@ public partial class {{ name }} : IDisposable
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal Unmanaged IntoUnmanaged()
     {
         var rval = new Unmanaged();
@@ -83,7 +87,8 @@ public partial class {{ name }} : IDisposable
         return rval;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal Unmanaged AsUnmanaged()
     {
         var rval = new Unmanaged();
@@ -103,6 +108,8 @@ public partial class {{ name }} : IDisposable
         internal IntPtr _data;
         internal IntPtr _destructor;
 
+        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_internal | indent(prefix="        ") }}
         internal {{ name }} IntoManaged()
         {
             var rval = new {{ name }}();
@@ -119,25 +126,25 @@ public partial class {{ name }} : IDisposable
         private {{ name }} _managed;
         private Unmanaged _unmanaged;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller({{ name }} managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromManaged({{ name }} managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public {{ name }} ToManaged() { return _unmanaged.IntoManaged(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void Free() {}
     }
 }

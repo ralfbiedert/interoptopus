@@ -5,25 +5,25 @@ public partial class {{ name }}
         private {{ name }} _managed;
         private Unmanaged _unmanaged;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller({{ name }} managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromManaged({{ name }} managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public {{ name }} ToManaged() { return _unmanaged.ToManaged(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void Free() {}
     }
 }

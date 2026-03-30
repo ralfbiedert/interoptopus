@@ -1,4 +1,5 @@
-[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+{{ _fns_decorators_all }}
+{{ _fns_decorators_internal }}
 internal Unmanaged AsUnmanaged()
 {
     var _unmanaged = new Unmanaged();

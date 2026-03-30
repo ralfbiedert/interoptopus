@@ -1,5 +1,5 @@
 ///FFI buffer for Wire data transfer
-public partial struct WireBuffer
+internal partial struct WireBuffer
 {
     public IntPtr data;
     public int len;
@@ -7,12 +7,16 @@ public partial struct WireBuffer
 }
 
 [NativeMarshalling(typeof(MarshallerMeta))]
-public partial struct WireBuffer
+internal partial struct WireBuffer
 {
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     public WireBuffer() { }
 
     /// Allocate a Rust-owned buffer of the given size.
-    public static unsafe WireBuffer Allocate(int size)
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
+    internal static unsafe WireBuffer Allocate(int size)
     {
 {% if plugin_mode %}
         var ptr = Trampoline.WireCreate(size, out var outLen, out var outCapacity);
@@ -23,13 +27,17 @@ public partial struct WireBuffer
     }
 
     /// Get a BinaryWriter over this buffer.
-    public unsafe BinaryWriter Writer()
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
+    internal unsafe BinaryWriter Writer()
     {
         return new BinaryWriter(new UnmanagedMemoryStream((byte*)data, len, len, FileAccess.Write));
     }
 
     /// Get a BinaryReader over this buffer.
-    public unsafe BinaryReader Reader()
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
+    internal unsafe BinaryReader Reader()
     {
         return new BinaryReader(new UnmanagedMemoryStream((byte*)data, len));
     }
@@ -54,7 +62,8 @@ public partial struct WireBuffer
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal unsafe Unmanaged IntoUnmanaged()
     {
         var _unmanaged = new Unmanaged();
@@ -64,7 +73,8 @@ public partial struct WireBuffer
         return _unmanaged;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal unsafe Unmanaged AsUnmanaged()
     {
         var _unmanaged = new Unmanaged();
@@ -81,7 +91,8 @@ public partial struct WireBuffer
         public int len;
         public int capacity;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_internal | indent(prefix="        ") }}
         internal unsafe WireBuffer IntoManaged()
         {
             var _managed = new WireBuffer();
@@ -93,7 +104,7 @@ public partial struct WireBuffer
     }
 
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public override string ToString()
     {
         return "WireBuffer { ... }";
@@ -106,25 +117,25 @@ public partial struct WireBuffer
         private WireBuffer _managed;
         private Unmanaged _unmanaged;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller(WireBuffer managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromManaged(WireBuffer managed) { _managed = managed; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public WireBuffer ToManaged() { return _unmanaged.IntoManaged(); }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void Free() {}
     }
 }
@@ -132,11 +143,11 @@ public partial struct WireBuffer
 {% if not plugin_mode %}
 internal partial class WireInterop {
     [LibraryImport(Interop.NativeLib, EntryPoint = "{{ create_entry_point }}")]
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public static unsafe partial IntPtr interoptopus_wire_create(int size, out int out_len, out int out_capacity);
 
     [LibraryImport(Interop.NativeLib, EntryPoint = "{{ destroy_entry_point }}")]
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public static partial void interoptopus_wire_destroy(IntPtr data, int len, int capacity);
 }
 {% endif %}

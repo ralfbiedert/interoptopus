@@ -1,4 +1,4 @@
-[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+{{ _fns_decorators_all }}
 public Exception ExceptionForVariant()
 {
     {%- for v in variants %}

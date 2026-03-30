@@ -1,4 +1,4 @@
-[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+{{ _fns_decorators_all }}
 public override string ToString()
 {
     {%- for v in variants %}

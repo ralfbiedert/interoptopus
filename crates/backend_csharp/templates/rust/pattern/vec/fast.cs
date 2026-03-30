@@ -6,7 +6,7 @@
 public partial class {{ name }} : IDisposable
 {
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public static unsafe {{ name }} From(Span<{{ element_type }}> _data)
     {
         var rval = new {{ name }}();
@@ -22,7 +22,7 @@ public partial class {{ name }} : IDisposable
 
     public unsafe {{ element_type }} this[int i]
     {
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         get
         {
             if (i >= Count) throw new IndexOutOfRangeException();

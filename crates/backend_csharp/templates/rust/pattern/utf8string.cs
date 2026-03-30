@@ -5,12 +5,13 @@ public partial class Utf8String
     ulong _capacity;
 }
 
+{{ _types_docs_owned }}
 [NativeMarshalling(typeof(MarshallerMeta))]
 public partial class Utf8String : IDisposable
 {
     private Utf8String() { }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public static unsafe Utf8String From(string s)
     {
         var rval = new Utf8String();
@@ -29,7 +30,7 @@ public partial class Utf8String : IDisposable
         return rval;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public static unsafe Utf8String Empty()
     {
         InteropHelper.interoptopus_string_create(IntPtr.Zero, 0, out var _out);
@@ -37,6 +38,8 @@ public partial class Utf8String : IDisposable
     }
 
 
+    /// Converts the native UTF-8 buffer to a managed string, leaving the native buffer alive.
+    /// The caller must still call <see cref="Dispose"/> to free the native memory.
     public unsafe string String
     {
         get
@@ -47,7 +50,10 @@ public partial class Utf8String : IDisposable
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    /// Converts the native UTF-8 buffer to a managed string and disposes the native buffer.
+    /// After this call the <see cref="Utf8String"/> instance is consumed (Dispose() will
+    /// have been called) and must not be used again.
+    {{ _fns_decorators_all | indent }}
     public string IntoString()
     {
         var rval = String;
@@ -55,7 +61,7 @@ public partial class Utf8String : IDisposable
         return rval;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public void Dispose()
     {
         if (_ptr == IntPtr.Zero) return;
@@ -67,7 +73,7 @@ public partial class Utf8String : IDisposable
         _ptr = IntPtr.Zero;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
     public Utf8String Clone()
     {
         var _new = new Unmanaged();
@@ -76,7 +82,8 @@ public partial class Utf8String : IDisposable
         return _new.IntoManaged();
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal Unmanaged IntoUnmanaged()
     {
         if (_ptr == IntPtr.Zero) { throw new Exception(); }
@@ -88,7 +95,8 @@ public partial class Utf8String : IDisposable
         return _unmanaged;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
     internal Unmanaged AsUnmanaged()
     {
         var _unmanaged = new Unmanaged();
@@ -105,7 +113,8 @@ public partial class Utf8String : IDisposable
         public ulong _len;
         public ulong _capacity;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_internal | indent(prefix="        ") }}
         internal Utf8String IntoManaged()
         {
             var _managed = new Utf8String();
@@ -120,17 +129,17 @@ public partial class Utf8String : IDisposable
     internal partial class InteropHelper
     {
         [LibraryImport(Interop.NativeLib, EntryPoint = "{{ create_entry_point }}")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
 
         public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
 
         [LibraryImport(Interop.NativeLib, EntryPoint = "{{ destroy_entry_point }}")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
 
         public static partial long interoptopus_string_destroy(Unmanaged utf8);
 
         [LibraryImport(Interop.NativeLib, EntryPoint = "{{ clone_entry_point }}")]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
 
         public static partial long interoptopus_string_clone(ref Unmanaged orig, ref Unmanaged cloned);
     }
@@ -143,29 +152,29 @@ public partial class Utf8String : IDisposable
         private Utf8String _managed; // Used when converting managed -> unmanaged
         private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller(Utf8String managed) { _managed = managed; }
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromManaged(Utf8String managed) { _managed = managed; }
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public unsafe Unmanaged ToUnmanaged()
         {
             return _managed.IntoUnmanaged();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public unsafe Utf8String ToManaged()
         {
             return _unmanaged.IntoManaged();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        {{ _fns_decorators_all | indent(prefix="        ") }}
         public void Free() { }
     }
 }
