@@ -59,7 +59,8 @@ impl Pass {
                 _ => Decorators::default(),
             };
 
-            let ty = Type { emission, name: name.clone(), kind: kind.clone(), decorators };
+            let docs = lookup_docs(*type_id, id_maps, rs_types);
+            let ty = Type { emission, name: name.clone(), docs, kind: kind.clone(), decorators };
 
             self.types.insert(*type_id, ty);
             outcome.changed();
@@ -94,4 +95,14 @@ fn lookup_emission(cs_type_id: TypeId, id_maps: &model::common::id_map::Pass, rs
     // Synthesized types (e.g., overload siblings) won't be in the inventory;
     // default to Builtin so they don't get emitted on their own.
     Emission::Builtin
+}
+
+/// Looks up the Rust docs for a C# type by searching the `id_map` for a matching Rust type.
+fn lookup_docs(cs_type_id: TypeId, id_maps: &model::common::id_map::Pass, rs_types: &Types) -> Vec<String> {
+    for (rust_id, rust_ty) in rs_types {
+        if id_maps.ty(*rust_id) == Some(cs_type_id) {
+            return rust_ty.docs.lines.clone();
+        }
+    }
+    Vec::new()
 }

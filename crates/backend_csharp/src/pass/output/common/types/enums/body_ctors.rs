@@ -3,7 +3,7 @@
 
 use crate::lang::TypeId;
 use crate::lang::types::kind::{TypeKind, TypePattern};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::{OutputResult, PassInfo, format_docs, model, output};
 use interoptopus_backends::template::{Context, Value};
 use std::collections::HashMap;
 
@@ -57,6 +57,7 @@ impl Pass {
                     m.insert("id", Value::Number((v.tag as i64).into()));
                     m.insert("has_payload", Value::Bool(has_payload));
                     m.insert("type", Value::String(type_name));
+                    m.insert("docs", Value::String(format_docs(&v.docs.lines)));
                     m
                 })
                 .collect();

@@ -7,7 +7,7 @@
 use crate::lang::functions::FunctionKind;
 use crate::lang::functions::overload::OverloadKind;
 use crate::output::{FileType, Output};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::{OutputResult, PassInfo, format_docs, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -69,12 +69,14 @@ impl Pass {
                     args.push(m);
                 }
 
+                let docs = format_docs(&function.docs);
                 let mut context = Context::new();
 
                 context.insert("name", name);
                 context.insert("symbol", name);
                 context.insert("args", &args);
                 context.insert("rval", rval);
+                context.insert("docs", &docs);
 
                 let import = templates.render("rust/fns/overload/simple.cs", &context)?;
                 imports.push(import);

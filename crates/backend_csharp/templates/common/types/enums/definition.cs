@@ -1,3 +1,6 @@
+{%- if docs %}
+{{ docs }}
+{%- endif %}
 public partial {{ struct_or_class }} {{ name }}
 {
     int _variant;

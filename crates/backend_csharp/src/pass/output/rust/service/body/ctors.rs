@@ -7,7 +7,7 @@
 use crate::lang::ServiceId;
 use crate::lang::functions::FunctionKind;
 use crate::lang::functions::overload::OverloadKind;
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::{OutputResult, PassInfo, format_docs, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -55,6 +55,8 @@ impl Pass {
                     None
                 });
 
+                let docs = format_docs(&ctor_fn.docs);
+
                 if let Some((overload_id, _transforms)) = async_overload {
                     // Async constructor: use the overloaded function (callback removed, returns Task<IntPtr>)
                     let Some(overload_fn) = fns.get(overload_id) else { continue };
@@ -66,6 +68,7 @@ impl Pass {
                     context.insert("method_name", method_name);
                     context.insert("interop_name", &overload_fn.name);
                     context.insert("args", &args);
+                    context.insert("docs", &docs);
 
                     let rendered = templates.render("rust/service/body_ctors_async.cs", &context)?;
                     rendered_ctors.push(rendered);
@@ -78,6 +81,7 @@ impl Pass {
                     context.insert("method_name", method_name);
                     context.insert("interop_name", &ctor_fn.name);
                     context.insert("args", &args);
+                    context.insert("docs", &docs);
 
                     let rendered = templates.render("rust/service/body_ctors.cs", &context)?;
                     rendered_ctors.push(rendered);

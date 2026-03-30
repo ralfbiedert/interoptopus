@@ -1,3 +1,6 @@
+{%- if docs %}
+{{ docs }}
+{%- endif %}
 [LibraryImport(NativeLib, EntryPoint = "{{symbol}}")]
 {%- if rval_decorator %}
 [{{ rval_decorator }}]

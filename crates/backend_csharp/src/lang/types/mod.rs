@@ -65,6 +65,7 @@ pub struct Decorators {
 pub struct Type {
     pub emission: Emission,
     pub name: String,
+    pub docs: Vec<String>,
     pub kind: TypeKind,
     pub decorators: Decorators,
 }

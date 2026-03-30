@@ -101,6 +101,7 @@ impl Pass {
             let overload_fn = Function {
                 emission: original_fn.emission.clone(),
                 name: original_fn.name.clone(),
+                docs: original_fn.docs.clone(),
                 signature: overload_signature,
                 kind: FunctionKind::Overload(Overload { kind: OverloadKind::Simple, base: original_id }),
             };

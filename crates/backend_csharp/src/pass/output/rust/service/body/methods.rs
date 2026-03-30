@@ -12,7 +12,7 @@ use crate::lang::ServiceId;
 use crate::lang::functions::FunctionKind;
 use crate::lang::functions::overload::OverloadKind;
 use crate::lang::types::kind::{PointerKind, Primitive, TypeKind, TypePattern};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::{OutputResult, PassInfo, format_docs, model, output};
 use interoptopus_backends::template::{Context, Value};
 use std::collections::HashMap;
 
@@ -61,19 +61,22 @@ impl Pass {
                         let Some(rval) = rval else { continue };
                         let is_void = result_info.is_void || matches!(rval_kind, Some(TypeKind::Primitive(Primitive::Void)));
 
+                        let docs = format_docs(&method_fn.docs);
                         let args = build_args(&method_fn.signature.arguments[1..], types);
-                        rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, method_name, &method_fn.name, &args)?);
+                        rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, method_name, &method_fn.name, &args, &docs)?);
                     }
                     FunctionKind::Overload(overload) => {
                         let Some(original_fn) = fns.get(overload.base) else { continue };
                         let Some(base_method_name) = method_names.get(overload.base) else { continue };
+
+                        let docs = format_docs(&method_fn.docs);
 
                         if matches!(&overload.kind, OverloadKind::Async(_)) {
                             // Async overload: rval is a Task type registered by the model pass
                             let task_rval = types.get(method_fn.signature.rval).map_or_else(|| "Task".to_string(), |t| t.name.clone());
                             let async_args = build_args(&method_fn.signature.arguments[1..], types);
 
-                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args)?);
+                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args, &docs)?);
                         } else {
                             // Simple or Body overload: render like a base method but with
                             // the overloaded signature
@@ -88,7 +91,7 @@ impl Pass {
                             let is_void = result_info.is_void || matches!(rval_kind, Some(TypeKind::Primitive(Primitive::Void)));
 
                             let overload_args = build_args(&method_fn.signature.arguments[1..], types);
-                            rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, base_method_name, &method_fn.name, &overload_args)?);
+                            rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, base_method_name, &method_fn.name, &overload_args, &docs)?);
                         }
                     }
                 }
@@ -136,6 +139,7 @@ fn render(
     method_name: &str,
     interop_name: &str,
     args: &[HashMap<&str, Value>],
+    docs: &str,
 ) -> Result<String, crate::Error> {
     let mut context = Context::new();
     context.insert("rval", rval);
@@ -144,6 +148,7 @@ fn render(
     context.insert("method_name", &method_name);
     context.insert("interop_name", &interop_name);
     context.insert("args", args);
+    context.insert("docs", docs);
     Ok(templates.render("rust/service/body_methods.cs", &context)?)
 }
 
@@ -153,12 +158,14 @@ fn render_async(
     method_name: &str,
     interop_name: &str,
     args: &[HashMap<&str, Value>],
+    docs: &str,
 ) -> Result<String, crate::Error> {
     let mut context = Context::new();
     context.insert("task_rval", task_rval);
     context.insert("method_name", method_name);
     context.insert("interop_name", interop_name);
     context.insert("args", args);
+    context.insert("docs", docs);
     Ok(templates.render("rust/service/body_methods_async.cs", &context)?)
 }
 

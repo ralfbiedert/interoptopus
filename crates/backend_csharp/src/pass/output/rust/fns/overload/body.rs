@@ -12,7 +12,7 @@ use crate::lang::functions::{Argument, Function};
 use crate::lang::types::OverloadFamily;
 use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
 use crate::output::{FileType, Output};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::{OutputResult, PassInfo, format_docs, model, output};
 use interoptopus_backends::template::{Context, TemplateEngine, Value};
 use std::collections::HashMap;
 
@@ -120,6 +120,7 @@ fn render(
 
     let native_rval_is_result = is_async && matches!(types.get(original_fn.signature.rval).map(|t| &t.kind), Some(TypeKind::TypePattern(TypePattern::Result(_, _, _))));
 
+    let docs = format_docs(&overload_fn.docs);
     let mut context = Context::new();
     context.insert("name", name);
     context.insert("rval", &rval);
@@ -129,6 +130,7 @@ fn render(
     context.insert("args", &args);
     context.insert("native_args", &native_args);
     context.insert("native_rval_is_result", &native_rval_is_result);
+    context.insert("docs", &docs);
 
     if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval
         && let Some(result_ty) = types.get(result_ty_id)

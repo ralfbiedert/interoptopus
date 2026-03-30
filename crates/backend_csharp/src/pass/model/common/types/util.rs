@@ -40,7 +40,7 @@ impl Pass {
         names.set(csharp::BOOL, "Bool".to_string());
         types.set(
             csharp::BOOL,
-            Type { emission: Emission::FileEmission(FileEmission::Common), name: "Bool".to_string(), kind: bool_kind, decorators: Decorators::default() },
+            Type { emission: Emission::FileEmission(FileEmission::Common), name: "Bool".to_string(), docs: Vec::new(), kind: bool_kind, decorators: Decorators::default() },
         );
 
         let utils = [
@@ -54,7 +54,7 @@ impl Pass {
             let kind = TypeKind::Util(variant);
             kinds.set(id, kind.clone());
             names.set(id, name.to_string());
-            types.set(id, Type { emission: Emission::FileEmission(FileEmission::Common), name: name.to_string(), kind, decorators: Decorators::default() });
+            types.set(id, Type { emission: Emission::FileEmission(FileEmission::Common), name: name.to_string(), docs: Vec::new(), kind, decorators: Decorators::default() });
         }
 
         self.done = true;

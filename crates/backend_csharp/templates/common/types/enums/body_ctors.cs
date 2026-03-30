@@ -1,5 +1,8 @@
 // Ctors
 {%- for v in variants %}
+{%- if v.docs %}
+{{ v.docs }}
+{%- endif %}
 {%- if v.has_payload %}
 public static {{ name }} {{ v.name }}({{ v.type }} value) => new() { _variant = {{ v.id }}, _{{ v.name }} = value };
 {%- else %}

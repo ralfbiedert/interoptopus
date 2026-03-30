@@ -6,7 +6,7 @@
 
 use crate::lang::TypeId;
 use crate::lang::types::kind::{TypeKind, TypePattern};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::{OutputResult, PassInfo, format_docs, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -44,6 +44,7 @@ impl Pass {
             };
 
             let name = &ty.name;
+            let docs = format_docs(&ty.docs);
 
             let ty = *type_id;
             let struct_or_class = if struct_class.is_struct(ty) { "struct" } else { "class" };
@@ -65,6 +66,7 @@ impl Pass {
             context.insert("name", name);
             context.insert("struct_or_class", struct_or_class);
             context.insert("variants", &variants);
+            context.insert("docs", &docs);
 
             let rendered = templates.render("common/types/enums/definition.cs", &context)?;
             self.enum_ty.insert(*type_id, rendered);

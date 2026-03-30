@@ -1,3 +1,6 @@
+{%- if docs %}
+{{ docs }}
+{%- endif %}
 {{ _fns_decorators_all }}
 public {{ rval }} {{ method_name }}({% for arg in args %}{{arg.ty}} {{arg.name}}{% if not loop.last %}, {% endif %}{% endfor %})
 {

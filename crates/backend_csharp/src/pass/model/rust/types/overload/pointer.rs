@@ -83,6 +83,7 @@ impl Pass {
                 Type {
                     emission: Emission::Builtin,
                     name: pointee_name.clone(),
+                    docs: Vec::new(),
                     kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }),
                     decorators: Decorators { param: Some(ParamDecorator::Ref), ..Default::default() },
                 },
@@ -92,6 +93,7 @@ impl Pass {
                 Type {
                     emission: Emission::Builtin,
                     name: pointee_name.clone(),
+                    docs: Vec::new(),
                     kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }),
                     decorators: Decorators { param: Some(ParamDecorator::Out), ..Default::default() },
                 },

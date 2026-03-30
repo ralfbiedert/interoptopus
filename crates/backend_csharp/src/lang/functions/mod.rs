@@ -20,6 +20,7 @@ pub struct Signature {
 pub struct Function {
     pub emission: Emission,
     pub name: String,
+    pub docs: Vec<String>,
     pub signature: Signature,
     pub kind: FunctionKind,
 }

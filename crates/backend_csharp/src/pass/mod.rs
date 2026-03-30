@@ -90,3 +90,13 @@ impl PassMeta {
         self.lost_found.entries.clear();
     }
 }
+
+/// Formats doc lines as C# `///` documentation comments.
+///
+/// Returns an empty string if there are no doc lines.
+pub fn format_docs(lines: &[String]) -> String {
+    if lines.is_empty() {
+        return String::new();
+    }
+    lines.iter().map(|line| format!("/// {line}")).collect::<Vec<_>>().join("\n")
+}

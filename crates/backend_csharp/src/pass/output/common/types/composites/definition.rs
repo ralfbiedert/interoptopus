@@ -5,7 +5,7 @@
 
 use crate::lang::TypeId;
 use crate::lang::types::kind::TypeKind;
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::{OutputResult, PassInfo, format_docs, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -46,14 +46,18 @@ impl Pass {
                     let mut m = HashMap::new();
                     m.insert("name", f.name.clone());
                     m.insert("managed_name", managed_name);
+                    m.insert("docs", format_docs(&f.docs.lines));
                     Some(m)
                 })
                 .collect();
+
+            let docs = format_docs(&ty.docs);
 
             let mut context = Context::new();
             context.insert("name", name);
             context.insert("struct_or_class", struct_or_class);
             context.insert("fields", &fields);
+            context.insert("docs", &docs);
 
             let rendered = templates.render("common/types/composite/definition.cs", &context)?;
             self.composite_ty.insert(*type_id, rendered);
