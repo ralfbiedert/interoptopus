@@ -10,8 +10,7 @@ public class TestWireArray
     {
         var data = new byte[32];
         data[0] = 42;
-        var x = WireOfU832.From(data);
-        var result = Interop.wire_accept_byte_array(x);
+        var result = Interop.wire_accept_byte_array(data.Wire());
         Assert.Equal(42, result);
     }
 

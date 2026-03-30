@@ -8,8 +8,7 @@ public class TestWireBasic
     [Fact]
     public void wire_accept_string_1()
     {
-        var x = WireOfString.From("hello world");
-        Interop.wire_accept_string_1(x);
+        Interop.wire_accept_string_1("hello world".Wire());
     }
 
     [Fact]

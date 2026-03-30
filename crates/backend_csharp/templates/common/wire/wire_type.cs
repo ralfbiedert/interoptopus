@@ -8,17 +8,19 @@ public partial class {{ inner_type }}
 }
 
 {% endif -%}
-public partial class {{ inner_type }}
+{% endif -%}
+/// Extension methods for converting <c>{{ inner_type }}</c> to <see cref="{{ wire_name }}"/>.
+public static class {{ wire_name }}Extensions
 {
-    /// Serializes this instance into a <see cref="{{ wire_name }}"/> for FFI transfer.
+    /// Serializes <paramref name="value"/> into a <see cref="{{ wire_name }}"/> for FFI transfer.
     /// Call <see cref="{{ wire_name }}.Dispose"/> on the result if it is not passed back to Rust.
-    public {{ wire_name }} Wire()
+    public static {{ wire_name }} Wire(this {{ inner_type }} value)
     {
-        return {{ wire_name }}.From(this);
+        return {{ wire_name }}.From(value);
     }
 }
 
-{% endif -%}
+
 /// Binary wire-format wrapper for <c>{{ inner_type }}</c>.
 ///
 /// Wire types serialize complex managed objects into a flat byte buffer that

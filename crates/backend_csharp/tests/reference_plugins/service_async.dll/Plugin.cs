@@ -22,7 +22,7 @@ class Plugin : IPlugin
         await Task.Yield();
         var dictionary = x.Unwire();
         dictionary["hello"] = "world";
-        return WireOfHashMapStringString.From(dictionary);
+        return dictionary.Wire();
     }
 
     public static async Task<ResultWireOfHashMapStringStringError> Wire2(WireOfHashMapStringString x)
@@ -30,7 +30,7 @@ class Plugin : IPlugin
         await Task.Yield();
         var dictionary = x.Unwire();
         dictionary["hello"] = "world";
-        var wire = WireOfHashMapStringString.From(dictionary);
+        var wire = dictionary.Wire();
         return ResultWireOfHashMapStringStringError.Ok(wire);
     }
 }
@@ -55,7 +55,7 @@ partial class AsyncBasic: IAsyncBasic<AsyncBasic>
         await Task.Yield();
         var dictionary = x.Unwire();
         dictionary["hello"] = "world";
-        return WireOfHashMapStringString.From(dictionary);
+        return dictionary.Wire();
     }
 
     public async Task<ResultWireOfHashMapStringStringError> Wire2(WireOfHashMapStringString x)
@@ -63,7 +63,7 @@ partial class AsyncBasic: IAsyncBasic<AsyncBasic>
         await Task.Yield();
         var dictionary = x.Unwire();
         dictionary["hello"] = "world";
-        var wire = WireOfHashMapStringString.From(dictionary);
+        var wire = dictionary.Wire();
         return ResultWireOfHashMapStringStringError.Ok(wire);
     }
 }
