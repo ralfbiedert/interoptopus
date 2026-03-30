@@ -22,13 +22,13 @@
 //! ```
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Visibility, common_or_module_emission};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use crate::wire::SerializationError;
 use std::any::Any;
 use std::fmt::Debug;
 use std::io::{Read, Write};
-use std::panic::{AssertUnwindSafe, catch_unwind};
+use std::panic::{catch_unwind, AssertUnwindSafe};
 
 /// Extracts a string message from a panic unwind.
 pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
@@ -119,7 +119,7 @@ unsafe impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
         let e = E::ty();
         Type {
             emission: common_or_module_emission(&[t.emission, e.emission]),
-            docs: crate::lang::meta::Docs::empty(),
+            docs: Docs::from_line("Rust-like `Result` type usable over FFI."),
             visibility: Visibility::Public,
             name: format!("Result<{}, {}>", t.name, e.name),
             kind: Self::kind(),

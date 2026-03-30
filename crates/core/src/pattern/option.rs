@@ -17,7 +17,7 @@
 //!
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::Visibility;
+use crate::lang::meta::{Docs, Visibility};
 use crate::lang::types::{TypeInfo, TypeKind, WireIO};
 use crate::wire::SerializationError;
 use std::io::{Read, Write};
@@ -133,7 +133,7 @@ unsafe impl<T: TypeInfo> TypeInfo for Option<T> {
         let t = T::ty();
         crate::lang::types::Type {
             emission: crate::lang::meta::common_or_module_emission(&[t.emission]),
-            docs: crate::lang::meta::Docs::empty(),
+            docs: Docs::from_line("Rust-like `Option` type usable over FFI."),
             visibility: Visibility::Public,
             name: format!("Option<{}>", t.name),
             kind: Self::kind(),

@@ -23,7 +23,7 @@
 //! ```
 
 use crate::inventory::{Inventory, TypeId};
-use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use crate::wire::SerializationError;
 use std::io::{Read, Write};
@@ -122,7 +122,7 @@ unsafe impl<T: TypeInfo> TypeInfo for Vec<T> {
         Type {
             name: format!("Vec<{}>", t.name),
             visibility: Visibility::Public,
-            docs: Docs::default(),
+            docs: Docs::from_line("Rust-like `Vec` type usable over FFI."),
             emission: common_or_module_emission(&[t.emission]),
             kind: Self::kind(),
         }
