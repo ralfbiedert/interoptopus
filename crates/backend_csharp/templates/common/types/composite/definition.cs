@@ -1,6 +1,9 @@
 {%- if docs %}
 {{ docs }}
 {%- endif %}
+{%- if is_disposable %}
+{{ _types_docs_owned }}
+{%- endif %}
 public partial {{ struct_or_class }} {{ name }}
 {
     {%- for field in fields %}

@@ -2,82 +2,82 @@
 
 {{ using }}
 
-namespace {{ namespace }} {
-    public static partial class Interop {
+namespace {{ namespace }};
 
-        public const string NativeLib = "{{ dll_name }}";
+public static partial class Interop {
+
+    public const string NativeLib = "{{ dll_name }}";
 {%- if api_guard and api_guard != "" %}
 
-        {{ api_guard | indent(prefix = "        ") }}
+    {{ api_guard | indent }}
 {%- endif %}
 {%- for fn in fns_rust %}
 
-        {{ fn | indent(prefix = "        ") }}
+    {{ fn | indent }}
 {%- endfor %}
 {%- for fn in fns_overload_simple %}
 
-        {{ fn | indent(prefix = "        ") }}
+    {{ fn | indent }}
 {%- endfor %}
 {%- for fn in fns_overload_body %}
 
-        {{ fn | indent(prefix = "        ") }}
+    {{ fn | indent }}
 {%- endfor %}
 {%- for fn in fns_overload_asynk %}
 
-        {{ fn | indent(prefix = "        ") }}
+    {{ fn | indent }}
 {%- endfor %}
 {%- for field in async_trampoline_fields %}
 
-        {{ field | indent(prefix = "        ") }}
+    {{ field | indent }}
 {%- endfor %}
-    }
+}
 {%- for enum in enums %}
 
-    {{ enum | indent }}
+{{ enum }}
 {%- endfor %}
 {%- for composite in composites %}
 
-    {{ composite | indent }}
+{{ composite }}
 {%- endfor %}
 {%- for delegate in delegates %}
 
-    {{ delegate | indent }}
+{{ delegate }}
 {%- endfor %}
 {%- for slice in slices %}
 
-    {{ slice | indent }}
+{{ slice }}
 {%- endfor %}
 {%- for vec in vecs %}
 
-    {{ vec | indent }}
+{{ vec }}
 {%- endfor %}
 {%- for service in services %}
 
-    {{ service | indent }}
+{{ service }}
 {%- endfor %}
 {%- for trampoline in async_trampolines %}
 
-    {{ trampoline | indent }}
+{{ trampoline }}
 {%- endfor %}
 
 {%- if pattern_bools and pattern_bools != "" %}
 
-    {{ pattern_bools | indent }}
+{{ pattern_bools }}
 {%- endif %}
 
 {%- if pattern_utf8string and pattern_utf8string != "" %}
 
-    {{ pattern_utf8string | indent }}
+{{ pattern_utf8string }}
 {%- endif %}
 
 {%- if pattern_wire_buffer and pattern_wire_buffer != "" %}
 
-    {{ pattern_wire_buffer | indent }}
+{{ pattern_wire_buffer }}
 {%- endif %}
 {%- for wire in wires %}
 
-    {{ wire | indent }}
+{{ wire }}
 {%- endfor %}
 
-    {{ util | indent }}
-}
+{{ util }}

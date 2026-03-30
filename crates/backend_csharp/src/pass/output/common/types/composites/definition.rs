@@ -29,6 +29,7 @@ impl Pass {
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
         struct_class: &model::common::types::info::struct_class::Pass,
+        disposable: &model::common::types::info::disposable::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -37,6 +38,7 @@ impl Pass {
 
             let name = &ty.name;
             let struct_or_class = if struct_class.is_struct(*type_id) { "struct" } else { "class" };
+            let is_disposable = disposable.is_disposable(*type_id).unwrap_or(false);
 
             let fields: Vec<HashMap<&str, String>> = composite
                 .fields
@@ -58,6 +60,7 @@ impl Pass {
             context.insert("struct_or_class", struct_or_class);
             context.insert("fields", &fields);
             context.insert("docs", &docs);
+            context.insert("is_disposable", &is_disposable);
 
             let rendered = templates.render("common/types/composite/definition.cs", &context)?;
             self.composite_ty.insert(*type_id, rendered);

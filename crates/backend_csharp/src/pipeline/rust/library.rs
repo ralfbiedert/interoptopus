@@ -421,7 +421,7 @@ impl RustLibrary {
         self.output_master.process(&mut pass_meta, &m.type_all, &m.fns_all)?;
         o.unmanaged_conversion.process(&mut pass_meta, &m.type_managed_conversion, &m.type_all)?;
         o.unmanaged_names.process(&mut pass_meta, &m.type_all, &m.type_managed_conversion)?;
-        o.enum_ty.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, OperationMode::Rust)?;
+        o.enum_ty.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, OperationMode::Rust)?;
         o.enum_body_unmanaged_variant.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, OperationMode::Rust)?;
         o.enum_body_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, OperationMode::Rust)?;
         o.enum_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, OperationMode::Rust)?;
@@ -434,7 +434,7 @@ impl RustLibrary {
         o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_from_call, &o.enum_body_exception_for_variant, &o.enum_body_tostring, &o.unmanaged_conversion)?;
         o.enums.process(&mut pass_meta, &self.output_master, &m.type_all, &o.enum_ty, &o.enum_body)?;
         o.conversion_fields.process(&mut pass_meta, &self.output_master, &m.type_all)?;
-        o.composite_ty.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class)?;
+        o.composite_ty.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable)?;
         o.composite_body_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.unmanaged_names, &o.conversion_fields)?;
         o.composite_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields, &m.type_nullable)?;
         o.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields, &m.type_nullable)?;
