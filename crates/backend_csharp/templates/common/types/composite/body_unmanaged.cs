@@ -3,7 +3,7 @@
 {%- else %}
 [StructLayout(LayoutKind.Sequential)]
 {%- endif %}
-public unsafe struct Unmanaged
+internal unsafe struct Unmanaged
 {
     {%- for field in fields %}
     {%- if field.is_fixed_array %}

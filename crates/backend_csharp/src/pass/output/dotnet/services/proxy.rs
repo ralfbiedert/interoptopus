@@ -7,7 +7,7 @@
 
 use crate::lang::types::kind::TypeKind;
 use crate::output::{FileType, Output};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -50,8 +50,7 @@ impl Pass {
 
                 let mut ctx = Context::new();
                 ctx.insert("name", &ty.name);
-
-                let template_name = self.template.as_deref().unwrap_or("common/types/service/all.cs");
+                let template_name = self.template.as_deref().unwrap_or("dotnet/service/proxy.cs");
                 let text = templates.render(template_name, &ctx)?;
                 rendered.push(text);
             }

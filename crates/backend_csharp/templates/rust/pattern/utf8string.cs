@@ -77,7 +77,7 @@ public partial class Utf8String : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public Unmanaged IntoUnmanaged()
+    internal Unmanaged IntoUnmanaged()
     {
         if (_ptr == IntPtr.Zero) { throw new Exception(); }
         var _unmanaged = new Unmanaged();
@@ -89,7 +89,7 @@ public partial class Utf8String : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public Unmanaged AsUnmanaged()
+    internal Unmanaged AsUnmanaged()
     {
         var _unmanaged = new Unmanaged();
         _unmanaged._ptr = _ptr;
@@ -99,14 +99,14 @@ public partial class Utf8String : IDisposable
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct Unmanaged
+    internal unsafe struct Unmanaged
     {
         public IntPtr _ptr;
         public ulong _len;
         public ulong _capacity;
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public Utf8String IntoManaged()
+        internal Utf8String IntoManaged()
         {
             var _managed = new Utf8String();
             _managed._ptr = _ptr;
@@ -117,7 +117,7 @@ public partial class Utf8String : IDisposable
 
     }
 
-    public partial class InteropHelper
+    internal partial class InteropHelper
     {
         [LibraryImport(Interop.NativeLib, EntryPoint = "{{ create_entry_point }}")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -138,7 +138,7 @@ public partial class Utf8String : IDisposable
     [CustomMarshaller(typeof(Utf8String), MarshalMode.Default, typeof(Marshaller))]
     private struct MarshallerMeta { }
 
-    public ref struct Marshaller
+    internal ref struct Marshaller
     {
         private Utf8String _managed; // Used when converting managed -> unmanaged
         private Unmanaged _unmanaged; // Used when converting unmanaged -> managed

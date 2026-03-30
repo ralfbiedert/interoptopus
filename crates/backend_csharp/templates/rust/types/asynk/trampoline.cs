@@ -1,4 +1,4 @@
-public class {{ trampoline_name }}
+internal class {{ trampoline_name }}
 {
     private static ulong Id = 0;
     private static Dictionary<ulong, TaskCompletionSource<{% if is_task_void %}bool{% else %}{{ task_inner_ty }}{% endif %}>> InFlight = new(1024);

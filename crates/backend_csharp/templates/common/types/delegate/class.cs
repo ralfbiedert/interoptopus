@@ -1,5 +1,5 @@
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-public delegate {{ rval_unmanaged_name }} {{ name }}Native({% for arg in args %}{{ arg.unmanaged_name }} {{ arg.name }}, {% endfor %}IntPtr callback_data);
+internal delegate {{ rval_unmanaged_name }} {{ name }}Native({% for arg in args %}{{ arg.unmanaged_name }} {{ arg.name }}, {% endfor %}IntPtr callback_data);
 public delegate {{ rval_managed }} {{ name }}Delegate({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %});
 
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -97,13 +97,13 @@ public partial class {{ name }} : IDisposable
     private struct MarshallerMeta {  }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct Unmanaged
+    internal struct Unmanaged
     {
         internal IntPtr _callback;
         internal IntPtr _data;
         internal IntPtr _destructor;
 
-        public {{ name }} IntoManaged()
+        internal {{ name }} IntoManaged()
         {
             var rval = new {{ name }}();
             rval._ptr = _callback;
@@ -114,7 +114,7 @@ public partial class {{ name }} : IDisposable
 
     }
 
-    public ref struct Marshaller
+    internal ref struct Marshaller
     {
         private {{ name }} _managed;
         private Unmanaged _unmanaged;

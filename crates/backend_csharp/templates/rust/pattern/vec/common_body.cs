@@ -17,7 +17,7 @@ public partial class {{ name }}
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public Unmanaged IntoUnmanaged()
+    internal Unmanaged IntoUnmanaged()
     {
         if (_ptr == IntPtr.Zero) throw new NullReferenceException();
         var rval = new Unmanaged();
@@ -29,7 +29,7 @@ public partial class {{ name }}
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public Unmanaged AsUnmanaged()
+    internal Unmanaged AsUnmanaged()
     {
         if (_ptr == IntPtr.Zero) throw new NullReferenceException();
         var rval = new Unmanaged();
@@ -59,7 +59,7 @@ public partial class {{ name }}
         return "{{ name }} { ... }";
     }
 
-    public partial class InteropHelper
+    internal partial class InteropHelper
     {
         [LibraryImport(Interop.NativeLib, EntryPoint = "{{ create_entry_point }}")]
         internal static partial long interoptopus_vec_create(IntPtr vec, ulong len, out Unmanaged rval);
@@ -71,14 +71,14 @@ public partial class {{ name }}
     private struct MarshallerMeta { }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct Unmanaged
+    internal struct Unmanaged
     {
         internal IntPtr _ptr;
         internal ulong _len;
         internal ulong _capacity;
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public {{ name }} IntoManaged()
+        internal {{ name }} IntoManaged()
         {
             var rval = new {{ name }}();
             rval._len = _len;
@@ -88,7 +88,7 @@ public partial class {{ name }}
         }
     }
 
-    public ref struct Marshaller
+    internal ref struct Marshaller
     {
         private {{ name }} _managed;
         private Unmanaged _unmanaged;

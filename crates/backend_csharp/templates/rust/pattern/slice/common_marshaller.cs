@@ -1,6 +1,6 @@
 public partial class {{ name }}
 {
-    public ref struct Marshaller
+    internal ref struct Marshaller
     {
         private {{ name }} _managed;
         private Unmanaged _unmanaged;

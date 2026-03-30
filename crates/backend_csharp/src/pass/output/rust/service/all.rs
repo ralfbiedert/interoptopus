@@ -1,7 +1,7 @@
 //! Renders service classes through the `service/all.cs` template, grouped per output file.
 
 use crate::output::{FileType, Output};
-use crate::pass::{OutputResult, PassInfo, model, output};
+use crate::pass::{model, output, OutputResult, PassInfo};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
@@ -49,7 +49,6 @@ impl Pass {
                 context.insert("dtor", &dtor_fn.name);
                 context.insert("ctors", &ctors);
                 context.insert("methods", &methods);
-
                 let rendered = templates.render("rust/service/all.cs", &context)?;
                 rendered_services.push(rendered);
             }

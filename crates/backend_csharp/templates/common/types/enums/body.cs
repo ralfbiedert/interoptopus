@@ -33,7 +33,7 @@ public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposa
     [CustomMarshaller(typeof({{ name }}), MarshalMode.Default, typeof(Marshaller))]
     private struct MarshallerMeta { }
 
-    public ref struct Marshaller
+    internal ref struct Marshaller
     {
         private {{ name }} _managed;
         private Unmanaged _unmanaged;

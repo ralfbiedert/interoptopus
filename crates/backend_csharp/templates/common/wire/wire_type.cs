@@ -78,18 +78,18 @@ public partial class {{ wire_name }} : IDisposable
     private struct MarshallerMeta { }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct Unmanaged
+    internal struct Unmanaged
     {
         public WireBuffer Buffer;
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public {{ wire_name }} IntoManaged()
+        internal {{ wire_name }} IntoManaged()
         {
             return new {{ wire_name }} { Buffer = Buffer };
         }
     }
 
-    public ref struct Marshaller
+    internal ref struct Marshaller
     {
         private {{ wire_name }} _managed;
         private Unmanaged _unmanaged;

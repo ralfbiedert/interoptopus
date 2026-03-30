@@ -1,12 +1,11 @@
 public partial class {{ name }} : IDisposable
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct Unmanaged
+    internal struct Unmanaged
     {
         internal IntPtr _handle;
 
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public {{ name }} IntoManaged()
+        internal {{ name }} IntoManaged()
         {
             var h = GCHandle.FromIntPtr(_handle);
             var obj = ({{ name }})h.Target!;
@@ -15,21 +14,21 @@ public partial class {{ name }} : IDisposable
         }
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public {{ name }} AsManaged()
+        internal {{ name }} AsManaged()
         {
             return ({{ name }})GCHandle.FromIntPtr(_handle).Target!;
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public Unmanaged IntoUnmanaged()
+    internal Unmanaged IntoUnmanaged()
     {
         var h = GCHandle.Alloc(this);
         return new Unmanaged { _handle = GCHandle.ToIntPtr(h) };
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public Unmanaged AsUnmanaged()
+    internal Unmanaged AsUnmanaged()
     {
         var h = GCHandle.Alloc(this);
         return new Unmanaged { _handle = GCHandle.ToIntPtr(h) };

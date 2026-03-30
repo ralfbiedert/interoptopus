@@ -117,7 +117,7 @@ public partial class Utf8String : IDisposable
 
     }
 
-    public partial class InteropHelper
+    internal partial class InteropHelper
     {
         [LibraryImport({{class_name}}.NativeLib, EntryPoint = "interoptopus_string_create")]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]

@@ -75,7 +75,7 @@ public partial struct WireBuffer
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct Unmanaged
+    internal unsafe struct Unmanaged
     {
         public IntPtr data;
         public int len;
@@ -101,7 +101,7 @@ public partial struct WireBuffer
 
     [CustomMarshaller(typeof(WireBuffer), MarshalMode.Default, typeof(Marshaller))]
     private struct MarshallerMeta { }
-    public ref struct Marshaller
+    internal ref struct Marshaller
     {
         private WireBuffer _managed;
         private Unmanaged _unmanaged;
@@ -130,7 +130,7 @@ public partial struct WireBuffer
 }
 
 {% if not plugin_mode %}
-public partial class WireInterop {
+internal partial class WireInterop {
     [LibraryImport(Interop.NativeLib, EntryPoint = "{{ create_entry_point }}")]
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public static unsafe partial IntPtr interoptopus_wire_create(int size, out int out_len, out int out_capacity);

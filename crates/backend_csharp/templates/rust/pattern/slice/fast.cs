@@ -83,7 +83,7 @@ public partial class {{ name }} : IEnumerable<{{ element_type }}>, IDisposable
     private struct MarshallerMeta { }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct Unmanaged
+    internal struct Unmanaged
     {
         public IntPtr _data;
         public ulong _len;

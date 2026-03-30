@@ -1,0 +1,2 @@
+// XXXXYYYXXX
+[MethodImpl(MethodImplOptions.AggressiveOptimization)]

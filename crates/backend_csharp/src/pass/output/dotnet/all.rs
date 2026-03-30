@@ -1,7 +1,7 @@
 //! Renders the final dotnet interop `.cs` file by composing intermediary output passes.
 
 use crate::output::FileType;
-use crate::pass::{OutputResult, PassInfo, output};
+use crate::pass::{output, OutputResult, PassInfo};
 use crate::pipeline::DotnetOutputPasses;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;
@@ -38,7 +38,7 @@ impl Pass {
             let delegates_signature = intermediary.delegates_signature.delegates_for(file).unwrap_or(&[]);
             let delegates: Vec<&str> = delegates_class.iter().chain(delegates_signature.iter()).map(String::as_str).collect();
             let composites = intermediary.composites.composites_for(file).unwrap_or(&[]);
-            let service_types = intermediary.service_types.services_for(file).unwrap_or(&[]);
+            let service_types = intermediary.service_proxy.services_for(file).unwrap_or(&[]);
             let enums = intermediary.enums.enums_for(file).unwrap_or(&[]);
             let pattern_bools = intermediary.pattern_bools.bool_for(file).unwrap_or("");
             let util = intermediary.util.utils_for(file).unwrap_or("");
