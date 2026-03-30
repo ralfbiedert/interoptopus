@@ -1,5 +1,6 @@
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 internal delegate {{ rval_unmanaged_name }} {{ name }}Native({% for arg in args %}{{ arg.unmanaged_name }} {{ arg.name }}, {% endfor %}IntPtr callback_data);
+/// Managed delegate signature for <see cref="{{ name }}"/>.
 public delegate {{ rval_managed }} {{ name }}Delegate({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %});
 
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -15,6 +16,14 @@ public partial class {{ name }}
     private Exception _exception;
 }
 
+/// A named callback that bridges a managed <see cref="{{ name }}Delegate"/> and an
+/// unmanaged function pointer. When created from a managed delegate, exceptions
+/// thrown inside the callback are captured and re-thrown on <see cref="Dispose"/>.
+///
+/// When received from Rust, use <see cref="Dispose"/> after the last use to allow
+/// Rust to free any associated data. When passed to Rust, hold onto this class until done,
+/// otherwise your function trampoline might get deallocated.
+{{ _types_docs_owned }}
 [NativeMarshalling(typeof(MarshallerMeta))]
 public partial class {{ name }} : IDisposable
 {
@@ -23,6 +32,7 @@ public partial class {{ name }} : IDisposable
     {{ _fns_decorators_internal | indent }}
     internal {{ name }}() { }
 
+    /// Wraps a managed delegate so it can be passed to Rust as a callback.
     {{ _fns_decorators_all | indent }}
     public {{ name }}({{ name }}Delegate managed)
     {
@@ -65,6 +75,9 @@ public partial class {{ name }} : IDisposable
         {% endif %}
     }
 
+    /// Disposes the callback. If the managed delegate threw an exception during a
+    /// previous invocation, that exception is re-thrown here. If the callback was
+    /// received from Rust, this tells Rust to free the associated data pointer.
     {{ _fns_decorators_all | indent }}
     public void Dispose()
     {

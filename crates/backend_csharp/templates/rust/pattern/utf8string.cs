@@ -5,12 +5,17 @@ public partial class Utf8String
     ulong _capacity;
 }
 
+/// A Rust-allocated UTF-8 string.
+///
+/// This type wraps a native Rust <c>String</c> and provides zero-copy read access
+/// via the <see cref="String"/> property.
 {{ _types_docs_owned }}
 [NativeMarshalling(typeof(MarshallerMeta))]
 public partial class Utf8String : IDisposable
 {
     private Utf8String() { }
 
+    /// Creates a new Rust-owned <see cref="Utf8String"/> from a managed string.
     {{ _fns_decorators_all | indent }}
     public static unsafe Utf8String From(string s)
     {
@@ -30,6 +35,7 @@ public partial class Utf8String : IDisposable
         return rval;
     }
 
+    /// Creates an empty Rust-owned <see cref="Utf8String"/>.
     {{ _fns_decorators_all | indent }}
     public static unsafe Utf8String Empty()
     {
@@ -51,8 +57,7 @@ public partial class Utf8String : IDisposable
     }
 
     /// Converts the native UTF-8 buffer to a managed string and disposes the native buffer.
-    /// After this call the <see cref="Utf8String"/> instance is consumed (Dispose() will
-    /// have been called) and must not be used again.
+    /// After this call the <see cref="Utf8String"/> instance is consumed and must not be used again.
     {{ _fns_decorators_all | indent }}
     public string IntoString()
     {
@@ -61,6 +66,7 @@ public partial class Utf8String : IDisposable
         return rval;
     }
 
+    /// Frees the native Rust memory. Safe to call multiple times.
     {{ _fns_decorators_all | indent }}
     public void Dispose()
     {
@@ -73,6 +79,7 @@ public partial class Utf8String : IDisposable
         _ptr = IntPtr.Zero;
     }
 
+    /// Creates an independent copy of this string, backed by a new Rust allocation.
     {{ _fns_decorators_all | indent }}
     public Utf8String Clone()
     {
@@ -180,7 +187,10 @@ public partial class Utf8String : IDisposable
 }
 
 
+/// Convenience extension to convert a <see cref="string"/> to a <see cref="Utf8String"/>.
 public static class StringExtensions
 {
+    /// Converts this string to a Rust-owned <see cref="Utf8String"/>.
+    /// Call <see cref="Utf8String.Dispose"/> if the value is not passed back to Rust.
     public static Utf8String Utf8(this string s) { return Utf8String.From(s); }
 }

@@ -3,6 +3,7 @@ public partial class {{ name }}
     {{ _fns_decorators_all | indent }}
     private {{ name }}() { }
 
+    /// Creates an empty Rust-owned vector.
     {{ _fns_decorators_all | indent }}
     public static unsafe {{ name }} Empty()
     {
@@ -10,6 +11,7 @@ public partial class {{ name }}
         return _out.IntoManaged();
     }
 
+    /// The number of elements in this vector.
     public int Count
     {
         {{ _fns_decorators_all | indent(prefix="        ") }}
@@ -41,6 +43,7 @@ public partial class {{ name }}
         return rval;
     }
 
+    /// Frees the underlying Rust allocation. Safe to call multiple times.
     {{ _fns_decorators_all | indent }}
     public void Dispose()
     {

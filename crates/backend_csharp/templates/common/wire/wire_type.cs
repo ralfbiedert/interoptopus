@@ -10,6 +10,8 @@ public partial class {{ inner_type }}
 {% endif -%}
 public partial class {{ inner_type }}
 {
+    /// Serializes this instance into a <see cref="{{ wire_name }}"/> for FFI transfer.
+    /// Call <see cref="{{ wire_name }}.Dispose"/> on the result if it is not passed back to Rust.
     public {{ wire_name }} Wire()
     {
         return {{ wire_name }}.From(this);
@@ -17,12 +19,18 @@ public partial class {{ inner_type }}
 }
 
 {% endif -%}
+/// Binary wire-format wrapper for <c>{{ inner_type }}</c>.
+///
+/// Wire types serialize complex managed objects into a flat byte buffer that
+/// Rust can read. Create one with <see cref="From"/> before passing to a Rust
+/// function; use <see cref="Unwire"/> to deserialize a buffer received from Rust.
 {{ _types_docs_owned }}
 [NativeMarshalling(typeof(MarshallerMeta))]
 public partial class {{ wire_name }} : IDisposable
 {
     internal WireBuffer Buffer;
 
+    /// Serializes <paramref name="value"/> into a new wire buffer.
     {{ _fns_decorators_all | indent }}
     public static {{ wire_name }} From({{ inner_type }} value)
     {
@@ -42,6 +50,7 @@ public partial class {{ wire_name }} : IDisposable
         }
     }
 
+    /// Deserializes the wire buffer back into a <c>{{ inner_type }}</c> instance.
     {{ _fns_decorators_all | indent }}
     public {{ inner_type }} Unwire()
     {
@@ -55,6 +64,7 @@ public partial class {{ wire_name }} : IDisposable
         {{ size_body | indent(prefix = "        ") }}
     }
 
+    /// Frees the underlying wire buffer.
     public void Dispose()
     {
         Buffer.Dispose();
@@ -68,7 +78,7 @@ public partial class {{ wire_name }} : IDisposable
         Buffer = default;
         return rval;
     }
-    
+
     {{ _fns_decorators_all | indent }}
     {{ _fns_decorators_internal | indent }}
     internal Unmanaged AsUnmanaged()
@@ -76,7 +86,7 @@ public partial class {{ wire_name }} : IDisposable
         var rval = new Unmanaged { Buffer = Buffer };
         return rval;
     }
-    
+
     [CustomMarshaller(typeof({{ wire_name }}), MarshalMode.Default, typeof(Marshaller))]
     private struct MarshallerMeta { }
 

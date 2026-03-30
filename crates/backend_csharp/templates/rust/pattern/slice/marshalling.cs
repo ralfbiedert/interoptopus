@@ -4,12 +4,20 @@ public partial class {{ name }}
     ulong _len;
 }
 
+/// A read-only view into a contiguous region of <c>{{ element_type }}</c> elements,
+/// with marshalling support for non-blittable element types.
+///
+/// Elements are marshalled from their unmanaged representation on each access.
+/// The slice allocates a temporary native copy via <c>Marshal.AllocHGlobal</c>;
+/// call <see cref="Dispose"/> to free it.
 {{ _types_docs_owned }}
 [NativeMarshalling(typeof(MarshallerMeta))]
 public partial class {{ name }} : IDisposable
 {
+    /// The number of elements in this slice.
     public int Count => (int) _len;
 
+    /// Gets the element at the given index, marshalling from its unmanaged form.
     public unsafe {{ element_type }} this[int i]
     {
         {{ _fns_decorators_all | indent(prefix="        ") }}
@@ -27,6 +35,7 @@ public partial class {{ name }} : IDisposable
     {{ _fns_decorators_all | indent }}
     {{ name }}() { }
 
+    /// Creates a slice by marshalling each element from a managed array into a native copy.
     {{ _fns_decorators_all | indent }}
     public static unsafe {{ name }} From({{ element_type }}[] managed)
     {
@@ -43,6 +52,7 @@ public partial class {{ name }} : IDisposable
         return rval;
     }
 
+    /// Frees the native copy. Safe to call multiple times.
     {{ _fns_decorators_all | indent }}
     public void Dispose()
     {
@@ -88,7 +98,9 @@ public partial class {{ name }} : IDisposable
 
 {%- include "rust/pattern/slice/common_marshaller.cs" %}
 
+/// Convenience extension to convert a <c>{{ element_type }}[]</c> array to a <see cref="{{ name }}"/>.
 public static class {{ name }}Extensions
 {
+    /// Marshals the array into a <see cref="{{ name }}"/>. Call <see cref="{{ name }}.Dispose"/> when done.
     public static {{ name }} {{ method }}(this {{ element_type }}[] s) { return {{ name }}.From(s); }
 }

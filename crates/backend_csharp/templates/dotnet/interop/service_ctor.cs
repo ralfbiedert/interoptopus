@@ -1,5 +1,5 @@
     [UnmanagedCallersOnly(EntryPoint = "{{ ffi_name }}")]
-    public static nint {{ ffi_name }}({{ args }})
+    internal static nint {{ ffi_name }}({{ args }})
     {
         try
         {

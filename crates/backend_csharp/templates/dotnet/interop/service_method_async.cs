@@ -1,5 +1,5 @@
     [UnmanagedCallersOnly(EntryPoint = "{{ ffi_name }}")]
-    public static void {{ ffi_name }}({{ args }})
+    internal static void {{ ffi_name }}({{ args }})
     {
         try
         {
