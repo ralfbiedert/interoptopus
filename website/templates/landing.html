@@ -29,6 +29,8 @@
                     </picture>
 
                 {% endif %}
+                <!-- Floating graph meshes -->
+                <canvas id="hero-graphs" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
             </div>
             <div class="relative z-10 p-8 max-w-6xl mx-auto">
                 {% if section.extra.hero.badge %}
@@ -70,6 +72,7 @@
                 {% endif %}
             </div>
         </div>
+        <script src="{{ get_url(path='js/hero-graphs.js') | safe }}"></script>
     {% endif %}
 {% endmacro %}
 

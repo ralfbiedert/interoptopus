@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - website
+      - release
 
 jobs:
   deploy:
