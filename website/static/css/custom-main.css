@@ -16,3 +16,14 @@ body {
 pre.giallo {
     color-scheme: inherit !important;
 }
+
+/* Reduce table row height */
+.prose th {
+    padding-top: 0.50rem;
+    padding-bottom: 0.20rem;
+}
+
+.prose td {
+    padding-top: 0.40rem;
+    padding-bottom: 0.40rem;
+}
