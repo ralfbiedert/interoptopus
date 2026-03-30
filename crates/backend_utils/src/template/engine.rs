@@ -1,5 +1,5 @@
-use crate::template::Assets;
 use crate::Error;
+use crate::template::Assets;
 use std::collections::HashMap;
 use std::io::Read;
 use tera::{Context, Tera};

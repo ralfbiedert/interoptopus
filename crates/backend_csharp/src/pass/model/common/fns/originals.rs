@@ -68,7 +68,13 @@ impl Pass {
             }
 
             let cs_signature = Signature { arguments: cs_arguments, rval: cs_rval };
-            let cs_function = Function { emission: rust_fn.emission.clone(), name: rust_fn.name.clone(), docs: rust_fn.docs.lines.clone(), signature: cs_signature, kind: FunctionKind::Original };
+            let cs_function = Function {
+                emission: rust_fn.emission.clone(),
+                name: rust_fn.name.clone(),
+                docs: rust_fn.docs.lines.clone(),
+                signature: cs_signature,
+                kind: FunctionKind::Original,
+            };
 
             all.register(cs_id, cs_function.clone());
             self.functions.insert(cs_id, cs_function);

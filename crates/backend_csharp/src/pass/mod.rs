@@ -94,6 +94,7 @@ impl PassMeta {
 /// Formats doc lines as C# `///` documentation comments.
 ///
 /// Returns an empty string if there are no doc lines.
+#[must_use]
 pub fn format_docs(lines: &[String]) -> String {
     if lines.is_empty() {
         return String::new();

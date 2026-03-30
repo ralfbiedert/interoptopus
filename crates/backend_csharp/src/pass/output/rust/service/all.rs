@@ -1,7 +1,7 @@
 //! Renders service classes through the `service/all.cs` template, grouped per output file.
 
 use crate::output::{FileType, Output};
-use crate::pass::{model, output, OutputResult, PassInfo};
+use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
 
