@@ -2,6 +2,14 @@ h2::after {
     display: none;
 }
 
+/* Improve font rendering on Windows where subpixel rendering
+   can make light-weight webfonts appear thin and jaggy. */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
 /* Giallo sets color-scheme: light dark on <pre> via inline style, which makes
    light-dark() follow OS preference instead of the DaisyUI theme. Override with
    !important so the site's theme toggle controls syntax highlighting colors. */
