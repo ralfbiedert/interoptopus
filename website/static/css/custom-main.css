@@ -17,6 +17,11 @@ pre.giallo {
     color-scheme: inherit !important;
 }
 
+/* Lighten primary accent in dark theme for better contrast */
+[data-theme="business"] {
+    --color-primary: oklch(67% .099 251.473);
+}
+
 /* Reduce table row height */
 .prose th {
     padding-top: 0.50rem;
