@@ -13,3 +13,4 @@ interoptopus = { workspace = true, features = ["macros", "tokio"] }
 
 [dev-dependencies]
 interoptopus_csharp.workspace = true
+interoptopus_c.workspace = true

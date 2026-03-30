@@ -1,0 +1,1 @@
+typedef {{ rval }} (*{{ name }})({{ params }});
