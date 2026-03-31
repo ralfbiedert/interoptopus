@@ -231,7 +231,7 @@ fn build_arg_transforms(
     let mut overload_args = Vec::new();
     let mut transforms = Vec::new();
 
-    for (_, arg) in args.iter().enumerate() {
+    for arg in args {
         if let Some(OverloadFamily::Delegate(family)) = is_delegate_class(arg.ty, types).then(|| type_overloads.get(arg.ty)).flatten() {
             overload_args.push(Argument { name: arg.name.clone(), ty: family.signature });
             transforms.push(ArgTransform::WrapDelegate);

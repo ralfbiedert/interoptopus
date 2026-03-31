@@ -33,6 +33,7 @@ impl Visibility {
     }
 
     /// Returns whichever of `self` and `other` is more restrictive.
+    #[must_use]
     pub fn most_restrictive(self, other: &Self) -> Self {
         if other.restrictiveness() > self.restrictiveness() { other.clone() } else { self }
     }

@@ -89,7 +89,7 @@ fn rebuild_with_overloads(
                         // Only compare against overloads of the same base function.
                         let same_base = match &existing.kind {
                             FunctionKind::Overload(eo) => eo.base == o.base,
-                            _ => false,
+                            FunctionKind::Original => false,
                         };
                         if !same_base {
                             return false;

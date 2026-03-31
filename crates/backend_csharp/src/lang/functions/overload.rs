@@ -18,7 +18,7 @@ pub enum ArgTransform {
     Ref,
     /// Argument is a bare C# delegate that wraps into a delegate class.
     WrapDelegate,
-    /// Accepts a service instance, extracts the IntPtr, and uses that for invokes.
+    /// Accepts a service instance, extracts the `IntPtr`, and uses that for invokes.
     Service,
 }
 

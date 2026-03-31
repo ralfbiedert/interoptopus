@@ -212,7 +212,7 @@ fn resolve_result_rval(rval_kind: Option<&TypeKind>, types: &model::common::type
     }
 }
 
-/// Returns true if the function's first argument is a service type (not IntPtr).
+/// Returns true if the function's first argument is a service type (not `IntPtr`).
 fn has_service_self_arg(func: &crate::lang::functions::Function, types: &model::common::types::all::Pass) -> bool {
     func.signature
         .arguments

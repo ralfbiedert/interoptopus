@@ -41,6 +41,7 @@ fn is_eligible_intptr(ty: TypeId, types: &model::common::types::all::Pass) -> bo
 }
 
 /// If the argument is an `IntPtr` pointing to a `Service`, returns the service's `TypeId`.
+#[must_use]
 pub fn service_intptr_target(ty: TypeId, types: &model::common::types::all::Pass) -> Option<TypeId> {
     let TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target }) = types.get(ty).map(|t| &t.kind)? else {
         return None;

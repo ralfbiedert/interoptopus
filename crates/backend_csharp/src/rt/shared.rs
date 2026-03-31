@@ -3,7 +3,7 @@
 use interoptopus::lang::plugin::PluginLoadError;
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 /// Cache of loaded plugins, keyed by `(TypeId, path)`.
@@ -21,7 +21,7 @@ impl PluginCache {
     }
 
     /// Checks that `path` has not already been loaded for a different plugin type.
-    pub fn check_uniqueness<T: 'static>(&self, path: &PathBuf) -> Result<(), PluginLoadError> {
+    pub fn check_uniqueness<T: 'static>(&self, path: &Path) -> Result<(), PluginLoadError> {
         let type_id = TypeId::of::<T>();
         if let Some(existing_type) = self.path_to_type.get(path)
             && *existing_type != type_id
@@ -32,8 +32,8 @@ impl PluginCache {
     }
 
     /// Returns a cached plugin instance if `T` was already loaded from `path`.
-    pub fn get_cached<T: Send + Sync + 'static>(&self, path: &PathBuf) -> Option<Arc<T>> {
-        let key = (TypeId::of::<T>(), path.clone());
+    pub fn get_cached<T: Send + Sync + 'static>(&self, path: &Path) -> Option<Arc<T>> {
+        let key = (TypeId::of::<T>(), path.to_path_buf());
         self.plugins.get(&key).map(|boxed| {
             let arc = boxed.downcast_ref::<Arc<T>>().expect("type mismatch in plugin cache");
             Arc::clone(arc)
