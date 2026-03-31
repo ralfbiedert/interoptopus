@@ -68,7 +68,6 @@ impl Pass {
                 let docs = format_docs(&ctor_fn.docs);
 
                 if let Some(overload_id) = async_overload {
-                    // Async constructor
                     let Some(overload_fn) = fns.get(overload_id) else { continue };
 
                     let args = build_args(&overload_fn.signature.arguments, types);
@@ -79,12 +78,11 @@ impl Pass {
                     context.insert("interop_name", &overload_fn.name);
                     context.insert("args", &args);
                     context.insert("docs", &docs);
-                    context.insert("visibility", &overload_fn.visibility.to_string());
+                    context.insert("visibility", "public");
 
                     let rendered = templates.render("rust/service/body_ctors_async.cs", &context)?;
                     rendered_ctors.push(rendered);
                 } else if let Some(overload_id) = body_overload {
-                    // Sync constructor with body overload (e.g., service arg transforms)
                     let Some(overload_fn) = fns.get(overload_id) else { continue };
 
                     let args = build_args(&overload_fn.signature.arguments, types);
@@ -95,12 +93,12 @@ impl Pass {
                     context.insert("interop_name", &overload_fn.name);
                     context.insert("args", &args);
                     context.insert("docs", &docs);
-                    context.insert("visibility", &overload_fn.visibility.to_string());
+                    context.insert("visibility", "public");
 
                     let rendered = templates.render("rust/service/body_ctors.cs", &context)?;
                     rendered_ctors.push(rendered);
                 } else {
-                    // Sync constructor: use the original function
+                    // Sync constructor with no overload — render with original args
                     let args = build_args(&ctor_fn.signature.arguments, types);
 
                     let mut context = Context::new();
@@ -109,7 +107,7 @@ impl Pass {
                     context.insert("interop_name", &ctor_fn.name);
                     context.insert("args", &args);
                     context.insert("docs", &docs);
-                    context.insert("visibility", &ctor_fn.visibility.to_string());
+                    context.insert("visibility", "public");
 
                     let rendered = templates.render("rust/service/body_ctors.cs", &context)?;
                     rendered_ctors.push(rendered);

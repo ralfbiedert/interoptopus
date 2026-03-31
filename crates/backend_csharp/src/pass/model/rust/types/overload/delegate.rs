@@ -69,7 +69,14 @@ impl Pass {
             names.set(sig_id, sig_name.clone());
             types.set(
                 sig_id,
-                Type { emission: Emission::Builtin, name: sig_name, visibility: Visibility::Public, docs: Vec::new(), kind: TypeKind::Delegate(sig_delegate), decorators: Decorators::default() },
+                Type {
+                    emission: Emission::Builtin,
+                    name: sig_name,
+                    visibility: Visibility::Public,
+                    docs: Vec::new(),
+                    kind: TypeKind::Delegate(sig_delegate),
+                    decorators: Decorators::default(),
+                },
             );
 
             // Register family in the overload all pass

@@ -192,7 +192,10 @@ fn resolve_or_create_task_type(
         let kind = TypeKind::Task(Task { inner });
         kinds.set(task_ty_id, kind.clone());
         names.set(task_ty_id, task_name.clone());
-        types.set(task_ty_id, Type { emission: Emission::Builtin, name: task_name, visibility: Visibility::Public, docs: Vec::new(), kind, decorators: Decorators::default() });
+        types.set(
+            task_ty_id,
+            Type { emission: Emission::Builtin, name: task_name, visibility: Visibility::Public, docs: Vec::new(), kind, decorators: Decorators::default() },
+        );
     }
 
     task_ty_id

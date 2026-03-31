@@ -19,6 +19,7 @@ public class TestWireBasic
             x = "hello world"
         }.Wire();
 
+
         Interop.wire_accept_string_2(x);
     }
 }

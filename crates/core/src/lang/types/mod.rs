@@ -27,6 +27,8 @@ pub use std::{type_id_ptr, type_id_ptr_mut};
 pub use structs::{Field, Struct};
 pub use wire::{WireIO, WireOnly};
 
+pub trait TypeProxy {}
+
 /// Implemented by every Rust type that can appear in an FFI signature.
 ///
 /// The `#[ffi]` attribute generates this for annotated structs and enums.

@@ -36,7 +36,10 @@ impl Pass {
         for (_service_id, service) in services.iter() {
             let Some(type_name) = types.get(service.ty).map(|t| &t.name) else { continue };
 
-            let source_fns: Vec<_> = service.sources.ctors.iter()
+            let source_fns: Vec<_> = service
+                .sources
+                .ctors
+                .iter()
                 .chain(service.sources.methods.iter())
                 .chain(service.ctors.iter())
                 .chain(service.methods.iter())

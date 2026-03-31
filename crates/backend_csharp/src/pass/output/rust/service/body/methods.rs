@@ -49,8 +49,13 @@ impl Pass {
                 let Some(method_name) = method_names.get(method_fn_id) else { continue };
 
                 match &method_fn.kind {
+                    // Skip originals that have overloads — the overload will be rendered instead.
+                    // Only render originals that have no overloads (no body/async transform needed).
                     FunctionKind::Original => {
-                        // Base method (the raw native forwarding method)
+                        let has_overload = fns.overloads_for(method_fn_id).next().is_some();
+                        if has_overload {
+                            continue;
+                        }
                         let rval_kind = types.get(method_fn.signature.rval).map(|t| &t.kind);
                         let result_info = resolve_result_rval(rval_kind, types);
 
@@ -63,24 +68,20 @@ impl Pass {
 
                         let docs = format_docs(&method_fn.docs);
                         let args = build_args(&method_fn.signature.arguments[1..], types);
-                        let visibility = method_fn.visibility.to_string();
-                        // Originals take IntPtr — forward _context
-                        rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, method_name, &method_fn.name, &args, &docs, &visibility, "_context")?);
+                        rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, method_name, &method_fn.name, &args, &docs, "public", "_context")?);
                     }
                     FunctionKind::Overload(overload) => {
                         let Some(original_fn) = fns.get(overload.base) else { continue };
                         let Some(base_method_name) = method_names.get(overload.base) else { continue };
 
                         let docs = format_docs(&method_fn.docs);
-                        // Overloads accept Service type — forward this
                         let self_arg = if has_service_self_arg(method_fn, types) { "this" } else { "_context" };
 
                         if matches!(&overload.kind, OverloadKind::Async(_)) {
                             let task_rval = types.get(method_fn.signature.rval).map_or_else(|| "Task".to_string(), |t| t.name.clone());
                             let async_args = build_args(&method_fn.signature.arguments[1..], types);
-                            let visibility = method_fn.visibility.to_string();
 
-                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args, &docs, &visibility, self_arg)?);
+                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args, &docs, "public", self_arg)?);
                         } else {
                             let rval_kind = types.get(original_fn.signature.rval).map(|t| &t.kind);
                             let result_info = resolve_result_rval(rval_kind, types);
@@ -93,8 +94,18 @@ impl Pass {
                             let is_void = result_info.is_void || matches!(rval_kind, Some(TypeKind::Primitive(Primitive::Void)));
 
                             let overload_args = build_args(&method_fn.signature.arguments[1..], types);
-                            let visibility = method_fn.visibility.to_string();
-                            rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, base_method_name, &method_fn.name, &overload_args, &docs, &visibility, self_arg)?);
+                            rendered_methods.push(render(
+                                templates,
+                                rval,
+                                is_void,
+                                result_info.as_ok,
+                                base_method_name,
+                                &method_fn.name,
+                                &overload_args,
+                                &docs,
+                                "public",
+                                self_arg,
+                            )?);
                         }
                     }
                 }

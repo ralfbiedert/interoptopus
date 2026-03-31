@@ -10,7 +10,7 @@ use crate::lang::types::csharp;
 use crate::lang::types::kind::{TypeKind, TypePattern, Util};
 use crate::lang::types::{Decorators, Type};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::{model, ModelResult, PassInfo};
+use crate::pass::{ModelResult, PassInfo, model};
 
 #[derive(Default)]
 pub struct Config {}
@@ -66,7 +66,14 @@ impl Pass {
                 names.set(id, name.to_string());
                 types.set(
                     id,
-                    Type { emission: Emission::FileEmission(FileEmission::Common), name: name.to_string(), visibility, docs: Vec::new(), kind, decorators: Decorators::default() },
+                    Type {
+                        emission: Emission::FileEmission(FileEmission::Common),
+                        name: name.to_string(),
+                        visibility,
+                        docs: Vec::new(),
+                        kind,
+                        decorators: Decorators::default(),
+                    },
                 );
             }
 
