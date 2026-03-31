@@ -26,13 +26,13 @@ static class Benchmark {
         var callback_huge_prealloc = new CallbackHugeVecSlice(x => x[0]);
         var serviceAsync = ServiceAsyncBasic.Create();
         var hello_world = "hello world".Utf8();
-        var deeply_nested = new My.Company.DeeplyNestedWire1 {
+        var deeply_nested = new DeeplyNestedWire1 {
             name = new string('x', 50),
             values = Enumerable.Range(0, 3).ToDictionary(
                 i => (uint)i,
-                i => new My.Company.DeeplyNestedWire2 {
-                    values = Enumerable.Range(0, 3).Select(j => new My.Company.DeeplyNestedWire3 {
-                        x = Enumerable.Range(0, 3).ToDictionary(k => (uint)k, k => new My.Company.DeeplyNestedWire4 { a = (uint)k }),
+                i => new DeeplyNestedWire2 {
+                    values = Enumerable.Range(0, 3).Select(j => new DeeplyNestedWire3 {
+                        x = Enumerable.Range(0, 3).ToDictionary(k => (uint)k, k => new DeeplyNestedWire4 { a = (uint)k }),
                         y = new string('y', 50)
                     }).ToList()
                 }
