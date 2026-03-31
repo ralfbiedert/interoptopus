@@ -13,7 +13,8 @@ Use [Github Discussions](https://github.com/ralfbiedert/interoptopus/discussions
 
 #### Why does the async overhead appear so high in benchmarks?
 
-It depends heavily on how many tasks are in flight. When a `.NET` callback completes and needs to
+It depends heavily on how many tasks are in flight, and how wake-ups are scheduled 
+by the respective runtime. For example, when a `.NET` callback completes and needs to
 resume a Tokio task, it calls the waker. If no Tokio worker thread is active, the OS must wake one
 up — a futex operation that costs 1–4 µs. With other tasks already running, the waker hands off
 directly to an active thread and the overhead drops a dramatic 8x despite 64x more work in flight:
@@ -25,6 +26,7 @@ directly to an active thread and the overhead drops a dramatic 8x despite 64x mo
 
 In practice, workloads with many concurrent async calls will not pay the elevated wake up cost;
 and applications with few tasks in flight benefit from sleeping threads.
+
 
 
 ## Safety, Soundness, Undefined Behavior

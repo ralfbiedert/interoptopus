@@ -21,14 +21,17 @@ The .NET runtime adds ~20 MB RSS on first plugin load.
 The 'forward calling mode', i.e., a C# application calling an embedded Rust `.dll`. Used when you
 have a legacy app but want high-performance Rust under the hood.
 
-| Construct                              | ns / call |
-|----------------------------------------|-----------|
-| `primitive_void()`                     | 3         |
-| `primitive_u64(0)`                     | 4         |
-| `pattern_delegate_retained(delegate)`  | 21        |
-| `pattern_ascii_pointer("hello world")` | 20        |
-| `pattern_utf8_string("hello world")`   | 52        |
-| `await serviceAsync.Success()`         | 361       |
+| Construct                                               | ns / call        |
+|---------------------------------------------------------|------------------|
+| `primitive_void()`                                      | 3                |
+| `primitive_u64(0)`                                      | 4                |
+| `pattern_delegate_retained(delegate)`                   | 21               |
+| `pattern_ascii_pointer("hello world")`                  | 20               |
+| `pattern_utf8_string("hello world")`                    | 52               |
+| `await serviceAsync.Success()` \[.NET task rescheduled\]| 1835<sup>1</sup> |
+| `await serviceAsync.Success()` \[Rust result returend\] | 564              |
+
+<sup>1</sup> Includes .NET wakeup overhead — see the [FAQ](/faq#performance).
 
 ### Calling .NET
 
