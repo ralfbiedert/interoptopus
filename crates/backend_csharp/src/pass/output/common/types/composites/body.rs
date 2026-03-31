@@ -71,6 +71,7 @@ impl Pass {
             context.insert("name", name);
             context.insert("struct_or_class", struct_or_class);
             context.insert("is_disposable", &is_disposable);
+            context.insert("visibility", &ty.visibility.to_string());
             context.insert("unmanaged", &unmanaged);
             context.insert("to_unmanaged", &to_unmanaged);
             context.insert("as_unmanaged", &as_unmanaged);

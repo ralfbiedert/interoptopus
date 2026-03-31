@@ -36,19 +36,40 @@ impl Pass {
         for (_service_id, service) in services.iter() {
             let Some(type_name) = types.get(service.ty).map(|t| &t.name) else { continue };
 
-            let all_fns = service.ctors.iter().chain(service.methods.iter()).chain(std::iter::once(&service.destructor));
+            let source_fns: Vec<_> = service.sources.ctors.iter()
+                .chain(service.sources.methods.iter())
+                .chain(service.ctors.iter())
+                .chain(service.methods.iter())
+                .chain(std::iter::once(&service.destructor))
+                .copied()
+                .collect();
 
-            for &fn_id in all_fns {
-                if self.names.contains_key(&fn_id) {
+            for fn_id in &source_fns {
+                if self.names.contains_key(fn_id) {
                     continue;
                 }
 
-                let Some(func) = fns.get(fn_id) else { continue };
+                let Some(func) = fns.get(*fn_id) else { continue };
 
                 let method_name = service_method_name(type_name, &func.name);
 
-                self.names.insert(fn_id, method_name);
+                self.names.insert(*fn_id, method_name);
                 outcome.changed();
+            }
+
+            // Also assign names to overloads of source functions so they're
+            // available when `service_method_overload` adds them to the
+            // renderable lists.
+            for &fn_id in service.sources.ctors.iter().chain(service.sources.methods.iter()) {
+                for (overload_id, overload_fn) in fns.overloads_for(fn_id) {
+                    if self.names.contains_key(overload_id) {
+                        continue;
+                    }
+
+                    let method_name = service_method_name(type_name, &overload_fn.name);
+                    self.names.insert(*overload_id, method_name);
+                    outcome.changed();
+                }
             }
         }
 

@@ -41,7 +41,7 @@ impl Pass {
 
             let mut rendered_ctors = Vec::new();
 
-            for ctor_fn_id in &service.ctors {
+            for ctor_fn_id in &service.sources.ctors {
                 let Some(ctor_fn) = fns.get(*ctor_fn_id) else { continue };
                 let Some(method_name) = method_names.get(*ctor_fn_id) else { continue };
 
@@ -69,6 +69,7 @@ impl Pass {
                     context.insert("interop_name", &overload_fn.name);
                     context.insert("args", &args);
                     context.insert("docs", &docs);
+                    context.insert("visibility", &overload_fn.visibility.to_string());
 
                     let rendered = templates.render("rust/service/body_ctors_async.cs", &context)?;
                     rendered_ctors.push(rendered);
@@ -82,6 +83,7 @@ impl Pass {
                     context.insert("interop_name", &ctor_fn.name);
                     context.insert("args", &args);
                     context.insert("docs", &docs);
+                    context.insert("visibility", &ctor_fn.visibility.to_string());
 
                     let rendered = templates.render("rust/service/body_ctors.cs", &context)?;
                     rendered_ctors.push(rendered);

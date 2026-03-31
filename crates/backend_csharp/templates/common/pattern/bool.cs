@@ -1,11 +1,11 @@
 [Serializable]
 [StructLayout(LayoutKind.Sequential)]
-public partial struct Bool
+{{ visibility }} partial struct Bool
 {
     byte value;
 }
 
-public partial struct Bool
+{{ visibility }} partial struct Bool
 {
     public static readonly Bool True = new Bool { value = 1 };
     public static readonly Bool False = new Bool { value = 0 };

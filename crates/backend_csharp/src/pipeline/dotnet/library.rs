@@ -105,6 +105,7 @@ pub struct ModelPasses {
     pub type_nullable: model::common::types::info::nullable::Pass,
     pub fns_all: model::common::fns::all::Pass,
     pub fn_originals: model::common::fns::originals::Pass,
+    pub fn_reflow_vis: model::common::fns::reflow_vis::Pass,
     pub service_all: model::common::service::all::Pass,
     pub type_util: model::common::types::util::Pass,
     pub trampoline: model::dotnet::trampoline::Pass,
@@ -209,6 +210,7 @@ impl DotnetLibrary {
                 type_nullable: model::common::types::info::nullable::Pass::new(config.model_type_nullable),
                 fns_all: model::common::fns::all::Pass::new(config.model_fn_all),
                 fn_originals: model::common::fns::originals::Pass::new(config.model_fn_originals),
+                fn_reflow_vis: model::common::fns::reflow_vis::Pass::new(Default::default()),
                 service_all: model::common::service::all::Pass::new(config.model_service_map),
                 type_util: model::common::types::util::Pass::new(config.model_type_util),
                 trampoline: model::dotnet::trampoline::Pass::new(config.model_trampoline),
@@ -297,7 +299,8 @@ impl DotnetLibrary {
             r.run(m.type_nullable.process(&mut pass_meta, &m.type_all))?;
             r.run(m.type_util.process(&mut pass_meta, &mut m.type_kinds, &mut m.type_names, &mut m.type_all))?;
             r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &mut m.fns_all, &self.inventory.functions))?;
-            r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
+            r.run(m.fn_reflow_vis.process(&mut pass_meta, &mut m.fns_all, &m.type_all))?;
+            r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services, &m.fns_all))?;
             r.run(m.wire_helpers.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.wire_nested.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &mut m.type_names, &self.inventory.types))?;
             r.run(m.trampoline.process(&mut pass_meta, &m.fns_all, &m.service_all))?;
@@ -335,7 +338,7 @@ impl DotnetLibrary {
         o.enum_body_tostring.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_from_call, &o.enum_body_exception_for_variant, &o.enum_body_tostring, &o.unmanaged_conversion)?;
         o.enums.process(&mut pass_meta, &self.output_master, &m.type_all, &o.enum_ty, &o.enum_body)?;
-        o.util.process(&mut pass_meta, &self.output_master)?;
+        o.util.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.delegates_class.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
         o.delegates_signature.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.pattern_bools.process(&mut pass_meta, &self.output_master, &m.type_all)?;

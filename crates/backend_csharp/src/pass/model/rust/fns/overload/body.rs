@@ -17,7 +17,7 @@
 
 use crate::lang::functions::overload::{ArgTransform, FnTransforms, Overload, OverloadKind, RvalTransform};
 use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
-use crate::lang::meta::Emission;
+use crate::lang::meta::{Emission, Visibility};
 use crate::lang::types::OverloadFamily;
 use crate::lang::types::kind::task::Task;
 use crate::lang::types::kind::{DelegateKind, Primitive, TypeKind, TypePattern};
@@ -119,6 +119,7 @@ impl Pass {
                 let func = Function {
                     emission: original_fn.emission.clone(),
                     name: original_fn.name.clone(),
+                    visibility: Visibility::Public,
                     docs: original_fn.docs.clone(),
                     signature: sig,
                     kind: FunctionKind::Overload(Overload { kind: OverloadKind::Body(transforms), base: original_id }),
@@ -138,6 +139,7 @@ impl Pass {
                 let func = Function {
                     emission: original_fn.emission.clone(),
                     name: original_fn.name.clone(),
+                    visibility: Visibility::Public,
                     docs: original_fn.docs.clone(),
                     signature: sig,
                     kind: FunctionKind::Overload(Overload { kind: OverloadKind::Async(transforms), base: original_id }),
@@ -189,7 +191,7 @@ fn resolve_or_create_task_type(
         let kind = TypeKind::Task(Task { inner });
         kinds.set(task_ty_id, kind.clone());
         names.set(task_ty_id, task_name.clone());
-        types.set(task_ty_id, Type { emission: Emission::Builtin, name: task_name, docs: Vec::new(), kind, decorators: Decorators::default() });
+        types.set(task_ty_id, Type { emission: Emission::Builtin, name: task_name, visibility: Visibility::Public, docs: Vec::new(), kind, decorators: Decorators::default() });
     }
 
     task_ty_id

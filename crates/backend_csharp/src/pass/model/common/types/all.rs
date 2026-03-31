@@ -5,7 +5,7 @@
 //! over accessing `kind` or `names` directly.
 
 use crate::lang::TypeId;
-use crate::lang::meta::Emission;
+use crate::lang::meta::{Emission, Visibility};
 use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::lang::types::{Decorators, MarshalAs, ParamDecorator, RvalDecorator, Type};
 use crate::pass::Outcome::Unchanged;
@@ -60,7 +60,7 @@ impl Pass {
             };
 
             let docs = lookup_docs(*type_id, id_maps, rs_types);
-            let ty = Type { emission, name: name.clone(), docs, kind: kind.clone(), decorators };
+            let ty = Type { emission, name: name.clone(), visibility: Visibility::Public, docs, kind: kind.clone(), decorators };
 
             self.types.insert(*type_id, ty);
             outcome.changed();
@@ -76,6 +76,10 @@ impl Pass {
     #[must_use]
     pub fn get(&self, ty: TypeId) -> Option<&Type> {
         self.types.get(&ty)
+    }
+
+    pub fn get_mut(&mut self, ty: TypeId) -> Option<&mut Type> {
+        self.types.get_mut(&ty)
     }
 
     pub fn iter(&self) -> impl Iterator<Item = (&TypeId, &Type)> {

@@ -46,6 +46,7 @@ impl Pass {
 
             let name = &ty.name;
             let docs = format_docs(&ty.docs);
+            let visibility = ty.visibility.to_string();
             let is_disposable = disposable.is_disposable(*type_id).unwrap_or(false);
 
             let ty = *type_id;
@@ -70,6 +71,7 @@ impl Pass {
             context.insert("variants", &variants);
             context.insert("docs", &docs);
             context.insert("is_disposable", &is_disposable);
+            context.insert("visibility", &visibility);
 
             let rendered = templates.render("common/types/enums/definition.cs", &context)?;
             self.enum_ty.insert(*type_id, rendered);

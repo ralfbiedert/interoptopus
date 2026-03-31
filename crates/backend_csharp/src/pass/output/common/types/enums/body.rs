@@ -49,6 +49,7 @@ impl Pass {
             }
 
             let name = &ty.name;
+            let visibility = ty.visibility.to_string();
 
             // Managed-only types (e.g. Result<Service, Error> siblings) have no Unmanaged representation.
             let is_managed_only = match type_kind {
@@ -101,6 +102,7 @@ impl Pass {
             context.insert("struct_or_class", struct_or_class);
             context.insert("is_disposable", &is_disposable);
             context.insert("is_managed_only", &is_managed_only);
+            context.insert("visibility", &visibility);
             context.insert("disposable_variants", &disposable_variants);
             context.insert("unmanaged_variants", &unmanaged_variants);
             context.insert("unmanaged", &unmanaged);

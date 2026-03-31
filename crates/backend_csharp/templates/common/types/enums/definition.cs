@@ -4,7 +4,7 @@
 {%- if is_disposable %}
 {{ _types_docs_owned }}
 {%- endif %}
-public partial {{ struct_or_class }} {{ name }}
+{{ visibility }} partial {{ struct_or_class }} {{ name }}
 {
     int _variant;
     {%- for variant in variants %}

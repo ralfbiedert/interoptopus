@@ -30,6 +30,10 @@ impl Pass {
         self.functions.get(&id)
     }
 
+    pub fn get_mut(&mut self, id: FunctionId) -> Option<&mut Function> {
+        self.functions.get_mut(&id)
+    }
+
     pub fn iter(&self) -> impl Iterator<Item = (&FunctionId, &Function)> {
         self.functions.iter()
     }

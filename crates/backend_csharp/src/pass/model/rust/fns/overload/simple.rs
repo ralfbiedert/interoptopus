@@ -10,6 +10,7 @@
 use crate::lang::FunctionId;
 use crate::lang::functions::overload::{Overload, OverloadKind};
 use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
+use crate::lang::meta::Visibility;
 use crate::lang::types::OverloadFamily;
 use crate::lang::types::kind::TypeKind;
 use crate::pass::Outcome::Unchanged;
@@ -101,6 +102,7 @@ impl Pass {
             let overload_fn = Function {
                 emission: original_fn.emission.clone(),
                 name: original_fn.name.clone(),
+                visibility: Visibility::Public,
                 docs: original_fn.docs.clone(),
                 signature: overload_signature,
                 kind: FunctionKind::Overload(Overload { kind: OverloadKind::Simple, base: original_id }),

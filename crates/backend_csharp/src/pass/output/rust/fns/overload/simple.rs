@@ -77,6 +77,7 @@ impl Pass {
                 context.insert("args", &args);
                 context.insert("rval", rval);
                 context.insert("docs", &docs);
+                context.insert("visibility", &function.visibility.to_string());
 
                 let import = templates.render("rust/fns/overload/simple.cs", &context)?;
                 imports.push(import);

@@ -6,7 +6,7 @@
 //! and all passes, and registers the family in the overload all pass.
 
 use crate::lang::TypeId;
-use crate::lang::meta::Emission;
+use crate::lang::meta::{Emission, Visibility};
 use crate::lang::types::kind::{Pointer, PointerKind, TypeKind};
 use crate::lang::types::{Decorators, OverloadFamily, ParamDecorator, PointerFamily, Type};
 use crate::pass::Outcome::Unchanged;
@@ -83,6 +83,7 @@ impl Pass {
                 Type {
                     emission: Emission::Builtin,
                     name: pointee_name.clone(),
+                    visibility: Visibility::Public,
                     docs: Vec::new(),
                     kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }),
                     decorators: Decorators { param: Some(ParamDecorator::Ref), ..Default::default() },
@@ -93,6 +94,7 @@ impl Pass {
                 Type {
                     emission: Emission::Builtin,
                     name: pointee_name.clone(),
+                    visibility: Visibility::Public,
                     docs: Vec::new(),
                     kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }),
                     decorators: Decorators { param: Some(ParamDecorator::Out), ..Default::default() },

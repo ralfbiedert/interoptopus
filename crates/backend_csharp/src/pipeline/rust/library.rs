@@ -123,6 +123,7 @@ pub struct ModelPasses {
     pub fn_originals: model::common::fns::originals::Pass,
     pub fn_overload_simple: model::rust::fns::overload::simple::Pass,
     pub fn_overload_body: model::rust::fns::overload::body::Pass,
+    pub fn_reflow_vis: model::common::fns::reflow_vis::Pass,
     pub type_async_types: model::rust::types::info::async_types::Pass,
     pub service_all: model::common::service::all::Pass,
     pub service_method_names: model::rust::service::method::names::Pass,
@@ -274,6 +275,7 @@ impl RustLibrary {
                 fn_originals: model::common::fns::originals::Pass::new(config.model_fn_originals),
                 fn_overload_simple: model::rust::fns::overload::simple::Pass::new(config.model_fn_overload_simple),
                 fn_overload_body: model::rust::fns::overload::body::Pass::new(config.model_fn_overload_body),
+                fn_reflow_vis: model::common::fns::reflow_vis::Pass::new(Default::default()),
                 type_async_types: model::rust::types::info::async_types::Pass::new(config.model_type_async_types),
                 service_all: model::common::service::all::Pass::new(config.model_service_map),
                 service_method_names: model::rust::service::method::names::Pass::new(config.model_service_method_names),
@@ -394,12 +396,13 @@ impl RustLibrary {
             r.run(m.fn_originals.process(&mut pass_meta, &m.id_maps, &mut m.fns_all, &self.inventory.functions))?;
             r.run(m.fn_overload_simple.process(&mut pass_meta, &mut m.fns_all, &m.type_all, &m.type_overload_all))?;
             r.run(m.fn_overload_body.process(&mut pass_meta, &mut m.fns_all, &mut m.type_kinds, &mut m.type_names, &mut m.type_all, &m.type_overload_all))?;
+            r.run(m.fn_reflow_vis.process(&mut pass_meta, &mut m.fns_all, &m.type_all))?;
             r.run(m.type_async_types.process(&mut pass_meta, &m.fns_all))?;
             r.run(m.pattern_string.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.pattern_vec.process(&mut pass_meta, &m.id_maps, &self.inventory.functions, &self.inventory.types))?;
             r.run(m.wire_helpers.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.wire_nested.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &mut m.type_names, &self.inventory.types))?;
-            r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
+            r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services, &m.fns_all))?;
             r.run(m.service_method_names.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
             r.run(m.service_method_overload.process(&mut pass_meta, &mut m.service_all, &m.fns_all, &m.type_all))?;
 
@@ -459,7 +462,7 @@ impl RustLibrary {
         o.wire_types.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types)?;
         o.wire_helper_classes.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &self.inventory.types, &o.wire_types)?;
         o.wires.process(&mut pass_meta, &self.output_master, &o.wire_types, &o.wire_helper_classes)?;
-        o.util.process(&mut pass_meta, &self.output_master)?;
+        o.util.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.using.process(&mut pass_meta, &self.output_master)?;
         self.extension_post_output_pass()?;
 

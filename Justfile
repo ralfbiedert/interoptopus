@@ -75,6 +75,6 @@ ids:
     for i in $(seq 1 8); do od -An -tx1 -N16 /dev/urandom | tr -d ' \n' | sed 's/^/0x/' | tr 'a-f' 'A-F'; echo; done
 
 # Can be used by agents for the current task.
-test-agent: (_bdp_p "exceptions")
+test-agent:
     # Agents: Feel free to update the test logic here for the task at hand.
-    cargo test --test mod plugins::exceptions::load_plugin
+    cargo test -p interoptopus_csharp --test mod reference_project::interop

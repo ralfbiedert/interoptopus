@@ -1,12 +1,12 @@
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 internal delegate {{ rval_unmanaged_name }} {{ name }}Native({% for arg in args %}{{ arg.unmanaged_name }} {{ arg.name }}, {% endfor %}IntPtr callback_data);
 /// Managed delegate signature for <see cref="{{ name }}"/>.
-public delegate {{ rval_managed }} {{ name }}Delegate({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %});
+{{ visibility }} delegate {{ rval_managed }} {{ name }}Delegate({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %});
 
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 delegate void {{ name }}Destructor(IntPtr data);
 
-public partial class {{ name }}
+{{ visibility }} partial class {{ name }}
 {
     private {{ name }}Delegate _managed;
     private {{ name }}Native _native;
@@ -25,7 +25,7 @@ public partial class {{ name }}
 /// otherwise your function trampoline might get deallocated.
 {{ _types_docs_owned }}
 [NativeMarshalling(typeof(MarshallerMeta))]
-public partial class {{ name }} : IDisposable
+{{ visibility }} partial class {{ name }} : IDisposable
 {
 
     {{ _fns_decorators_all | indent }}

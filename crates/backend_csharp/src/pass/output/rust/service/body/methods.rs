@@ -63,7 +63,8 @@ impl Pass {
 
                         let docs = format_docs(&method_fn.docs);
                         let args = build_args(&method_fn.signature.arguments[1..], types);
-                        rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, method_name, &method_fn.name, &args, &docs)?);
+                        let visibility = method_fn.visibility.to_string();
+                        rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, method_name, &method_fn.name, &args, &docs, &visibility)?);
                     }
                     FunctionKind::Overload(overload) => {
                         let Some(original_fn) = fns.get(overload.base) else { continue };
@@ -75,8 +76,9 @@ impl Pass {
                             // Async overload: rval is a Task type registered by the model pass
                             let task_rval = types.get(method_fn.signature.rval).map_or_else(|| "Task".to_string(), |t| t.name.clone());
                             let async_args = build_args(&method_fn.signature.arguments[1..], types);
+                            let visibility = method_fn.visibility.to_string();
 
-                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args, &docs)?);
+                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args, &docs, &visibility)?);
                         } else {
                             // Simple or Body overload: render like a base method but with
                             // the overloaded signature
@@ -91,7 +93,8 @@ impl Pass {
                             let is_void = result_info.is_void || matches!(rval_kind, Some(TypeKind::Primitive(Primitive::Void)));
 
                             let overload_args = build_args(&method_fn.signature.arguments[1..], types);
-                            rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, base_method_name, &method_fn.name, &overload_args, &docs)?);
+                            let visibility = method_fn.visibility.to_string();
+                            rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, base_method_name, &method_fn.name, &overload_args, &docs, &visibility)?);
                         }
                     }
                 }
@@ -140,6 +143,7 @@ fn render(
     interop_name: &str,
     args: &[HashMap<&str, Value>],
     docs: &str,
+    visibility: &str,
 ) -> Result<String, crate::Error> {
     let mut context = Context::new();
     context.insert("rval", rval);
@@ -149,6 +153,7 @@ fn render(
     context.insert("interop_name", &interop_name);
     context.insert("args", args);
     context.insert("docs", docs);
+    context.insert("visibility", visibility);
     Ok(templates.render("rust/service/body_methods.cs", &context)?)
 }
 
@@ -159,6 +164,7 @@ fn render_async(
     interop_name: &str,
     args: &[HashMap<&str, Value>],
     docs: &str,
+    visibility: &str,
 ) -> Result<String, crate::Error> {
     let mut context = Context::new();
     context.insert("task_rval", task_rval);
@@ -166,6 +172,7 @@ fn render_async(
     context.insert("interop_name", interop_name);
     context.insert("args", args);
     context.insert("docs", docs);
+    context.insert("visibility", visibility);
     Ok(templates.render("rust/service/body_methods_async.cs", &context)?)
 }
 

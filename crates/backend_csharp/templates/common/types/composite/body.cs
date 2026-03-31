@@ -1,5 +1,5 @@
 [NativeMarshalling(typeof(MarshallerMeta))]
-public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposable{% endif %}
+{{ visibility }} partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposable{% endif %}
 {
     public {{name}}() { }
 

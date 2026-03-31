@@ -2,7 +2,7 @@ pub mod csharp;
 pub mod kind;
 mod overload;
 
-use crate::lang::meta::Emission;
+use crate::lang::meta::{Emission, Visibility};
 use crate::lang::types::kind::TypeKind;
 pub use overload::{DelegateFamily, OverloadFamily, PointerFamily};
 
@@ -65,6 +65,7 @@ pub struct Decorators {
 pub struct Type {
     pub emission: Emission,
     pub name: String,
+    pub visibility: Visibility,
     pub docs: Vec<String>,
     pub kind: TypeKind,
     pub decorators: Decorators,

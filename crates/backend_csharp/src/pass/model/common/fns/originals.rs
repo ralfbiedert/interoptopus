@@ -6,7 +6,7 @@
 
 use crate::lang::FunctionId;
 use crate::lang::functions::{Argument, Function, FunctionKind, Signature};
-use crate::lang::meta::Emission;
+use crate::lang::meta::{Emission, Visibility};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
@@ -71,6 +71,7 @@ impl Pass {
             let cs_function = Function {
                 emission: rust_fn.emission.clone(),
                 name: rust_fn.name.clone(),
+                visibility: Visibility::Public,
                 docs: rust_fn.docs.lines.clone(),
                 signature: cs_signature,
                 kind: FunctionKind::Original,

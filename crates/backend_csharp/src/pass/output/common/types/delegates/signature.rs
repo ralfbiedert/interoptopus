@@ -62,6 +62,7 @@ impl Pass {
 
                 let mut context = Context::new();
                 context.insert("name", name);
+                context.insert("visibility", &ty.visibility.to_string());
                 context.insert("rval_managed", &rval_managed);
                 context.insert("args", &args);
 

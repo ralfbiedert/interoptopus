@@ -54,6 +54,7 @@ impl Pass {
                 .collect();
 
             let docs = format_docs(&ty.docs);
+            let visibility = ty.visibility.to_string();
 
             let mut context = Context::new();
             context.insert("name", name);
@@ -61,6 +62,7 @@ impl Pass {
             context.insert("fields", &fields);
             context.insert("docs", &docs);
             context.insert("is_disposable", &is_disposable);
+            context.insert("visibility", &visibility);
 
             let rendered = templates.render("common/types/composite/definition.cs", &context)?;
             self.composite_ty.insert(*type_id, rendered);

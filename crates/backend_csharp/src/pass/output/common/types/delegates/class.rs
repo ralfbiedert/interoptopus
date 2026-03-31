@@ -94,6 +94,7 @@ impl Pass {
                 let mut context = Context::new();
                 context.insert("name", name);
                 context.insert("is_void", &is_void);
+                context.insert("visibility", &ty.visibility.to_string());
                 context.insert("rval_managed", &rval_managed);
                 context.insert("rval_unmanaged_name", &rval_unmanaged);
                 context.insert("rval_to_unmanaged", &rval_to_unmanaged);

@@ -1,1 +1,1 @@
-public class InteropException(string text) : Exception(text) { }
+{{ visibility }} class InteropException(string text) : Exception(text) { }

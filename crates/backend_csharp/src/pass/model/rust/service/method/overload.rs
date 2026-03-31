@@ -1,10 +1,9 @@
 //! Adds overload function IDs to service ctors and methods.
 //!
-//! For each service ctor/method that is an original function, this pass checks
-//! whether the underlying function has any overloads in `fns::all`. It inserts
-//! those overload `FunctionId`s right after the original in the service's `ctors`
-//! and `methods` lists, so that output passes can simply iterate over these lists
-//! without querying overload registries.
+//! Uses the immutable `sources` to discover
+//! overloads for each original function. Discovered overloads are added to
+//! the renderable `ctors` / `methods` lists (which may have been filtered
+//! by visibility in `service::all`).
 //!
 //! This pass also handles conflict detection: for non-async overloads, if stripping
 //! the self-arg produces the same signature as the base method, the overload is
@@ -38,18 +37,14 @@ impl Pass {
     ) -> ModelResult {
         let mut outcome = Unchanged;
 
-        // Collect rebuilt lists, then apply
         let mut method_rebuilds: Vec<(crate::lang::ServiceId, Vec<FunctionId>)> = Vec::new();
 
         for (&service_id, service) in services.iter() {
-            // Rebuild methods with overloads inserted after their originals
-            let new_methods = rebuild_with_overloads(&service.methods, fns_all, types);
-            if let Some(new_methods) = new_methods {
+            if let Some(new_methods) = rebuild_with_overloads(&service.sources.methods, &service.methods, fns_all, types) {
                 method_rebuilds.push((service_id, new_methods));
             }
         }
 
-        // Apply rebuilt lists
         for (service_id, new_methods) in method_rebuilds {
             if let Some(service) = services.get_mut(service_id) {
                 service.methods = new_methods;
@@ -61,29 +56,30 @@ impl Pass {
     }
 }
 
-/// Rebuild a function list by inserting overloads right after their base original.
-/// Returns `None` if no changes were made (no new overloads to add).
-fn rebuild_with_overloads(fn_ids: &[FunctionId], fns_all: &model::common::fns::all::Pass, types: &model::common::types::all::Pass) -> Option<Vec<FunctionId>> {
-    let mut result = Vec::new();
+/// Discovers overloads for each original in `sources` and builds the renderable list.
+///
+/// Starts from the current `renderable` list, then for each source original that
+/// isn't already represented, adds any public overloads found in `fns_all`.
+fn rebuild_with_overloads(
+    sources: &[FunctionId],
+    renderable: &[FunctionId],
+    fns_all: &model::common::fns::all::Pass,
+    types: &model::common::types::all::Pass,
+) -> Option<Vec<FunctionId>> {
+    let mut result: Vec<FunctionId> = renderable.to_vec();
     let mut changed = false;
 
-    for &fn_id in fn_ids {
-        result.push(fn_id);
-
-        // Only look for overloads of original functions
-        let Some(func) = fns_all.get(fn_id) else { continue };
+    for &source_id in sources {
+        let Some(func) = fns_all.get(source_id) else { continue };
         if !matches!(func.kind, FunctionKind::Original) {
             continue;
         }
 
-        for (overload_id, overload_fn) in fns_all.overloads_for(fn_id) {
-            // Skip if already in the list
-            if fn_ids.contains(overload_id) {
+        for (overload_id, overload_fn) in fns_all.overloads_for(source_id) {
+            if result.contains(overload_id) {
                 continue;
             }
 
-            // For non-async overloads, check if stripping the self-arg
-            // would produce a duplicate signature. If so, skip it.
             let dominated = match &overload_fn.kind {
                 FunctionKind::Overload(o) if !matches!(o.kind, OverloadKind::Async(_)) => {
                     service_args_equivalent(&func.signature.arguments, &overload_fn.signature.arguments, types)

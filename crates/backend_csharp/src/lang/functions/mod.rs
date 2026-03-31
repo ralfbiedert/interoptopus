@@ -1,8 +1,8 @@
 pub mod overload;
 
-use crate::lang::TypeId;
 use crate::lang::functions::overload::Overload;
-use crate::lang::meta::Emission;
+use crate::lang::meta::{Emission, Visibility};
+use crate::lang::TypeId;
 
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Argument {
@@ -20,6 +20,7 @@ pub struct Signature {
 pub struct Function {
     pub emission: Emission,
     pub name: String,
+    pub visibility: Visibility,
     pub docs: Vec<String>,
     pub signature: Signature,
     pub kind: FunctionKind,

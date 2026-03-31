@@ -1,7 +1,7 @@
 {%- if not is_managed_only -%}
 [NativeMarshalling(typeof(MarshallerMeta))]
 {% endif -%}
-public partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposable{% endif %}
+{{ visibility }} partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposable{% endif %}
 {
 {%- if not is_managed_only %}
     {%- for item in unmanaged_variants %}

@@ -7,6 +7,7 @@
 //! The struct is emitted in the output file that the `Bool` type is routed to
 //! (typically the Common file in multi-file setups).
 
+use crate::lang::types::csharp;
 use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::output::{FileType, Output};
 use crate::pass::{OutputResult, PassInfo, model, output};
@@ -42,7 +43,10 @@ impl Pass {
                 .any(|(type_id, ty)| output_master.type_belongs_to(*type_id, file) && matches!(&ty.kind, TypeKind::TypePattern(TypePattern::Bool)));
 
             let content = if file_has_bool {
-                templates.render("common/pattern/bool.cs", &Context::new())?.trim().to_string()
+                let visibility = types.get(csharp::BOOL).map_or_else(|| "public".to_string(), |t| t.visibility.to_string());
+                let mut ctx = Context::new();
+                ctx.insert("visibility", &visibility);
+                templates.render("common/pattern/bool.cs", &ctx)?.trim().to_string()
             } else {
                 String::new()
             };

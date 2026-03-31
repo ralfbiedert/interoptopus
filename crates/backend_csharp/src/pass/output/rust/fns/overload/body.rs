@@ -131,6 +131,7 @@ fn render(
     context.insert("native_args", &native_args);
     context.insert("native_rval_is_result", &native_rval_is_result);
     context.insert("docs", &docs);
+    context.insert("visibility", &overload_fn.visibility.to_string());
 
     if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval
         && let Some(result_ty) = types.get(result_ty_id)

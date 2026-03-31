@@ -73,6 +73,7 @@ impl Pass {
                 context.insert("rval", rval);
                 context.insert("rval_decorator", &rval_decorator);
                 context.insert("docs", &docs);
+                context.insert("visibility", &function.visibility.to_string());
 
                 let import = templates.render("rust/fns/rust.cs", &context)?;
                 imports.push(import);
