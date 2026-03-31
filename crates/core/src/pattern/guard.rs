@@ -66,6 +66,26 @@ impl Version {
         Self { version }
     }
 
+    /// Mixes an additional value into this version hash, returning a new [`Version`].
+    ///
+    /// Use this when an important internal change (e.g., a behavioral or layout
+    /// change) is not reflected in the public API signature. Bumping `salt` will
+    /// force an API guard mismatch so that stale bindings are detected.
+    ///
+    /// ```rust
+    /// use interoptopus::pattern::guard::Version;
+    ///
+    /// let v = Version::new(0xCAFE);
+    /// let v2 = v.derive(1);
+    /// assert_ne!(v, v2);
+    /// ```
+    #[must_use]
+    pub const fn derive(self, salt: u64) -> Self {
+        // FNV-1a-style mixing: XOR then multiply by a large prime.
+        let mixed = (self.version ^ salt).wrapping_mul(0x100000001b3);
+        Self { version: mixed }
+    }
+
     /// Create a new API version from the given library.
     #[must_use]
     pub fn from_inventory(inventory: &RustInventory) -> Self {
