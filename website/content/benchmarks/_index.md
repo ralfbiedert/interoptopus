@@ -29,7 +29,7 @@ have a legacy app but want high-performance Rust under the hood.
 | `pattern_ascii_pointer("hello world")`                  | 20               |
 | `pattern_utf8_string("hello world")`                    | 52               |
 | `await serviceAsync.Success()` \[.NET task rescheduled\]| 1835<sup>1</sup> |
-| `await serviceAsync.Success()` \[Rust result returend\] | 564              |
+| `await serviceAsync.Success()` \[Rust result returned\] | 564              |
 
 <sup>1</sup> Includes .NET wakeup overhead — see the [FAQ](/faq#performance).
 
