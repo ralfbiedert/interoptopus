@@ -111,13 +111,13 @@ macro_rules! callback {
         #[repr(C)]
         pub struct $name {
             /// The function pointer to invoke. `None` means the callback is absent.
-            pub callback: ::std::option::Option<extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>,
+            callback: ::std::option::Option<extern "C" fn($($ty,)* *const ::std::ffi::c_void) -> $rval>,
             /// Opaque context pointer passed as the last argument on every call.
-            pub data: *const ::std::ffi::c_void,
+            data: *const ::std::ffi::c_void,
             /// Optional destructor for `data`. Set by [`from_closure`](Self::from_closure);
             /// `None` for plain function-pointer callbacks. The foreign caller (e.g. C#
             /// `Dispose()`) must invoke this exactly once when done with the callback.
-            pub destructor: ::std::option::Option<unsafe extern "C" fn(*const ::std::ffi::c_void)>,
+            destructor: ::std::option::Option<unsafe extern "C" fn(*const ::std::ffi::c_void)>,
         }
 
         // Safety: This is a transparent wrapper around a function pointer
