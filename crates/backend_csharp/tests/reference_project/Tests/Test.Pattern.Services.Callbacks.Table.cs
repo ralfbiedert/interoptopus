@@ -5,7 +5,7 @@ using Xunit;
 
 public class TestPatternServicesCallbacksTable
 {
-    private CallbackTable _table;
+    private CallbackTable _table = default!;
 
     void CreatePatternDelegateTable(ServiceCallbacks service)
     {

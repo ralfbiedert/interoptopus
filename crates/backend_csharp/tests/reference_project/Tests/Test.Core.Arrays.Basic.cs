@@ -10,7 +10,7 @@ public class TestArrayBasic
     {
         Assert.Equal((array?.Length ?? 0) > 0 ? 1 : 0, Interop.array_1(new Array
         {
-            data = array
+            data = array!
         }));
     }
 
