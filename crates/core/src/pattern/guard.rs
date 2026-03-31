@@ -1,11 +1,13 @@
-//! Ensures bindings match the used DLL, used via [`api_guard!`](crate::api_guard).
+//! Ensures bindings match the used DLL.
 //!
 //! Using an API guard is as simple as defining and exporting a function `my_api_guard` returning an
 //! [`ApiVersion`] as in the example below. Backends supporting API guards will automatically
 //! generate guard code executed when the library is loaded.
 //!
-//! When developing we **highly recommend** adding API guards, as mismatching bindings are the #1
+//! We **highly recommend** you add API guards, as mismatching bindings are the #1
 //! cause of "inexplicable" errors (undefined behavior) that often take hours to hunt down.
+//!
+//! Guards are emitted automatically for plugins.
 //!
 //! # Example
 //!
@@ -19,8 +21,7 @@
 //! fn ffi_inventory() -> RustInventory {
 //!     RustInventory::new()
 //!         .register(api_guard!(ffi_inventory)) // <- You must name the current function.
-//!         .validate()                          //    since it will be called at runtime
-//!                                              //    but cannot be inferred.
+//!         .validate()
 //! }
 //! ```
 //! In backends that support API guards an error message like this might be emitted if you try load
@@ -68,7 +69,7 @@ impl ApiVersion {
     /// Create a new API version from the given library.
     #[must_use]
     pub fn from_inventory(inventory: &RustInventory) -> Self {
-        let version = ApiHash::from(inventory).hash;
+        let version = ApiHash::from_rust(inventory).hash;
         Self { version }
     }
 }
@@ -130,14 +131,24 @@ pub struct ApiHash {
 }
 
 impl ApiHash {
-    /// Returns a unique hash for an inventory; used by backends.
+    /// Returns a unique hash for a Rust library inventory; used by backends.
     #[must_use]
-    pub fn from(inventory: &RustInventory) -> Self {
+    pub fn from_rust(inventory: &RustInventory) -> Self {
+        Self::from_inventory_parts(&inventory.types, &inventory.functions, &inventory.constants)
+    }
+
+    /// Returns a unique hash for a plugin inventory; used by plugin API guards.
+    #[must_use]
+    pub fn from_plugin(inventory: &crate::inventory::PluginInventory) -> Self {
+        Self::from_inventory_parts(&inventory.types, &inventory.functions, &inventory.constants)
+    }
+
+    fn from_inventory_parts(types: &crate::inventory::Types, functions: &crate::inventory::Functions, constants: &crate::inventory::Constants) -> Self {
         let mut hasher = DefaultHasher::new();
 
-        let mut types: Vec<_> = inventory.types.iter().collect();
-        let mut functions: Vec<_> = inventory.functions.iter().collect();
-        let mut constants: Vec<_> = inventory.constants.iter().collect();
+        let mut types: Vec<_> = types.iter().collect();
+        let mut functions: Vec<_> = functions.iter().collect();
+        let mut constants: Vec<_> = constants.iter().collect();
 
         types.sort_by_key(|(id, _)| *id);
         functions.sort_by_key(|(id, _)| *id);

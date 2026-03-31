@@ -2,11 +2,11 @@ use std::collections::{HashMap, HashSet};
 
 use proc_macro2::{Group, Ident, Span, TokenStream, TokenTree};
 use quote::{format_ident, quote, quote_spanned};
-use syn::Type;
 use syn::spanned::Spanned;
+use syn::Type;
 
 use crate::plugin::model::{
-    PluginModel, PluginParam, ServiceBlock, direct_service_name, is_self_return, ref_service_name, replace_self, service_in_type, transitive_returned_services,
+    direct_service_name, is_self_return, ref_service_name, replace_self, service_in_type, transitive_returned_services, PluginModel, PluginParam, ServiceBlock,
 };
 
 impl PluginModel {
@@ -118,11 +118,16 @@ impl PluginModel {
             register_trampoline: ::interoptopus::lang::plugin::RegisterTrampolineFn
         };
 
+        let query_trampoline_field = quote! {
+            query_trampoline: ::interoptopus::lang::plugin::QueryTrampolineFn
+        };
+
         quote! {
             pub struct #name {
                 #(#bare_fields,)*
                 #(#service_fields,)*
                 #register_trampoline_field,
+                #query_trampoline_field,
                 instrumentor: ::std::sync::Arc<::interoptopus::telemetry::MetricsRecorder>,
             }
         }
@@ -149,8 +154,10 @@ impl PluginModel {
         quote! {
             impl #name {
                 pub fn new(loader: &impl ::interoptopus::lang::plugin::Loader) -> Result<Self, ::interoptopus::lang::plugin::PluginLoadError> {
+                    use ::interoptopus::lang::plugin::Plugin;
                     let plugin: Self = loader.load_plugin()?;
                     plugin.register_trampolines();
+                    plugin.verify_api_guard()?;
                     Ok(plugin)
                 }
 
@@ -217,7 +224,10 @@ impl PluginModel {
         });
 
         let register_trampoline_field = format_ident!("register_trampoline");
-        let register_trampoline_load = emit_load_field(&register_trampoline_field, "register_trampoline", quote! { ::interoptopus::lang::plugin::RegisterTrampolineFn });
+        let register_trampoline_load = emit_load_field(&register_trampoline_field, "_trampoline_register", quote! { ::interoptopus::lang::plugin::RegisterTrampolineFn });
+
+        let query_trampoline_field = format_ident!("query_trampoline");
+        let query_trampoline_load = emit_load_field(&query_trampoline_field, "_trampoline_query_u64", quote! { ::interoptopus::lang::plugin::QueryTrampolineFn });
 
         // Instrumentor initialization with all function names.
         let inst_names = self.instrument_names();
@@ -231,6 +241,7 @@ impl PluginModel {
                         #(#bare_loads,)*
                         #(#service_loads,)*
                         #register_trampoline_load,
+                        #query_trampoline_load,
                         instrumentor: ::std::sync::Arc::new(
                             ::interoptopus::telemetry::MetricsRecorder::from(&[#(#inst_name_lits),*])
                         ),
@@ -239,6 +250,24 @@ impl PluginModel {
 
                 fn register_trampoline_fn(&self) -> ::interoptopus::lang::plugin::RegisterTrampolineFn {
                     self.register_trampoline
+                }
+
+                fn query_trampoline_fn(&self) -> ::interoptopus::lang::plugin::QueryTrampolineFn {
+                    self.query_trampoline
+                }
+
+                fn verify_api_guard(&self) -> Result<(), ::interoptopus::lang::plugin::PluginLoadError> {
+                    use ::interoptopus::lang::plugin::PluginInfo;
+
+                    let inventory = Self::inventory();
+                    let expected = ::interoptopus::pattern::api_guard::ApiHash::from_plugin(&inventory).hash();
+                    let actual = (self.query_trampoline)(::interoptopus::trampoline::QUERY_API_GUARD_HASH);
+
+                    if expected != actual {
+                        return Err(::interoptopus::lang::plugin::PluginLoadError::api_mismatch(expected, actual));
+                    }
+
+                    Ok(())
                 }
             }
         }
@@ -1262,7 +1291,7 @@ fn emit_load_field(field: &Ident, symbol: &str, fn_ty: TokenStream) -> TokenStre
         #field: {
             let ptr = loader(#symbol);
             if ptr.is_null() {
-                return Err(::interoptopus::lang::plugin::PluginLoadError::SymbolNotFound(#symbol.to_string()));
+                return Err(::interoptopus::lang::plugin::PluginLoadError::symbol_not_found(#symbol));
             }
             unsafe { ::std::mem::transmute::<*const u8, #fn_ty>(ptr) }
         }

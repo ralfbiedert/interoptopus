@@ -95,13 +95,13 @@ impl DotnetRuntime {
             inner
                 .context
                 .get_delegate_loader_for_assembly(dll_pdc)
-                .map_err(|e| PluginLoadError::LoadFailed(e.to_string()))?
+                .map_err(|e| PluginLoadError::load_failed(e.to_string()))?
         };
 
         let assembly_name = path
             .file_stem()
             .and_then(|s| s.to_str())
-            .ok_or_else(|| PluginLoadError::LoadFailed("invalid DLL path".to_string()))?
+            .ok_or_else(|| PluginLoadError::load_failed("invalid DLL path".to_string()))?
             .to_string();
 
         let type_name = format!("Interoptopus.API.Interop, {assembly_name}");
@@ -130,6 +130,9 @@ impl DotnetRuntime {
             register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION, shared::uncaught_exception_callback as *const u8);
             register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX, ctx);
         }
+
+        // Verify API guard after trampolines are registered so the query function works.
+        plugin.verify_api_guard()?;
 
         let arc = Arc::new(plugin);
         {

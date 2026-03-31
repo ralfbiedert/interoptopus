@@ -37,6 +37,7 @@ impl Pass {
         trampoline_model: &model::dotnet::trampoline::Pass,
         raw_pass: &raw::Pass,
         service_pass: &service::Pass,
+        meta_info: &crate::pass::meta::dotnet::info::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -66,6 +67,11 @@ impl Pass {
                 let ctx = Context::new();
                 let register = templates.render("dotnet/interop/register_trampoline.cs", &ctx)?;
                 methods.insert(0, register.trim_end().to_string());
+
+                let mut query_ctx = Context::new();
+                query_ctx.insert("api_guard_hash", &meta_info.api_hash_hex_literal());
+                let query = templates.render("dotnet/interop/query_trampoline.cs", &query_ctx)?;
+                methods.insert(1, query.trim_end().to_string());
             }
 
             self.trampolines.insert(file.clone(), methods);

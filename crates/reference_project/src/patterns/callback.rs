@@ -1,5 +1,6 @@
 use crate::patterns::result::Error;
 use crate::types::string::UseString;
+use interoptopus::ffi::CStrPtr;
 use interoptopus::lang::types::TypeInfo;
 use interoptopus::{callback, ffi};
 use std::ffi::c_void;
@@ -15,6 +16,7 @@ callback!(SumDelegateReturn2(x: i32, y: i32));
 callback!(Pointers(x: &i32, y: &mut i32));
 callback!(StringCallback(s: ffi::String));
 callback!(NestedStringCallback(s: UseString));
+callback!(CStrPassthrough(s: CStrPtr<'static>) -> CStrPtr<'static>);
 
 #[ffi]
 pub struct DelegateCallback<C: TypeInfo> {

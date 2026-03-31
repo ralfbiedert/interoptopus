@@ -113,6 +113,20 @@ public class TestPatternStrings
         s.Dispose();
     }
 
+    [Fact]
+    public void pattern_string_12()
+    {
+        var rval = Interop.pattern_string_12(s1 => s1 + "world", "hello");
+        Assert.Equal(rval, "helloworld");
+    }
+
+    [Fact]
+    public void pattern_string_13()
+    {
+
+    }
+
+
 
     [Fact]
     public void string_by_ref_dont_leak()

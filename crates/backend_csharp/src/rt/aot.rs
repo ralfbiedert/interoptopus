@@ -63,7 +63,7 @@ impl AotRuntime {
         }
 
         // Load the native library.
-        let lib = unsafe { libloading::Library::new(path.as_os_str()) }.map_err(|e| PluginLoadError::LoadFailed(e.to_string()))?;
+        let lib = unsafe { libloading::Library::new(path.as_os_str()) }.map_err(|e| PluginLoadError::load_failed(e.to_string()))?;
 
         let plugin = T::load_from(|symbol| {
             let symbol_bytes: Vec<u8> = symbol.bytes().chain(std::iter::once(0)).collect();
@@ -85,6 +85,9 @@ impl AotRuntime {
             register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION, shared::uncaught_exception_callback as *const u8);
             register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX, ctx);
         }
+
+        // Verify API guard after trampolines are registered so the query function works.
+        plugin.verify_api_guard()?;
 
         let arc = Arc::new(plugin);
         {

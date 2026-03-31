@@ -26,7 +26,7 @@ impl PluginCache {
         if let Some(existing_type) = self.path_to_type.get(path)
             && *existing_type != type_id
         {
-            return Err(PluginLoadError::LoadFailed(format!("DLL {} already loaded for a different plugin type", path.display())));
+            return Err(PluginLoadError::load_failed(format!("DLL {} already loaded for a different plugin type", path.display())));
         }
         Ok(())
     }

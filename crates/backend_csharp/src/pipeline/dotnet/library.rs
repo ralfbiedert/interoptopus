@@ -1,5 +1,5 @@
 use crate::Error;
-use crate::pass::{OperationMode, PassMeta, model, output};
+use crate::pass::{OperationMode, PassMeta, meta, model, output};
 use crate::pipeline::loop_model_passes_until_done;
 use interoptopus::inventory::PluginInventory;
 use interoptopus_backends::output::Multibuf;
@@ -7,6 +7,7 @@ use interoptopus_backends::output::Multibuf;
 /// Configuration for the .NET codegen pipeline.
 #[derive(Default)]
 pub struct DotnetLibraryConfig {
+    pub meta_info: meta::dotnet::info::Config,
     pub model_id_maps: model::common::id_map::Config,
     pub model_type_kinds: model::common::types::kind::Config,
     pub model_type_map_primitives: model::common::types::kind::primitives::Config,
@@ -165,6 +166,7 @@ pub struct IntermediateOutputPasses {
 /// assembly rather than *to* one.
 pub struct DotnetLibrary {
     inventory: PluginInventory,
+    meta_info: meta::dotnet::info::Pass,
     model_passes: ModelPasses,
     output_master: output::common::master::Pass,
     output_passes: IntermediateOutputPasses,
@@ -187,6 +189,7 @@ impl DotnetLibrary {
     pub(crate) fn with_config(inventory: PluginInventory, config: DotnetLibraryConfig) -> Self {
         Self {
             inventory,
+            meta_info: meta::dotnet::info::Pass::new(config.meta_info),
             model_passes: ModelPasses {
                 id_maps: model::common::id_map::Pass::new(config.model_id_maps),
                 type_kinds: model::common::types::kind::Pass::new(config.model_type_kinds),
@@ -270,6 +273,10 @@ impl DotnetLibrary {
     #[rustfmt::skip]
     pub fn process(mut self) -> Result<Multibuf, Error> {
         let mut pass_meta = PassMeta::default();
+
+        // Meta pass — compute API hash before model passes.
+        self.meta_info.process(&mut pass_meta, &self.inventory)?;
+
         let m = &mut self.model_passes;
         let o = &mut self.output_passes;
 
@@ -348,8 +355,8 @@ impl DotnetLibrary {
         o.wires.process(&mut pass_meta, &self.output_master, &o.wire_types, &o.wire_helper_classes)?;
         o.interop_raw.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.plugin_interface, &m.fns_all, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
         o.interop_service.process(&mut pass_meta, &self.output_master, &m.trampoline, &m.service_interfaces, &m.fns_all, &m.type_all, &m.service_all, &o.unmanaged_names, &o.unmanaged_conversion)?;
-        o.interop.process(&mut pass_meta, &self.output_master, &m.trampoline, &o.interop_raw, &o.interop_service)?;
-        o.trampoline.process(&mut pass_meta, &self.output_master, &o.interop)?;
+        o.interop.process(&mut pass_meta, &self.output_master, &m.trampoline, &o.interop_raw, &o.interop_service, &self.meta_info)?;
+        o.trampoline.process(&mut pass_meta, &self.output_master, &o.interop, &self.meta_info)?;
         o.plugin_interface.process(&mut pass_meta, &self.output_master, &m.plugin_interface, &m.type_all)?;
         o.service_interface.process(&mut pass_meta, &self.output_master, &m.service_interfaces, &m.type_all)?;
         o.plugin_stub.process(&mut pass_meta, &self.output_master, &m.plugin_interface, &m.service_interfaces, &m.type_all)?;

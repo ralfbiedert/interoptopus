@@ -2,7 +2,7 @@
 //!
 //! When a Rust host loads a foreign plugin (e.g., a .NET DLL), it needs to
 //! provide certain runtime functions (like wire buffer allocation) to the
-//! plugin. These are registered via a `register_trampoline(id, fn_ptr)` call,
+//! plugin. These are registered via a `_trampoline_register(id, fn_ptr)` call,
 //! where `id` is one of the constants defined here.
 //!
 //! Use the [`register_wire_trampolines!`](crate::register_wire_trampolines)
@@ -34,3 +34,6 @@ pub const TRAMPOLINE_UNCAUGHT_EXCEPTION: i64 = 0x4952_4F50_5743_0003;
 /// Must be registered alongside [`TRAMPOLINE_UNCAUGHT_EXCEPTION`]. The value
 /// is passed back as the first argument (`ctx`) on every invocation.
 pub const TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX: i64 = 0x4952_4F50_5743_0004;
+
+/// Query ID for the API guard hash, used with `_trampoline_query_u64`.
+pub const QUERY_API_GUARD_HASH: i64 = 0x4952_4F50_5143_0001;

@@ -102,7 +102,6 @@
 //! not in all backends. For example, something like `ffi::Slice<ffi::Result<ffi::Option<ffi::String>, Error>>` is supported in
 //! Rust without issues, but its UX might suffer in Python.
 
-#[doc(hidden)]
 pub mod api_guard;
 mod api_table;
 pub mod asynk;

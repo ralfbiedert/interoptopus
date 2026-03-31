@@ -138,6 +138,7 @@ pub fn inventory() -> RustInventory {
         .register(function!(patterns::string::pattern_string_9))
         .register(function!(patterns::string::pattern_string_10))
         .register(function!(patterns::string::pattern_string_11))
+        .register(function!(patterns::string::pattern_string_12))
         .register(function!(patterns::slice::pattern_ffi_slice_1))
         .register(function!(patterns::slice::pattern_ffi_slice_1b))
         .register(function!(patterns::slice::pattern_ffi_slice_2))

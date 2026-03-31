@@ -31,14 +31,21 @@ impl Pass {
         Self { info: PassInfo { name: file!() }, rendered: HashMap::default() }
     }
 
-    pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, output_master: &output::common::master::Pass, interop_pass: &interop::all::Pass) -> OutputResult {
+    pub fn process(
+        &mut self,
+        _pass_meta: &mut crate::pass::PassMeta,
+        output_master: &output::common::master::Pass,
+        interop_pass: &interop::all::Pass,
+        meta_info: &crate::pass::meta::dotnet::info::Pass,
+    ) -> OutputResult {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(FileType::Csharp) {
             let has_trampolines = interop_pass.trampolines_for(file).is_some_and(|t| !t.is_empty());
 
             let content = if has_trampolines {
-                let ctx = Context::new();
+                let mut ctx = Context::new();
+                ctx.insert("api_guard_hash", &meta_info.api_hash_hex_literal());
                 templates.render("dotnet/trampoline.cs", &ctx)?.trim().to_string()
             } else {
                 String::new()

@@ -10,6 +10,7 @@ public static unsafe class Trampoline
     private const long WIRE_DESTROY             = 0x4952_4F50_5743_0002;
     private const long UNCAUGHT_EXCEPTION       = 0x4952_4F50_5743_0003;
     private const long UNCAUGHT_EXCEPTION_CTX   = 0x4952_4F50_5743_0004;
+    private const long QUERY_API_GUARD_HASH     = 0x4952_4F50_5143_0001;
 
     public static void Register(long id, IntPtr fn_ptr)
     {
@@ -17,6 +18,12 @@ public static unsafe class Trampoline
         if (id == WIRE_DESTROY)           _wire_destroy           = (delegate* unmanaged[Cdecl]<IntPtr, int, int, void>)fn_ptr;
         if (id == UNCAUGHT_EXCEPTION)     _uncaught_exception     = (delegate* unmanaged[Cdecl]<nint, byte*, int, void>)fn_ptr;
         if (id == UNCAUGHT_EXCEPTION_CTX) _uncaught_exception_ctx = fn_ptr;
+    }
+
+    public static long QueryU64(long id)
+    {
+        if (id == QUERY_API_GUARD_HASH) return unchecked((long){{ api_guard_hash }});
+        return 0;
     }
 
     public static IntPtr WireCreate(int size, out int len, out int capacity)
