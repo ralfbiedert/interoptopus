@@ -45,8 +45,8 @@ bench:
 # Runs .NET benchmarks.
 bench-dotnet:
     # Make sure the DLL + Interop files exist
-    # cargo build -p reference_project --release  --all-features
-    # cargo test --test mod reference_project::interop  --all-features
+    cargo build -p reference_project --release  --all-features
+    cargo test --test mod reference_project::interop  --all-features
     dotnet run -c Release --project crates/backend_csharp/benches/dotnet/dotnet_benchmarks.csproj
 
 # Run linters, check tidiness.
