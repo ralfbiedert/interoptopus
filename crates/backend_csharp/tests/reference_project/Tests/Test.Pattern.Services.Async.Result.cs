@@ -12,16 +12,15 @@ public class TestPatternServicesAsyncResult
     [Fact]
     public async void Success()
     {
-        var s = ServiceAsyncResult.Create();
+        using var s = ServiceAsyncResult.Create();
         await s.Success();
-        s.Dispose();
     }
 
     [Fact]
     public async void Fail()
     {
         var exceptionThrown = false;
-        var s = ServiceAsyncResult.Create();
+        using var s = ServiceAsyncResult.Create();
 
         try { await s.Fail(); }
         catch (EnumException<Error> e)
@@ -29,7 +28,6 @@ public class TestPatternServicesAsyncResult
             Assert.True(e.Value.IsFail);
             exceptionThrown = true;
         }
-        s.Dispose();
 
         Assert.True(exceptionThrown);
     }

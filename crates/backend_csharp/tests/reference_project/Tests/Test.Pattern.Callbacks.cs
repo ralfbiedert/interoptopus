@@ -19,9 +19,8 @@ public class TestPatternDelegates
     [Fact]
     public void pattern_callback_1_retained()
     {
-        var cb = new MyCallback(value => value + 1);
+        using var cb = new MyCallback(value => value + 1);
         var x = Interop.pattern_callback_1(cb, 0);
-        cb.Dispose();
         Assert.Equal(1u, x);
     }
 
@@ -43,26 +42,23 @@ public class TestPatternDelegates
     [Fact]
     public void pattern_callback_4()
     {
-        var cb = new MyCallbackNamespaced(value => value);
+        using var cb = new MyCallbackNamespaced(value => value);
         var y = Interop.pattern_callback_4(cb, 5);
-        cb.Dispose();
         Assert.Equal(y, 5u);
     }
 
     [Fact]
     public void pattern_callback_5()
     {
-        var cb = Interop.pattern_callback_5();
+        using var cb = Interop.pattern_callback_5();
         cb.Call();
-        cb.Dispose();
     }
 
     [Fact]
     public void pattern_callback_6()
     {
-        var cb = Interop.pattern_callback_6();
+        using var cb = Interop.pattern_callback_6();
         var rval = cb.Call(1, 2);
-        cb.Dispose();
         
         Assert.Equal(3, rval);
     }

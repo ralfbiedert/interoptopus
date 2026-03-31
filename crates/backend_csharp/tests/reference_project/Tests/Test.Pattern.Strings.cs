@@ -153,16 +153,13 @@ public class TestPatternStrings
     [Fact]
     public void string_clones()
     {
-        var s1 = "hello".Utf8();
+        using var s1 = "hello".Utf8();
 
         for (var i = 0; i < 1000; i++)
         {
-            var s2 = s1.Clone();
+            using var s2 = s1.Clone();
             Assert.Equal(s1.String, s2.String);
-            s2.Dispose();
         }
-
-        s1.Dispose();
     }
 
     [Fact]

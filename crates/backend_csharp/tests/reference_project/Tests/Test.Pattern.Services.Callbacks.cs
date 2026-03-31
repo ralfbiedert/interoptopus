@@ -9,7 +9,7 @@ public class TestPatternServicesCallbacks
     [Fact]
     public void CallbackSimple()
     {
-        var callbacks = ServiceCallbacks.Create();
+        using var callbacks = ServiceCallbacks.Create();
         var called = false;
 
         callbacks.CallbackSimple(x =>
@@ -20,15 +20,14 @@ public class TestPatternServicesCallbacks
         });
 
         Assert.True(called);
-        callbacks.Dispose();
     }
 
     [Fact]
     public void CallbackWithSlice()
     {
-        var callbacks = ServiceCallbacks.Create();
+        using var callbacks = ServiceCallbacks.Create();
         var called = false;
-        var slice = new[] { 1, 2, 3 }.Slice();
+        using var slice = new[] { 1, 2, 3 }.Slice();
 
         callbacks.CallbackWithSlice((x, y) =>
         {
@@ -39,17 +38,13 @@ public class TestPatternServicesCallbacks
         }, slice);
 
         Assert.True(called);
-        slice.Dispose();
-        callbacks.Dispose();
     }
 
     [Fact]
     public void CallbackFfiReturn()
     {
-        var service = ServiceCallbacks.Create();
+        using var service = ServiceCallbacks.Create();
 
         service.CallbackFfiReturn((x, y) => ResultVoidError.Ok);
-
-        service.Dispose();
     }
 }

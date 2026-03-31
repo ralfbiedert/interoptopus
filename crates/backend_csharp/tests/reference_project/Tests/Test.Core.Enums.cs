@@ -93,11 +93,9 @@ public class TestEnums
             vec = new Vec3f32(),
             the_enum = EnumPayload.A
         };
-        var l3 = Layer3String.B(l2);
+        using var l3 = Layer3String.B(l2);
 
         Assert.Equal("hello", Interop.enums_4(l3).String);
-
-        l3.Dispose();
     }
 
 }

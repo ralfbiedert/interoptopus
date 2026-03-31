@@ -6,23 +6,20 @@ public class TestPatternServicesIgnored
     [Fact]
     public void CreateDispose()
     {
-        var s = ServiceIgnoringMethods.Create();
-        s.Dispose();
+        using var s = ServiceIgnoringMethods.Create();
     }
 
     [Fact]
     public void ThisIsIgnored()
     {
-        var s = ServiceIgnoringMethods.Create();
+        using var s = ServiceIgnoringMethods.Create();
         s.ThisIsIgnored();
-        s.Dispose();
     }
 
     [Fact]
     public void Test()
     {
-        var s = ServiceIgnoringMethods.Create();
+        using var s = ServiceIgnoringMethods.Create();
         s.Test(42);
-        s.Dispose();
     }
 }

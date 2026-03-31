@@ -6,8 +6,7 @@ public class TestPatternServicesBasic
     [Fact]
     public void NewDispose()
     {
-        var service = ServiceBasic.Create();
-        service.Dispose();
+        using var service = ServiceBasic.Create();
     }
 
 }

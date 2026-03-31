@@ -12,23 +12,21 @@ public class TestPatternServicesAsyncVecString
     [Fact]
     public async void HandleString()
     {
-        var s = ServiceAsyncVecString.Create();
+        using var s = ServiceAsyncVecString.Create();
         var r = await s.HandleString("abc".Utf8());
-        s.Dispose();
         Assert.Equal(r.IntoString(), "abc");
     }
 
     [Fact]
     public async void HandleVecString()
     {
-        var s = ServiceAsyncVecString.Create();
+        using var s = ServiceAsyncVecString.Create();
         var v = new[]
         {
             "abc".Utf8()
         }.IntoVec();
 
         var r = await s.HandleVecString(v);
-        s.Dispose();
         Assert.Equal(r[0].IntoString(), "abc");
     }
 
@@ -36,9 +34,8 @@ public class TestPatternServicesAsyncVecString
     [Fact]
     public async void HandleNestedString()
     {
-        var s = ServiceAsyncVecString.Create();
+        using var s = ServiceAsyncVecString.Create();
         var r = await s.HandleNestedString("abc".Utf8());
-        s.Dispose();
         Assert.Equal(r.s1.IntoString(), "abc");
         Assert.Equal(r.s2.IntoString(), "abc");
     }

@@ -8,9 +8,8 @@ public class TestPatternSlices
     [Fact]
     public void pattern_ffi_slice_1()
     {
-        var data = new uint[100_000].Slice();
+        using var data = new uint[100_000].Slice();
         var result = Interop.pattern_ffi_slice_1(data);
-        data.Dispose();
         Assert.Equal(100_000u, result);
     }
 
@@ -18,15 +17,13 @@ public class TestPatternSlices
     [Fact]
     public void pattern_ffi_slice_2()
     {
-        var data = new Vec3f32[] {
+        using var data = new Vec3f32[] {
             new() { x = 1.0f, y = 2.0f, z = 3.0f },
             new() { x = 4.0f, y = 5.0f, z = 6.0f },
             new() { x = 7.0f, y = 8.0f, z = 9.0f },
         }.Slice();
 
         var result = Interop.pattern_ffi_slice_2(data, 1);
-
-        data.Dispose();
 
         Assert.Equal(4.0f, result.x);
         Assert.Equal(5.0f, result.y);
@@ -36,7 +33,7 @@ public class TestPatternSlices
     [Fact]
     public void pattern_ffi_slice_3()
     {
-        var data = new byte[100_000].SliceMut();
+        using var data = new byte[100_000].SliceMut();
 
         Interop.pattern_ffi_slice_3(data, (slice) =>
         {
@@ -46,7 +43,6 @@ public class TestPatternSlices
 
         Assert.Equal(data[0], 1);
         Assert.Equal(data[1], 100);
-        data.Dispose();
     }
 
     [Fact]
@@ -56,7 +52,6 @@ public class TestPatternSlices
         var data2 = new byte[100_000].SliceMut();
 
         Interop.pattern_ffi_slice_5(ref data1, ref data2);
-
         data1.Dispose();
         data2.Dispose();
     }
@@ -66,14 +61,12 @@ public class TestPatternSlices
     {
         var data = new byte[] {1, 2, 3}.SliceMut();
 
-        var callback = new CallbackU8(x =>
+        using var callback = new CallbackU8(x =>
         {
             Assert.Equal(1, x);
             return 0;
         });
         Interop.pattern_ffi_slice_6(ref data, callback);
-        callback.Dispose();
-
         data.Dispose();
     }
 
@@ -99,13 +92,13 @@ public class TestPatternSlices
     public void pattern_ffi_slice_9()
     {
 
-        var use_string = new UseString()
+        using var use_string = new UseString()
         {
             s1 = "hello".Utf8(),
             s2 = "world".Utf8()
         };
 
-        var slice = new[]
+        using var slice = new[]
         {
             use_string,
             use_string,
@@ -115,27 +108,21 @@ public class TestPatternSlices
         var rval = Interop.pattern_ffi_slice_9(slice).IntoString();
 
         Assert.Equal("hello", rval);
-
-        slice.Dispose();
-        use_string.Dispose();
     }
 
     [Fact]
     public void pattern_ffi_slice_1b()
     {
-        var data = new uint[500].SliceMut();
+        using var data = new uint[500].SliceMut();
         var result = Interop.pattern_ffi_slice_1b(data);
         Assert.Equal(500u, result);
-        data.Dispose();
     }
 
     [Fact]
     public void pattern_ffi_slice_4()
     {
-        var slice = new byte[] { 1, 2, 3 }.Slice();
-        var sliceMut = new byte[] { 4, 5, 6 }.SliceMut();
+        using var slice = new byte[] { 1, 2, 3 }.Slice();
+        using var sliceMut = new byte[] { 4, 5, 6 }.SliceMut();
         Interop.pattern_ffi_slice_4(slice, sliceMut);
-        slice.Dispose();
-        sliceMut.Dispose();
     }
 }

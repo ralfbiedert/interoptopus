@@ -12,7 +12,7 @@ public class TestPatternServicesAsyncStructs
     [Fact]
     public async void ProcessStruct()
     {
-        var s = ServiceAsyncStructs.Create();
+        using var s = ServiceAsyncStructs.Create();
         var a = new NestedArray
         {
             field_array = new ushort[5],
@@ -24,7 +24,6 @@ public class TestPatternServicesAsyncStructs
             field_int = 123,
         };
         var r = await s.ProcessStruct(a);
-        s.Dispose();
         Assert.Equal(r.field_int, 124);
     }
 }

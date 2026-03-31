@@ -9,22 +9,19 @@ public class TestPatternVec
     [Fact]
     public void pattern_ffi_vec_1()
     {
-        var vec = Interop.pattern_vec_1();
+        using var vec = Interop.pattern_vec_1();
 
         Assert.Equal(3, vec.Count);
         Assert.Equal(1, vec[0]);
         Assert.Equal(2, vec[1]);
         Assert.Equal(3, vec[2]);
-
-        vec.Dispose();
     }
 
     [Fact]
     public void pattern_ffi_vec_2()
     {
-        var vec = Interop.pattern_vec_1();
+        using var vec = Interop.pattern_vec_1();
         Interop.pattern_vec_2(vec);
-        vec.Dispose();
     }
 
     [Fact]
@@ -78,16 +75,14 @@ public class TestPatternVec
     {
 
         var vec1 = Interop.pattern_vec_1();
-        var vec2 = Interop.pattern_vec_4(ref vec1);
+        using var vec2 = Interop.pattern_vec_4(ref vec1);
 
         Assert.Equal(3, vec1.Count);
         Assert.Equal(3, vec2.Count);
         Assert.Equal(vec1[0], vec2[0]);
         Assert.Equal(vec1[1], vec2[1]);
         Assert.Equal(vec1[2], vec2[2]);
-
         vec1.Dispose();
-        vec2.Dispose();
     }
 
     [Fact]
@@ -153,9 +148,8 @@ public class TestPatternVec
     [Fact]
     public void vec_empty()
     {
-        var empty = VecUtf8String.Empty();
+        using var empty = VecUtf8String.Empty();
         Assert.Equal(0, empty.Count);
-        empty.Dispose();
     }
 
 }

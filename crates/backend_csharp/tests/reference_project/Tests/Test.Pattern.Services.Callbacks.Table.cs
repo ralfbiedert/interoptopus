@@ -22,7 +22,7 @@ public class TestPatternServicesCallbacksTable
     [Fact]
     public void InvokeDelegates()
     {
-        var service = ServiceCallbacks.Create();
+        using var service = ServiceCallbacks.Create();
     
         CreatePatternDelegateTable(service);
         // ^-- this might run at risk of our delegates getting GC'ed if we don't add
@@ -33,7 +33,6 @@ public class TestPatternServicesCallbacksTable
         GC.Collect();
     
         service.InvokeDelegates();
-        service.Dispose();
     }
 
 }
