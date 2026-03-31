@@ -1,6 +1,6 @@
 //! Creates `DataEnum` types from computed enum variants.
 
-use crate::lang::types::kind::{DataEnum, TypeKind};
+use crate::lang::types::kind::{DataEnum, Primitive, TypeKind};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
@@ -11,6 +11,19 @@ pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
+}
+
+/// Map a core `Primitive` (from `Enum.repr`) to the C# backend `Primitive`.
+fn cs_primitive(p: &lang::types::Primitive) -> Primitive {
+    match p {
+        lang::types::Primitive::U8 => Primitive::Byte,
+        lang::types::Primitive::U16 => Primitive::UShort,
+        lang::types::Primitive::U32 => Primitive::UInt,
+        lang::types::Primitive::I8 => Primitive::SByte,
+        lang::types::Primitive::I16 => Primitive::Short,
+        lang::types::Primitive::I32 => Primitive::Int,
+        _ => Primitive::Int,
+    }
 }
 
 impl Pass {
@@ -30,10 +43,10 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            match &ty.kind {
-                lang::types::TypeKind::Enum(_) => {}
+            let rust_enum = match &ty.kind {
+                lang::types::TypeKind::Enum(e) => e,
                 _ => continue,
-            }
+            };
 
             let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
             let variants = try_resolve!(variants_pass.get(cs_id), pass_meta, self.info, crate::pass::MissingItem::CsType(cs_id));
@@ -43,8 +56,14 @@ impl Pass {
                 continue;
             }
 
+            // Determine discriminant type from Rust repr
+            let discriminant_type = match &rust_enum.repr.layout {
+                lang::types::Layout::Primitive(p) => cs_primitive(p),
+                _ => Primitive::Int,
+            };
+
             // Create the data enum
-            let data_enum = DataEnum { variants: variants.clone() };
+            let data_enum = DataEnum { variants: variants.clone(), discriminant_type };
 
             kinds.set(cs_id, TypeKind::DataEnum(data_enum));
             outcome.changed();

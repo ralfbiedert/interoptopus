@@ -2,7 +2,7 @@
 internal unsafe struct Unmanaged
 {
     [FieldOffset(0)]
-    internal int _variant;
+    internal {{ discriminant_type }} _variant;
     {%- for v in variants %}
 
     [FieldOffset(0)]

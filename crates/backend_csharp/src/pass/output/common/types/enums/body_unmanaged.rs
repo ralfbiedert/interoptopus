@@ -62,6 +62,7 @@ impl Pass {
             context.insert("name", name);
             context.insert("to_managed_method", to_managed_method);
             context.insert("variants", &variants);
+            context.insert("discriminant_type", data_enum.discriminant_type.cs_name());
 
             let rendered = templates.render("common/types/enums/body_unmanaged.cs", &context)?;
             self.enum_body_unmanaged.insert(*type_id, rendered);

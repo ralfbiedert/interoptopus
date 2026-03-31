@@ -1,4 +1,5 @@
 mod args;
+mod discriminant;
 mod emit;
 mod model;
 mod validation;
@@ -25,7 +26,7 @@ pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     model.validate()?;
 
     // Add repr attributes and remove skip attributes
-    add_repr_attribute(&mut input_ast, &args)?;
+    add_repr_attribute(&mut input_ast, &model)?;
     remove_skip_attributes(&mut input_ast);
 
     let typeinfo_impl = model.emit_typeinfo_impl()?;
@@ -45,29 +46,26 @@ pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     Ok(result)
 }
 
-fn add_repr_attribute(input: &mut DeriveInput, args: &FfiTypeArgs) -> syn::Result<()> {
-    if args.service {
+fn add_repr_attribute(input: &mut DeriveInput, model: &TypeModel) -> syn::Result<()> {
+    if model.args.service {
         return Ok(());
     }
 
-    // Check if a repr attribute already exists
-    let has_repr = input.attrs.iter().any(|attr| attr.path().is_ident("repr"));
+    // Remove any existing repr attribute — for enums the macro always picks the
+    // optimal discriminant size, and for structs we enforce a known layout.
+    input.attrs.retain(|attr| !attr.path().is_ident("repr"));
 
-    if has_repr {
-        return Ok(());
-    }
-
-    let repr_attr = if args.opaque {
+    let repr_attr = if model.args.opaque {
         syn::parse_quote! { #[repr(C)] }
-    } else if args.transparent {
+    } else if model.args.transparent {
         syn::parse_quote! { #[repr(transparent)] }
-    } else if args.packed {
+    } else if model.args.packed {
         syn::parse_quote! { #[repr(C, packed)] }
     } else {
-        match &input.data {
-            syn::Data::Struct(_) => syn::parse_quote! { #[repr(C)] },
-            syn::Data::Enum(_) => syn::parse_quote! { #[repr(i32)] },
-            syn::Data::Union(_) => return Err(syn::Error::new_spanned(input, "Unions are not supported")),
+        match &model.data {
+            model::TypeData::Struct(_) => syn::parse_quote! { #[repr(C)] },
+            model::TypeData::Enum(enum_data) => discriminant::repr_attribute(&enum_data.discriminant),
+            
         }
     };
 

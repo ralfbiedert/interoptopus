@@ -6,7 +6,7 @@
 {%- endif %}
 {{ visibility }} partial {{ struct_or_class }} {{ name }}
 {
-    int _variant;
+    {{ discriminant_type }} _variant;
     {%- for variant in variants %}
     {{ variant.type }} _{{ variant.name }};
     {%- endfor %}

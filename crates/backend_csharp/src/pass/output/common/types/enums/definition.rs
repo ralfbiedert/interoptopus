@@ -72,6 +72,7 @@ impl Pass {
             context.insert("docs", &docs);
             context.insert("is_disposable", &is_disposable);
             context.insert("visibility", &visibility);
+            context.insert("discriminant_type", data_enum.discriminant_type.cs_name());
 
             let rendered = templates.render("common/types/enums/definition.cs", &context)?;
             self.enum_ty.insert(*type_id, rendered);

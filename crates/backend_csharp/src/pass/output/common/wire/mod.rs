@@ -205,9 +205,10 @@ impl WireCodeGen<'_> {
                 self.emit_deserialize(lines, arr.ty, &format!("{target}[{idx}]"), depth + 1, indent + 1);
                 lines.push(format!("{p}}}"));
             }
-            RsTypeKind::Enum(_) => {
+            RsTypeKind::Enum(e) => {
                 let enum_name = self.cs_type_name(ty_id);
-                lines.push(format!("{p}{{ var _u = new {enum_name}.Unmanaged(); _u._variant = reader.ReadInt32(); {target} = _u.ToManaged(); }}"));
+                let read_expr = cs_read_primitive(enum_repr_primitive(e));
+                lines.push(format!("{p}{{ var _u = new {enum_name}.Unmanaged(); _u._variant = {read_expr}; {target} = _u.ToManaged(); }}"));
             }
             RsTypeKind::Struct(s) => {
                 let struct_name = self.cs_type_name(ty_id);

@@ -54,6 +54,7 @@ impl Pass {
                 let mut context = Context::new();
                 context.insert("variant", &variant.name);
                 context.insert("unmanaged_name", variant_type);
+                context.insert("discriminant_type", data_enum.discriminant_type.cs_name());
 
                 let rendered = templates.render("common/types/enums/body_unmanaged_variant.cs", &context)?;
                 rendered_variants.push(rendered);

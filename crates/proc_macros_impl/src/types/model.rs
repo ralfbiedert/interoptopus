@@ -1,6 +1,7 @@
 use crate::docs::extract_docs;
 use crate::skip::has_ffi_skip_attribute;
 use crate::types::args::FfiTypeArgs;
+use crate::types::discriminant::DiscriminantChoice;
 use syn::{Data, DeriveInput, Fields, Generics, Ident, Type, Visibility};
 
 #[derive(Clone)]
@@ -26,6 +27,8 @@ pub struct StructData {
 #[derive(Clone)]
 pub struct EnumData {
     pub variants: Vec<VariantModel>,
+    /// The smallest discriminant type that fits all variant values.
+    pub discriminant: DiscriminantChoice,
 }
 
 #[derive(Clone)]
@@ -97,7 +100,8 @@ impl TypeModel {
                     })
                     .collect::<syn::Result<Vec<_>>>()?;
 
-                TypeData::Enum(EnumData { variants })
+                let discriminant = crate::types::discriminant::optimal_discriminant(variants.iter().map(|v| v.discriminant.as_ref()));
+                TypeData::Enum(EnumData { variants, discriminant })
             }
             Data::Union(_) => return Err(syn::Error::new_spanned(input, "Unions are not supported")),
         };

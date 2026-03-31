@@ -1,0 +1,94 @@
+---
+source: crates/proc_macros_impl/tests/ty_enum.rs
+assertion_line: 42
+expression: expand_ffi!(item)
+---
+#[repr(i8)]
+enum Foo {
+    A,
+    B = -2,
+}
+#[allow(
+    clippy::eq_op,
+    clippy::type_repetition_in_bounds,
+    clippy::used_underscore_binding
+)]
+unsafe impl ::interoptopus::lang::types::TypeInfo for Foo {
+    const WIRE_SAFE: bool = true;
+    const RAW_SAFE: bool = true;
+    const ASYNC_SAFE: bool = true;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
+    fn id() -> ::interoptopus::inventory::TypeId {
+        ::interoptopus::inventory::TypeId::from_id(::interoptopus::id!(Foo))
+    }
+    fn kind() -> ::interoptopus::lang::types::TypeKind {
+        ::interoptopus::lang::types::TypeKind::Enum(::interoptopus::lang::types::Enum {
+            variants: vec![
+                ::interoptopus::lang::types::Variant { name : "A".to_string(), docs :
+                ::interoptopus::lang::meta::Docs::from_line(""), kind :
+                ::interoptopus::lang::types::VariantKind::Unit(0isize), },
+                ::interoptopus::lang::types::Variant { name : "B".to_string(), docs :
+                ::interoptopus::lang::meta::Docs::from_line(""), kind :
+                ::interoptopus::lang::types::VariantKind::Unit({
+                #[allow(clippy::unnecessary_cast)] { (- 2) as isize } }), }
+            ],
+            repr: ::interoptopus::lang::types::Repr {
+                layout: ::interoptopus::lang::types::Layout::Primitive(
+                    ::interoptopus::lang::types::Primitive::I8,
+                ),
+                alignment: ::std::option::Option::None,
+            },
+        })
+    }
+    fn ty() -> ::interoptopus::lang::types::Type {
+        ::interoptopus::lang::types::Type {
+            name: "Foo".to_string(),
+            visibility: ::interoptopus::lang::meta::Visibility::Public,
+            docs: ::interoptopus::lang::meta::Docs::from_line(""),
+            emission: ::interoptopus::lang::meta::Emission::FileEmission(
+                ::interoptopus::lang::meta::FileEmission::Default,
+            ),
+            kind: Self::kind(),
+        }
+    }
+    fn register(inventory: &mut impl ::interoptopus::inventory::Inventory) {
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}
+#[allow(clippy::used_underscore_binding, clippy::type_repetition_in_bounds)]
+unsafe impl ::interoptopus::lang::types::WireIO for Foo {
+    fn write(
+        &self,
+        out: &mut impl ::std::io::Write,
+    ) -> ::std::result::Result<(), ::interoptopus::wire::SerializationError> {
+        let __disc = match self {
+            Foo::A => Foo::A as i8,
+            Foo::B => Foo::B as i8,
+        };
+        <i8 as ::interoptopus::lang::types::WireIO>::write(&__disc, out)
+    }
+    fn read(
+        input: &mut impl ::std::io::Read,
+    ) -> ::std::result::Result<Self, ::interoptopus::wire::SerializationError>
+    where
+        Self: Sized,
+    {
+        let __discriminant = <i8 as ::interoptopus::lang::types::WireIO>::read(input)?;
+        match __discriminant {
+            x if x == Foo::A as i8 => ::std::result::Result::Ok(Foo::A),
+            x if x == Foo::B as i8 => ::std::result::Result::Ok(Foo::B),
+            _ => {
+                ::std::result::Result::Err(
+                    ::interoptopus::wire::SerializationError::invalid_discriminant(
+                        stringify!(Foo),
+                        __discriminant as isize,
+                    ),
+                )
+            }
+        }
+    }
+    fn live_size(&self) -> usize {
+        ::std::mem::size_of::<i8>()
+    }
+}

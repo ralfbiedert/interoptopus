@@ -154,10 +154,11 @@ impl TypeModel {
             TypeData::Enum(enum_data) => {
                 if enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)) {
                     let name = &self.name;
+                    let wire_ty = crate::types::discriminant::wire_type_tokens(&enum_data.discriminant, self.name.span());
                     let arms = enum_data.variants.iter().map(|v| {
                         let vname = &v.name;
                         quote_spanned! { vname.span() =>
-                            #name::#vname => #name::#vname as u32,
+                            #name::#vname => #name::#vname as #wire_ty,
                         }
                     });
 
@@ -165,7 +166,7 @@ impl TypeModel {
                         let __disc = match self {
                             #(#arms)*
                         };
-                        <u32 as ::interoptopus::lang::types::WireIO>::write(&__disc, out)
+                        <#wire_ty as ::interoptopus::lang::types::WireIO>::write(&__disc, out)
                     }
                 } else {
                     quote_spanned! { self.name.span() =>
@@ -246,15 +247,16 @@ impl TypeModel {
             TypeData::Enum(enum_data) => {
                 if enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)) {
                     let name = &self.name;
+                    let wire_ty = crate::types::discriminant::wire_type_tokens(&enum_data.discriminant, self.name.span());
                     let match_arms = enum_data.variants.iter().map(|variant| {
                         let vname = &variant.name;
                         quote_spanned! { vname.span() =>
-                            x if x == #name::#vname as i32 => ::std::result::Result::Ok(#name::#vname),
+                            x if x == #name::#vname as #wire_ty => ::std::result::Result::Ok(#name::#vname),
                         }
                     });
 
                     quote_spanned! { self.name.span() =>
-                        let __discriminant = <i32 as ::interoptopus::lang::types::WireIO>::read(input)?;
+                        let __discriminant = <#wire_ty as ::interoptopus::lang::types::WireIO>::read(input)?;
                         match __discriminant {
                             #(#match_arms)*
                             _ => ::std::result::Result::Err(::interoptopus::wire::SerializationError::invalid_discriminant(
@@ -326,8 +328,9 @@ impl TypeModel {
             }
             TypeData::Enum(enum_data) => {
                 if enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)) {
+                    let wire_ty = crate::types::discriminant::wire_type_tokens(&enum_data.discriminant, self.name.span());
                     quote_spanned! { self.name.span() =>
-                        ::std::mem::size_of::<u32>()
+                        ::std::mem::size_of::<#wire_ty>()
                     }
                 } else {
                     quote_spanned! { self.name.span() =>

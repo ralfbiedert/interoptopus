@@ -302,11 +302,9 @@ impl TypeModel {
         } else {
             match &self.data {
                 TypeData::Struct(_) => quote_spanned! { self.name.span() => ::interoptopus::lang::types::Layout::C },
-                TypeData::Enum(_) => quote_spanned! { self.name.span() =>
-                    ::interoptopus::lang::types::Layout::Primitive(
-                        ::interoptopus::lang::types::Primitive::I32
-                    )
-                },
+                TypeData::Enum(enum_data) => {
+                    crate::types::discriminant::layout_tokens(&enum_data.discriminant, self.name.span())
+                }
             }
         };
 

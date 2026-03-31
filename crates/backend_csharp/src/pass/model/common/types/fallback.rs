@@ -80,7 +80,7 @@ impl Pass {
                 }
                 lang::types::TypePattern::Option(rust_ty) => {
                     let Some(payload) = resolve_payload(*rust_ty, id_map) else { continue };
-                    TypeKind::DataEnum(DataEnum { variants: vec![variant("Some", 0, payload), variant("None", 1, None)] })
+                    TypeKind::DataEnum(DataEnum { variants: vec![variant("Some", 0, payload), variant("None", 1, None)], discriminant_type: Primitive::UInt })
                 }
                 lang::types::TypePattern::Result(rust_ok, rust_err) => {
                     let Some(ok_payload) = resolve_payload(*rust_ok, id_map) else { continue };
@@ -92,6 +92,7 @@ impl Pass {
                             variant("Panic", 2, None),
                             variant("Null", 3, None),
                         ],
+                        discriminant_type: Primitive::UInt,
                     })
                 }
                 lang::types::TypePattern::Bool => TypeKind::Primitive(Primitive::Byte),
