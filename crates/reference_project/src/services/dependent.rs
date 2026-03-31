@@ -23,6 +23,7 @@ impl ServiceDependent {
     pub fn from_main(main: &ServiceMain) -> ffi::Result<Self, Error> {
         ffi::Ok(Self { val: main.val })
     }
+    pub fn pass_main(&self, _: &ServiceMain) {}
 
     pub fn get(&self) -> u32 {
         self.val

@@ -24,7 +24,7 @@ use crate::lang::types::kind::{DelegateKind, Primitive, TypeKind, TypePattern};
 use crate::lang::types::{Decorators, Type};
 use crate::lang::{FunctionId, TypeId};
 use crate::pass::Outcome::Unchanged;
-use crate::pass::model::rust::fns::overload::{IntPtrEligibility, derive_overload_id, intptr_eligibility, is_eligible_intptr};
+use crate::pass::model::rust::fns::overload::{IntPtrEligibility, derive_overload_id, intptr_eligibility, is_eligible_intptr, service_intptr_target};
 use crate::pass::{ModelResult, PassInfo, model};
 use std::collections::HashSet;
 
@@ -76,6 +76,7 @@ impl Pass {
             };
 
             let has_delegate = transformable_args.iter().any(|a| is_delegate_class(a.ty, types));
+            let has_service = transformable_args.iter().any(|a| service_intptr_target(a.ty, types).is_some());
 
             // If any IntPtr argument's target type is not yet resolved, defer.
             let has_any_unknown = transformable_args
@@ -86,7 +87,7 @@ impl Pass {
             }
 
             // Nothing to do for this function
-            if async_result_ty.is_none() && !has_delegate {
+            if async_result_ty.is_none() && !has_delegate && !has_service {
                 self.processed.insert(original_id);
                 continue;
             }
@@ -112,7 +113,7 @@ impl Pass {
             // When async is present, the Async overload already applies the same arg
             // transforms; emitting both would create two methods differing only in
             // return type, which C# rejects.
-            if has_delegate && async_result_ty.is_none() {
+            if (has_delegate || has_service) && async_result_ty.is_none() {
                 let sig = Signature { arguments: overload_args.clone(), rval: original_fn.signature.rval };
                 let id = derive_overload_id(original_id, &sig);
                 let transforms = FnTransforms { rval: RvalTransform::PassThrough, args: arg_transforms.clone() };
@@ -227,13 +228,16 @@ fn build_arg_transforms(
     let mut overload_args = Vec::new();
     let mut transforms = Vec::new();
 
-    for arg in args {
+    for (_, arg) in args.iter().enumerate() {
         if let Some(OverloadFamily::Delegate(family)) = is_delegate_class(arg.ty, types).then(|| type_overloads.get(arg.ty)).flatten() {
             overload_args.push(Argument { name: arg.name.clone(), ty: family.signature });
             transforms.push(ArgTransform::WrapDelegate);
         } else if let Some(OverloadFamily::Pointer(family)) = is_eligible_intptr(arg.ty, types).then(|| type_overloads.get(arg.ty)).flatten() {
             overload_args.push(Argument { name: arg.name.clone(), ty: family.by_ref });
             transforms.push(ArgTransform::Ref);
+        } else if let Some(service_ty) = service_intptr_target(arg.ty, types) {
+            overload_args.push(Argument { name: arg.name.clone(), ty: service_ty });
+            transforms.push(ArgTransform::Service);
         } else {
             overload_args.push(Argument { name: arg.name.clone(), ty: arg.ty });
             transforms.push(ArgTransform::PassThrough);

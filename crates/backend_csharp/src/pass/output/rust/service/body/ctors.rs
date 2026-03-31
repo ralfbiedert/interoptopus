@@ -48,17 +48,27 @@ impl Pass {
                 // Check if this constructor has an async overload
                 let async_overload = fns.overloads_for(*ctor_fn_id).find_map(|(overload_id, func)| {
                     if let FunctionKind::Overload(o) = &func.kind
-                        && let OverloadKind::Async(transforms) = &o.kind
+                        && let OverloadKind::Async(_) = &o.kind
                     {
-                        return Some((*overload_id, transforms));
+                        return Some(*overload_id);
+                    }
+                    None
+                });
+
+                // Check if this constructor has a body overload (service arg transforms)
+                let body_overload = fns.overloads_for(*ctor_fn_id).find_map(|(overload_id, func)| {
+                    if let FunctionKind::Overload(o) = &func.kind
+                        && matches!(&o.kind, OverloadKind::Body(_))
+                    {
+                        return Some(*overload_id);
                     }
                     None
                 });
 
                 let docs = format_docs(&ctor_fn.docs);
 
-                if let Some((overload_id, _transforms)) = async_overload {
-                    // Async constructor: use the overloaded function (callback removed, returns Task<IntPtr>)
+                if let Some(overload_id) = async_overload {
+                    // Async constructor
                     let Some(overload_fn) = fns.get(overload_id) else { continue };
 
                     let args = build_args(&overload_fn.signature.arguments, types);
@@ -72,6 +82,22 @@ impl Pass {
                     context.insert("visibility", &overload_fn.visibility.to_string());
 
                     let rendered = templates.render("rust/service/body_ctors_async.cs", &context)?;
+                    rendered_ctors.push(rendered);
+                } else if let Some(overload_id) = body_overload {
+                    // Sync constructor with body overload (e.g., service arg transforms)
+                    let Some(overload_fn) = fns.get(overload_id) else { continue };
+
+                    let args = build_args(&overload_fn.signature.arguments, types);
+
+                    let mut context = Context::new();
+                    context.insert("name", name);
+                    context.insert("method_name", method_name);
+                    context.insert("interop_name", &overload_fn.name);
+                    context.insert("args", &args);
+                    context.insert("docs", &docs);
+                    context.insert("visibility", &overload_fn.visibility.to_string());
+
+                    let rendered = templates.render("rust/service/body_ctors.cs", &context)?;
                     rendered_ctors.push(rendered);
                 } else {
                     // Sync constructor: use the original function

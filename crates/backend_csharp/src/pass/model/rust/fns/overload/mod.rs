@@ -40,6 +40,15 @@ fn is_eligible_intptr(ty: TypeId, types: &model::common::types::all::Pass) -> bo
     matches!(intptr_eligibility(ty, types), IntPtrEligibility::Eligible)
 }
 
+/// If the argument is an `IntPtr` pointing to a `Service`, returns the service's `TypeId`.
+pub fn service_intptr_target(ty: TypeId, types: &model::common::types::all::Pass) -> Option<TypeId> {
+    let TypeKind::Pointer(Pointer { kind: PointerKind::IntPtr(_), target }) = types.get(ty).map(|t| &t.kind)? else {
+        return None;
+    };
+    let target_type = types.get(*target)?;
+    matches!(&target_type.kind, TypeKind::Service).then_some(*target)
+}
+
 fn derive_overload_id(original_id: FunctionId, signature: &Signature) -> FunctionId {
     let mut id = FunctionId::from_id(original_id.id().derive_id(signature.rval.id()));
     for arg in &signature.arguments {

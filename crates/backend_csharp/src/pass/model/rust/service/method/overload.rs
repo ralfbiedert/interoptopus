@@ -80,9 +80,16 @@ fn rebuild_with_overloads(
                 continue;
             }
 
+            // Skip non-async overloads that would produce a duplicate service method.
+            // Check against the original AND all overloads already in the result list.
             let dominated = match &overload_fn.kind {
                 FunctionKind::Overload(o) if !matches!(o.kind, OverloadKind::Async(_)) => {
                     service_args_equivalent(&func.signature.arguments, &overload_fn.signature.arguments, types)
+                        || result.iter().any(|&existing_id| {
+                            fns_all
+                                .get(existing_id)
+                                .is_some_and(|existing| service_args_equivalent(&existing.signature.arguments, &overload_fn.signature.arguments, types))
+                        })
                 }
                 _ => false,
             };

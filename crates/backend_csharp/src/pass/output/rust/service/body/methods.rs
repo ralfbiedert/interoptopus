@@ -64,24 +64,24 @@ impl Pass {
                         let docs = format_docs(&method_fn.docs);
                         let args = build_args(&method_fn.signature.arguments[1..], types);
                         let visibility = method_fn.visibility.to_string();
-                        rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, method_name, &method_fn.name, &args, &docs, &visibility)?);
+                        // Originals take IntPtr — forward _context
+                        rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, method_name, &method_fn.name, &args, &docs, &visibility, "_context")?);
                     }
                     FunctionKind::Overload(overload) => {
                         let Some(original_fn) = fns.get(overload.base) else { continue };
                         let Some(base_method_name) = method_names.get(overload.base) else { continue };
 
                         let docs = format_docs(&method_fn.docs);
+                        // Overloads accept Service type — forward this
+                        let self_arg = if has_service_self_arg(method_fn, types) { "this" } else { "_context" };
 
                         if matches!(&overload.kind, OverloadKind::Async(_)) {
-                            // Async overload: rval is a Task type registered by the model pass
                             let task_rval = types.get(method_fn.signature.rval).map_or_else(|| "Task".to_string(), |t| t.name.clone());
                             let async_args = build_args(&method_fn.signature.arguments[1..], types);
                             let visibility = method_fn.visibility.to_string();
 
-                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args, &docs, &visibility)?);
+                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args, &docs, &visibility, self_arg)?);
                         } else {
-                            // Simple or Body overload: render like a base method but with
-                            // the overloaded signature
                             let rval_kind = types.get(original_fn.signature.rval).map(|t| &t.kind);
                             let result_info = resolve_result_rval(rval_kind, types);
 
@@ -94,7 +94,7 @@ impl Pass {
 
                             let overload_args = build_args(&method_fn.signature.arguments[1..], types);
                             let visibility = method_fn.visibility.to_string();
-                            rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, base_method_name, &method_fn.name, &overload_args, &docs, &visibility)?);
+                            rendered_methods.push(render(templates, rval, is_void, result_info.as_ok, base_method_name, &method_fn.name, &overload_args, &docs, &visibility, self_arg)?);
                         }
                     }
                 }
@@ -144,6 +144,7 @@ fn render(
     args: &[HashMap<&str, Value>],
     docs: &str,
     visibility: &str,
+    self_arg: &str,
 ) -> Result<String, crate::Error> {
     let mut context = Context::new();
     context.insert("rval", rval);
@@ -154,6 +155,7 @@ fn render(
     context.insert("args", args);
     context.insert("docs", docs);
     context.insert("visibility", visibility);
+    context.insert("self_arg", self_arg);
     Ok(templates.render("rust/service/body_methods.cs", &context)?)
 }
 
@@ -165,6 +167,7 @@ fn render_async(
     args: &[HashMap<&str, Value>],
     docs: &str,
     visibility: &str,
+    self_arg: &str,
 ) -> Result<String, crate::Error> {
     let mut context = Context::new();
     context.insert("task_rval", task_rval);
@@ -173,6 +176,7 @@ fn render_async(
     context.insert("args", args);
     context.insert("docs", docs);
     context.insert("visibility", visibility);
+    context.insert("self_arg", self_arg);
     Ok(templates.render("rust/service/body_methods_async.cs", &context)?)
 }
 
@@ -195,4 +199,13 @@ fn resolve_result_rval(rval_kind: Option<&TypeKind>, types: &model::common::type
         }
         _ => ResultRval { as_ok: false, rval_name: None, is_void: false },
     }
+}
+
+/// Returns true if the function's first argument is a service type (not IntPtr).
+fn has_service_self_arg(func: &crate::lang::functions::Function, types: &model::common::types::all::Pass) -> bool {
+    func.signature
+        .arguments
+        .first()
+        .and_then(|arg| types.get(arg.ty))
+        .is_some_and(|ty| matches!(&ty.kind, TypeKind::Service))
 }

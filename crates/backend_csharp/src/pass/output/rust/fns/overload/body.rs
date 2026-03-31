@@ -203,6 +203,16 @@ fn resolve_args(
                 m.insert("wrapper_type", Value::String(class_name.clone()));
                 has_wraps = true;
             }
+            ArgTransform::Service => {
+                // The original arg is an IntPtr pointing to a Service. Resolve the
+                // service target type to get its name.
+                let service_ty = crate::pass::model::rust::fns::overload::service_intptr_target(arg.ty, types)
+                    .and_then(|id| types.get(id))
+                    .ok_or_else(|| crate::Error::from(format!("service type for arg `{}` of overload `{}`", arg.name, fn_name)))?;
+                m.insert("ty", Value::String(service_ty.name.clone()));
+                m.insert("is_ref", Value::String("false".into()));
+                m.insert("is_wrap", Value::String("false".into()));
+            }
         }
         out.push(m);
     }
@@ -217,6 +227,7 @@ fn build_native_args(args: &[Argument], transforms: &[ArgTransform]) -> Vec<Hash
             let forwarded = match transform {
                 ArgTransform::WrapDelegate => format!("{}_wrapped", arg.name),
                 ArgTransform::Ref => format!("ref {}", arg.name),
+                ArgTransform::Service => format!("{}.Context", arg.name),
                 ArgTransform::PassThrough => arg.name.clone(),
             };
             let mut m = HashMap::new();

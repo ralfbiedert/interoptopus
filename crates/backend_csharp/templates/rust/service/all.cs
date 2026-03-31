@@ -19,5 +19,5 @@ public partial class {{ name }} : IDisposable
         _context = IntPtr.Zero;
     }
 
-    public IntPtr Context => _context;
+    internal IntPtr Context => _context;
 }

@@ -8,7 +8,7 @@ public class TestPatternServicesAsyncCtor
     public async void NewAsyncAndGetValue()
     {
         var asyncBasic = ServiceAsyncBasic.Create();
-        var asyncCtor = await ServiceAsyncCtor.NewAsync(asyncBasic.Context, 42);
+        var asyncCtor = await ServiceAsyncCtor.NewAsync(asyncBasic, 42);
         Assert.Equal(42u, asyncCtor.GetValue());
         asyncCtor.Dispose();
         asyncBasic.Dispose();
