@@ -50,6 +50,11 @@ impl Pass {
                 ctx.insert("visibility", &visibility_of(csharp::UTIL_ASYNC_CALLBACK_COMMON, types));
                 parts.push(templates.render("common/types/util/async_callback_common.cs", &ctx)?.trim().to_string());
             }
+            if output_master.type_belongs_to(csharp::UTIL_CONST_CSTR_MARSHALLER, file) {
+                let mut ctx = Context::new();
+                ctx.insert("visibility", &visibility_of(csharp::UTIL_CONST_CSTR_MARSHALLER, types));
+                parts.push(templates.render("common/types/util/const_cstr_marshaller.cs", &ctx)?.trim().to_string());
+            }
 
             self.utils.insert(file.clone(), parts.join("\n\n"));
         }

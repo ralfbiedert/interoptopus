@@ -5,4 +5,5 @@ pub enum Util {
     EnumException,
     AsyncCallbackCommon,
     WireBuffer,
+    ConstCStrMarshaller,
 }

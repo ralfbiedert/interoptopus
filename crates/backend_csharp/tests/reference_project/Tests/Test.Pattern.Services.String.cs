@@ -34,10 +34,9 @@ public class TestPatternServicesString
     [Fact]
     public void ReturnCstr()
     {
-        // TODO: This crashes.
-        // var s = ServiceStrings.Create();
-        // var result = s.ReturnCstr();
-        // Assert.NotNull(result);
-        // s.Dispose();
+        var s = ServiceStrings.Create();
+        var result = s.ReturnCstr();
+        Assert.Equal(result, "hello.world");
+        s.Dispose();
     }
 }

@@ -63,7 +63,10 @@ impl Pass {
                     .decorators
                     .rval
                     .as_ref()
-                    .map(|crate::lang::types::RvalDecorator::MarshalAs(m)| format!("return: MarshalAs({m})"));
+                    .map(|d| match d {
+                        crate::lang::types::RvalDecorator::MarshalAs(m) => format!("return: MarshalAs({m})"),
+                        crate::lang::types::RvalDecorator::MarshalUsing(t) => format!("return: MarshalUsing(typeof({t}))"),
+                    });
 
                 let docs = format_docs(&function.docs);
 

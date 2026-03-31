@@ -302,7 +302,7 @@ impl<S: AsyncRuntime> Deref for Async<S> {
 /// spawned future and retrievable via [`Async::context`]. Use `()` if no
 /// extra context is needed.
 ///
-/// See the [`rt`](crate::rt) module for a ready-made Tokio implementation,
+/// See the [`rt`](crate::rt) module for a ready-made Tokio implementation
 /// or implement this trait directly for a custom executor.
 pub trait AsyncRuntime {
     /// Per-call context handed to the spawned future.

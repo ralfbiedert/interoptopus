@@ -52,6 +52,7 @@ impl std::fmt::Display for ParamDecorator {
 #[derive(Clone, Debug)]
 pub enum RvalDecorator {
     MarshalAs(MarshalAs),
+    MarshalUsing(String),
 }
 
 /// Can decorate a type with additional attributes in generated C# code.

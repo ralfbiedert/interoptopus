@@ -177,6 +177,7 @@ impl Pass {
                     Util::EnumException => ManagedConversion::Into,
                     Util::AsyncCallbackCommon => ManagedConversion::AsIs,
                     Util::WireBuffer => ManagedConversion::Into,
+                    Util::ConstCStrMarshaller => ManagedConversion::AsIs,
                 },
                 TypeKind::WireOnly(_) => ManagedConversion::Into,
             };

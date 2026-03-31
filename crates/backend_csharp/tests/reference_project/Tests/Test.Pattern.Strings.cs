@@ -16,9 +16,8 @@ public class TestPatternStrings
     [Fact]
     public void pattern_ascii_pointer_2()
     {
-        // TODO: Why does this not codegen properly?
-        // var rval = Interop.pattern_ascii_pointer_2();
-        // Assert.Equal(string.IsNullOrEmpty(rval));
+        var rval = Interop.pattern_ascii_pointer_2();
+        Assert.Equal(rval, "hello.world");
     }
     
     [Fact]

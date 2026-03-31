@@ -58,6 +58,7 @@ impl Pass {
                 (csharp::UTIL_ENUM_EXCEPTION, "EnumException", Util::EnumException, Visibility::Public),
                 (csharp::UTIL_ASYNC_CALLBACK_COMMON, "AsyncCallbackCommonNative", Util::AsyncCallbackCommon, Visibility::Internal),
                 (csharp::UTIL_WIRE_BUFFER, "WireBuffer", Util::WireBuffer, Visibility::Internal),
+                (csharp::UTIL_CONST_CSTR_MARSHALLER, "ConstCStrMarshaller", Util::ConstCStrMarshaller, Visibility::Internal),
             ];
 
             for (id, name, variant, visibility) in utils {

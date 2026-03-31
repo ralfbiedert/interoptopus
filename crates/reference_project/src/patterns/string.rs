@@ -10,7 +10,7 @@ pub fn pattern_ascii_pointer_1(x: ffi::CStrPtr) -> u32 {
 
 #[ffi]
 pub fn pattern_ascii_pointer_2() -> ffi::CStrPtr<'static> {
-    ffi::CStrPtr::empty()
+    ffi::CStrPtr::from_cstr(c"hello.world")
 }
 
 // NOTE: In some languages (C#) this can be a bad idea, because

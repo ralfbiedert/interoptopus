@@ -20,7 +20,7 @@ impl ServiceStrings {
     pub fn pass_cstr(&mut self, _: ffi::CStrPtr) {}
 
     pub fn return_cstr(&mut self) -> ffi::CStrPtr<'_> {
-        ffi::CStrPtr::empty()
+        ffi::CStrPtr::from_cstr(c"hello.world")
     }
 
     pub fn callback_string(&self, s: ffi::String, cb: StringCallback) {
