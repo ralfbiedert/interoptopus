@@ -66,7 +66,7 @@ impl Pass {
                         // Direct mappings — no marshalling
                         TypePattern::Bool | TypePattern::CChar | TypePattern::CVoid => ManagedConversion::AsIs,
                         TypePattern::CStrPointer => ManagedConversion::AsIs,
-                        TypePattern::ApiVersion => ManagedConversion::AsIs,
+                        TypePattern::Version => ManagedConversion::AsIs,
 
                         // Copy semantics (borrowing, original stays valid)
                         TypePattern::Slice(_) | TypePattern::SliceMut(_) => ManagedConversion::To,

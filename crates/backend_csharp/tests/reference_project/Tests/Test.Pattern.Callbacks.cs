@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using My.Company;
 using My.Company.Common;
 using Xunit;

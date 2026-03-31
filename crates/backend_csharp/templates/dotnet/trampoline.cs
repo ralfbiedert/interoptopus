@@ -22,7 +22,7 @@ public static unsafe class Trampoline
 
     public static long QueryU64(long id)
     {
-        if (id == QUERY_API_GUARD_HASH) return unchecked((long){{ api_guard_hash }});
+        if (id == QUERY_API_GUARD_HASH) return unchecked((long){{ guard_hash }});
         return 0;
     }
 

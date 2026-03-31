@@ -1,7 +1,7 @@
 #![allow(clippy::ptr_as_ptr, clippy::borrow_as_ptr, clippy::cast_ptr_alignment, clippy::ref_as_ptr)]
 
 use interoptopus::ffi;
-use interoptopus::pattern::api_guard::ApiVersion;
+use interoptopus::pattern::guard::Version;
 use std::mem;
 
 const PTR_SIZE: usize = mem::size_of::<*const u8>();
@@ -12,11 +12,11 @@ const PTR_SIZE: usize = mem::size_of::<*const u8>();
 #[test]
 fn api_version() {
     // repr(transparent) over u64
-    assert_eq!(mem::size_of::<ApiVersion>(), mem::size_of::<u64>());
-    assert_eq!(mem::align_of::<ApiVersion>(), mem::align_of::<u64>());
+    assert_eq!(mem::size_of::<Version>(), mem::size_of::<u64>());
+    assert_eq!(mem::align_of::<Version>(), mem::align_of::<u64>());
 
-    let v = ApiVersion::new(0x1234_5678_9ABC_DEF0);
-    let raw = unsafe { *(&v as *const ApiVersion as *const u64) };
+    let v = Version::new(0x1234_5678_9ABC_DEF0);
+    let raw = unsafe { *(&v as *const Version as *const u64) };
     assert_eq!(raw, 0x1234_5678_9ABC_DEF0);
 }
 

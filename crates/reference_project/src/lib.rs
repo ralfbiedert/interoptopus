@@ -10,7 +10,7 @@ pub mod functions;
 /// Reference implementations of patterns.
 pub mod patterns {
     // pub mod api_entry;
-    pub mod api_guard;
+    pub mod guard;
     pub mod api_table;
     pub mod callback;
     pub mod option;
@@ -162,7 +162,7 @@ pub fn inventory() -> RustInventory {
         .register(function!(patterns::result::pattern_result_2))
         .register(function!(patterns::result::pattern_result_3))
         .register(function!(patterns::result::pattern_result_4))
-        .register(function!(patterns::api_guard::pattern_api_guard))
+        .register(function!(patterns::guard::pattern_api_guard))
         .register(function!(patterns::callback::pattern_callback_1))
         .register(function!(patterns::callback::pattern_callback_2))
         // .register(function!(patterns::callback::pattern_callback_3))

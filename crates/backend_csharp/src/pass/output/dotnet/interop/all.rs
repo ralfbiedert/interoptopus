@@ -69,7 +69,7 @@ impl Pass {
                 methods.insert(0, register.trim_end().to_string());
 
                 let mut query_ctx = Context::new();
-                query_ctx.insert("api_guard_hash", &meta_info.api_hash_hex_literal());
+                query_ctx.insert("guard_hash", &meta_info.api_hash_hex_literal());
                 let query = templates.render("dotnet/interop/query_trampoline.cs", &query_ctx)?;
                 methods.insert(1, query.trim_end().to_string());
             }

@@ -46,7 +46,10 @@ pub fn pattern_callback_4(callback: MyCallbackNamespaced, x: u32) -> u32 {
 
 #[ffi]
 pub fn pattern_callback_5() -> SumDelegate1 {
-    SumDelegate1::from_fn(|| {})
+    let value = Box::new("hello".to_string());
+    SumDelegate1::from_fn(move || {
+        dbg!(&value);
+    })
 }
 
 #[ffi]

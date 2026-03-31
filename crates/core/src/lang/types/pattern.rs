@@ -11,7 +11,7 @@ pub enum TypePattern {
     /// A UTF-8 string (`ffi::String`).
     Utf8String,
     /// An API version constant.
-    APIVersion,
+    Version,
     /// An immutable slice (`ffi::Slice<T>`).
     Slice(TypeId),
     /// A mutable slice (`ffi::SliceMut<T>`).

@@ -2,7 +2,7 @@ Advanced "convenience patterns" that will make your life easier, esp. from C# an
 
 | File                           | Description                                                            |
 |--------------------------------|------------------------------------------------------------------------|
-| [`api_guard.rs`](api_guard.rs) | Helper to ensure your bindings match your .DLL.                        |
+| [`guard.rs`](guard.rs)         | Helper to ensure your bindings match your .DLL.                        |
 | [`callback.rs`](callback.rs)   | Callbacks and delegates.                                               |
 | [`option.rs`](option.rs)       | An FFI-safe `ffi::Option`.                                             |
 | [`primitive.rs`](primitive.rs) | Other primitives with special handling (e.g., `ffi::Bool`).            |

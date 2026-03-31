@@ -88,7 +88,7 @@ impl Pass {
                     TypePattern::CVoid => "void".to_string(),
                     TypePattern::CStrPointer => "string".to_string(),
                     TypePattern::Utf8String => "Utf8String".to_string(),
-                    TypePattern::ApiVersion => "ulong".to_string(),
+                    TypePattern::Version => "ulong".to_string(),
                     TypePattern::Slice(t) => format!("Slice{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
                     TypePattern::SliceMut(t) => format!("SliceMut{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),
                     TypePattern::Vec(t) => format!("Vec{}", rust_to_pascal(resolve_compositional_name!(self, *t, kinds, pass_meta))),

@@ -80,6 +80,7 @@ delegate void {{ name }}Destructor(IntPtr data);
     {{ _fns_decorators_all | indent }}
     public {{ rval_managed }} Call({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %})
     {
+        if (_ptr == IntPtr.Zero) throw new ObjectDisposedException(nameof({{ name }}));
         if (_managed != null)
         {
             {% if not is_void %}return {% endif %}_managed({% for arg in args %}{{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %});
@@ -99,6 +100,7 @@ delegate void {{ name }}Destructor(IntPtr data);
             Marshal.GetDelegateForFunctionPointer<{{ name }}Destructor>(_destructor)(_data);
             _destructor = IntPtr.Zero;
         }
+        _ptr = IntPtr.Zero;
     }
 
     {{ _fns_decorators_all | indent }}

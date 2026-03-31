@@ -3,7 +3,7 @@ use crate::lang::types::kind::DataEnum;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TypePattern {
-    ApiVersion,
+    Version,
     CStrPointer,
     Utf8String,
     Slice(TypeId),

@@ -44,7 +44,7 @@ impl Pass {
                 lang::types::TypePattern::Bool => TypePattern::Bool,
                 lang::types::TypePattern::CChar => TypePattern::CChar,
                 lang::types::TypePattern::CVoid => TypePattern::CVoid,
-                lang::types::TypePattern::APIVersion => TypePattern::ApiVersion,
+                lang::types::TypePattern::Version => TypePattern::Version,
 
                 lang::types::TypePattern::Slice(rust_ty) => TypePattern::Slice(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty))),
                 lang::types::TypePattern::SliceMut(rust_ty) => TypePattern::SliceMut(try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty))),

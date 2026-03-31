@@ -45,7 +45,7 @@ impl Pass {
 
             let content = if has_trampolines {
                 let mut ctx = Context::new();
-                ctx.insert("api_guard_hash", &meta_info.api_hash_hex_literal());
+                ctx.insert("guard_hash", &meta_info.api_hash_hex_literal());
                 templates.render("dotnet/trampoline.cs", &ctx)?.trim().to_string()
             } else {
                 String::new()

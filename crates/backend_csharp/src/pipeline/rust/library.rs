@@ -76,7 +76,7 @@ pub struct RustLibraryConfig {
     pub output_slices: output::rust::pattern::slices::Config,
     pub output_vecs: output::rust::pattern::vec::Config,
     pub output_fn_imports: output::rust::fns::rust::Config,
-    pub output_fn_api_guard: output::rust::fns::api_guard::Config,
+    pub output_fn_guard: output::rust::fns::guard::Config,
     pub output_fn_overload_simple: output::rust::fns::overload::simple::Config,
     pub output_fn_overload_body: output::rust::fns::overload::body::Config,
     pub output_asynk: output::rust::types::asynk::Config,
@@ -161,7 +161,7 @@ pub struct IntermediateOutputPasses {
     pub slices: output::rust::pattern::slices::Pass,
     pub vecs: output::rust::pattern::vec::Pass,
     pub fns_rust: output::rust::fns::rust::Pass,
-    pub fns_api_guard: output::rust::fns::api_guard::Pass,
+    pub fns_guard: output::rust::fns::guard::Pass,
     pub fns_overload_simple: output::rust::fns::overload::simple::Pass,
     pub fns_overload_body: output::rust::fns::overload::body::Pass,
     pub asynk: output::rust::types::asynk::Pass,
@@ -313,7 +313,7 @@ impl RustLibrary {
                 slices: output::rust::pattern::slices::Pass::new(config.output_slices),
                 vecs: output::rust::pattern::vec::Pass::new(config.output_vecs),
                 fns_rust: output::rust::fns::rust::Pass::new(config.output_fn_imports),
-                fns_api_guard: output::rust::fns::api_guard::Pass::new(config.output_fn_api_guard),
+                fns_guard: output::rust::fns::guard::Pass::new(config.output_fn_guard),
                 fns_overload_simple: output::rust::fns::overload::simple::Pass::new(config.output_fn_overload_simple),
                 fns_overload_body: output::rust::fns::overload::body::Pass::new(config.output_fn_overload_body),
                 asynk: output::rust::types::asynk::Pass::new(config.output_asynk),
@@ -449,7 +449,7 @@ impl RustLibrary {
         o.slices.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_managed_conversion, &o.unmanaged_names)?;
         o.vecs.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_managed_conversion, &o.unmanaged_names, &m.pattern_vec)?;
         o.fns_rust.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all)?;
-        o.fns_api_guard.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all, &self.meta_info)?;
+        o.fns_guard.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all, &self.meta_info)?;
         o.fns_overload_simple.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all)?;
         o.fns_overload_body.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all, &m.type_overload_all)?;
         o.asynk.process(&mut pass_meta, &self.output_master, &m.type_async_types, &m.type_all, &m.type_managed_conversion)?;

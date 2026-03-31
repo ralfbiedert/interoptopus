@@ -7,9 +7,9 @@ namespace {{ namespace }};
 public static partial class Interop {
 
     public const string NativeLib = "{{ dll_name }}";
-{%- if api_guard and api_guard != "" %}
+{%- if guard and guard != "" %}
 
-    {{ api_guard | indent }}
+    {{ guard | indent }}
 {%- endif %}
 {%- for fn in fns_rust %}
 

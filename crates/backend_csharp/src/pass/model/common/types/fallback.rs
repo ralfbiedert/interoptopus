@@ -59,7 +59,7 @@ impl Pass {
                     let Some(cs_u64) = id_map.ty(u64::id()) else { continue };
                     TypeKind::Composite(Composite { fields: vec![field("ptr", cs_ptr), field("len", cs_u64), field("capacity", cs_u64)], repr: Repr::c() })
                 }
-                lang::types::TypePattern::APIVersion => TypeKind::Primitive(Primitive::ULong),
+                lang::types::TypePattern::Version => TypeKind::Primitive(Primitive::ULong),
                 lang::types::TypePattern::Slice(rust_ty) => {
                     // { *const T, u64 }
                     let Some(cs_ptr) = id_map.ty(type_id_ptr(*rust_ty)) else { continue };

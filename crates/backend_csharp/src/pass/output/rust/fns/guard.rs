@@ -1,7 +1,7 @@
 //! Renders a static constructor for the `Interop` class that calls the API guard
 //! function and checks the returned hash against the one baked into the bindings.
 //!
-//! If the inventory contains a function whose return type is `TypePattern::ApiVersion`,
+//! If the inventory contains a function whose return type is `TypePattern::Version`,
 //! this pass reads the API hash from `meta::rust::info` and emits a C# static constructor
 //! that validates the hash at load time. If no such function exists, the pass produces
 //! an empty string and the template simply omits the block.
@@ -37,10 +37,10 @@ impl Pass {
     ) -> OutputResult {
         let templates = output_master.templates();
 
-        // Find the API guard function: one whose return type is ApiVersion
+        // Find the API guard function: one whose return type is Version
         let guard: Option<(FunctionId, String)> = fns_all.originals().find_map(|(&id, function)| {
             let rval_ty = types.get(function.signature.rval)?;
-            if matches!(&rval_ty.kind, TypeKind::TypePattern(TypePattern::ApiVersion)) {
+            if matches!(&rval_ty.kind, TypeKind::TypePattern(TypePattern::Version)) {
                 Some((id, function.name.clone()))
             } else {
                 None
@@ -54,7 +54,7 @@ impl Pass {
                     context.insert("fn_name", fn_name);
                     context.insert("hash_hex", meta_info.api_hash());
 
-                    templates.render("rust/fns/api_guard.cs", &context)?.trim().to_string()
+                    templates.render("rust/fns/guard.cs", &context)?.trim().to_string()
                 } else {
                     String::new()
                 }
@@ -69,7 +69,7 @@ impl Pass {
     }
 
     #[must_use]
-    pub fn api_guard_for(&self, output: &Output) -> Option<&str> {
+    pub fn guard_for(&self, output: &Output) -> Option<&str> {
         self.rendered.get(output).map(|s| &**s)
     }
 }

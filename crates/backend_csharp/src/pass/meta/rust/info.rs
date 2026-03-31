@@ -2,7 +2,7 @@
 
 use crate::pass::{ModelResult, Outcome, PassInfo};
 use interoptopus::inventory::RustInventory;
-use interoptopus::pattern::api_guard::ApiHash;
+use interoptopus::pattern::guard::Hash;
 
 #[derive(Default)]
 pub struct Config {
@@ -22,7 +22,7 @@ impl Pass {
     }
 
     pub fn process(&mut self, _pass_meta: &mut crate::pass::PassMeta, inventory: &RustInventory) -> ModelResult {
-        self.api_hash = ApiHash::from_rust(inventory).hash_hex().to_string();
+        self.api_hash = Hash::from_rust(inventory).hash_hex().to_string();
 
         // Sweet little lie, but we're running early and often, so this won't matter.
         Ok(Outcome::Unchanged)

@@ -1,7 +1,7 @@
-//! Ensures bindings match the used DLL.
+//! API guards ensuring bindings match the used DLL.
 //!
 //! Using an API guard is as simple as defining and exporting a function `my_api_guard` returning an
-//! [`ApiVersion`] as in the example below. Backends supporting API guards will automatically
+//! [`Version`] as in the example below. Backends supporting API guards will automatically
 //! generate guard code executed when the library is loaded.
 //!
 //! We **highly recommend** you add API guards, as mismatching bindings are the #1
@@ -16,11 +16,11 @@
 //!
 //! ```rust
 //! use interoptopus::inventory::RustInventory;
-//! use interoptopus::{api_guard, function};
+//! use interoptopus::{guard, function};
 //!
 //! fn ffi_inventory() -> RustInventory {
 //!     RustInventory::new()
-//!         .register(api_guard!(ffi_inventory)) // <- You must name the current function.
+//!         .register(guard!(ffi_inventory)) // <- You must name the current function.
 //!         .validate()
 //! }
 //! ```
@@ -48,18 +48,18 @@ use crate::lang::meta::{Docs, Emission, FileEmission, Visibility};
 use crate::lang::types::{TypeInfo, TypeKind, TypePattern, WireIO};
 use crate::wire::SerializationError;
 use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
+use std::hash::{Hash as _, Hasher};
 use std::io::{Read, Write};
 
 /// Holds the API version hash of the given library.
 #[repr(transparent)]
 #[allow(dead_code)]
 #[derive(Debug, Default, PartialOrd, PartialEq, Eq, Copy, Clone)]
-pub struct ApiVersion {
+pub struct Version {
     version: u64,
 }
 
-impl ApiVersion {
+impl Version {
     /// Create a new API version from the given hash.
     #[must_use]
     pub const fn new(version: u64) -> Self {
@@ -69,12 +69,12 @@ impl ApiVersion {
     /// Create a new API version from the given library.
     #[must_use]
     pub fn from_inventory(inventory: &RustInventory) -> Self {
-        let version = ApiHash::from_rust(inventory).hash;
+        let version = Hash::from_rust(inventory).hash;
         Self { version }
     }
 }
 
-unsafe impl TypeInfo for ApiVersion {
+unsafe impl TypeInfo for Version {
     const WIRE_SAFE: bool = true;
     const RAW_SAFE: bool = true;
     const ASYNC_SAFE: bool = true;
@@ -86,7 +86,7 @@ unsafe impl TypeInfo for ApiVersion {
     }
 
     fn kind() -> TypeKind {
-        TypeKind::TypePattern(TypePattern::APIVersion)
+        TypeKind::TypePattern(TypePattern::Version)
     }
 
     fn ty() -> crate::lang::types::Type {
@@ -94,7 +94,7 @@ unsafe impl TypeInfo for ApiVersion {
             emission: Emission::FileEmission(FileEmission::Common),
             docs: Docs::empty(),
             visibility: Visibility::Public,
-            name: "ApiVersion".to_string(),
+            name: "Version".to_string(),
             kind: Self::kind(),
         }
     }
@@ -104,7 +104,7 @@ unsafe impl TypeInfo for ApiVersion {
     }
 }
 
-unsafe impl WireIO for ApiVersion {
+unsafe impl WireIO for Version {
     fn write(&self, w: &mut impl Write) -> Result<(), SerializationError> {
         <u64 as WireIO>::write(&self.version, w)
     }
@@ -118,19 +118,19 @@ unsafe impl WireIO for ApiVersion {
     }
 }
 
-impl From<RustInventory> for ApiVersion {
+impl From<RustInventory> for Version {
     fn from(i: RustInventory) -> Self {
         Self::from_inventory(&i)
     }
 }
 
 /// Represents the API hash.
-pub struct ApiHash {
+pub struct Hash {
     pub hash: u64,
     pub hash_hex: String,
 }
 
-impl ApiHash {
+impl Hash {
     /// Returns a unique hash for a Rust library inventory; used by backends.
     #[must_use]
     pub fn from_rust(inventory: &RustInventory) -> Self {
@@ -188,24 +188,24 @@ impl ApiHash {
     }
 }
 
-/// Creates and registers an [API guard](crate::pattern::api_guard) for the current library.
+/// Creates and registers an API [guard](crate::pattern::guard) for the current library.
 ///
 /// # Example
 /// ```rust
 /// # use interoptopus::inventory::RustInventory;
-/// # use interoptopus::{api_guard, function};
+/// # use interoptopus::{guard, function};
 ///
 /// fn ffi_inventory() -> RustInventory {
 ///     RustInventory::new()
-///         .register(api_guard!(ffi_inventory)) // <- You must name the current function.
+///         .register(guard!(ffi_inventory)) // <- You must name the current function.
 ///         .validate()                          
 /// }
 /// ```
 #[macro_export]
-macro_rules! api_guard {
+macro_rules! guard {
     ($f:tt) => {{
         #[$crate::ffi]
-        pub fn __api_guard() -> $crate::pattern::api_guard::ApiVersion {
+        pub fn __api_guard() -> $crate::pattern::guard::Version {
             $f().into()
         }
 

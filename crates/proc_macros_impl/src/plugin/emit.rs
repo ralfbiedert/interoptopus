@@ -260,7 +260,7 @@ impl PluginModel {
                     use ::interoptopus::lang::plugin::PluginInfo;
 
                     let inventory = Self::inventory();
-                    let expected = ::interoptopus::pattern::api_guard::ApiHash::from_plugin(&inventory).hash();
+                    let expected = ::interoptopus::pattern::guard::Hash::from_plugin(&inventory).hash();
                     let actual = (self.query_trampoline)(::interoptopus::trampoline::QUERY_API_GUARD_HASH);
 
                     if expected != actual {

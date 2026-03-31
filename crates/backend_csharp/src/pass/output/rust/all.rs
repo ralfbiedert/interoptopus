@@ -34,7 +34,7 @@ impl Pass {
 
             let header = intermediary.header.header_for(file).unwrap();
             let fns_rust = intermediary.fns_rust.imports_for(file).unwrap();
-            let api_guard = intermediary.fns_api_guard.api_guard_for(file).unwrap();
+            let guard = intermediary.fns_guard.guard_for(file).unwrap();
             let fns_overload_simple = intermediary.fns_overload_simple.imports_for(file).unwrap();
             let fns_overload_body = intermediary.fns_overload_body.body_imports_for(file).unwrap();
             let fns_overload_asynk = intermediary.fns_overload_body.async_imports_for(file).unwrap();
@@ -60,7 +60,7 @@ impl Pass {
             context.insert("header", header);
             context.insert("using", using);
             context.insert("fns_rust", &fns_rust);
-            context.insert("api_guard", api_guard);
+            context.insert("guard", guard);
             context.insert("fns_overload_simple", &fns_overload_simple);
             context.insert("fns_overload_body", &fns_overload_body);
             context.insert("fns_overload_asynk", &fns_overload_asynk);
