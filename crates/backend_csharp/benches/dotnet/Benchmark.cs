@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Interoptopus;
 using My.Company;
@@ -104,11 +107,17 @@ static class Benchmark {
         result = MeasureResult.Measure(Iterations, () => Interop.pattern_vec_1().Dispose());
         writer.Add("pattern_vec_u8_return().Dispose()", result);
 
-        result = MeasureResult.Measure(Iterations, async () => { await new TaskCompletionSource().Task; });
-        writer.Add("await new TaskCompletionSource().Task", result);
+        result = MeasureResult.MeasureParallel(Iterations, 1, async () => { var tcs = new TaskCompletionSource<int>(); tcs.SetResult(0); await tcs.Task; });
+        writer.Add("await new TaskCompletionSource<int>().Task", result);
 
-        result = MeasureResult.Measure(Iterations, async () => { await serviceAsync.Call(); });
-        writer.Add("await serviceAsync.Success()", result);
+        result = MeasureResult.MeasureParallel(Iterations, 1, async () => { await serviceAsync.Call(); });
+        writer.Add("await serviceAsync.Success() [1 parallel]", result);
+
+        result = MeasureResult.MeasureParallel(Iterations, 16, async () => { await serviceAsync.Call(); });
+        writer.Add("await serviceAsync.Success() [16 parallel]", result);
+
+        result = MeasureNativeCallback(Iterations, cb => Interop.service_async_basic_call(serviceAsync.Context, cb));
+        writer.Add("serviceAsync.Call() [native callback only]", result);
 
         result = MeasureResult.Measure(Iterations, () => Interop.wire_accept_string_1(WireOfString.From("hello world")));
         writer.Add("wire_accept_string_1()", result);
@@ -117,5 +126,41 @@ static class Benchmark {
         writer.Add("wire_deeply_nested_1(deeply_nested.Wire())", result);
 
         writer.Write("RESULTS.md");
+    }
+
+    // Measures time from when the native call is issued until the completion callback fires —
+    // pure native round-trip latency with no C# async scheduler overhead.
+    static MeasureResult MeasureNativeCallback(uint n, Func<AsyncCallbackCommonNative, TaskHandle> nativeInvoke)
+    {
+        var mre = new ManualResetEventSlim(false);
+        long callbackTick = 0;
+        AsyncCallbackCommon cb = (_, __) => { callbackTick = Stopwatch.GetTimestamp(); mre.Set(); };
+        var cbNative = new AsyncCallbackCommonNative
+        {
+            _ptr = Marshal.GetFunctionPointerForDelegate(cb),
+            _ts = IntPtr.Zero,
+        };
+
+        // Warmup
+        for (var i = 0; i < n; i++)
+        {
+            mre.Reset();
+            var th = nativeInvoke(cbNative);
+            mre.Wait();
+            th.Dispose();
+        }
+
+        long sumTicks = 0;
+        for (var i = 0; i < n; i++)
+        {
+            mre.Reset();
+            var t0 = Stopwatch.GetTimestamp();
+            var th = nativeInvoke(cbNative);
+            mre.Wait();
+            sumTicks += callbackTick - t0;
+            th.Dispose();
+        }
+
+        return new MeasureResult(n, sumTicks);
     }
 }

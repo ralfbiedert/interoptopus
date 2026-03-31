@@ -4,15 +4,15 @@ Times were determined by running the construct 100k times (warmup + measure), re
 
 | Construct | ns per call |
 | --- | --- |
-| `primitive_void()` | 50 |
-| `primitive_u32(42)` | 50 |
-| `svc.call(5)` | 50 |
-| `wire_string(Wire::from("{}")).unwire()` | 3287 |
-| `wire_hashmap_string(Wire::from(1x{16char,16char})).unwire()` | 621 |
-| `wire_hashmap_string(Wire::from(16x{16char,16char})).unwire()` | 5781 |
-| `async service_async.add_one(1) [sequential]` | 4698 |
-| `async service_async.add_one(1) [64 in-flight]` | 597 |
-| `async service_async.wire_1(Wire::from({1char,1char})).await` | 4949 |
-| `async async_svc.add_one(1) [sequential]` | 4639 |
-| `async async_svc.add_one(1) [64 in-flight]` | 534 |
-| `async async_svc.wire_1(Wire::from({1char,1char})).await` | 4909 |
+| `primitive_void()` | 100 |
+| `primitive_u32(42)` | 100 |
+| `svc.call(5)` | 100 |
+| `wire_string(Wire::from("{}")).unwire()` | 2700 |
+| `wire_hashmap_string(Wire::from(1x{16char,16char})).unwire()` | 1000 |
+| `wire_hashmap_string(Wire::from(16x{16char,16char})).unwire()` | 5000 |
+| `async service_async.add_one(1) [sequential]` | 1300 |
+| `async service_async.add_one(1) [64 in-flight]` | 598 |
+| `async service_async.wire_1(Wire::from({1char,1char})).await` | 2000 |
+| `async async_svc.add_one(1) [sequential]` | 1500 |
+| `async async_svc.add_one(1) [64 in-flight]` | 489 |
+| `async async_svc.wire_1(Wire::from({1char,1char})).await` | 1800 |

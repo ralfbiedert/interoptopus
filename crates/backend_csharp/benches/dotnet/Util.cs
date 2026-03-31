@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Interoptopus
 {
@@ -54,6 +57,44 @@ namespace Interoptopus
             stopwatch.Stop();
 
             return new MeasureResult( n, stopwatch.ElapsedTicks - _calibrationTicks);
+        }
+
+        // Runs `parallelism` concurrent copies of `action` per batch, for `n / parallelism` batches
+        // (total individual calls == n). Each individual call is timed; all times are summed so the
+        // reported ns/call reflects cumulative in-flight work rather than wall-clock latency.
+        public static MeasureResult MeasureParallel(uint n, int parallelism, Func<Task> action)
+        {
+            var batchCount = n / (uint)parallelism;
+            var warmupTasks = new Task[parallelism];
+            var timedTasks = new Task<long>[parallelism];
+
+            // Warmup
+            for (var i = 0; i < batchCount; i++)
+            {
+                for (var j = 0; j < parallelism; j++)
+                    warmupTasks[j] = action();
+                Task.WhenAll(warmupTasks).GetAwaiter().GetResult();
+            }
+
+            long sumTicks = 0;
+            for (var i = 0; i < batchCount; i++)
+            {
+                for (var j = 0; j < parallelism; j++)
+                    timedTasks[j] = RunTimed(action);
+
+                var results = Task.WhenAll(timedTasks).GetAwaiter().GetResult();
+                for (var j = 0; j < parallelism; j++)
+                    sumTicks += results[j];
+            }
+
+            return new MeasureResult(batchCount * (long)parallelism, sumTicks);
+        }
+
+        private static async Task<long> RunTimed(Func<Task> action)
+        {
+            var t0 = Stopwatch.GetTimestamp();
+            await action();
+            return Stopwatch.GetTimestamp() - t0;
         }
 
     }
