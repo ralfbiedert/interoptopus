@@ -24,6 +24,7 @@
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::pattern::asynk::CancelValue;
 use crate::wire::SerializationError;
 use std::any::Any;
 use std::fmt::Debug;
@@ -58,6 +59,12 @@ pub enum Result<T, E> {
 
 impl<T, E> ResultAs for Result<T, E> {
     type AsT<X> = Result<X, E>;
+}
+
+impl<T, E> CancelValue for Result<T, E> {
+    fn cancel_value() -> Self {
+        Self::Panic
+    }
 }
 
 impl<T, E> Result<T, E> {

@@ -494,14 +494,28 @@ unsafe impl WireIO for TaskHandle {
     }
 }
 
+/// Trait for types that can produce a cancellation/fallback value.
+///
+/// Implemented by [`ffi::Result`](crate::ffi::Result) to produce
+/// the `Panic` variant when an async task is aborted.
+pub trait CancelValue {
+    /// Creates the value used to signal cancellation to the foreign side.
+    fn cancel_value() -> Self;
+}
+
 /// Drop guard ensuring an [`AsyncCallback`] is always invoked.
 ///
 /// When a spawned future completes normally, call [`mark_completed`](Self::mark_completed)
 /// before invoking the callback. If the future is aborted (e.g. via
-/// [`TaskHandle::abort`]) the guard's [`Drop`] impl fires the stored
-/// cancellation closure, which typically invokes the callback with
-/// `ffi::Result::Panic` so the foreign side's task-completion mechanism
-/// is never leaked.
+/// [`TaskHandle::abort`]) the guard's [`Drop`] impl fires the callback
+/// with [`CancelValue::cancel_value`] (typically `ffi::Result::Panic`)
+/// so the foreign side's task-completion mechanism is never leaked.
+///
+/// # Zero allocation
+///
+/// The guard stores the [`AsyncCallback`] inline (two pointer-sized fields,
+/// `Copy`) and constructs the cancel value on the stack in [`Drop`].
+/// No heap allocation is performed.
 ///
 /// # Thread safety
 ///
@@ -511,16 +525,15 @@ unsafe impl WireIO for TaskHandle {
 /// `.await`) and `Drop` (called when the future is dropped). The atomic
 /// is a defence-in-depth measure.
 #[doc(hidden)]
-pub struct AsyncCallbackGuard {
+pub struct AsyncCallbackGuard<T: TypeInfo + CancelValue> {
     completed: AtomicBool,
-    on_cancel: Option<Box<dyn FnOnce() + Send>>,
+    callback: AsyncCallback<T>,
 }
 
-impl AsyncCallbackGuard {
-    /// Creates a guard that will call `on_cancel` if dropped before
-    /// [`mark_completed`](Self::mark_completed) is called.
-    pub fn new(on_cancel: impl FnOnce() + Send + 'static) -> Self {
-        Self { completed: AtomicBool::new(false), on_cancel: Some(Box::new(on_cancel)) }
+impl<T: TypeInfo + CancelValue> AsyncCallbackGuard<T> {
+    /// Creates a guard from the callback to protect.
+    pub fn new(callback: AsyncCallback<T>) -> Self {
+        Self { completed: AtomicBool::new(false), callback }
     }
 
     /// Mark the async operation as completed. Must be called before
@@ -532,12 +545,15 @@ impl AsyncCallbackGuard {
     }
 }
 
-impl Drop for AsyncCallbackGuard {
+impl<T: TypeInfo + CancelValue> Drop for AsyncCallbackGuard<T> {
     fn drop(&mut self) {
-        if !self.completed.swap(true, Ordering::AcqRel)
-            && let Some(f) = self.on_cancel.take()
-        {
-            f();
+        if !self.completed.swap(true, Ordering::AcqRel) {
+            let v = T::cancel_value();
+            // SAFETY: The callback was created by the foreign side and is valid
+            // until it has been called exactly once. `mark_completed` ensures
+            // only one of normal-completion or cancel-on-drop fires.
+            unsafe { self.callback.call(&raw const v); }
+            std::mem::forget(v);
         }
     }
 }

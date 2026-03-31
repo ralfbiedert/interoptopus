@@ -333,14 +333,7 @@ impl ServiceModel {
                     let _runtime_inside = ::std::sync::Arc::clone(&_runtime_arc);
                     ::std::mem::forget(_runtime_arc); // Don't drop the original
 
-                    let _callback_for_guard = callback;
-                    let _guard = ::interoptopus::pattern::asynk::AsyncCallbackGuard::new(
-                        move || {
-                            let _v: #callback_type = ::interoptopus::ffi::Result::Panic;
-                            _callback_for_guard.call(&raw const _v);
-                            ::std::mem::forget(_v);
-                        }
-                    );
+                    let _guard = ::interoptopus::pattern::asynk::AsyncCallbackGuard::new(callback);
 
                     _runtime_invoke.spawn(move |_ctx| async move {
                         let _guard = _guard;
@@ -533,14 +526,7 @@ impl ServiceModel {
                     let _instance_inside = ::std::sync::Arc::clone(&_instance_arc);
                     ::std::mem::forget(_instance_arc); // Don't drop the original
 
-                    let _callback_for_guard = callback;
-                    let _guard = ::interoptopus::pattern::asynk::AsyncCallbackGuard::new(
-                        move || {
-                            let _v: #callback_type = ::interoptopus::ffi::Result::Panic;
-                            _callback_for_guard.call(&raw const _v);
-                            ::std::mem::forget(_v);
-                        }
-                    );
+                    let _guard = ::interoptopus::pattern::asynk::AsyncCallbackGuard::new(callback);
 
                     _instance_invoke.spawn(move |_ctx| async move {
                         let _guard = _guard;
