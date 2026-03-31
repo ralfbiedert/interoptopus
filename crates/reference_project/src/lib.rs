@@ -30,6 +30,7 @@ pub mod services {
         pub mod sleep;
         pub mod structs;
         pub mod vecstring;
+        pub mod wire;
     }
     pub mod basic;
     pub mod callback;
@@ -207,6 +208,7 @@ pub fn inventory() -> RustInventory {
         .register(service!(services::asynk::vecstring::ServiceAsyncVecString))
         .register(service!(services::asynk::result::ServiceAsyncResult))
         .register(service!(services::asynk::structs::ServiceAsyncStructs))
+        .register(service!(services::asynk::wire::ServiceAsyncWire))
         .register(service!(services::basic::ServiceBasic))
         .register(service!(services::dependent::ServiceMain))
         .register(service!(services::dependent::ServiceDependent))
