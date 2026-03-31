@@ -65,7 +65,7 @@ delegate void {{ name }}Destructor(IntPtr data);
 
     {{ _fns_decorators_all | indent }}
     {{ _fns_decorators_internal | indent }}
-    internal {{ rval_managed }} Call({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %})
+    internal {{ rval_managed }} CallRaw({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %})
     {
         var __target = Marshal.GetDelegateForFunctionPointer<{{ name }}Native>(_ptr);
         {% if not is_void %}
@@ -73,6 +73,18 @@ delegate void {{ name }}Destructor(IntPtr data);
         {% else %}
         __target({% for arg in args %}{{ arg.name }}{{ arg.to_unmanaged }}, {% endfor %}_data);
         {% endif %}
+    }
+
+    /// Invokes the callback. When created from a managed delegate, calls it directly.
+    /// When received from Rust, marshals arguments and calls through the function pointer.
+    {{ _fns_decorators_all | indent }}
+    public {{ rval_managed }} Call({% for arg in args %}{{ arg.managed_type }} {{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %})
+    {
+        if (_managed != null)
+        {
+            {% if not is_void %}return {% endif %}_managed({% for arg in args %}{{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %});
+        }
+        {% if not is_void %}return {% endif %}CallRaw({% for arg in args %}{{ arg.name }}{% if not loop.last %}, {% endif %}{% endfor %});
     }
 
     /// Disposes the callback. If the managed delegate threw an exception during a

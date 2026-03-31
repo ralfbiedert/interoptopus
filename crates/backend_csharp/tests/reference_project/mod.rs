@@ -17,7 +17,7 @@ fn interop() -> Result<(), Box<dyn std::error::Error>> {
         .build()
         .process()?;
 
-    multibuf.write_buffers_to("tests/reference_project")?;
+    multibuf.write_buffers_to("tests/reference_project/Bindings")?;
     multibuf.write_buffers_to("benches/dotnet")?;
 
     // insta::assert_snapshot!(multibuf);
