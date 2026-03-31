@@ -53,10 +53,9 @@ impl Pass {
 
             // Create the Type
             let decorators = match kind {
-                TypeKind::TypePattern(TypePattern::CStrPointer) => Decorators {
-                    param: Some(ParamDecorator::MarshalAs(MarshalAs::LPStr)),
-                    rval: Some(RvalDecorator::MarshalUsing("ConstCStrMarshaller".to_string())),
-                },
+                TypeKind::TypePattern(TypePattern::CStrPointer) => {
+                    Decorators { param: Some(ParamDecorator::MarshalAs(MarshalAs::LPStr)), rval: Some(RvalDecorator::MarshalUsing("ConstCStrMarshaller".to_string())) }
+                }
                 _ => Decorators::default(),
             };
 

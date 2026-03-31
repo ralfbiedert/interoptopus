@@ -63,8 +63,8 @@ pub fn optimal_discriminant<'a>(discriminants: impl Iterator<Item = Option<&'a s
     let mut next_auto: isize = 0;
 
     for disc in discriminants {
-        let value = match disc {
-            Some(expr) => match try_eval(expr) {
+        let value = if let Some(expr) = disc {
+            match try_eval(expr) {
                 Some(val) => {
                     next_auto = val + 1;
                     val
@@ -73,12 +73,11 @@ pub fn optimal_discriminant<'a>(discriminants: impl Iterator<Item = Option<&'a s
                     // Can't evaluate — conservatively fall back to i32
                     return DiscriminantChoice { repr_ident: "i32", primitive_ident: "I32" };
                 }
-            },
-            None => {
-                let val = next_auto;
-                next_auto += 1;
-                val
             }
+        } else {
+            let val = next_auto;
+            next_auto += 1;
+            val
         };
 
         if value < 0 {
@@ -88,6 +87,7 @@ pub fn optimal_discriminant<'a>(discriminants: impl Iterator<Item = Option<&'a s
         max_val = max_val.max(value);
     }
 
+    #[allow(clippy::cast_possible_wrap)]
     if has_negative {
         if min_val >= i8::MIN as isize && max_val <= i8::MAX as isize {
             DiscriminantChoice { repr_ident: "i8", primitive_ident: "I8" }
@@ -121,7 +121,7 @@ pub fn layout_tokens(choice: &DiscriminantChoice, span: proc_macro2::Span) -> pr
     }
 }
 
-/// Build the Rust type token for WireIO read/write (e.g. `u8`, `i16`).
+/// Build the Rust type token for `WireIO` read/write (e.g. `u8`, `i16`).
 pub fn wire_type_tokens(choice: &DiscriminantChoice, span: proc_macro2::Span) -> syn::Ident {
     syn::Ident::new(choice.repr_ident, span)
 }

@@ -90,7 +90,18 @@ impl Pass {
                                 ("_trampoline".to_string(), false)
                             };
 
-                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args, &docs, "public", self_arg, &trampoline_field, is_task_void)?);
+                            rendered_methods.push(render_async(
+                                templates,
+                                &task_rval,
+                                base_method_name,
+                                &original_fn.name,
+                                &async_args,
+                                &docs,
+                                "public",
+                                self_arg,
+                                &trampoline_field,
+                                is_task_void,
+                            )?);
                         } else {
                             let rval_kind = types.get(original_fn.signature.rval).map(|t| &t.kind);
                             let result_info = resolve_result_rval(rval_kind, types);

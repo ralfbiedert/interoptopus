@@ -112,7 +112,10 @@ impl Pass {
                 lang::types::TypePattern::TaskHandle => {
                     // { *mut c_void, *mut c_void, *mut c_void }
                     let Some(cs_void_ptr) = id_map.ty(<*mut std::ffi::c_void>::id()) else { continue };
-                    TypeKind::Composite(Composite { fields: vec![field("data", cs_void_ptr), field("abort_fn", cs_void_ptr), field("drop_fn", cs_void_ptr)], repr: Repr::c() })
+                    TypeKind::Composite(Composite {
+                        fields: vec![field("data", cs_void_ptr), field("abort_fn", cs_void_ptr), field("drop_fn", cs_void_ptr)],
+                        repr: Repr::c(),
+                    })
                 }
             };
 

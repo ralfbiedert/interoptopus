@@ -26,7 +26,7 @@ pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     model.validate()?;
 
     // Add repr attributes and remove skip attributes
-    add_repr_attribute(&mut input_ast, &model)?;
+    add_repr_attribute(&mut input_ast, &model);
     remove_skip_attributes(&mut input_ast);
 
     let typeinfo_impl = model.emit_typeinfo_impl()?;
@@ -46,9 +46,9 @@ pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     Ok(result)
 }
 
-fn add_repr_attribute(input: &mut DeriveInput, model: &TypeModel) -> syn::Result<()> {
+fn add_repr_attribute(input: &mut DeriveInput, model: &TypeModel) {
     if model.args.service {
-        return Ok(());
+        return;
     }
 
     // Remove any existing repr attribute — for enums the macro always picks the
@@ -65,12 +65,10 @@ fn add_repr_attribute(input: &mut DeriveInput, model: &TypeModel) -> syn::Result
         match &model.data {
             model::TypeData::Struct(_) => syn::parse_quote! { #[repr(C)] },
             model::TypeData::Enum(enum_data) => discriminant::repr_attribute(&enum_data.discriminant),
-            
         }
     };
 
     input.attrs.push(repr_attr);
-    Ok(())
 }
 
 fn remove_skip_attributes(input: &mut DeriveInput) {

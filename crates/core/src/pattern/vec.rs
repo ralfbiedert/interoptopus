@@ -83,9 +83,7 @@ impl<T> Vec<T> {
 impl<T: Clone + TypeInfo> Clone for Vec<T> {
     #[allow(clippy::cast_possible_truncation)]
     fn clone(&self) -> Self {
-        let this = std::mem::ManuallyDrop::new(unsafe {
-            std::vec::Vec::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize)
-        });
+        let this = std::mem::ManuallyDrop::new(unsafe { std::vec::Vec::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize) });
         this.as_slice().to_vec().into()
     }
 }

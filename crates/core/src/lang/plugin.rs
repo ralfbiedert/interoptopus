@@ -109,6 +109,7 @@ impl PluginLoadError {
     }
 
     /// Creates an `ApiMismatch` error.
+    #[must_use]
     pub fn api_mismatch(expected: u64, actual: u64) -> Self {
         Self { kind: PluginLoadErrorKind::ApiMismatch { expected, actual } }
     }

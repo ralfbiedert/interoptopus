@@ -10,9 +10,9 @@ pub mod functions;
 /// Reference implementations of patterns.
 pub mod patterns {
     // pub mod api_entry;
-    pub mod guard;
     pub mod api_table;
     pub mod callback;
+    pub mod guard;
     pub mod option;
     pub mod primitive;
     pub mod result;

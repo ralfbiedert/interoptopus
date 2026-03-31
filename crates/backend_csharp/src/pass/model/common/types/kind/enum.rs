@@ -14,7 +14,7 @@ pub struct Pass {
 }
 
 /// Map a core `Primitive` (from `Enum.repr`) to the C# backend `Primitive`.
-fn cs_primitive(p: &lang::types::Primitive) -> Primitive {
+fn cs_primitive(p: lang::types::Primitive) -> Primitive {
     match p {
         lang::types::Primitive::U8 => Primitive::Byte,
         lang::types::Primitive::U16 => Primitive::UShort,
@@ -43,9 +43,8 @@ impl Pass {
         let mut outcome = Unchanged;
 
         for (rust_id, ty) in rs_types {
-            let rust_enum = match &ty.kind {
-                lang::types::TypeKind::Enum(e) => e,
-                _ => continue,
+            let lang::types::TypeKind::Enum(rust_enum) = &ty.kind else {
+                continue;
             };
 
             let cs_id = try_resolve!(id_map.ty(*rust_id), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_id));
@@ -57,7 +56,7 @@ impl Pass {
             }
 
             // Determine discriminant type from Rust repr
-            let discriminant_type = match &rust_enum.repr.layout {
+            let discriminant_type = match rust_enum.repr.layout {
                 lang::types::Layout::Primitive(p) => cs_primitive(p),
                 _ => Primitive::Int,
             };

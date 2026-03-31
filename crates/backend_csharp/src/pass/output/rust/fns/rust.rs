@@ -59,14 +59,10 @@ impl Pass {
 
                 let mut context = Context::new();
 
-                let rval_decorator = rval_type
-                    .decorators
-                    .rval
-                    .as_ref()
-                    .map(|d| match d {
-                        crate::lang::types::RvalDecorator::MarshalAs(m) => format!("return: MarshalAs({m})"),
-                        crate::lang::types::RvalDecorator::MarshalUsing(t) => format!("return: MarshalUsing(typeof({t}))"),
-                    });
+                let rval_decorator = rval_type.decorators.rval.as_ref().map(|d| match d {
+                    crate::lang::types::RvalDecorator::MarshalAs(m) => format!("return: MarshalAs({m})"),
+                    crate::lang::types::RvalDecorator::MarshalUsing(t) => format!("return: MarshalUsing(typeof({t}))"),
+                });
 
                 let docs = format_docs(&function.docs);
 

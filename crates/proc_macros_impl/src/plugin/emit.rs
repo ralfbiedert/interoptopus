@@ -2,11 +2,11 @@ use std::collections::{HashMap, HashSet};
 
 use proc_macro2::{Group, Ident, Span, TokenStream, TokenTree};
 use quote::{format_ident, quote, quote_spanned};
-use syn::spanned::Spanned;
 use syn::Type;
+use syn::spanned::Spanned;
 
 use crate::plugin::model::{
-    direct_service_name, is_self_return, ref_service_name, replace_self, service_in_type, transitive_returned_services, PluginModel, PluginParam, ServiceBlock,
+    PluginModel, PluginParam, ServiceBlock, direct_service_name, is_self_return, ref_service_name, replace_self, service_in_type, transitive_returned_services,
 };
 
 impl PluginModel {

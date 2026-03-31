@@ -228,7 +228,7 @@ fn resolve_args(
             }
         }
         // Ensure has_default is always present for template access
-        m.entry("has_default").or_insert(Value::String("false".into()));
+        m.entry("has_default").or_insert_with(|| Value::String("false".into()));
         out.push(m);
     }
 

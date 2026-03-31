@@ -240,6 +240,7 @@ extern "C" fn async_callback_complete<T: Send + 'static>(value: *const T, contex
 /// alive by the leaked Arc ref in the callback's context pointer and is freed
 /// when the callback eventually fires. If the native side never calls the
 /// callback the Arc leaks — this is the same contract as the underlying FFI.
+#[doc(hidden)]
 pub struct AsyncCallbackFuture<T> {
     state: Arc<Mutex<FutureState<T>>>,
 }
@@ -332,14 +333,11 @@ pub trait AsyncRuntime {
 /// function pointers so that any runtime can provide its own abort
 /// mechanism without leaking implementation details through the FFI.
 ///
-/// # C# usage
+/// # Backend Support
 ///
-/// The generated C# code bridges `System.Threading.CancellationToken` to
+/// In C# the generated code bridges `System.Threading.CancellationToken` to
 /// this handle: when the C# token fires, it calls [`abort`](Self::abort),
-/// which drops the Rust future at the next `.await` point. An
-/// [`AsyncCallbackGuard`] inside the future ensures the completion
-/// callback always fires (with a `Panic` result) so the C#
-/// `TaskCompletionSource` is never leaked.
+/// which drops the Rust future at the next `.await` point.
 #[repr(C)]
 pub struct TaskHandle {
     data: *mut (),
@@ -385,6 +383,7 @@ impl TaskHandle {
     }
 
     /// Creates a handle that cannot abort anything.
+    #[must_use]
     pub fn dummy() -> Self {
         Self { data: std::ptr::null_mut(), abort_fn: None, drop_fn: None }
     }
@@ -535,10 +534,10 @@ impl AsyncCallbackGuard {
 
 impl Drop for AsyncCallbackGuard {
     fn drop(&mut self) {
-        if !self.completed.swap(true, Ordering::AcqRel) {
-            if let Some(f) = self.on_cancel.take() {
-                f();
-            }
+        if !self.completed.swap(true, Ordering::AcqRel)
+            && let Some(f) = self.on_cancel.take()
+        {
+            f();
         }
     }
 }

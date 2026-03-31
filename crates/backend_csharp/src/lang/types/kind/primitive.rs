@@ -18,6 +18,7 @@ pub enum Primitive {
 
 impl Primitive {
     /// Returns the C# keyword for this primitive type.
+    #[must_use]
     pub fn cs_name(self) -> &'static str {
         match self {
             Self::Void => "void",

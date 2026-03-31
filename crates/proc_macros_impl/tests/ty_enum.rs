@@ -1,5 +1,5 @@
 use quote::quote;
-use syn::{parse_quote, ItemEnum};
+use syn::{ItemEnum, parse_quote};
 
 mod util;
 
