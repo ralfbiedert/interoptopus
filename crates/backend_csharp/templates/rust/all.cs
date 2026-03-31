@@ -1,7 +1,7 @@
 {{ header }}
 
-{{ using }}
 {% include "common/pragma.cs" %}
+{{ using }}
 namespace {{ namespace }};
 
 public static partial class Interop {
