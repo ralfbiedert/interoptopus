@@ -20,6 +20,9 @@ pub enum ArgTransform {
     WrapDelegate,
     /// Accepts a service instance, extracts the `IntPtr`, and uses that for invokes.
     Service,
+    /// A synthetic `CancellationToken` parameter added to async overloads.
+    /// Has no corresponding native argument; rendered with `= default`.
+    CancellationToken,
 }
 
 /// Per-function overload transforms describing how each argument and the return

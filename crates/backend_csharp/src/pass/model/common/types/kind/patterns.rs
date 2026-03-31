@@ -67,6 +67,7 @@ impl Pass {
 
                 // NamedCallback is handled by the delegate kind pass, not here.
                 lang::types::TypePattern::NamedCallback(_) => continue,
+                lang::types::TypePattern::TaskHandle => TypePattern::TaskHandle,
             };
 
             kinds.set(cs_id, TypeKind::TypePattern(cs_pattern));

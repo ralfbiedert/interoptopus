@@ -134,9 +134,15 @@ impl Pass {
                 // Resolve the Task return type from the Result type
                 let task_ty_id = resolve_or_create_task_type(result_ty_id, types, kinds, names);
 
-                let sig = Signature { arguments: overload_args, rval: task_ty_id };
+                // Append a synthetic CancellationToken argument
+                let mut async_args = overload_args;
+                async_args.push(Argument { name: "_ct".to_string(), ty: crate::lang::types::csharp::CANCELLATION_TOKEN });
+                let mut async_transforms = arg_transforms;
+                async_transforms.push(ArgTransform::CancellationToken);
+
+                let sig = Signature { arguments: async_args, rval: task_ty_id };
                 let id = derive_overload_id(original_id, &sig);
-                let transforms = FnTransforms { rval: RvalTransform::AsyncTask(result_ty_id), args: arg_transforms };
+                let transforms = FnTransforms { rval: RvalTransform::AsyncTask(result_ty_id), args: async_transforms };
                 let func = Function {
                     emission: original_fn.emission.clone(),
                     name: original_fn.name.clone(),

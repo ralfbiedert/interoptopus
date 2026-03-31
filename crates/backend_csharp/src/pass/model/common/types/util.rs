@@ -7,7 +7,7 @@
 
 use crate::lang::meta::{Emission, FileEmission, Visibility};
 use crate::lang::types::csharp;
-use crate::lang::types::kind::{TypeKind, TypePattern, Util};
+use crate::lang::types::kind::{Primitive, TypeKind, TypePattern, Util};
 use crate::lang::types::{Decorators, Type};
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
@@ -59,6 +59,7 @@ impl Pass {
                 (csharp::UTIL_ASYNC_CALLBACK_COMMON, "AsyncCallbackCommonNative", Util::AsyncCallbackCommon, Visibility::Internal),
                 (csharp::UTIL_WIRE_BUFFER, "WireBuffer", Util::WireBuffer, Visibility::Internal),
                 (csharp::UTIL_CONST_CSTR_MARSHALLER, "ConstCStrMarshaller", Util::ConstCStrMarshaller, Visibility::Internal),
+                (csharp::UTIL_TASK_HANDLE, "TaskHandle", Util::TaskHandle, Visibility::Internal),
             ];
 
             for (id, name, variant, visibility) in utils {
@@ -80,6 +81,23 @@ impl Pass {
 
             self.registered = true;
             outcome.changed();
+
+            // CancellationToken is a system type (System.Threading.CancellationToken).
+            // Register it as a builtin so async overloads can reference it by TypeId.
+            let ct_kind = TypeKind::Primitive(Primitive::Void); // placeholder kind — never emitted
+            kinds.set(csharp::CANCELLATION_TOKEN, ct_kind.clone());
+            names.set(csharp::CANCELLATION_TOKEN, "CancellationToken".to_string());
+            types.set(
+                csharp::CANCELLATION_TOKEN,
+                Type {
+                    emission: Emission::Builtin,
+                    name: "CancellationToken".to_string(),
+                    visibility: Visibility::Public,
+                    docs: Vec::new(),
+                    kind: ct_kind,
+                    decorators: Decorators::default(),
+                },
+            );
         }
 
         // Propagate util type visibilities to pattern-mapped types that share the

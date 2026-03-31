@@ -16,4 +16,5 @@ pub enum TypePattern {
     CVoid,
     AsyncCallback(TypeId),
     Wire(TypeId),
+    TaskHandle,
 }

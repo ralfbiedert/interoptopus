@@ -321,7 +321,7 @@ impl ServiceModel {
             #ffi_attr
             unsafe fn #function_name #generics(
                 #async_params
-            ) {
+            ) -> ::interoptopus::pattern::asynk::TaskHandle {
                 #assert_service_send_sync
                 #assert_error_send_sync
 
@@ -333,9 +333,20 @@ impl ServiceModel {
                     let _runtime_inside = ::std::sync::Arc::clone(&_runtime_arc);
                     ::std::mem::forget(_runtime_arc); // Don't drop the original
 
+                    let _callback_for_guard = callback;
+                    let _guard = ::interoptopus::pattern::asynk::AsyncCallbackGuard::new(
+                        move || {
+                            let _v: #callback_type = ::interoptopus::ffi::Result::Panic;
+                            _callback_for_guard.call(&raw const _v);
+                            ::std::mem::forget(_v);
+                        }
+                    );
+
                     _runtime_invoke.spawn(move |_ctx| async move {
+                        let _guard = _guard;
                         let _async_runtime = ::interoptopus::pattern::asynk::Async::new(_runtime_inside, _ctx);
                         let _result = #service_call(_async_runtime, #param_names).await;
+                        _guard.mark_completed();
                         match _result {
                             ::interoptopus::ffi::Ok(service_instance) => {
                                 let _cb_result = ::interoptopus::ffi::Ok(
@@ -360,7 +371,7 @@ impl ServiceModel {
                                 ::std::mem::forget(_cb_result);
                             }
                         }
-                    });
+                    })
                 }
             }
         }
@@ -511,7 +522,7 @@ impl ServiceModel {
             #ffi_attr
             unsafe fn #function_name #enhanced_generics(
                 #async_params
-            ) -> <::interoptopus::ffi::Result<(), Error> as ::interoptopus::pattern::result::ResultAs>::AsT<*const #service_type> #where_clause {
+            ) -> ::interoptopus::pattern::asynk::TaskHandle #where_clause {
                 #assert_return_send_sync
 
                 unsafe {
@@ -522,15 +533,25 @@ impl ServiceModel {
                     let _instance_inside = ::std::sync::Arc::clone(&_instance_arc);
                     ::std::mem::forget(_instance_arc); // Don't drop the original
 
+                    let _callback_for_guard = callback;
+                    let _guard = ::interoptopus::pattern::asynk::AsyncCallbackGuard::new(
+                        move || {
+                            let _v: #callback_type = ::interoptopus::ffi::Result::Panic;
+                            _callback_for_guard.call(&raw const _v);
+                            ::std::mem::forget(_v);
+                        }
+                    );
+
                     _instance_invoke.spawn(move |_ctx| async move {
+                        let _guard = _guard;
                         let _async_this = ::interoptopus::pattern::asynk::Async::new(_instance_inside, _ctx);
                         let _result = #service_type::#method_name(_async_this, #param_names).await;
+                        _guard.mark_completed();
                         callback.call(&raw const _result);
                         // Prevent Rust from dropping owned data (e.g. ffi::String) after the
                         // callback, since the callee took ownership via ptr::read.
                         ::std::mem::forget(_result);
-                    });
-                    ::interoptopus::ffi::Ok(::std::ptr::null())
+                    })
                 }
 
             }

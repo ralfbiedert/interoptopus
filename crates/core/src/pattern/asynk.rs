@@ -68,7 +68,7 @@
 use crate::bad_wire;
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::Visibility;
-use crate::lang::types::{TypeInfo, TypeKind, WireIO};
+use crate::lang::types::{TypeInfo, TypeKind, TypePattern, WireIO};
 use crate::wire::SerializationError;
 use std::ffi::c_void;
 use std::future::Future;
@@ -76,14 +76,25 @@ use std::io::{Read, Write};
 use std::ops::Deref;
 use std::pin::Pin;
 use std::ptr::null;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, Waker};
 
 /// When used as the last parameter, makes a function `async`.
 #[doc(hidden)]
-#[derive(Clone, Copy)]
 #[repr(C)]
 pub struct AsyncCallback<T>(Option<extern "C" fn(*const T, *const c_void) -> ()>, *const c_void);
+
+// Manual Clone/Copy: the derive would add `T: Copy` / `T: Clone` bounds,
+// but `T` only appears behind pointers in the struct fields so these impls
+// are valid for any `T`.
+impl<T> Clone for AsyncCallback<T> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl<T> Copy for AsyncCallback<T> {}
 
 // SAFETY: This is "safe-ish", as the type itself and its pointer are safe to send.
 // However, this type must not be used / called with non-{send, sync} types. The proc
@@ -308,9 +319,226 @@ pub trait AsyncRuntime {
     /// Per-call context handed to the spawned future.
     type T;
 
-    /// Spawn a future onto the runtime.
-    fn spawn<Fn, F>(&self, f: Fn)
+    /// Spawn a future onto the runtime, returning a handle that can abort it.
+    fn spawn<Fn, F>(&self, f: Fn) -> TaskHandle
     where
         Fn: FnOnce(Self::T) -> F + Send + 'static,
         F: Future<Output = ()> + Send + 'static;
+}
+
+/// FFI-safe handle that can abort a spawned async task.
+///
+/// Returned by [`AsyncRuntime::spawn`]. The handle carries type-erased
+/// function pointers so that any runtime can provide its own abort
+/// mechanism without leaking implementation details through the FFI.
+///
+/// # C# usage
+///
+/// The generated C# code bridges `System.Threading.CancellationToken` to
+/// this handle: when the C# token fires, it calls [`abort`](Self::abort),
+/// which drops the Rust future at the next `.await` point. An
+/// [`AsyncCallbackGuard`] inside the future ensures the completion
+/// callback always fires (with a `Panic` result) so the C#
+/// `TaskCompletionSource` is never leaked.
+#[repr(C)]
+pub struct TaskHandle {
+    data: *mut (),
+    abort_fn: Option<unsafe extern "C" fn(*mut ())>,
+    drop_fn: Option<unsafe extern "C" fn(*mut ())>,
+}
+
+// SAFETY: The data pointer is opaque and only touched by the function pointers,
+// which are safe to call from any thread. The runtime implementation is
+// responsible for ensuring thread safety of the underlying abort mechanism.
+unsafe impl Send for TaskHandle {}
+unsafe impl Sync for TaskHandle {}
+
+impl TaskHandle {
+    /// Creates a task handle from any abort-able value.
+    ///
+    /// `handle` is the runtime-specific abort mechanism (e.g.
+    /// [`tokio::task::AbortHandle`]). `abort` is called when
+    /// cancellation is requested; `handle` is dropped when the
+    /// `TaskHandle` itself is dropped.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// let join = runtime.spawn(future);
+    /// TaskHandle::from_handle(join.abort_handle(), tokio::task::AbortHandle::abort)
+    /// ```
+    pub fn from_handle<T: Send + 'static>(handle: T, abort: fn(&T)) -> Self {
+        let boxed = Box::into_raw(Box::new(TaskHandleInner { handle, abort }));
+
+        Self { data: boxed.cast(), abort_fn: Some(trampoline_abort::<T>), drop_fn: Some(trampoline_drop::<T>) }
+    }
+
+    /// Abort the task. The spawned future will be dropped at the next `.await` point.
+    ///
+    /// Calling this multiple times is safe — only the first call has effect.
+    pub fn abort(&self) {
+        if let Some(f) = self.abort_fn {
+            unsafe {
+                f(self.data);
+            }
+        }
+    }
+
+    /// Creates a handle that cannot abort anything.
+    pub fn dummy() -> Self {
+        Self { data: std::ptr::null_mut(), abort_fn: None, drop_fn: None }
+    }
+}
+
+/// Typed payload stored behind the type-erased `data` pointer in [`TaskHandle`].
+///
+/// Created by [`TaskHandle::from_handle`], which heap-allocates this struct
+/// via [`Box`] and stores the raw pointer as `*mut ()` in the handle.
+struct TaskHandleInner<T> {
+    handle: T,
+    abort: fn(&T),
+}
+
+/// Type-erased abort trampoline stored in [`TaskHandle::abort_fn`].
+///
+/// Monomorphized for each concrete `T` by [`TaskHandle::from_handle`] so that
+/// the correct type is recovered from the opaque pointer at call-time.
+///
+/// # Safety
+///
+/// `data` must point to a live, aligned `Box<TaskHandleInner<T>>` allocation
+/// produced by [`TaskHandle::from_handle`]. This invariant is upheld by
+/// construction: `from_handle` creates the allocation, and only
+/// `trampoline_drop` frees it.
+unsafe extern "C" fn trampoline_abort<T>(data: *mut ()) {
+    // SAFETY: `data` was created by `Box::into_raw(Box::new(TaskHandleInner<T>))` in
+    // `from_handle` and has not been freed yet (freeing only happens in `trampoline_drop`).
+    // The cast back to the original type is valid because the same `T` that was used in
+    // `from_handle` is baked into this monomorphized function at compile time.
+    unsafe {
+        let inner = &*(data.cast::<TaskHandleInner<T>>());
+        (inner.abort)(&inner.handle);
+    }
+}
+
+/// Type-erased drop trampoline stored in [`TaskHandle::drop_fn`].
+///
+/// Reclaims the heap allocation created by [`TaskHandle::from_handle`].
+/// Called exactly once from [`TaskHandle::drop`].
+///
+/// # Safety
+///
+/// Same invariant as [`trampoline_abort`]: `data` must point to a live
+/// `Box<TaskHandleInner<T>>` allocation. After this call the pointer is
+/// invalid and must not be used again. [`TaskHandle::drop`] ensures
+/// single-call by using [`Option::take`] on `drop_fn`.
+unsafe extern "C" fn trampoline_drop<T>(data: *mut ()) {
+    // SAFETY: `data` was created by `Box::into_raw` in `from_handle`.
+    // `TaskHandle::drop` calls this exactly once (via `Option::take`),
+    // so there is no double-free.
+    unsafe {
+        let _ = Box::from_raw(data.cast::<TaskHandleInner<T>>());
+    }
+}
+
+impl Drop for TaskHandle {
+    fn drop(&mut self) {
+        if let Some(f) = self.drop_fn.take() {
+            unsafe {
+                f(self.data);
+            }
+        }
+    }
+}
+
+unsafe impl TypeInfo for TaskHandle {
+    const WIRE_SAFE: bool = false;
+    const RAW_SAFE: bool = true;
+    const ASYNC_SAFE: bool = false;
+    const SERVICE_SAFE: bool = false;
+    const SERVICE_CTOR_SAFE: bool = false;
+
+    fn id() -> TypeId {
+        TypeId::new(0xA4B3C2D1E0F98765_4321ABCDEF012345)
+    }
+
+    fn kind() -> TypeKind {
+        TypeKind::TypePattern(TypePattern::TaskHandle)
+    }
+
+    fn ty() -> crate::lang::types::Type {
+        crate::lang::types::Type {
+            emission: crate::lang::meta::Emission::Builtin,
+            docs: crate::lang::meta::Docs::empty(),
+            visibility: Visibility::Public,
+            name: "TaskHandle".to_string(),
+            kind: Self::kind(),
+        }
+    }
+
+    fn register(inventory: &mut impl Inventory) {
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}
+
+unsafe impl WireIO for TaskHandle {
+    fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
+        bad_wire!()
+    }
+
+    fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
+        bad_wire!()
+    }
+
+    fn live_size(&self) -> usize {
+        bad_wire!()
+    }
+}
+
+/// Drop guard ensuring an [`AsyncCallback`] is always invoked.
+///
+/// When a spawned future completes normally, call [`mark_completed`](Self::mark_completed)
+/// before invoking the callback. If the future is aborted (e.g. via
+/// [`TaskHandle::abort`]) the guard's [`Drop`] impl fires the stored
+/// cancellation closure, which typically invokes the callback with
+/// `ffi::Result::Panic` so the foreign side's task-completion mechanism
+/// is never leaked.
+///
+/// # Thread safety
+///
+/// The `completed` flag uses [`AtomicBool`] with acquire/release ordering.
+/// Because tokio only aborts futures at `.await` points, there is no race
+/// between `mark_completed` (called in synchronous code after the last
+/// `.await`) and `Drop` (called when the future is dropped). The atomic
+/// is a defence-in-depth measure.
+#[doc(hidden)]
+pub struct AsyncCallbackGuard {
+    completed: AtomicBool,
+    on_cancel: Option<Box<dyn FnOnce() + Send>>,
+}
+
+impl AsyncCallbackGuard {
+    /// Creates a guard that will call `on_cancel` if dropped before
+    /// [`mark_completed`](Self::mark_completed) is called.
+    pub fn new(on_cancel: impl FnOnce() + Send + 'static) -> Self {
+        Self { completed: AtomicBool::new(false), on_cancel: Some(Box::new(on_cancel)) }
+    }
+
+    /// Mark the async operation as completed. Must be called before
+    /// invoking the callback directly. Returns `true` if this was the
+    /// first completion (i.e. the caller should proceed to fire the
+    /// callback).
+    pub fn mark_completed(&self) -> bool {
+        !self.completed.swap(true, Ordering::AcqRel)
+    }
+}
+
+impl Drop for AsyncCallbackGuard {
+    fn drop(&mut self) {
+        if !self.completed.swap(true, Ordering::AcqRel) {
+            if let Some(f) = self.on_cancel.take() {
+                f();
+            }
+        }
+    }
 }

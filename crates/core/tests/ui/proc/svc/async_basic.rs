@@ -1,6 +1,6 @@
 use interoptopus::{
     ffi,
-    pattern::asynk::{Async, AsyncRuntime},
+    pattern::asynk::{Async, AsyncRuntime, TaskHandle},
 };
 use std::future::Future;
 
@@ -26,11 +26,12 @@ impl Service {
 impl AsyncRuntime for Service {
     type T = ();
 
-    fn spawn<Fn, F>(&self, _f: Fn)
+    fn spawn<Fn, F>(&self, _f: Fn) -> TaskHandle
     where
         Fn: FnOnce(()) -> F + Send + 'static,
         F: Future<Output = ()> + Send + 'static,
     {
+        TaskHandle::dummy()
     }
 }
 

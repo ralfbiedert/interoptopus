@@ -37,7 +37,7 @@
 //! }
 //! ```
 
-use crate::pattern::asynk::AsyncRuntime;
+use crate::pattern::asynk::{AsyncRuntime, TaskHandle};
 use std::sync::Arc;
 
 /// A ready-made [`AsyncRuntime`] backed by a multi-threaded Tokio runtime.
@@ -79,11 +79,12 @@ impl Tokio {
 impl AsyncRuntime for Tokio {
     type T = ();
 
-    fn spawn<Fn, F>(&self, f: Fn)
+    fn spawn<Fn, F>(&self, f: Fn) -> TaskHandle
     where
         Fn: FnOnce(Self::T) -> F + Send + 'static,
         F: Future<Output = ()> + Send + 'static,
     {
-        self.rt.spawn(f(()));
+        let join = self.rt.spawn(f(()));
+        TaskHandle::from_handle(join.abort_handle(), tokio::task::AbortHandle::abort)
     }
 }

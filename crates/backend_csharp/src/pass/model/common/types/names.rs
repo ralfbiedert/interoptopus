@@ -108,6 +108,7 @@ impl Pass {
                         let err_name = rust_to_pascal(resolve_compositional_name!(self, *err, kinds, pass_meta));
                         format!("Result{ok_name}{err_name}")
                     }
+                    TypePattern::TaskHandle => "TaskHandle".to_string(),
                 },
                 TypeKind::Delegate(_) => match &ty.kind {
                     // Bare fn pointers have signature-based names like "extern C fn(u8) -> u8"

@@ -1,3 +1,16 @@
+error[E0053]: method `spawn` has an incompatible type for trait
+  --> tests/ui/proc/svc/async_non_send.rs:35:35
+   |
+35 |     fn spawn<Fn, F>(&self, _f: Fn)
+   |                                   ^ expected `interoptopus::pattern::asynk::TaskHandle`, found `()`
+   |
+   = note: expected signature `fn(&Service, Fn) -> interoptopus::pattern::asynk::TaskHandle`
+              found signature `fn(&Service, Fn) -> ()`
+help: change the output type to match the trait
+   |
+35 |     fn spawn<Fn, F>(&self, _f: Fn) -> interoptopus::pattern::asynk::TaskHandle
+   |                                    +++++++++++++++++++++++++++++++++++++++++++
+
 error[E0277]: `*mut u8` cannot be sent between threads safely
   --> tests/ui/proc/svc/async_non_send.rs:27:45
    |

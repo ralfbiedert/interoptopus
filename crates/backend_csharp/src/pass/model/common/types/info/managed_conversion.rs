@@ -76,6 +76,8 @@ impl Pass {
                         TypePattern::Vec(_) => ManagedConversion::Into,
                         // AsyncCallbackCommonNative is already the blittable struct — it IS the unmanaged form.
                         TypePattern::AsyncCallback(_) => ManagedConversion::AsIs,
+                        // TaskHandle is a blittable struct (three IntPtrs) — no marshalling needed.
+                        TypePattern::TaskHandle => ManagedConversion::AsIs,
                         TypePattern::Wire(_) => ManagedConversion::Into,
 
                         // Option/Result: inspect variant payloads (same logic as DataEnum).
@@ -178,6 +180,7 @@ impl Pass {
                     Util::AsyncCallbackCommon => ManagedConversion::AsIs,
                     Util::WireBuffer => ManagedConversion::Into,
                     Util::ConstCStrMarshaller => ManagedConversion::AsIs,
+                    Util::TaskHandle => ManagedConversion::AsIs,
                 },
                 TypeKind::WireOnly(_) => ManagedConversion::Into,
             };

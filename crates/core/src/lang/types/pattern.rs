@@ -34,4 +34,6 @@ pub enum TypePattern {
     Vec(TypeId),
     /// A wire-serialized value (`Wire<T>`).
     Wire(TypeId),
+    /// An opaque handle for aborting a spawned async task (`TaskHandle`).
+    TaskHandle,
 }

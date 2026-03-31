@@ -6,4 +6,5 @@ pub enum Util {
     AsyncCallbackCommon,
     WireBuffer,
     ConstCStrMarshaller,
+    TaskHandle,
 }

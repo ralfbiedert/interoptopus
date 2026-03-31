@@ -137,6 +137,12 @@ fn build_args(args: &[crate::lang::functions::Argument], types: &model::common::
             let mut m = HashMap::new();
             m.insert("name", arg.name.clone());
             m.insert("ty", decorated);
+            if arg.ty == crate::lang::types::csharp::CANCELLATION_TOKEN {
+                m.insert("has_default", "true".to_string());
+                m.insert("default_value", "default".to_string());
+            } else {
+                m.insert("has_default", "false".to_string());
+            }
             Some(m)
         })
         .collect()

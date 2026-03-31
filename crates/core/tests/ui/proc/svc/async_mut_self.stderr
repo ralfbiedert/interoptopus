@@ -3,3 +3,16 @@ error: Async services cannot have methods with &mut self. Use &self instead.
    |
 21 |     pub fn bad(&mut self) {}
    |                ^^^^^^^^^
+
+error[E0053]: method `spawn` has an incompatible type for trait
+  --> tests/ui/proc/svc/async_mut_self.rs:27:35
+   |
+27 |     fn spawn<Fn, F>(&self, _f: Fn)
+   |                                   ^ expected `interoptopus::pattern::asynk::TaskHandle`, found `()`
+   |
+   = note: expected signature `fn(&Service, Fn) -> interoptopus::pattern::asynk::TaskHandle`
+              found signature `fn(&Service, Fn) -> ()`
+help: change the output type to match the trait
+   |
+27 |     fn spawn<Fn, F>(&self, _f: Fn) -> interoptopus::pattern::asynk::TaskHandle
+   |                                    +++++++++++++++++++++++++++++++++++++++++++

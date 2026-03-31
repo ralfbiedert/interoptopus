@@ -97,17 +97,21 @@ fn render(
     let name = &original_fn.name;
     let is_async = matches!(transforms.rval, RvalTransform::AsyncTask(_));
 
-    // For async: args exclude the callback (last); for body: all args
+    // For async: original args exclude the callback (last); for body: all args.
+    // These are the args that map 1:1 to native call forwarding.
     let original_args = if is_async {
         &original_fn.signature.arguments[..original_fn.signature.arguments.len() - 1]
     } else {
         &original_fn.signature.arguments[..]
     };
 
-    // Resolve overloaded arg types + detect wraps
-    let (args, has_wraps) = resolve_args(original_args, &transforms.args, types, type_overloads, name)?;
+    // Resolve overloaded arg types + detect wraps.
+    // The overload's transform list may be longer than original_args (e.g., a trailing
+    // CancellationToken has no native counterpart), so we pass the overload signature.
+    let (args, has_wraps) = resolve_args(&overload_fn.signature.arguments, &transforms.args, types, type_overloads, name)?;
 
-    // Build native call forwarding names (applying ref/wrap transforms)
+    // Build native call forwarding names — only for args that have a native counterpart
+    // (i.e., skip synthetic args like CancellationToken).
     let native_args = build_native_args(original_args, &transforms.args);
 
     // Return type: use the overload function's rval directly (Task type for async, original for body)
@@ -126,6 +130,7 @@ fn render(
     context.insert("rval", &rval);
     context.insert("is_void", &is_void);
     context.insert("is_async", &is_async);
+    context.insert("is_task_void", &false);
     context.insert("has_wraps", &has_wraps);
     context.insert("args", &args);
     context.insert("native_args", &native_args);
@@ -138,6 +143,8 @@ fn render(
     {
         let trampoline_field = format!("_trampoline{}", result_ty.name);
         context.insert("trampoline_field", &trampoline_field);
+        let is_task_void = rval == "Task";
+        context.insert("is_task_void", &is_task_void);
     }
 
     templates.render("rust/fns/overload/body.cs", &context).map_err(Into::into)
@@ -204,16 +211,24 @@ fn resolve_args(
                 has_wraps = true;
             }
             ArgTransform::Service => {
-                // The original arg is an IntPtr pointing to a Service. Resolve the
-                // service target type to get its name.
-                let service_ty = crate::pass::model::rust::fns::overload::service_intptr_target(arg.ty, types)
-                    .and_then(|id| types.get(id))
+                // The overload arg already has the service TypeId (not the original IntPtr).
+                let service_ty = types
+                    .get(arg.ty)
                     .ok_or_else(|| crate::Error::from(format!("service type for arg `{}` of overload `{}`", arg.name, fn_name)))?;
                 m.insert("ty", Value::String(service_ty.name.clone()));
                 m.insert("is_ref", Value::String("false".into()));
                 m.insert("is_wrap", Value::String("false".into()));
             }
+            ArgTransform::CancellationToken => {
+                m.insert("ty", Value::String("CancellationToken".into()));
+                m.insert("is_ref", Value::String("false".into()));
+                m.insert("is_wrap", Value::String("false".into()));
+                m.insert("has_default", Value::String("true".into()));
+                m.insert("default_value", Value::String("default".into()));
+            }
         }
+        // Ensure has_default is always present for template access
+        m.entry("has_default").or_insert(Value::String("false".into()));
         out.push(m);
     }
 
@@ -229,6 +244,7 @@ fn build_native_args(args: &[Argument], transforms: &[ArgTransform]) -> Vec<Hash
                 ArgTransform::Ref => format!("ref {}", arg.name),
                 ArgTransform::Service => format!("{}.Context", arg.name),
                 ArgTransform::PassThrough => arg.name.clone(),
+                ArgTransform::CancellationToken => unreachable!("CancellationToken has no native counterpart"),
             };
             let mut m = HashMap::new();
             m.insert("name", Value::String(forwarded));

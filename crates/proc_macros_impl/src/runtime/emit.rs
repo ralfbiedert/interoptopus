@@ -23,7 +23,7 @@ impl RuntimeModel {
             impl #impl_generics ::interoptopus::pattern::asynk::AsyncRuntime for #name #ty_generics #where_clause {
                 type T = <#forward_ty as ::interoptopus::pattern::asynk::AsyncRuntime>::T;
 
-                fn spawn<Fn, F>(&self, f: Fn)
+                fn spawn<Fn, F>(&self, f: Fn) -> ::interoptopus::pattern::asynk::TaskHandle
                 where
                     Fn: FnOnce(Self::T) -> F + Send + 'static,
                     F: ::std::future::Future<Output = ()> + Send + 'static,

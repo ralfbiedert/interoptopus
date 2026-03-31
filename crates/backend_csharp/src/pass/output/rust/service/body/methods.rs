@@ -10,7 +10,7 @@
 
 use crate::lang::ServiceId;
 use crate::lang::functions::FunctionKind;
-use crate::lang::functions::overload::OverloadKind;
+use crate::lang::functions::overload::{OverloadKind, RvalTransform};
 use crate::lang::types::kind::{PointerKind, Primitive, TypeKind, TypePattern};
 use crate::pass::{OutputResult, PassInfo, format_docs, model, output};
 use interoptopus_backends::template::{Context, Value};
@@ -77,11 +77,20 @@ impl Pass {
                         let docs = format_docs(&method_fn.docs);
                         let self_arg = if has_service_self_arg(method_fn, types) { "this" } else { "_context" };
 
-                        if matches!(&overload.kind, OverloadKind::Async(_)) {
+                        if let OverloadKind::Async(transforms) = &overload.kind {
                             let task_rval = types.get(method_fn.signature.rval).map_or_else(|| "Task".to_string(), |t| t.name.clone());
                             let async_args = build_args(&method_fn.signature.arguments[1..], types);
 
-                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args, &docs, "public", self_arg)?);
+                            let (trampoline_field, is_task_void) = if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval {
+                                let result_ty = types.get(result_ty_id);
+                                let field = result_ty.map_or_else(|| "_trampoline".to_string(), |t| format!("_trampoline{}", t.name));
+                                let is_void = task_rval == "Task";
+                                (field, is_void)
+                            } else {
+                                ("_trampoline".to_string(), false)
+                            };
+
+                            rendered_methods.push(render_async(templates, &task_rval, base_method_name, &original_fn.name, &async_args, &docs, "public", self_arg, &trampoline_field, is_task_void)?);
                         } else {
                             let rval_kind = types.get(original_fn.signature.rval).map(|t| &t.kind);
                             let result_info = resolve_result_rval(rval_kind, types);
@@ -132,7 +141,14 @@ fn build_args(args: &[crate::lang::functions::Argument], types: &model::common::
                 Some(d) => format!("{d} {}", arg_type.name),
                 None => arg_type.name.clone(),
             };
-            Some(make_arg(&arg.name, &decorated, is_ref))
+            let mut m = make_arg(&arg.name, &decorated, is_ref);
+            if arg.ty == crate::lang::types::csharp::CANCELLATION_TOKEN {
+                m.insert("has_default", Value::String("true".into()));
+                m.insert("default_value", Value::String("default".into()));
+            } else {
+                m.insert("has_default", Value::String("false".into()));
+            }
+            Some(m)
         })
         .collect()
 }
@@ -179,6 +195,8 @@ fn render_async(
     docs: &str,
     visibility: &str,
     self_arg: &str,
+    trampoline_field: &str,
+    is_task_void: bool,
 ) -> Result<String, crate::Error> {
     let mut context = Context::new();
     context.insert("task_rval", task_rval);
@@ -188,6 +206,8 @@ fn render_async(
     context.insert("docs", docs);
     context.insert("visibility", visibility);
     context.insert("self_arg", self_arg);
+    context.insert("trampoline_field", trampoline_field);
+    context.insert("is_task_void", &is_task_void);
     Ok(templates.render("rust/service/body_methods_async.cs", &context)?)
 }
 
