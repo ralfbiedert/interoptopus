@@ -498,6 +498,7 @@ unsafe impl WireIO for TaskHandle {
 ///
 /// Implemented by [`ffi::Result`](crate::ffi::Result) to produce
 /// the `Panic` variant when an async task is aborted.
+#[doc(hidden)]
 pub trait CancelValue {
     /// Creates the value used to signal cancellation to the foreign side.
     fn cancel_value() -> Self;
@@ -532,6 +533,7 @@ pub struct AsyncCallbackGuard<T: TypeInfo + CancelValue> {
 
 impl<T: TypeInfo + CancelValue> AsyncCallbackGuard<T> {
     /// Creates a guard from the callback to protect.
+    #[must_use]
     pub fn new(callback: AsyncCallback<T>) -> Self {
         Self { completed: AtomicBool::new(false), callback }
     }
@@ -552,7 +554,9 @@ impl<T: TypeInfo + CancelValue> Drop for AsyncCallbackGuard<T> {
             // SAFETY: The callback was created by the foreign side and is valid
             // until it has been called exactly once. `mark_completed` ensures
             // only one of normal-completion or cancel-on-drop fires.
-            unsafe { self.callback.call(&raw const v); }
+            unsafe {
+                self.callback.call(&raw const v);
+            }
             std::mem::forget(v);
         }
     }

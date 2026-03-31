@@ -3,7 +3,7 @@ use interoptopus::pattern::asynk::Async;
 use interoptopus::pattern::result::result_to_ffi;
 use interoptopus::rt::Tokio;
 use interoptopus::wire::Wire;
-use interoptopus::{ffi, AsyncRuntime};
+use interoptopus::{AsyncRuntime, ffi};
 use std::collections::HashMap;
 
 #[ffi(service)]
