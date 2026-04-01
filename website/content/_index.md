@@ -10,7 +10,7 @@ badge = "Productive. Performant. Robust."
 title = "Interoptopus 🐙"
 description = "Focus on the business logic, get Rust interop (almost) for free."
 cta_buttons = [
-    { text = "Get Started", url = "/overview/getting-started", style = "primary" },
+    { text = "Get Started", url = "/getting-started", style = "primary" },
     { text = "GitHub", url = "https://github.com/ralfbiedert/interoptopus", style = "secondary" },
 ]
 
@@ -60,7 +60,7 @@ title = "One attribute. Every language."
 description = "Annotate your Rust types and functions with #[ffi], register them in an inventory, and generate bindings."
 tabs = [
     { name = "Rust", command = '#[ffi]\npub struct Vec2 { pub x: f32, pub y: f32 }\n\n#[ffi]\npub fn my_function(input: Vec2) -> f32 { input.x }' },
-    { name = "Docs", link = "/docs" },
+    { name = "Docs", link = "/overview" },
 ]
 
 [extra.features_section]

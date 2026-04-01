@@ -50,7 +50,7 @@ footer_html = "<div style='display: flex; align-items: center; justify-content: 
 
 
 nav = [
-    { name = "Learn", url = "/docs", type = "url", icon = "book" },
+    { name = "Learn", url = "/overview", type = "url", icon = "book" },
     { name = "API", url = "https://docs.rs/interoptopus/0.16.0-alpha.13/interoptopus/", type = "url", icon = "book" },
     { name = "", url = "https://github.com/ralfbiedert/interoptopus", type = "url", icon = "github" },
 ]
