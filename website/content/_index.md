@@ -10,7 +10,7 @@ badge = "Productive. Performant. Robust."
 title = "Interoptopus 🐙"
 description = "Focus on the business logic, get Rust interop (almost) for free."
 cta_buttons = [
-    { text = "Get Started", url = "/docs/getting-started", style = "primary" },
+    { text = "Get Started", url = "/overview/getting-started", style = "primary" },
     { text = "GitHub", url = "https://github.com/ralfbiedert/interoptopus", style = "secondary" },
 ]
 
@@ -76,6 +76,6 @@ features = [
 [extra.final_cta_section]
 title = "Ready to deliver Rust?"
 description = ""
-button = { text = "Read the Docs", url = "/docs" }
+button = { text = "Read the Docs", url = "/overview" }
 +++
 

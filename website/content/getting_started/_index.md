@@ -1,7 +1,6 @@
 +++
 title = "Getting Started"
-weight = 10
-disable_toc = true
+weight = 30
 +++
 
 This guide walks you through setting up a minimal Interoptopus project and generating your first C# bindings. For other use cases see the [Examples](@/examples/_index.md) section.

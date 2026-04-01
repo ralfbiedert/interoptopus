@@ -1,6 +1,6 @@
 +++
 title = "Architecture"
-weight = 20
+weight = 50
 +++
 
 
