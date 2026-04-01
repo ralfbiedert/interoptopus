@@ -18,6 +18,15 @@ public class Plugin : IPlugin
         GC.WaitForPendingFinalizers();
         GC.Collect();
     }
+
+    // Hangs indefinitely until the CancellationToken fires.
+    // Used by the Rust side to test task-cancellation memory behaviour:
+    // the caller drops the returned Future immediately, which cancels the
+    // CancellationTokenSource, which terminates this task.
+    public static async Task Spin(CancellationToken ct)
+    {
+        await Task.Delay(-1, ct).ConfigureAwait(false);
+    }
 }
 
 partial class Heavy : IHeavy<Heavy>

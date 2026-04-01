@@ -8,6 +8,7 @@ const ALLOWED_GROWTH: usize = 8 * CHUNK;
 
 interoptopus::plugin!(Memory {
     fn gc();
+    async fn spin();
 
     impl Heavy {
         fn new_self(size: usize, value: u32) -> Try<Self>;
@@ -201,6 +202,20 @@ async fn load_plugin_async() -> Result<(), Box<dyn Error>> {
             assert!(growth_since_first < ALLOWED_GROWTH, "cycle {cycle}: memory grew {growth_since_first} bytes since cycle 0, expected stable");
         }
     }
+
+    // Task-cancellation stress test: start tasks and immediately cancel them by dropping the future.
+    // Each drop triggers TaskHandle::drop which cancels the C# CancellationTokenSource, causing
+    // the long-running Task.Delay(-1, ct) to terminate and fire its completion callback.
+    const CANCEL_CYCLES: usize = 10_000_000;
+    let rss_before = rss();
+    for _ in 0..CANCEL_CYCLES {
+        drop(plugin.spin()); // future dropped immediately → TaskHandle dropped → CTS cancelled
+    }
+    plugin.gc();
+    tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+    plugin.gc();
+    let rss_after = rss();
+    println!("task-cancel stress ({CANCEL_CYCLES} cycles): before={rss_before} after={rss_after} delta={}", rss_after as i64 - rss_before as i64);
 
     Ok(())
 }
