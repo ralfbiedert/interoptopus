@@ -82,7 +82,7 @@ impl PluginModel {
             let ffi_ptys: Vec<_> = f.params.iter().map(|p| ffi_param_ty(&p.ty, svc_names)).collect();
             if f.is_async {
                 let cb_ret = ffi_ret_or_unit(f.ret.as_ref(), svc_names);
-                quote! { #field_name: extern "C" fn(#(#ffi_ptys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) }
+                quote! { #field_name: extern "C" fn(#(#ffi_ptys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) -> ::interoptopus::pattern::asynk::TaskHandle }
             } else {
                 let ret = ffi_ret_arrow(f.ret.as_ref(), svc_names);
                 quote! { #field_name: extern "C" fn(#(#ffi_ptys),*) #ret }
@@ -187,7 +187,7 @@ impl PluginModel {
             let ffi_ptys: Vec<_> = f.params.iter().map(|p| ffi_param_ty(&p.ty, svc_names)).collect();
             let fn_ty = if f.is_async {
                 let cb_ret = ffi_ret_or_unit(f.ret.as_ref(), svc_names);
-                quote! { extern "C" fn(#(#ffi_ptys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) }
+                quote! { extern "C" fn(#(#ffi_ptys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) -> ::interoptopus::pattern::asynk::TaskHandle }
             } else {
                 let ret = ffi_ret_arrow(f.ret.as_ref(), svc_names);
                 quote! { extern "C" fn(#(#ffi_ptys),*) #ret }
@@ -300,7 +300,11 @@ impl PluginModel {
         let name_str = name.to_string();
 
         let bare_registrations = self.functions.iter().map(|f| {
-            let ffi_ret = if f.is_async { None } else { f.ret.as_ref().map(|ty| ffi_reg_ret(ty, svc_names)) };
+            let ffi_ret: Option<Type> = if f.is_async {
+                Some(syn::parse_quote! { ::interoptopus::pattern::asynk::TaskHandle })
+            } else {
+                f.ret.as_ref().map(|ty| ffi_reg_ret(ty, svc_names))
+            };
             let cb_ty = if f.is_async {
                 let cb_inner = ffi_ret_or_unit(f.ret.as_ref(), svc_names);
                 Some(quote! { ::interoptopus::pattern::asynk::AsyncCallback<#cb_inner> })
@@ -464,9 +468,10 @@ fn emit_bare_method(
                     let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new_with_on_complete(
                         move || { _inst_cb.record_call(#index, _inst_start, _inst_cb.time_ns()); }
                     );
-                    (self.#fn_name)(#(#ffi_args,)* cb);
+                    let _task_handle = (self.#fn_name)(#(#ffi_args,)* cb);
                     #(#field_src_lets)*
                     #async_kw move {
+                        let _th = _task_handle;
                         let raw = future.await;
                         ::interoptopus::plugin::ServiceHandleMap::map_service_handle(raw, #construct)
                     }
@@ -498,8 +503,9 @@ fn emit_bare_method(
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new_with_on_complete(
                     move || { _inst.record_call(#index, _inst_start, _inst.time_ns()); }
                 );
-                (self.#fn_name)(#(#ffi_args,)* cb);
+                let _task_handle = (self.#fn_name)(#(#ffi_args,)* cb);
                 #async_kw move {
+                    let _th = _task_handle;
                     future.await
                 }
             }
@@ -563,9 +569,10 @@ fn emit_ctor_method(
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new_with_on_complete(
                     Box::new(move || { _inst_cb.record_call(#index, _inst_start, _inst_cb.time_ns()); })
                 );
-                (self.#ctor_field)(#(#ffi_args,)* cb);
+                let _task_handle = (self.#ctor_field)(#(#ffi_args,)* cb);
                 #(#field_src_lets)*
                 #async_kw move {
+                    let _th = _task_handle;
                     let raw = future.await;
                     ::interoptopus::plugin::ServiceHandleMap::map_service_handle(raw, #construct)
                 }
@@ -711,9 +718,10 @@ fn emit_instance_method(
                     let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new_with_on_complete(
                         move || { _inst_cb.record_call(#index, _inst_start, _inst_cb.time_ns()); }
                     );
-                    (self.#field)(self.handle, #(#ffi_args,)* cb);
+                    let _task_handle = (self.#field)(self.handle, #(#ffi_args,)* cb);
                     #(#field_src_lets)*
                     #async_kw move {
+                        let _th = _task_handle;
                         let raw = future.await;
                         ::interoptopus::plugin::ServiceHandleMap::map_service_handle(raw, #construct)
                     }
@@ -744,8 +752,9 @@ fn emit_instance_method(
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new_with_on_complete(
                     move || { _inst.record_call(#index, _inst_start, _inst.time_ns()); }
                 );
-                (self.#field)(self.handle, #(#ffi_args,)* cb);
+                let _task_handle = (self.#field)(self.handle, #(#ffi_args,)* cb);
                 #async_kw move {
+                    let _th = _task_handle;
                     future.await
                 }
             }
@@ -891,7 +900,8 @@ fn emit_service_registration(s: &ServiceBlock, svc_names: &HashSet<String>) -> T
         let (ffi_ret, cb_ty) = if ctor.is_async {
             let cb_inner = ffi_ctor_cb_ret(ctor, svc_name);
             let cb = Some(quote! { ::interoptopus::pattern::asynk::AsyncCallback<#cb_inner> });
-            (None, cb)
+            let ret_ty: Type = syn::parse_quote! { ::interoptopus::pattern::asynk::TaskHandle };
+            (Some(ret_ty), cb)
         } else if is_self_return(ctor.ret.as_ref()) {
             let ret_ty: Type = syn::parse_quote! { ::interoptopus::plugin::ServiceHandle<#svc_name> };
             (Some(ret_ty), None)
@@ -907,7 +917,8 @@ fn emit_service_registration(s: &ServiceBlock, svc_names: &HashSet<String>) -> T
         let (ffi_ret, cb_ty) = if method.is_async {
             let cb_inner = ffi_ret_or_unit(method.ret.as_ref(), svc_names);
             let cb = Some(quote! { ::interoptopus::pattern::asynk::AsyncCallback<#cb_inner> });
-            (None, cb)
+            let ret_ty: Type = syn::parse_quote! { ::interoptopus::pattern::asynk::TaskHandle };
+            (Some(ret_ty), cb)
         } else {
             let ffi_ret = method.ret.as_ref().map(|ty| ffi_reg_ret(ty, svc_names));
             (ffi_ret, None)
@@ -1104,7 +1115,7 @@ fn ffi_reg_ret(ty: &Type, svc_names: &HashSet<String>) -> Type {
 fn ctor_ffi_fn_ty(ffi_ptys: &[TokenStream], c: &crate::plugin::model::PluginMethod, svc_ident: &Ident) -> TokenStream {
     if c.is_async {
         let cb_ret = ffi_ctor_cb_ret(c, svc_ident);
-        quote! { extern "C" fn(#(#ffi_ptys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) }
+        quote! { extern "C" fn(#(#ffi_ptys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) -> ::interoptopus::pattern::asynk::TaskHandle }
     } else if is_self_return(c.ret.as_ref()) {
         quote! { extern "C" fn(#(#ffi_ptys),*) -> ::interoptopus::plugin::ServiceHandle<#svc_ident> }
     } else {
@@ -1125,7 +1136,7 @@ fn ffi_ctor_cb_ret(c: &crate::plugin::model::PluginMethod, svc_ident: &Ident) ->
 fn method_ffi_fn_ty(ffi_ptys: &[TokenStream], ret: Option<&Type>, is_async: bool, self_svc: &Ident, svc_names: &HashSet<String>) -> TokenStream {
     if is_async {
         let cb_ret = ffi_ret_or_unit(ret, svc_names);
-        quote! { extern "C" fn(::interoptopus::plugin::ServiceHandle<#self_svc>, #(#ffi_ptys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) }
+        quote! { extern "C" fn(::interoptopus::plugin::ServiceHandle<#self_svc>, #(#ffi_ptys,)* ::interoptopus::pattern::asynk::AsyncCallback<#cb_ret>) -> ::interoptopus::pattern::asynk::TaskHandle }
     } else {
         let ret_toks = ffi_ret_arrow(ret, svc_names);
         quote! { extern "C" fn(::interoptopus::plugin::ServiceHandle<#self_svc>, #(#ffi_ptys),*) #ret_toks }

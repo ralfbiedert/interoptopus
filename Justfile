@@ -13,7 +13,7 @@ build verbose="":
     cargo build --all-features {{ verbose }}
 
 # Builds the .NET (reverse interop) plugins. Separate step, as .NET output is not reproducible.
-build-dotnet-plugins: (_bdp_ref "functions_primitive") (_bdp_ref "functions_behavior") (_bdp_ref "complex") (_bdp_ref "pattern") (_bdp_ref "service_basic") (_bdp_ref "service_async") (_bdp_ref "service_nested") (_bdp_ref "wire") (_bdp_p "exceptions") (_bdp_p "memory")
+build-dotnet-plugins: (_bdp_ref "functions_primitive") (_bdp_ref "functions_behavior") (_bdp_ref "complex") (_bdp_ref "pattern") (_bdp_ref "service_basic") (_bdp_ref "service_async") (_bdp_ref "service_async_cancel") (_bdp_ref "service_nested") (_bdp_ref "wire") (_bdp_p "exceptions") (_bdp_p "memory")
 
 # Helper to build a .NET `reference-plugins` plugin.
 _bdp_ref name:

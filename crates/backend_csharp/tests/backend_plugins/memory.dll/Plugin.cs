@@ -4,6 +4,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using System.Threading;
 using My.Company.Common;
 using Interoptopus.API;
 
@@ -33,7 +34,7 @@ partial class Heavy : IHeavy<Heavy>
         return new Heavy(data);
     }
 
-    public static Task<Heavy> NewSelfAsync(nuint size)
+    public static Task<Heavy> NewSelfAsync(nuint size, CancellationToken ct)
     {
         return Task.FromResult(new Heavy(new uint[(int)size]));
     }
@@ -51,10 +52,10 @@ partial class Fliparoo : IFliparoo<Fliparoo>
 
     public static Fliparoo Create1(Heavy heavy_1, Heavy heavy_2) => new Fliparoo(heavy_1, heavy_2);
 
-    public static Task<Fliparoo> Create2(Heavy heavy1, Heavy heavy2)
+    public static Task<Fliparoo> Create2(Heavy heavy1, Heavy heavy2, CancellationToken ct)
         => Task.FromResult(new Fliparoo(heavy1, heavy2));
 
-    public static Task<Fliparoo> Create3(Heavy heavy1, Heavy heavy3)
+    public static Task<Fliparoo> Create3(Heavy heavy1, Heavy heavy3, CancellationToken ct)
         => Task.FromResult(new Fliparoo(heavy1, heavy3));
 
     public Heavy ReplaceLeft1(Heavy heavy) { var old = _left; _left = heavy; return old; }
@@ -65,7 +66,7 @@ partial class Fliparoo : IFliparoo<Fliparoo>
 
     public Heavy ReplaceRight2(Heavy heavy) { var old = _right; _right = heavy; return old; }
 
-    public async Task<Heavy> ReplaceLeftAsync(Heavy heavy)
+    public async Task<Heavy> ReplaceLeftAsync(Heavy heavy, CancellationToken ct)
     {
         await Task.Yield();
         var old = _left;
@@ -73,7 +74,7 @@ partial class Fliparoo : IFliparoo<Fliparoo>
         return old;
     }
 
-    public async Task<Heavy> ReplaceRightAsync(Heavy heavy)
+    public async Task<Heavy> ReplaceRightAsync(Heavy heavy, CancellationToken ct)
     {
         await Task.Yield();
         var old = _right;

@@ -25,6 +25,21 @@ interoptopus::plugin!(ServiceAsync {
     }
 });
 
+interoptopus::plugin!(ServiceAsyncCancel {
+    async fn run_long();
+    async fn run_long_value(x: u32) -> u32;
+    fn get() -> u32;
+
+    impl AsyncCancellation {
+        async fn create() -> Self;
+        async fn run_long(&self);
+        async fn run_long_value(&self, x: u32) -> u32;
+        fn get(&self) -> u32;
+        // async fn run_long();
+        // async fn run_long_value(x: u32) -> u32;
+    }
+});
+
 interoptopus::plugin!(ServiceNested {
     fn create_a(value: u32) -> NestedA;
     fn create_a_result(value: u32) -> ffi::Result<NestedA, Error>;

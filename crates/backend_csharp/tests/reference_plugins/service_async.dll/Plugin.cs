@@ -1,3 +1,4 @@
+using System.Threading;
 using My.Company;
 using My.Company.Common;
 
@@ -6,18 +7,18 @@ namespace My.Company;
 class Plugin : IPlugin
 {
 
-    public static async Task<uint> AddOne(uint x)
+    public static async Task<uint> AddOne(uint x, CancellationToken ct)
     {
         await Task.Yield();
         return x + 1;
     }
 
-    public static async Task CallVoid()
+    public static async Task CallVoid(CancellationToken ct)
     {
         await Task.Yield();
     }
 
-    public static async Task<WireOfHashMapStringString> Wire1(WireOfHashMapStringString x)
+    public static async Task<WireOfHashMapStringString> Wire1(WireOfHashMapStringString x, CancellationToken ct)
     {
         await Task.Yield();
         var dictionary = x.Unwire();
@@ -25,7 +26,7 @@ class Plugin : IPlugin
         return dictionary.Wire();
     }
 
-    public static async Task<ResultWireOfHashMapStringStringError> Wire2(WireOfHashMapStringString x)
+    public static async Task<ResultWireOfHashMapStringStringError> Wire2(WireOfHashMapStringString x, CancellationToken ct)
     {
         await Task.Yield();
         var dictionary = x.Unwire();
@@ -39,18 +40,18 @@ partial class AsyncBasic: IAsyncBasic<AsyncBasic>
 {
     public static AsyncBasic Create() => new();
     
-    public async Task CallVoid()
+    public async Task CallVoid(CancellationToken ct)
     {
         await Task.Yield();
     }
 
-    public async Task<uint> AddOne(uint x)
+    public async Task<uint> AddOne(uint x, CancellationToken ct)
     {
         await Task.Yield();
         return x + 1;
     }
 
-    public async Task<WireOfHashMapStringString> Wire1(WireOfHashMapStringString x)
+    public async Task<WireOfHashMapStringString> Wire1(WireOfHashMapStringString x, CancellationToken ct)
     {
         await Task.Yield();
         var dictionary = x.Unwire();
@@ -58,7 +59,7 @@ partial class AsyncBasic: IAsyncBasic<AsyncBasic>
         return dictionary.Wire();
     }
 
-    public async Task<ResultWireOfHashMapStringStringError> Wire2(WireOfHashMapStringString x)
+    public async Task<ResultWireOfHashMapStringStringError> Wire2(WireOfHashMapStringString x, CancellationToken ct)
     {
         await Task.Yield();
         var dictionary = x.Unwire();

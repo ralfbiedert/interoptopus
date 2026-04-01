@@ -35,4 +35,42 @@
             _drop_fn = IntPtr.Zero;
         }
     }
+
+    /// Creates a <see cref="TaskHandle"/> backed by a <see cref="CancellationTokenSource"/>.
+    /// Calling <c>Abort</c> on the returned handle triggers <see cref="CancellationTokenSource.Cancel"/>;
+    /// calling <c>Dispose</c> frees the pinned GCHandle.
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
+    internal static unsafe TaskHandle FromCancellationTokenSource(CancellationTokenSource cts)
+    {
+        var gcHandle = GCHandle.Alloc(cts);
+        return new TaskHandle
+        {
+            _data = GCHandle.ToIntPtr(gcHandle),
+            _abort_fn = (IntPtr)(delegate* unmanaged[Cdecl]<IntPtr, void>)&TaskHandleAbort,
+            _drop_fn = (IntPtr)(delegate* unmanaged[Cdecl]<IntPtr, void>)&TaskHandleDrop,
+        };
+    }
+
+    [UnmanagedCallersOnly(CallConvs = new[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    private static void TaskHandleAbort(IntPtr data)
+    {
+        var handle = GCHandle.FromIntPtr(data);
+        if (handle.Target is CancellationTokenSource cts)
+        {
+            cts.Cancel();
+        }
+    }
+
+    [UnmanagedCallersOnly(CallConvs = new[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+    private static void TaskHandleDrop(IntPtr data)
+    {
+        var handle = GCHandle.FromIntPtr(data);
+        if (handle.Target is CancellationTokenSource cts)
+        {
+            cts.Cancel();
+            cts.Dispose();
+        }
+        handle.Free();
+    }
 }

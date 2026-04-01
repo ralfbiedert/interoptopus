@@ -11,7 +11,6 @@
 use crate::dispatch::{Item, ItemKind};
 use crate::lang::plugin::PLUGIN_DEFAULT_EMISSION;
 use crate::output::{FileType, Output};
-use crate::pass::output::dotnet::interop::{raw, service};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
@@ -35,8 +34,8 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         trampoline_model: &model::dotnet::trampoline::Pass,
-        raw_pass: &raw::Pass,
-        service_pass: &service::Pass,
+        raw_pass: &output::dotnet::interop::raw::all::Pass,
+        service_pass: &output::dotnet::interop::service::all::Pass,
         meta_info: &crate::pass::meta::dotnet::info::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();

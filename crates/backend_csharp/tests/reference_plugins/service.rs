@@ -1,6 +1,6 @@
 use crate::{define_plugin, load_plugin};
 use interoptopus::wire::Wire;
-use reference_project::plugins::service::{ServiceAsync, ServiceBasic, ServiceNested};
+use reference_project::plugins::service::{ServiceAsync, ServiceAsyncCancel, ServiceBasic, ServiceNested};
 use std::collections::HashMap;
 use std::error::Error;
 
@@ -8,6 +8,7 @@ use std::error::Error;
 fn define_plugins() -> Result<(), Box<dyn Error>> {
     define_plugin!(ServiceBasic, "service_basic.dll", super::BASE);
     define_plugin!(ServiceAsync, "service_async.dll", super::BASE);
+    define_plugin!(ServiceAsyncCancel, "service_async_cancel.dll", super::BASE);
     define_plugin!(ServiceNested, "service_nested.dll", super::BASE);
     Ok(())
 }
@@ -101,6 +102,47 @@ fn load_plugin_service_nested() -> Result<(), Box<dyn Error>> {
     // Drop all
     drop(services_b);
     drop(services_a);
+
+    Ok(())
+}
+
+// Test cancellation of a C# plugin async task by dropping the TaskHandle from Rust.
+#[tokio::test]
+async fn load_plugin_service_async_cancel() -> Result<(), Box<dyn Error>> {
+    let plugin = load_plugin!(ServiceAsyncCancel, "service_async_cancel.dll", super::BASE);
+
+    // Bare async fn: run_long loops forever, incrementing a counter.
+    // Dropping the future (and thus the TaskHandle) should cancel the C# task.
+    {
+        let fut = plugin.run_long();
+        // Let the C# side run a few iterations
+        tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+        let counter_before = plugin.get();
+        assert!(counter_before > 0, "counter should have incremented");
+
+        // Drop the future — this drops the TaskHandle, which cancels the CTS
+        drop(fut);
+        tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+        let counter_after = plugin.get();
+
+        // Counter should have stopped (or at most +1 from in-flight iteration)
+        assert!(counter_after <= counter_before + 1);
+    }
+
+    // Service async method: same pattern via service instance.
+    {
+        let svc = plugin.async_cancellation_create().await;
+        let fut = svc.run_long();
+        tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+        let counter_before = svc.get();
+        assert!(counter_before > 0, "service counter should have incremented");
+
+        drop(fut);
+        tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+        let counter_after = svc.get();
+
+        assert!(counter_after <= counter_before + 1);
+    }
 
     Ok(())
 }

@@ -56,7 +56,7 @@ impl Pass {
             for method in &interface.methods {
                 let args_str = format_args(&method.csharp.arguments, types);
                 let rval_name = rval_display_name(method, types);
-                members.push(format!("    static abstract {} {}({args_str});", rval_name, method.name));
+                members.push(format!("    static abstract {rval_name} {}({args_str});", method.name));
             }
 
             if members.is_empty() {

@@ -57,10 +57,12 @@ pub(super) fn resolve_method_info(args: &[Argument], rval: TypeId, types: &Types
     let async_inner = async_callback_inner(args, types);
     let is_async = async_inner.is_some();
 
-    // For async functions, the rval may carry an override (service-specific TypeId) set by the
-    // proc macro. Use it when available (non-void); otherwise fall back to the callback inner type.
+    // For async functions, the user-facing return type comes from the AsyncCallback<T>
+    // inner type, not the FFI return (which is TaskHandle). When a non-void rval carries
+    // a service-specific override from the proc macro, prefer that.
+    let rval_is_task_handle = matches!(types.get(rval).map(|t| &t.kind), Some(TypeKind::TypePattern(TypePattern::TaskHandle)));
     let rval_is_void = matches!(types.get(rval).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
-    let raw_rval_id = if is_async && rval_is_void { async_inner.unwrap_or(rval) } else { rval };
+    let raw_rval_id = if is_async && (rval_is_void || rval_is_task_handle) { async_inner.unwrap_or(rval) } else { rval };
     let mut resolved_rval_id = resolve_rval_type(raw_rval_id, types);
 
     // Unwrap Result<T, ErrorXXX> → T for user-facing signatures.
@@ -88,7 +90,16 @@ pub(super) fn resolve_method_info(args: &[Argument], rval: TypeId, types: &Types
     let effective_rval = if is_void && is_async { rval } else { resolved_rval_id };
 
     let arg_count = if is_async { args.len().saturating_sub(1) } else { args.len() };
-    let arguments: Vec<Argument> = args.iter().take(arg_count).cloned().collect();
+    let mut arguments: Vec<Argument> = args.iter().take(arg_count).cloned().collect();
+
+    // Append a CancellationToken parameter for async methods so that output
+    // passes render it naturally via `format_args()` without special-casing.
+    if is_async {
+        arguments.push(Argument {
+            name: "ct".to_string(),
+            ty: crate::lang::types::csharp::CANCELLATION_TOKEN,
+        });
+    }
 
     (Signature { arguments, rval: effective_rval }, resolved_rval_id, is_async, unwrapped_result_id)
 }

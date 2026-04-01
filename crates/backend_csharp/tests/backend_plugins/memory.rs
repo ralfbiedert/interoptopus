@@ -118,7 +118,7 @@ fn load_plugin() -> Result<(), Box<dyn Error>> {
         plugin.gc();
 
         let current = rss();
-        // eprintln!("cycle {cycle}: current={current}");
+        println!("cycle {cycle}: current={current}");
 
         // After the first cycle, the runtime has its peak committed memory.
         // Subsequent cycles must not grow significantly — that would indicate a leak.
@@ -189,7 +189,8 @@ async fn load_plugin_async() -> Result<(), Box<dyn Error>> {
         plugin.gc();
         // tokio::time::sleep(std::time::Duration::from_millis(50)).await;
         // let stats = memory_stats::memory_stats();
-        // println!("cycle {cycle}: val={:?}", stats.unwrap().physical_mem);
+        let current = rss();
+        println!("cycle {cycle}: current={current}");
 
         let current = rss();
 

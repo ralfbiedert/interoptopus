@@ -67,7 +67,7 @@ impl Pass {
                         }
                         MethodKind::Regular => {
                             let rval_name = rval_display_name(method, types);
-                            format!("    {} {}({args_str});", rval_name, method.name)
+                            format!("    {rval_name} {}({args_str});", method.name)
                         }
                     };
 

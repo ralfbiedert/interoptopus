@@ -4,6 +4,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
+using System.Threading;
 using My.Company.Common;
 using Interoptopus.API;
 
@@ -13,11 +14,11 @@ partial class Plugin : IPlugin
 {
     public static NestedA CreateA(uint value) => new NestedA(value);
 
-    public static Task<NestedA> CreateAAsync(uint value) => Task.FromResult(new NestedA(value));
+    public static Task<NestedA> CreateAAsync(uint value, CancellationToken ct) => Task.FromResult(new NestedA(value));
 
     public static uint GetValue() => 42;
 
-    public static Task<uint> GetValueAsync() => Task.FromResult(42u);
+    public static Task<uint> GetValueAsync(CancellationToken ct) => Task.FromResult(42u);
 }
 
 partial class NestedA : INestedA<NestedA>
@@ -29,9 +30,9 @@ partial class NestedA : INestedA<NestedA>
 
     public static NestedA Create(uint value) => new NestedA(value);
 
-    public static Task<NestedA> CreateAsync(uint value) => Task.FromResult(new NestedA(value));
+    public static Task<NestedA> CreateAsync(uint value, CancellationToken ct) => Task.FromResult(new NestedA(value));
 
     public uint GetValue() => _value;
 
-    public Task<uint> GetValueAsync() => Task.FromResult(_value);
+    public Task<uint> GetValueAsync(CancellationToken ct) => Task.FromResult(_value);
 }
