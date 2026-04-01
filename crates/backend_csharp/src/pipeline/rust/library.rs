@@ -89,6 +89,7 @@ pub struct RustLibraryConfig {
     pub output_wire_helper_classes: output::common::wire::helper_classes::Config,
     pub output_wires: output::common::wire::all::Config,
     pub output_header: output::rust::header::Config,
+    pub output_search_path: output::rust::searchpath::Config,
     pub output_util: output::common::types::util::Config,
     pub output_using: output::rust::r#using::Config,
     pub output_final: output::rust::all::Config,
@@ -177,6 +178,7 @@ pub struct IntermediateOutputPasses {
     pub wires: output::common::wire::all::Pass,
     pub util: output::common::types::util::Pass,
     pub using: output::rust::r#using::Pass,
+    pub search_path: output::rust::searchpath::Pass,
 }
 
 /// The main entry point for C# code generation.
@@ -329,6 +331,7 @@ impl RustLibrary {
                 wires: output::common::wire::all::Pass::new(config.output_wires),
                 util: output::common::types::util::Pass::new(config.output_util),
                 using: output::rust::r#using::Pass::new(config.output_using),
+                search_path: output::rust::searchpath::Pass::new(config.output_search_path),
             },
             output_final: output::rust::all::Pass::new(config.output_final),
             output: Multibuf::default(),
@@ -465,6 +468,7 @@ impl RustLibrary {
         o.wires.process(&mut pass_meta, &self.output_master, &o.wire_types, &o.wire_helper_classes)?;
         o.util.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.using.process(&mut pass_meta, &self.output_master)?;
+        o.search_path.process(&mut pass_meta, &self.output_master)?;
         self.extension_post_output_pass()?;
 
         // Final output pass(es)

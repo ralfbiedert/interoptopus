@@ -1,5 +1,5 @@
 use crate::RustLibrary;
-use crate::config::HeaderConfig;
+use crate::config::{HeaderConfig, SearchPathConfig};
 use crate::dispatch::Dispatch;
 use crate::pipeline::RustLibraryConfig;
 use interoptopus::inventory::RustInventory;
@@ -35,6 +35,13 @@ impl RustLibraryBuilder {
     #[must_use]
     pub fn header_config(mut self, header_config: HeaderConfig) -> Self {
         self.config.output_header = header_config;
+        self
+    }
+
+    /// What DLL loading policies to emit.
+    #[must_use]
+    pub fn search_path_config(mut self, search_path: SearchPathConfig) -> Self {
+        self.config.output_search_path = search_path;
         self
     }
 

@@ -1,6 +1,6 @@
 use interoptopus::lang::meta::FileEmission;
 use interoptopus_csharp::RustLibrary;
-use interoptopus_csharp::config::HeaderConfig;
+use interoptopus_csharp::config::{DllImportSearchPath, HeaderConfig, SearchPathConfig};
 use interoptopus_csharp::dispatch::Dispatch;
 use interoptopus_csharp::output::Target;
 
@@ -14,6 +14,7 @@ fn interop() -> Result<(), Box<dyn std::error::Error>> {
             FileEmission::CustomModule(_) => Target::new("Interop.cs", "My.Company"),
         }))
         .header_config(HeaderConfig { emit_version: false })
+        .search_path_config(SearchPathConfig { import_search_path: DllImportSearchPath::LegacyBehavior })
         .build()
         .process()?;
 

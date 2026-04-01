@@ -54,11 +54,13 @@ impl Pass {
             let wires = intermediary.wires.wires_for(file).unwrap();
             let util = intermediary.util.utils_for(file).unwrap();
             let using = intermediary.using.using_for(file).unwrap();
+            let search_path = intermediary.search_path.search_path_for(file).unwrap();
 
             context.insert("namespace", file.target.namespace());
             context.insert("dll_name", meta_info.dll_name());
             context.insert("header", header);
             context.insert("using", using);
+            context.insert("search_path", search_path);
             context.insert("fns_rust", &fns_rust);
             context.insert("guard", guard);
             context.insert("fns_overload_simple", &fns_overload_simple);

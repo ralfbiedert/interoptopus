@@ -6,6 +6,7 @@
 //! without duplicating dispatch logic.
 
 use crate::dispatch::{Dispatch, Item, ItemKind};
+use crate::lang::meta::FileEmission;
 use crate::lang::{FunctionId, TypeId};
 use crate::output::{FileType, Output, Target};
 use crate::pass::{OutputResult, PassInfo, model};
@@ -34,6 +35,8 @@ pub struct Pass {
     type_routing: HashMap<TypeId, Target>,
     /// Which output file each function should be rendered into.
     fn_routing: HashMap<FunctionId, Target>,
+    /// Targets that received at least one `FileEmission::Default` item.
+    default_targets: HashSet<Target>,
 }
 
 impl Pass {
@@ -46,6 +49,7 @@ impl Pass {
             outputs: vec![],
             type_routing: HashMap::new(),
             fn_routing: HashMap::new(),
+            default_targets: HashSet::new(),
         }
     }
 
@@ -57,9 +61,13 @@ impl Pass {
         for (&type_id, ty) in types.iter() {
             let Some(file_emission) = ty.emission.file_emission() else { continue };
 
+            let is_default = matches!(file_emission, FileEmission::Default);
             let item = Item { kind: ItemKind::Type(type_id, ty.clone()), emission: file_emission.clone() };
             let file_name = dispatch.classify(item);
 
+            if is_default {
+                self.default_targets.insert(file_name.clone());
+            }
             self.type_routing.insert(type_id, file_name.clone());
             seen_files.insert(file_name);
         }
@@ -68,9 +76,13 @@ impl Pass {
         for (&fn_id, func) in fns_all.originals() {
             let Some(file_emission) = func.emission.file_emission() else { continue };
 
+            let is_default = matches!(file_emission, FileEmission::Default);
             let item = Item { kind: ItemKind::Function(fn_id, func.clone()), emission: file_emission.clone() };
             let file_name = dispatch.classify(item);
 
+            if is_default {
+                self.default_targets.insert(file_name.clone());
+            }
             self.fn_routing.insert(fn_id, file_name.clone());
             seen_files.insert(file_name);
         }
@@ -131,5 +143,11 @@ impl Pass {
     pub fn item_belongs_to(&self, item: Item, output: &Output) -> bool {
         let target = self.dispatch.borrow_mut().classify(item);
         target == output.target
+    }
+
+    /// Returns true if the given output received at least one `FileEmission::Default` item.
+    #[must_use]
+    pub fn has_default_items(&self, output: &Output) -> bool {
+        self.default_targets.contains(&output.target)
     }
 }
