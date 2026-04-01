@@ -26,21 +26,9 @@ use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
 use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
 use crate::pattern::asynk::CancelValue;
 use crate::wire::SerializationError;
-use std::any::Any;
 use std::fmt::Debug;
 use std::io::{Read, Write};
 use std::panic::{AssertUnwindSafe, catch_unwind};
-
-/// Extracts a string message from a panic unwind.
-pub fn get_panic_message(pan: &(dyn Any + Send)) -> &str {
-    match pan.downcast_ref::<&'static str>() {
-        Some(s) => s,
-        None => match pan.downcast_ref::<String>() {
-            Some(s) => s,
-            None => "Any { .. }",
-        },
-    }
-}
 
 /// FFI-safe result type.
 ///

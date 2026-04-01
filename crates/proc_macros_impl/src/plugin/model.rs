@@ -2,7 +2,7 @@ use proc_macro2::Span;
 use std::collections::HashSet;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
-use syn::{braced, token, Ident, Token, Type};
+use syn::{Ident, Token, Type, braced, token};
 
 /// Top-level plugin declaration: `Plugin { fn ...; impl Foo { ... } }`.
 pub struct PluginInput {
