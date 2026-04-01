@@ -1,5 +1,5 @@
 use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, format_ident, quote, quote_spanned};
 use syn::spanned::Spanned;
 use syn::{Error, Generics, Lifetime, ReturnType, Type};
@@ -315,17 +315,19 @@ impl ServiceModel {
 
         let ffi_attr = self.emit_ffi_attr(&function_name);
 
+        let unsafe_token = quote_spanned! { Span::call_site() => unsafe };
+
         quote_spanned! { ctor.name.span() =>
             #docs
             #[allow(clippy::used_underscore_items, clippy::forget_non_drop)]
             #ffi_attr
-            unsafe fn #function_name #generics(
+            #unsafe_token fn #function_name #generics(
                 #async_params
             ) -> ::interoptopus::pattern::asynk::TaskHandle {
                 #assert_service_send_sync
                 #assert_error_send_sync
 
-                unsafe {
+                #unsafe_token {
                     use ::interoptopus::pattern::asynk::AsyncRuntime;
 
                     let _runtime_arc = ::std::sync::Arc::from_raw(runtime);
@@ -509,16 +511,21 @@ impl ServiceModel {
 
         let ffi_attr = self.emit_ffi_attr(function_name);
 
+        // Use Span::call_site() for the `unsafe` keywords so the IDE doesn't
+        // highlight the user's method name with an unsafe warning. Everything else
+        // keeps method.name.span() so errors point back to the user's code.
+        let unsafe_token = quote_spanned! { Span::call_site() => unsafe };
+
         quote_spanned! { method.name.span() =>
             #docs
             #[allow(clippy::used_underscore_items, clippy::forget_non_drop)]
             #ffi_attr
-            unsafe fn #function_name #enhanced_generics(
+            #unsafe_token fn #function_name #enhanced_generics(
                 #async_params
             ) -> ::interoptopus::pattern::asynk::TaskHandle #where_clause {
                 #assert_return_send_sync
 
-                unsafe {
+                #unsafe_token {
                     use ::interoptopus::pattern::asynk::AsyncRuntime;
 
                     let _instance_arc = ::std::sync::Arc::from_raw(instance);
