@@ -1,0 +1,5 @@
+error: Bare plugin function `bad` cannot take `&self`. Move it into an `impl` block to make it a service method.
+ --> tests/ui/proc/plugin/bare_fn_self.rs:3:8
+  |
+3 |     fn bad(&self) -> u32;
+  |        ^^^

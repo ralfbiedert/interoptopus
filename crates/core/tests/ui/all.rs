@@ -37,6 +37,8 @@ fn all_ui_tests() {
 
     // proc/plugin
     t.compile_fail("tests/ui/proc/plugin/svc_static_method.rs");
+    t.compile_fail("tests/ui/proc/plugin/svc_mut_self.rs");
+    t.compile_fail("tests/ui/proc/plugin/bare_fn_self.rs");
 
     // proc/ty
     t.compile_fail("tests/ui/proc/ty/empty_struct.rs");

@@ -53,7 +53,19 @@ impl PluginModel {
 
         for item in input.items {
             match item {
-                PluginItem::Function(m) => functions.push(*m),
+                PluginItem::Function(m) => {
+                    if m.has_self {
+                        return Err(syn::Error::new(
+                            m.name.span(),
+                            format!(
+                                "Bare plugin function `{}` cannot take `&self`. \
+                                 Move it into an `impl` block to make it a service method.",
+                                m.name
+                            ),
+                        ));
+                    }
+                    functions.push(*m);
+                }
                 PluginItem::Service(s) => {
                     // Validate: every method in an impl block must either be a
                     // constructor (returns Self / contains Self in return type)
@@ -335,6 +347,13 @@ impl Parse for PluginMethod {
         syn::parenthesized!(content in input);
 
         let has_self = content.peek(Token![&]) && content.peek2(Token![self]);
+        let has_mut_self = content.peek(Token![&]) && content.peek2(Token![mut]);
+        if has_mut_self {
+            return Err(syn::Error::new(
+                name.span(),
+                format!("`&mut self` is not supported in plugin service methods. Use `&self` instead."),
+            ));
+        }
         if has_self {
             content.parse::<Token![&]>()?;
             content.parse::<Token![self]>()?;

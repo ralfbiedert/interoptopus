@@ -1,0 +1,5 @@
+error: `&mut self` is not supported in plugin service methods. Use `&self` instead.
+ --> tests/ui/proc/plugin/svc_mut_self.rs:4:12
+  |
+4 |         fn mutate(&mut self);
+  |            ^^^^^^
