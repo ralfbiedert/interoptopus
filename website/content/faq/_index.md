@@ -13,19 +13,43 @@ Use [Github Discussions](https://github.com/ralfbiedert/interoptopus/discussions
 
 #### Why does the async overhead appear so high in benchmarks?
 
-It depends heavily on how many tasks are in flight, and how wake-ups are scheduled 
-by the respective runtime. For example, when a `.NET` callback completes and needs to
-resume a Tokio task, it calls the waker. If no Tokio worker thread is active, the OS must wake one
-up — a futex operation that costs 1–4 µs. With other tasks already running, the waker hands off
-directly to an active thread and the overhead drops a dramatic 8x despite 64x more work in flight:
+Async benchmarks can be highly misleading, both in what they measure, and what it means for your application. For example, the measured time depends heavily on how many tasks are in flight, and how wake-ups are scheduled by the respective runtime. 
+
 
 | Construct [run on Linux]                 | ns / call |
 |------------------------------------------|-----------|
 | `plugin.add_one(1).await` [sequential]   | 4779      |
 | `plugin.add_one(1).await` [64 in-flight] | 570       |
 
-In practice, workloads with many concurrent async calls will not pay the elevated wake up cost;
-and applications with few tasks in flight benefit from sleeping threads.
+
+Here, when a `.NET` callback completes and needs to resume a Tokio task, it calls the waker. If no Tokio worker thread is active, the OS must wake one up — a futex operation that costs 1–4 µs. 
+
+<div style="font-family: system-ui, sans-serif; font-size: 14px; max-width: 600px;">
+  <div style="margin-bottom: 12px;">
+    <div style="font-weight: 600; margin-bottom: 4px;">Sequential Benchmarks (Worker sleeping, ~4800 ns)</div>
+    <div style="display: flex; border-radius: 6px; overflow: hidden; height: 32px; line-height: 32px; text-align: center; color: #fff; font-size: 12px;">
+      <div style="width: 90px; background: #5b9bd5;">.NET done</div>
+      <div style="flex: 1; background: #e06060; font-weight: 600;">OS wakes thread (1–4 µs)</div>
+      <div style="width: 80px; background: #50b87a;">Rust resume</div>
+    </div>
+  </div>
+</div>
+
+With other tasks already running, the waker hands off
+directly to an active thread and the overhead drops a dramatic 8x despite 64x more work in flight:
+
+<div style="font-family: system-ui, sans-serif; font-size: 14px; max-width: 600px;">
+    <div>
+    <div style="font-weight: 600; margin-bottom: 4px;">Concurrent Operation (Worker active, ~570 ns)</div>
+    <div style="display: flex; border-radius: 6px; overflow: hidden; height: 32px; line-height: 32px; text-align: center; color: #fff; font-size: 12px;">
+      <div style="width: 90px; background: #5b9bd5;">.NET done</div>
+      <div style="width: 80px; background: #50b87a;">Rust resume</div>
+    </div>
+  </div>
+</div>
+
+Part of that wakeup can be CPU cost, part of it is just waiting for a time slice. In practice, workloads with many concurrent async calls will not pay the elevated wake up cost;
+and applications with few tasks in flight doing actual `async` work will benefit from sleeping threads.
 
 
 
