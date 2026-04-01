@@ -2,7 +2,7 @@ use proc_macro2::Span;
 use std::collections::HashSet;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
-use syn::{Ident, Token, Type, braced, token};
+use syn::{braced, token, Ident, Token, Type};
 
 /// Top-level plugin declaration: `Plugin { fn ...; impl Foo { ... } }`.
 pub struct PluginInput {
@@ -47,18 +47,28 @@ pub struct PluginModel {
 }
 
 impl PluginModel {
-    pub fn from_input(input: PluginInput) -> Self {
+    pub fn from_input(input: PluginInput) -> syn::Result<Self> {
         let mut functions = Vec::new();
         let mut services = Vec::new();
 
         for item in input.items {
             match item {
                 PluginItem::Function(m) => functions.push(*m),
-                PluginItem::Service(s) => services.push(s),
+                PluginItem::Service(s) => {
+                    // Validate: every method in an impl block must either be a
+                    // constructor (returns Self / contains Self in return type)
+                    // or an instance method (has &self).
+                    for m in &s.methods {
+                        if !m.has_self && !contains_self_return(m.ret.as_ref()) {
+                            return Err(syn::Error::new(m.name.span(), format!("Non-ctor static method `{}` in `impl {}` is not allowed.", m.name, s.name)));
+                        }
+                    }
+                    services.push(s);
+                }
             }
         }
 
-        Self { name: input.name, functions, services }
+        Ok(Self { name: input.name, functions, services })
     }
 
     /// Returns the set of all service type names defined in this plugin.

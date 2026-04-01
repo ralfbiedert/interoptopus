@@ -35,8 +35,6 @@ interoptopus::plugin!(ServiceAsyncCancel {
         async fn run_long(&self);
         async fn run_long_value(&self, x: u32) -> u32;
         fn get(&self) -> u32;
-        // async fn run_long();
-        // async fn run_long_value(x: u32) -> u32;
     }
 });
 

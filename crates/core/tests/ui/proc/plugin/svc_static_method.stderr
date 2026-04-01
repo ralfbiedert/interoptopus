@@ -1,0 +1,5 @@
+error: Non-ctor static method `not_a_method` in `impl MyService` is not allowed.
+ --> tests/ui/proc/plugin/svc_static_method.rs:4:12
+  |
+4 |         fn not_a_method(x: u32) -> u32;
+  |            ^^^^^^^^^^^^

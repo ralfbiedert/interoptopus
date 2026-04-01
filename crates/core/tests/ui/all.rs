@@ -35,6 +35,9 @@ fn all_ui_tests() {
     // t.compile_fail("tests/ui/proc/svc/module.rs"); TODO: later
     t.compile_fail("tests/ui/proc/svc/opaque.rs"); // TODO: should have better error warning about `opaque`
 
+    // proc/plugin
+    t.compile_fail("tests/ui/proc/plugin/svc_static_method.rs");
+
     // proc/ty
     t.compile_fail("tests/ui/proc/ty/empty_struct.rs");
     t.compile_fail("tests/ui/proc/ty/empty_unit.rs");
