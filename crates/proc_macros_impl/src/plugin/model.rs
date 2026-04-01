@@ -2,7 +2,7 @@ use proc_macro2::Span;
 use std::collections::HashSet;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
-use syn::{Ident, Token, Type, braced, token};
+use syn::{braced, token, Ident, Token, Type};
 
 /// Top-level plugin declaration: `Plugin { fn ...; impl Foo { ... } }`.
 pub struct PluginInput {
@@ -349,7 +349,7 @@ impl Parse for PluginMethod {
         let has_self = content.peek(Token![&]) && content.peek2(Token![self]);
         let has_mut_self = content.peek(Token![&]) && content.peek2(Token![mut]);
         if has_mut_self {
-            return Err(syn::Error::new(name.span(), format!("`&mut self` is not supported in plugin service methods. Use `&self` instead.")));
+            return Err(syn::Error::new(name.span(), "`&mut self` is not supported in plugin service methods. Use `&self` instead.".to_string()));
         }
         if has_self {
             content.parse::<Token![&]>()?;
