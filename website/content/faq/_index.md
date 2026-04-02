@@ -9,6 +9,15 @@ weight = 400
 
 Use [Github Discussions](https://github.com/ralfbiedert/interoptopus/discussions).
 
+
+#### How do you pronounce it?
+
+Inter‧op‧topus, just as one word. 
+
+Once we support eight backend languages, we might rename it to Interoctopus.
+
+
+
 ## Performance
 
 #### Why does the async overhead appear so high in benchmarks?
