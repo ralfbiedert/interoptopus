@@ -30,9 +30,6 @@ impl ServiceCallbacks {
         ffi::Ok(Self { delegate_table: None, stored_callback: None })
     }
 
-    /// Constructor that takes a callback and stores it for later invocation.
-    /// This tests that the generated C# service class keeps the managed
-    /// delegate alive (prevents GC) for the lifetime of the service.
     pub fn create_with_callback(callback: MyCallback) -> ffi::Result<Self, Error> {
         ffi::Ok(Self { delegate_table: None, stored_callback: Some(callback) })
     }

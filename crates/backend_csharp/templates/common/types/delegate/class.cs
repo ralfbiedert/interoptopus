@@ -27,11 +27,8 @@ delegate void {{ name }}Destructor(IntPtr data);
 [NativeMarshalling(typeof(MarshallerMeta))]
 {{ visibility }} partial class {{ name }} : IDisposable
 {
-    // Static destructor delegate and function pointer. These release the GCHandle
-    // that pins `this` when a managed callback is moved to unmanaged via IntoUnmanaged().
-    // Must be static so they are rooted for the lifetime of the process.
-    private static void ReleaseGCHandle(IntPtr data) => GCHandle.FromIntPtr(data).Free();
-    private static readonly {{ name }}Destructor _prevent_gc_release = ReleaseGCHandle;
+    // Static helpers to de-allocate a pinned GCHandle when callback dropped / disposed.
+    private static readonly {{ name }}Destructor _prevent_gc_release = data => GCHandle.FromIntPtr(data).Free();
     private static readonly IntPtr _prevent_gc_release_ptr = Marshal.GetFunctionPointerForDelegate(_prevent_gc_release);
 
     {{ _fns_decorators_all | indent }}
