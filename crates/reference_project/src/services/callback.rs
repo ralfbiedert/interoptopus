@@ -20,13 +20,29 @@ pub struct CallbackTable {
 #[ffi(service)]
 pub struct ServiceCallbacks {
     delegate_table: Option<CallbackTable>,
+    stored_callback: Option<MyCallback>,
 }
 
 // Regular implementation of methods.
 #[ffi]
 impl ServiceCallbacks {
     pub fn create() -> ffi::Result<Self, Error> {
-        ffi::Ok(Self { delegate_table: None })
+        ffi::Ok(Self { delegate_table: None, stored_callback: None })
+    }
+
+    /// Constructor that takes a callback and stores it for later invocation.
+    /// This tests that the generated C# service class keeps the managed
+    /// delegate alive (prevents GC) for the lifetime of the service.
+    pub fn create_with_callback(callback: MyCallback) -> ffi::Result<Self, Error> {
+        ffi::Ok(Self { delegate_table: None, stored_callback: Some(callback) })
+    }
+
+    /// Invoke the callback stored at construction time.
+    pub fn invoke_stored_callback(&self, x: u32) -> u32 {
+        match &self.stored_callback {
+            Some(cb) => cb.call(x),
+            None => 0,
+        }
     }
 
     pub fn callback_simple(&mut self, callback: MyCallback) -> ffi::Result<(), Error> {

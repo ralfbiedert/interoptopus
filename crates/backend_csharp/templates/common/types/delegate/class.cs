@@ -27,6 +27,12 @@ delegate void {{ name }}Destructor(IntPtr data);
 [NativeMarshalling(typeof(MarshallerMeta))]
 {{ visibility }} partial class {{ name }} : IDisposable
 {
+    // Static destructor delegate and function pointer. These release the GCHandle
+    // that pins `this` when a managed callback is moved to unmanaged via IntoUnmanaged().
+    // Must be static so they are rooted for the lifetime of the process.
+    private static void ReleaseGCHandle(IntPtr data) => GCHandle.FromIntPtr(data).Free();
+    private static readonly {{ name }}Destructor _prevent_gc_release = ReleaseGCHandle;
+    private static readonly IntPtr _prevent_gc_release_ptr = Marshal.GetFunctionPointerForDelegate(_prevent_gc_release);
 
     {{ _fns_decorators_all | indent }}
     {{ _fns_decorators_internal | indent }}
@@ -103,14 +109,27 @@ delegate void {{ name }}Destructor(IntPtr data);
         _ptr = IntPtr.Zero;
     }
 
+    /// Converts this managed callback to its unmanaged representation for passing to Rust.
+    /// Pins `this` via GCHandle so the native trampoline delegate cannot be garbage collected
+    /// while Rust holds the function pointer. The GCHandle is freed when Rust drops the
+    /// callback and invokes the destructor.
     {{ _fns_decorators_all | indent }}
     {{ _fns_decorators_internal | indent }}
     internal Unmanaged IntoUnmanaged()
     {
         var rval = new Unmanaged();
         rval._callback = _ptr;
-        rval._data = IntPtr.Zero;
-        rval._destructor = IntPtr.Zero;
+        if (_managed != null)
+        {
+            var handle = GCHandle.Alloc(this);
+            rval._data = GCHandle.ToIntPtr(handle);
+            rval._destructor = _prevent_gc_release_ptr;
+        }
+        else
+        {
+            rval._data = _data;
+            rval._destructor = _destructor;
+        }
         return rval;
     }
 
@@ -120,8 +139,8 @@ delegate void {{ name }}Destructor(IntPtr data);
     {
         var rval = new Unmanaged();
         rval._callback = _ptr;
-        rval._data = IntPtr.Zero;
-        rval._destructor = IntPtr.Zero;
+        rval._data = _data;
+        rval._destructor = _destructor;
         return rval;
     }
 
