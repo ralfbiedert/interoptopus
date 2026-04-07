@@ -62,4 +62,30 @@ public class TestPatternServicesCallbacks
         Assert.Equal(142u, result);
         service.Dispose();
     }
+
+    [Fact]
+    public void CallbackDisposePreventsFurtherCalls()
+    {
+        var cb = new MyCallback(x => x * 2);
+        Assert.Equal(10u, cb.Call(5));
+        cb.Dispose();
+        Assert.Throws<ObjectDisposedException>(() => cb.Call(5));
+    }
+
+    [Fact]
+    public void CallbackCreateDisposeLoop()
+    {
+        for (var i = 0; i < 100_000; i++)
+        {
+            using var cb = new MyCallback(x => x);
+            Assert.Equal(42u, cb.Call(42));
+        }
+    }
+
+    [Fact]
+    public void CallbackExceptionPropagatesFromCall()
+    {
+        using var cb = new MyCallback(_ => throw new InvalidOperationException("boom"));
+        Assert.Throws<InvalidOperationException>(() => cb.Call(0));
+    }
 }
