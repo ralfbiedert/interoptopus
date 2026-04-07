@@ -48,15 +48,8 @@ public class TestPatternServicesCallbacks
         service.CallbackFfiReturn((x, y) => ResultVoidError.Ok);
     }
 
-    /// <summary>
-    /// Verify that a callback passed to a service constructor survives GC.
-    /// Without _prevent_gc in the generated service class, the managed delegate
-    /// backing the callback's function pointer would be collected, and the
-    /// subsequent invoke would crash with "callback was made on a garbage
-    /// collected delegate".
-    /// </summary>
     [Fact]
-    public void ConstructorCallbackSurvivesGC()
+    public void CallbackSurvivesGC()
     {
         var service = ServiceCallbacks.CreateWithCallback(x => x + 100);
 
