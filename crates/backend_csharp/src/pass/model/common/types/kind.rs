@@ -13,8 +13,8 @@ pub mod r#struct;
 pub mod struct_fields;
 pub mod wire_only;
 
-use crate::lang::types::kind::TypeKind;
 use crate::lang::TypeId;
+use crate::lang::types::kind::TypeKind;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo};
 use std::collections::HashMap;

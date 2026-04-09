@@ -1,5 +1,5 @@
-use crate::lang::types::kind::Composite;
 use crate::lang::TypeId;
+use crate::lang::types::kind::Composite;
 
 #[derive(Debug, Clone)]
 pub enum WireOnly {

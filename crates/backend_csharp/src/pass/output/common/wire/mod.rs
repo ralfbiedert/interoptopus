@@ -321,14 +321,13 @@ impl WireCodeGen<'_> {
             lines.push(format!("{p}if ({val}.HasValue)"));
             lines.push(format!("{p}{{"));
             self.emit_serialize(lines, inner_id, &format!("{val}.Value"), depth, indent + 1);
-            lines.push(format!("{p}}}"));
         } else {
             lines.push(format!("{p}writer.Write((byte)({val} != null ? 1 : 0));"));
             lines.push(format!("{p}if ({val} != null)"));
             lines.push(format!("{p}{{"));
             self.emit_serialize(lines, inner_id, val, depth, indent + 1);
-            lines.push(format!("{p}}}"));
         }
+        lines.push(format!("{p}}}"));
     }
 
     fn emit_option_deserialize(&self, lines: &mut Vec<String>, inner_id: TypeId, target: &str, depth: usize, indent: usize) {
@@ -364,13 +363,12 @@ impl WireCodeGen<'_> {
             lines.push(format!("{p}if ({val}.HasValue)"));
             lines.push(format!("{p}{{"));
             self.emit_size(lines, inner_id, &format!("{val}.Value"), depth, indent + 1);
-            lines.push(format!("{p}}}"));
         } else {
             lines.push(format!("{p}if ({val} != null)"));
             lines.push(format!("{p}{{"));
             self.emit_size(lines, inner_id, val, depth, indent + 1);
-            lines.push(format!("{p}}}"));
         }
+        lines.push(format!("{p}}}"));
     }
 }
 
@@ -433,7 +431,7 @@ fn cs_primitive_size(p: Primitive) -> &'static str {
 
 /// Returns `true` if the Rust type maps to a C# value type (struct/primitive/enum)
 /// rather than a reference type (class, string, List, Dictionary).
-/// Structs with WireOnly fields are emitted as C# classes, so they are reference types.
+/// Structs with `WireOnly` fields are emitted as C# classes, so they are reference types.
 fn is_cs_value_type(ty_id: TypeId, rs_types: &RsTypes) -> bool {
     let Some(ty) = rs_types.get(&ty_id) else { return false };
     match &ty.kind {

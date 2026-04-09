@@ -1,10 +1,10 @@
+use crate::Error;
 use crate::extensions::{PostModelPass, PostOutputPass, RustCodegenExtension};
 use crate::pass::meta;
 use crate::pass::model;
 use crate::pass::output;
 use crate::pass::{OperationMode, OutputResult, PassMeta};
-use crate::pipeline::{loop_model_passes_until_done, RustLibraryBuilder};
-use crate::Error;
+use crate::pipeline::{RustLibraryBuilder, loop_model_passes_until_done};
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
@@ -365,6 +365,7 @@ impl RustLibrary {
 
 
     #[rustfmt::skip]
+    #[allow(clippy::too_many_lines)]
     /// Runs the full code generation pipeline and returns the generated output buffers.
     pub fn process(mut self) -> Result<Multibuf, Error> {
         self.extension_init_pass();

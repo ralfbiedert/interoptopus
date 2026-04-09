@@ -115,15 +115,13 @@ fn contains_wireonly(
         return false;
     }
     let Some(ty) = rs_types.get(&ty_id) else { return false };
-    let result = match &ty.kind {
+    match &ty.kind {
         lang::types::TypeKind::WireOnly(_) => true,
         lang::types::TypeKind::Struct(s) => s.fields.iter().any(|f| contains_wireonly(f.ty, rs_types, visited)),
-        // ffi::Option<T> or ffi::Result<T, E> wrapping a WireOnly inner type.
         lang::types::TypeKind::TypePattern(lang::types::TypePattern::Option(inner)) => contains_wireonly(*inner, rs_types, visited),
         lang::types::TypeKind::TypePattern(lang::types::TypePattern::Result(ok, err)) => {
             contains_wireonly(*ok, rs_types, visited) || contains_wireonly(*err, rs_types, visited)
         }
         _ => false,
-    };
-    result
+    }
 }

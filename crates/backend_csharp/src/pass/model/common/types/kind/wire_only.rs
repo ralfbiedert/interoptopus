@@ -3,11 +3,11 @@
 //! Rust types with `TypeKind::WireOnly` (e.g., `String`, `Vec<T>`, `HashMap<K,V>`,
 //! `Option<T>`) appear in the inventory but are not handled by the regular struct,
 //! enum, or pattern kind passes. This pass gives them a C# `TypeKind::WireOnly`
-//! entry so that downstream passes (names, managed_conversion, etc.) can reference
+//! entry so that downstream passes (names, `managed_conversion`, etc.) can reference
 //! them without panicking.
 
-use crate::lang::types::kind::wire::WireOnly as CsWireOnly;
 use crate::lang::types::kind::TypeKind;
+use crate::lang::types::kind::wire::WireOnly as CsWireOnly;
 use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use crate::{skip_mapped, try_resolve};
@@ -81,10 +81,7 @@ impl Pass {
 
 /// Returns `true` if the Rust type is `WireOnly` or is a struct that transitively
 /// contains `WireOnly` fields.
-fn is_wire_only_type(
-    ty_id: interoptopus::inventory::TypeId,
-    rs_types: &interoptopus::inventory::Types,
-) -> bool {
+fn is_wire_only_type(ty_id: interoptopus::inventory::TypeId, rs_types: &interoptopus::inventory::Types) -> bool {
     let mut visited = std::collections::HashSet::new();
     is_wire_only_recursive(ty_id, rs_types, &mut visited)
 }

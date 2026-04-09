@@ -59,8 +59,5 @@ pub fn wire_option_3(mut x: Wire<OptionRoot>) -> u32 {
 #[ffi]
 pub fn wire_option_4(mut x: Wire<OptionRoot>) -> u32 {
     let root = x.try_unwire().unwrap();
-    root.middle_1
-        .and_then(|m| m.leaf_1)
-        .and_then(|l| l.score_2)
-        .unwrap_or(0)
+    root.middle_1.and_then(|m| m.leaf_1).and_then(|l| l.score_2).unwrap_or(0)
 }
