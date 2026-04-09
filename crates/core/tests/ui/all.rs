@@ -33,7 +33,7 @@ fn all_ui_tests() {
     t.compile_fail("tests/ui/proc/svc/ctor_rval_omit.rs");
     t.pass("tests/ui/proc/svc/lifetime.rs");
     // t.compile_fail("tests/ui/proc/svc/module.rs"); TODO: later
-    t.compile_fail("tests/ui/proc/svc/opaque.rs"); // TODO: should have better error warning about `opaque`
+    t.compile_fail("tests/ui/proc/svc/opaque.rs");
 
     // proc/plugin
     t.compile_fail("tests/ui/proc/plugin/svc_static_method.rs");

@@ -175,6 +175,7 @@ impl<T> Drop for Vec<T> {
 /// # unsafe impl interoptopus::lang::types::TypeInfo for Vec3f32 {
 /// #     const WIRE_SAFE: bool = false; const RAW_SAFE: bool = true; const ASYNC_SAFE: bool = true;
 /// #     const SERVICE_SAFE: bool = false; const SERVICE_CTOR_SAFE: bool = false;
+/// #     const OPTION_PTR_SAFE: bool = false;
 /// #     fn id() -> interoptopus::inventory::TypeId { interoptopus::inventory::TypeId::new(0) }
 /// #     fn kind() -> interoptopus::lang::types::TypeKind { todo!() }
 /// #     fn ty() -> interoptopus::lang::types::Type { todo!() }

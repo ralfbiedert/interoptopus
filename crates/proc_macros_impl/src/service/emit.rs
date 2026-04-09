@@ -778,13 +778,12 @@ impl ServiceModel {
             #[allow(clippy::used_underscore_items)]
             const _: () = {
                 #base_service_verification
+                ::interoptopus::lang::types::assert_service_type::<#base_service_name>();
                 #async_verification
                 #(#async_ctor_runtime_verification)*
                 #async_safe_verification
                 #(#ctor_verification_blocks)*
                 #(#async_method_verification_blocks)*
-
-                ::interoptopus::lang::types::assert_service_safe::<#service_type>();
             };
         })
     }

@@ -1,6 +1,6 @@
-use crate::Error;
-use crate::pass::{OperationMode, PassMeta, meta, model, output};
+use crate::pass::{meta, model, output, OperationMode, PassMeta};
 use crate::pipeline::loop_model_passes_until_done;
+use crate::Error;
 use interoptopus::inventory::PluginInventory;
 use interoptopus_backends::output::Multibuf;
 
@@ -21,6 +21,7 @@ pub struct DotnetLibraryConfig {
     pub model_type_map_enum: model::common::types::kind::r#enum::Config,
     pub model_type_map_opaque: model::common::types::kind::opaque::Config,
     pub model_type_map_struct_fields: model::common::types::kind::struct_fields::Config,
+    pub model_type_map_wire_only: model::common::types::kind::wire_only::Config,
     pub model_type_map_struct: model::common::types::kind::r#struct::Config,
     pub model_type_names: model::common::types::names::Config,
     pub model_type_all: model::common::types::all::Config,
@@ -102,6 +103,7 @@ pub struct ModelPasses {
     pub type_map_enum: model::common::types::kind::r#enum::Pass,
     pub type_map_opaque: model::common::types::kind::opaque::Pass,
     pub type_map_struct_fields: model::common::types::kind::struct_fields::Pass,
+    pub type_map_wire_only: model::common::types::kind::wire_only::Pass,
     pub type_map_struct: model::common::types::kind::r#struct::Pass,
     pub type_names: model::common::types::names::Pass,
     pub type_all: model::common::types::all::Pass,
@@ -214,6 +216,7 @@ impl DotnetLibrary {
                 type_map_enum: model::common::types::kind::r#enum::Pass::new(config.model_type_map_enum),
                 type_map_opaque: model::common::types::kind::opaque::Pass::new(config.model_type_map_opaque),
                 type_map_struct_fields: model::common::types::kind::struct_fields::Pass::new(config.model_type_map_struct_fields),
+                type_map_wire_only: model::common::types::kind::wire_only::Pass::new(config.model_type_map_wire_only),
                 type_map_struct: model::common::types::kind::r#struct::Pass::new(config.model_type_map_struct),
                 type_names: model::common::types::names::Pass::new(config.model_type_names),
                 type_all: model::common::types::all::Pass::new(config.model_type_all),
@@ -312,6 +315,7 @@ impl DotnetLibrary {
             r.run(m.type_map_enum.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &m.type_map_enum_variants, &self.inventory.types))?;
             r.run(m.type_map_opaque.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &self.inventory.types))?;
             r.run(m.type_map_struct_fields.process(&mut pass_meta, &m.id_maps, &self.inventory.types))?;
+            r.run(m.type_map_wire_only.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &self.inventory.types))?;
             r.run(m.type_map_struct.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &m.type_map_struct_fields, &self.inventory.types))?;
             r.run(m.type_names.process(&mut pass_meta, &m.id_maps, &m.type_kinds, &self.inventory.types))?;
             r.run(m.type_all.process(&mut pass_meta, &m.type_kinds, &m.type_names, &m.id_maps, &self.inventory.types))?;

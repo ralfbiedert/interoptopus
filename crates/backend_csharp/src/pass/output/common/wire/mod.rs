@@ -37,9 +37,25 @@ impl WireCodeGen<'_> {
             RsTypeKind::WireOnly(WireOnly::Map(k, v)) => {
                 format!("Dictionary<{}, {}>", self.cs_type_name(*k), self.cs_type_name(*v))
             }
+            RsTypeKind::WireOnly(WireOnly::Option(inner)) => {
+                let inner_name = self.cs_type_name(*inner);
+                if is_cs_value_type(*inner, self.rs_types) {
+                    format!("{inner_name}?")
+                } else {
+                    inner_name
+                }
+            }
             RsTypeKind::Struct(_) => ty.name.clone(),
             RsTypeKind::Enum(_) => ty.name.clone(),
             RsTypeKind::Array(arr) => format!("{}[]", self.cs_type_name(arr.ty)),
+            RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Option(inner)) => {
+                let inner_name = self.cs_type_name(*inner);
+                if is_cs_value_type(*inner, self.rs_types) {
+                    format!("{inner_name}?")
+                } else {
+                    inner_name
+                }
+            }
             _ => "object".to_string(),
         }
     }
@@ -121,6 +137,9 @@ impl WireCodeGen<'_> {
                 lines.push(format!("{pi}}}"));
                 lines.push(format!("{p}}}"));
             }
+            RsTypeKind::WireOnly(WireOnly::Option(inner_id)) => {
+                self.emit_option_serialize(lines, *inner_id, val, depth, indent);
+            }
             RsTypeKind::Array(arr) => {
                 let idx = format!("_i{depth}");
                 let pi = pad(indent + 1);
@@ -136,6 +155,9 @@ impl WireCodeGen<'_> {
                 for f in &s.fields {
                     self.emit_serialize(lines, f.ty, &format!("{val}.{}", f.name), depth, indent);
                 }
+            }
+            RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Option(inner_id)) => {
+                self.emit_option_serialize(lines, *inner_id, val, depth, indent);
             }
             _ => {
                 lines.push(format!("{p}/* unsupported wire type for {val} */"));
@@ -195,6 +217,9 @@ impl WireCodeGen<'_> {
                 lines.push(format!("{pi}}}"));
                 lines.push(format!("{p}}}"));
             }
+            RsTypeKind::WireOnly(WireOnly::Option(inner_id)) => {
+                self.emit_option_deserialize(lines, *inner_id, target, depth, indent);
+            }
             RsTypeKind::Array(arr) => {
                 let cs_elem = self.cs_type_name(arr.ty);
                 let idx = format!("_i{depth}");
@@ -216,6 +241,9 @@ impl WireCodeGen<'_> {
                 for f in &s.fields {
                     self.emit_deserialize(lines, f.ty, &format!("{target}.{}", f.name), depth, indent);
                 }
+            }
+            RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Option(inner_id)) => {
+                self.emit_option_deserialize(lines, *inner_id, target, depth, indent);
             }
             _ => {
                 lines.push(format!("{p}/* unsupported wire type for {target} */"));
@@ -259,6 +287,9 @@ impl WireCodeGen<'_> {
                 lines.push(format!("{pi}}}"));
                 lines.push(format!("{p}}}"));
             }
+            RsTypeKind::WireOnly(WireOnly::Option(inner_id)) => {
+                self.emit_option_size(lines, *inner_id, val, depth, indent);
+            }
             RsTypeKind::Array(arr) => {
                 let idx = format!("_i{depth}");
                 let pi = pad(indent + 1);
@@ -276,7 +307,69 @@ impl WireCodeGen<'_> {
                     self.emit_size(lines, f.ty, &format!("{val}.{}", f.name), depth, indent);
                 }
             }
+            RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Option(inner_id)) => {
+                self.emit_option_size(lines, *inner_id, val, depth, indent);
+            }
             _ => {}
+        }
+    }
+
+    fn emit_option_serialize(&self, lines: &mut Vec<String>, inner_id: TypeId, val: &str, depth: usize, indent: usize) {
+        let p = pad(indent);
+        if is_cs_value_type(inner_id, self.rs_types) {
+            lines.push(format!("{p}writer.Write((byte)({val}.HasValue ? 1 : 0));"));
+            lines.push(format!("{p}if ({val}.HasValue)"));
+            lines.push(format!("{p}{{"));
+            self.emit_serialize(lines, inner_id, &format!("{val}.Value"), depth, indent + 1);
+            lines.push(format!("{p}}}"));
+        } else {
+            lines.push(format!("{p}writer.Write((byte)({val} != null ? 1 : 0));"));
+            lines.push(format!("{p}if ({val} != null)"));
+            lines.push(format!("{p}{{"));
+            self.emit_serialize(lines, inner_id, val, depth, indent + 1);
+            lines.push(format!("{p}}}"));
+        }
+    }
+
+    fn emit_option_deserialize(&self, lines: &mut Vec<String>, inner_id: TypeId, target: &str, depth: usize, indent: usize) {
+        let p = pad(indent);
+        let pi = pad(indent + 1);
+        let pi2 = pad(indent + 2);
+        let has_var = format!("_has{depth}");
+        lines.push(format!("{p}{{"));
+        lines.push(format!("{pi}var {has_var} = reader.ReadByte() != 0;"));
+        lines.push(format!("{pi}if ({has_var})"));
+        lines.push(format!("{pi}{{"));
+        if is_cs_value_type(inner_id, self.rs_types) {
+            let cs_inner = self.cs_type_name(inner_id);
+            let tmp_var = format!("_optVal{depth}");
+            lines.push(format!("{pi2}{cs_inner} {tmp_var} = default;"));
+            self.emit_deserialize(lines, inner_id, &tmp_var, depth + 1, indent + 2);
+            lines.push(format!("{pi2}{target} = {tmp_var};"));
+        } else {
+            self.emit_deserialize(lines, inner_id, target, depth + 1, indent + 2);
+        }
+        lines.push(format!("{pi}}}"));
+        lines.push(format!("{pi}else"));
+        lines.push(format!("{pi}{{"));
+        lines.push(format!("{pi2}{target} = null;"));
+        lines.push(format!("{pi}}}"));
+        lines.push(format!("{p}}}"));
+    }
+
+    fn emit_option_size(&self, lines: &mut Vec<String>, inner_id: TypeId, val: &str, depth: usize, indent: usize) {
+        let p = pad(indent);
+        lines.push(format!("{p}_size += 1;"));
+        if is_cs_value_type(inner_id, self.rs_types) {
+            lines.push(format!("{p}if ({val}.HasValue)"));
+            lines.push(format!("{p}{{"));
+            self.emit_size(lines, inner_id, &format!("{val}.Value"), depth, indent + 1);
+            lines.push(format!("{p}}}"));
+        } else {
+            lines.push(format!("{p}if ({val} != null)"));
+            lines.push(format!("{p}{{"));
+            self.emit_size(lines, inner_id, val, depth, indent + 1);
+            lines.push(format!("{p}}}"));
         }
     }
 }
@@ -335,5 +428,33 @@ fn cs_primitive_size(p: Primitive) -> &'static str {
         Primitive::U16 | Primitive::I16 => "2",
         Primitive::U32 | Primitive::I32 | Primitive::F32 => "4",
         Primitive::U64 | Primitive::I64 | Primitive::F64 | Primitive::Usize | Primitive::Isize => "8",
+    }
+}
+
+/// Returns `true` if the Rust type maps to a C# value type (struct/primitive/enum)
+/// rather than a reference type (class, string, List, Dictionary).
+/// Structs with WireOnly fields are emitted as C# classes, so they are reference types.
+fn is_cs_value_type(ty_id: TypeId, rs_types: &RsTypes) -> bool {
+    let Some(ty) = rs_types.get(&ty_id) else { return false };
+    match &ty.kind {
+        RsTypeKind::Primitive(_) | RsTypeKind::Enum(_) | RsTypeKind::Array(_) => true,
+        RsTypeKind::Struct(s) => !s.fields.iter().any(|f| contains_wireonly(f.ty, rs_types, &mut std::collections::HashSet::new())),
+        _ => false,
+    }
+}
+
+fn contains_wireonly(ty_id: TypeId, rs_types: &RsTypes, visited: &mut std::collections::HashSet<TypeId>) -> bool {
+    if !visited.insert(ty_id) {
+        return false;
+    }
+    let Some(ty) = rs_types.get(&ty_id) else { return false };
+    match &ty.kind {
+        RsTypeKind::WireOnly(_) => true,
+        RsTypeKind::Struct(s) => s.fields.iter().any(|f| contains_wireonly(f.ty, rs_types, visited)),
+        RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Option(inner)) => contains_wireonly(*inner, rs_types, visited),
+        RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Result(ok, err)) => {
+            contains_wireonly(*ok, rs_types, visited) || contains_wireonly(*err, rs_types, visited)
+        }
+        _ => false,
     }
 }

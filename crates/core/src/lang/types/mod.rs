@@ -52,6 +52,9 @@ pub unsafe trait TypeInfo {
     const SERVICE_SAFE: bool;
     /// Whether this type is valid as a service constructor return type.
     const SERVICE_CTOR_SAFE: bool;
+    /// Whether `std::Option<Self>` uses a niche and is FFI-safe as a pointer
+    /// (e.g., references, `NonNull`, function pointers).
+    const OPTION_PTR_SAFE: bool = false;
 
     /// The unique identifier for this type.
     fn id() -> TypeId;
@@ -174,6 +177,12 @@ pub const fn assert_service_safe<T: TypeInfo>() {
 
 /// Compile-time assertion that `T` is `Send + Sync`.
 pub const fn assert_send_sync<T: Send + Sync>() {}
+
+/// Compile-time assertion that `T` is declared as a service type.
+#[track_caller]
+pub const fn assert_service_type<T: TypeInfo>() {
+    assert!(T::SERVICE_SAFE, "This type is not declared as a service type. Use #[ffi(service)] on the struct definition to use it with an #[ffi] impl block.");
+}
 
 /// Compile-time assertion that `T` is a valid service constructor return type.
 #[track_caller]

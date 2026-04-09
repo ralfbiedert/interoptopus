@@ -39,10 +39,8 @@ impl Pass {
         let templates = output_master.templates();
         let codegen = WireCodeGen { rs_types };
 
-        // Render helper classes once, then assign to the correct output file.
-        // WireOnly::Composite types have no file routing, so we place them in the
-        // same file as their parent Wire type when possible.
-        let mut all_helpers = Vec::new();
+        // Route each helper class to the output file its type is routed to.
+        let mut helpers_by_output: HashMap<Output, Vec<String>> = HashMap::new();
 
         for (type_id, ty) in types.iter() {
             let TypeKind::WireOnly(WireOnly::Composite(composite)) = &ty.kind else {
@@ -72,23 +70,33 @@ impl Pass {
             ctx.insert("field_decls", &field_decls);
 
             let result = templates.render("common/wire/wire_helper_class.cs", &ctx)?;
-            all_helpers.push(result);
-        }
 
-        all_helpers.sort();
+            // Find the output file this type is routed to.
+            let target_output = output_master
+                .outputs_of(FileType::Csharp)
+                .find(|o| output_master.type_belongs_to(*type_id, o))
+                .cloned();
 
-        // Place all helpers into the first output file only — they are
-        // internal support types visible across partial classes and don't
-        // need to be duplicated in every file.
-        let mut first = true;
-        for file in output_master.outputs_of(FileType::Csharp) {
-            if first {
-                self.helper_classes.insert(file.clone(), all_helpers.clone());
-                first = false;
+            if let Some(output) = target_output {
+                helpers_by_output.entry(output).or_default().push(result);
             } else {
-                self.helper_classes.insert(file.clone(), Vec::new());
+                // Fall back to first output file if no routing exists.
+                if let Some(first) = output_master.outputs_of(FileType::Csharp).next() {
+                    helpers_by_output.entry(first.clone()).or_default().push(result);
+                }
             }
         }
+
+        // Sort helpers within each output for deterministic output.
+        for helpers in helpers_by_output.values_mut() {
+            helpers.sort();
+        }
+
+        // Ensure all output files have an entry (even if empty).
+        for file in output_master.outputs_of(FileType::Csharp) {
+            self.helper_classes.entry(file.clone()).or_default();
+        }
+        self.helper_classes.extend(helpers_by_output);
 
         Ok(())
     }
@@ -99,23 +107,26 @@ impl Pass {
     }
 }
 
-/// Resolves the C# type name for a field. Tries the C# type model first,
-/// falls back to the Rust-based wire codegen for `WireOnly` types.
+/// Resolves the C# type name for a field of a wire helper class.
+///
+/// Wire helper classes represent managed C# types, so their fields should use
+/// managed type names (`string`, `List<T>`, `uint?`, etc.) rather than FFI
+/// envelope names (`Utf8String`, `VecU8`, `OptionUint`).  We always prefer the
+/// wire codegen which produces the correct managed C# type name.
 fn resolve_field_type_name(
     cs_ty: crate::lang::TypeId,
     types: &model::common::types::all::Pass,
     id_map: &model::common::id_map::Pass,
     codegen: &WireCodeGen<'_>,
 ) -> String {
-    // Try C# type model first.
-    if let Some(t) = types.get(cs_ty) {
-        return t.name.clone();
-    }
-    // Fall back: find the Rust TypeId and resolve via wire codegen.
     for rs_id in codegen.rs_types.keys() {
         if id_map.ty(*rs_id) == Some(cs_ty) {
             return codegen.cs_type_name(*rs_id);
         }
+    }
+
+    if let Some(t) = types.get(cs_ty) {
+        return t.name.clone();
     }
     "object".to_string()
 }

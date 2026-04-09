@@ -1,5 +1,5 @@
-use crate::lang::TypeId;
 use crate::lang::types::kind::Composite;
+use crate::lang::TypeId;
 
 #[derive(Debug, Clone)]
 pub enum WireOnly {
@@ -8,5 +8,7 @@ pub enum WireOnly {
     Composite(Composite),
     String,
     Vec(TypeId),
+    /// Some true `std::option::Option<T>` that became a nullable in C#
+    Nullable(TypeId),
     Map(TypeId, TypeId),
 }

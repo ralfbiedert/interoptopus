@@ -29,6 +29,7 @@ impl TypeModel {
                 const ASYNC_SAFE: bool = #async_safe;
                 const SERVICE_SAFE: bool = #service_safe;
                 const SERVICE_CTOR_SAFE: bool = false;
+                const OPTION_PTR_SAFE: bool = false;
 
                 fn id() -> ::interoptopus::inventory::TypeId {
                     #id_expr

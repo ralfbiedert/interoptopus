@@ -1,7 +1,7 @@
 use crate::bad_wire;
 use crate::inventory::Inventory;
 use crate::lang::function::{Argument, Signature};
-use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
+use crate::lang::meta::{common_or_module_emission, Docs, Visibility};
 use crate::lang::types::wire::WireIO;
 use crate::lang::types::{Type, TypeId, TypeInfo, TypeKind};
 use crate::wire::SerializationError;
@@ -18,6 +18,7 @@ macro_rules! impl_fnptr {
             const ASYNC_SAFE: bool = true;
             const SERVICE_SAFE: bool = false;
             const SERVICE_CTOR_SAFE: bool = false;
+            const OPTION_PTR_SAFE: bool = true;
 
             fn id() -> TypeId {
                 TypeId::new(0xEE8602B016C043561CA68291A8142F3B).derive_id($r::id())
@@ -68,46 +69,6 @@ macro_rules! impl_fnptr {
                 bad_wire!()
             }
         }
-
-        #[allow(non_snake_case)]
-        unsafe impl<$r: TypeInfo> TypeInfo for Option<extern "C" fn() -> $r> {
-            const WIRE_SAFE: bool = false;
-            const RAW_SAFE: bool = true;
-            const ASYNC_SAFE: bool = true;
-            const SERVICE_SAFE: bool = false;
-            const SERVICE_CTOR_SAFE: bool = false;
-
-            fn id() -> TypeId {
-                <extern "C" fn() -> $r as TypeInfo>::id()
-            }
-
-            fn kind() -> TypeKind {
-                <extern "C" fn() -> $r as TypeInfo>::kind()
-            }
-
-            fn ty() -> Type {
-                <extern "C" fn() -> $r as TypeInfo>::ty()
-            }
-
-            fn register(inventory: &mut impl Inventory) {
-                <extern "C" fn() -> $r as TypeInfo>::register(inventory);
-            }
-        }
-
-        #[allow(non_snake_case)]
-        unsafe impl<$r: WireIO> WireIO for extern "C" Option<extern "C" fn() -> $r> {
-            fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
-                bad_wire!()
-            }
-
-            fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
-                bad_wire!()
-            }
-
-            fn live_size(&self) -> usize {
-                bad_wire!()
-            }
-        }
     };
 
 
@@ -126,6 +87,7 @@ macro_rules! impl_fnptr {
             const ASYNC_SAFE: bool = true;
             const SERVICE_SAFE: bool = false;
             const SERVICE_CTOR_SAFE: bool = false;
+            const OPTION_PTR_SAFE: bool = true;
 
             fn id() -> TypeId {
                 TypeId::new(0xEE8602B016C043561CA68291A8142F3B)
@@ -218,55 +180,6 @@ macro_rules! impl_fnptr {
                 bad_wire!()
             }
         }
-
-        #[allow(unused_assignments, non_snake_case)]
-        unsafe impl<$r, $($t),+> TypeInfo for Option<extern "C" fn($($t),+) -> $r>
-        where
-            $($t: TypeInfo,)+
-            $r: TypeInfo,
-        {
-            const WIRE_SAFE: bool = false;
-            const RAW_SAFE: bool = true;
-            const ASYNC_SAFE: bool = true;
-            const SERVICE_CTOR_SAFE: bool = false;
-            const SERVICE_SAFE: bool = false;
-
-            fn id() -> TypeId {
-                <extern "C" fn($($t),+) -> $r as TypeInfo>::id()
-            }
-
-            fn kind() -> TypeKind {
-                <extern "C" fn($($t),+) -> $r as TypeInfo>::kind()
-            }
-
-            fn ty() -> Type {
-                <extern "C" fn($($t),+) -> $r as TypeInfo>::ty()
-            }
-
-            fn register(inventory: &mut impl Inventory) {
-                <extern "C" fn($($t),+) -> $r as TypeInfo>::register(inventory);
-            }
-        }
-
-        #[allow(unused_assignments, non_snake_case)]
-        unsafe impl<$r, $($t),+> WireIO for Option<extern "C" fn($($t),+) -> $r>
-        where
-            $($t: WireIO,)+
-            $r: WireIO,
-        {
-            fn write(&self, _: &mut impl Write) -> Result<(), SerializationError> {
-                bad_wire!()
-            }
-
-            fn read(_: &mut impl Read) -> Result<Self, SerializationError> {
-                bad_wire!()
-            }
-
-            fn live_size(&self) -> usize {
-                bad_wire!()
-            }
-        }
-
     };
 }
 impl_fnptr!(R, T1);

@@ -12,6 +12,8 @@ pub enum WireOnly {
     Vec(TypeId),
     /// A wire-transferred `Map<K, V>`.
     Map(TypeId, TypeId),
+    /// A wire-transferred `Vec<T>`.
+    Option(TypeId),
 }
 
 #[doc(hidden)]

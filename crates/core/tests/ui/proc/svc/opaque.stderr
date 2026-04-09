@@ -1,5 +1,5 @@
-error[E0080]: evaluation panicked: This method looks like a constructor, but does not return ffi::Result<Self, _>
-  --> tests/ui/proc/svc/opaque.rs:13:12
+error[E0080]: evaluation panicked: This type is not declared as a service type. Use #[ffi(service)] on the struct definition to use it with an #[ffi] impl block.
+  --> tests/ui/proc/svc/opaque.rs:12:6
    |
-13 |     pub fn create() -> ffi::Result<Self, Error> {
-   |            ^^^^^^ evaluation of `_` failed here
+12 | impl Service {
+   |      ^^^^^^^ evaluation of `_` failed here

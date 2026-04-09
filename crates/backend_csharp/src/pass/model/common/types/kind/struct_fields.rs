@@ -36,6 +36,14 @@ impl Pass {
                 continue;
             }
 
+            if ty.name == "ConnectionAction" {
+                eprintln!("DEBUG struct_fields: processing ConnectionAction for first time, fields:");
+                for f in &rust_struct.fields {
+                    let f_ty = rs_types.get(&f.ty);
+                    eprintln!("  field {} ty={:?} kind={:?}", f.name, f.ty, f_ty.map(|t| &t.kind));
+                }
+            }
+
             // Try to convert all fields
             let mut cs_fields = Vec::new();
             let mut all_fields_available = true;
@@ -45,6 +53,9 @@ impl Pass {
                 // are only used through Wire serialization and should not become
                 // C# composite types.
                 if contains_wireonly(rust_field.ty, rs_types, &mut std::collections::HashSet::new()) {
+                    if ty.name == "ConnectionAction" {
+                        eprintln!("DEBUG struct_fields: ConnectionAction SKIPPED due to wireonly field {:?}", rust_field.name);
+                    }
                     all_fields_available = false;
                     break;
                 }
@@ -104,9 +115,15 @@ fn contains_wireonly(
         return false;
     }
     let Some(ty) = rs_types.get(&ty_id) else { return false };
-    match &ty.kind {
+    let result = match &ty.kind {
         lang::types::TypeKind::WireOnly(_) => true,
         lang::types::TypeKind::Struct(s) => s.fields.iter().any(|f| contains_wireonly(f.ty, rs_types, visited)),
+        // ffi::Option<T> or ffi::Result<T, E> wrapping a WireOnly inner type.
+        lang::types::TypeKind::TypePattern(lang::types::TypePattern::Option(inner)) => contains_wireonly(*inner, rs_types, visited),
+        lang::types::TypeKind::TypePattern(lang::types::TypePattern::Result(ok, err)) => {
+            contains_wireonly(*ok, rs_types, visited) || contains_wireonly(*err, rs_types, visited)
+        }
         _ => false,
-    }
+    };
+    result
 }

@@ -43,6 +43,42 @@ impl Pass {
         }
 
         let mut outcome = Unchanged;
+
+        // Register ANY struct in the inventory that transitively contains WireOnly
+        // fields as a WireOnly::Composite.  The regular struct pass skips these
+        // (because their fields can't be mapped to C# composites), so they'd
+        // remain without a TypeKind and cause downstream panics.
+        for (rust_id, rust_ty) in rs_types {
+            let RsTypeKind::Struct(rust_s) = &rust_ty.kind else { continue };
+
+            let Some(cs_id) = id_map.ty(*rust_id) else { continue };
+            if type_kinds.contains(&cs_id) {
+                continue;
+            }
+
+            if !contains_wireonly_transitive(*rust_id, rs_types, &mut HashSet::new()) {
+                continue;
+            }
+
+            let cs_fields: Vec<Field> = rust_s
+                .fields
+                .iter()
+                .filter_map(|f| {
+                    let cs_field_ty = id_map.ty(f.ty)?;
+                    Some(Field { name: f.name.clone(), docs: f.docs.clone(), visibility: map_visibility(f.visibility), ty: cs_field_ty })
+                })
+                .collect();
+
+            let composite = Composite { fields: cs_fields, repr: Repr::c() };
+
+            type_kinds.set(cs_id, TypeKind::WireOnly(CsWireOnly::Composite(composite)));
+            type_names.set(cs_id, rust_ty.name.clone());
+            outcome.changed();
+        }
+
+        // Also walk Wire<T> inner types to discover nested structs reachable
+        // through WireOnly containers (Vec, Map, Option) and TypePatterns
+        // (ffi::Option, ffi::Result).
         let mut registered: HashSet<RsTypeId> = HashSet::new();
 
         for rust_ty in rs_types.values() {
@@ -53,12 +89,10 @@ impl Pass {
 
             let Some(inner_rust_ty) = rs_types.get(&inner_rust_id) else { continue };
 
-            // Walk the inner type's graph to find nested structs with WireOnly fields.
             let mut nested = Vec::new();
             let mut visited = HashSet::new();
             match &inner_rust_ty.kind {
                 RsTypeKind::Struct(s) => collect_nested_structs(rs_types, s, &mut nested, &mut visited),
-                // For Wire<Vec<T>>, Wire<Map<K,V>>, etc. — walk into the elements.
                 _ => collect_nested_from_type(rs_types, inner_rust_id, &mut nested, &mut visited),
             }
             // Exclude the top-level inner type — it gets its own WireOf* treatment.
@@ -77,7 +111,6 @@ impl Pass {
                 let Some(nested_ty) = rs_types.get(&nested_id) else { continue };
                 let RsTypeKind::Struct(nested_s) = &nested_ty.kind else { continue };
 
-                // Build C# fields, mapping each Rust field type to its C# TypeId.
                 let cs_fields: Vec<Field> = nested_s
                     .fields
                     .iter()
@@ -107,7 +140,8 @@ fn map_visibility(vis: RsVisibility) -> crate::lang::meta::Visibility {
     }
 }
 
-/// Recursively collects struct `TypeId`s reachable from `s` that have `WireOnly` fields.
+/// Recursively collects struct `TypeId`s reachable from `s` that have `WireOnly` fields
+/// (directly or transitively).
 fn collect_nested_structs(rs_types: &RsTypes, s: &Struct, out: &mut Vec<RsTypeId>, visited: &mut HashSet<RsTypeId>) {
     for f in &s.fields {
         collect_nested_from_type(rs_types, f.ty, out, visited);
@@ -121,11 +155,7 @@ fn collect_nested_from_type(rs_types: &RsTypes, ty_id: RsTypeId, out: &mut Vec<R
     let Some(ty) = rs_types.get(&ty_id) else { return };
     match &ty.kind {
         RsTypeKind::Struct(s) => {
-            let has_wire_only = s
-                .fields
-                .iter()
-                .any(|f| rs_types.get(&f.ty).is_some_and(|ft| matches!(&ft.kind, RsTypeKind::WireOnly(_))));
-            if has_wire_only {
+            if contains_wireonly_transitive(ty_id, rs_types, &mut HashSet::new()) {
                 out.push(ty_id);
             }
             for f in &s.fields {
@@ -139,9 +169,37 @@ fn collect_nested_from_type(rs_types: &RsTypes, ty_id: RsTypeId, out: &mut Vec<R
             collect_nested_from_type(rs_types, *k, out, visited);
             collect_nested_from_type(rs_types, *v, out, visited);
         }
+        RsTypeKind::WireOnly(RsWireOnly::Option(inner)) => {
+            collect_nested_from_type(rs_types, *inner, out, visited);
+        }
+        RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Option(inner)) => {
+            collect_nested_from_type(rs_types, *inner, out, visited);
+        }
+        RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Result(ok, err)) => {
+            collect_nested_from_type(rs_types, *ok, out, visited);
+            collect_nested_from_type(rs_types, *err, out, visited);
+        }
         RsTypeKind::Array(arr) => {
             collect_nested_from_type(rs_types, arr.ty, out, visited);
         }
         _ => {}
+    }
+}
+
+/// Returns `true` if the type is `WireOnly` or is a struct that transitively
+/// contains `WireOnly` fields (including through `ffi::Option`/`ffi::Result` wrappers).
+fn contains_wireonly_transitive(ty_id: RsTypeId, rs_types: &RsTypes, visited: &mut HashSet<RsTypeId>) -> bool {
+    if !visited.insert(ty_id) {
+        return false;
+    }
+    let Some(ty) = rs_types.get(&ty_id) else { return false };
+    match &ty.kind {
+        RsTypeKind::WireOnly(_) => true,
+        RsTypeKind::Struct(s) => s.fields.iter().any(|f| contains_wireonly_transitive(f.ty, rs_types, visited)),
+        RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Option(inner)) => contains_wireonly_transitive(*inner, rs_types, visited),
+        RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Result(ok, err)) => {
+            contains_wireonly_transitive(*ok, rs_types, visited) || contains_wireonly_transitive(*err, rs_types, visited)
+        }
+        _ => false,
     }
 }

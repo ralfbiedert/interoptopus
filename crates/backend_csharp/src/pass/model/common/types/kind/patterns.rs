@@ -54,6 +54,11 @@ impl Pass {
 
                 lang::types::TypePattern::Option(rust_ty) => {
                     let cs_ty = try_resolve!(id_map.ty(*rust_ty), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ty));
+                    // Skip ffi::Option wrapping a WireOnly inner type — these only appear
+                    // inside Wire<T> structs and are handled by the wire codegen.
+                    if is_wire_only_type(*rust_ty, rs_types) {
+                        continue;
+                    }
                     let Some(TypeKind::DataEnum(data_enum)) = fallbacks.get(cs_id) else { continue };
                     TypePattern::Option(cs_ty, data_enum.clone())
                 }
@@ -61,6 +66,10 @@ impl Pass {
                 lang::types::TypePattern::Result(rust_ok, rust_err) => {
                     let cs_ok = try_resolve!(id_map.ty(*rust_ok), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_ok));
                     let cs_err = try_resolve!(id_map.ty(*rust_err), pass_meta, self.info, crate::pass::MissingItem::RustType(*rust_err));
+                    // Skip ffi::Result wrapping a WireOnly inner type.
+                    if is_wire_only_type(*rust_ok, rs_types) || is_wire_only_type(*rust_err, rs_types) {
+                        continue;
+                    }
                     let Some(TypeKind::DataEnum(data_enum)) = fallbacks.get(cs_id) else { continue };
                     TypePattern::Result(cs_ok, cs_err, data_enum.clone())
                 }
@@ -75,5 +84,32 @@ impl Pass {
         }
 
         Ok(outcome)
+    }
+}
+
+/// Returns `true` if the Rust type is `WireOnly` or is a struct that transitively
+/// contains `WireOnly` fields. Such types can only appear inside `Wire<T>`.
+fn is_wire_only_type(ty_id: interoptopus::inventory::TypeId, rs_types: &interoptopus::inventory::Types) -> bool {
+    let mut visited = std::collections::HashSet::new();
+    is_wire_only_recursive(ty_id, rs_types, &mut visited)
+}
+
+fn is_wire_only_recursive(
+    ty_id: interoptopus::inventory::TypeId,
+    rs_types: &interoptopus::inventory::Types,
+    visited: &mut std::collections::HashSet<interoptopus::inventory::TypeId>,
+) -> bool {
+    if !visited.insert(ty_id) {
+        return false;
+    }
+    let Some(ty) = rs_types.get(&ty_id) else { return false };
+    match &ty.kind {
+        lang::types::TypeKind::WireOnly(_) => true,
+        lang::types::TypeKind::Struct(s) => s.fields.iter().any(|f| is_wire_only_recursive(f.ty, rs_types, visited)),
+        lang::types::TypeKind::TypePattern(lang::types::TypePattern::Option(inner)) => is_wire_only_recursive(*inner, rs_types, visited),
+        lang::types::TypeKind::TypePattern(lang::types::TypePattern::Result(ok, err)) => {
+            is_wire_only_recursive(*ok, rs_types, visited) || is_wire_only_recursive(*err, rs_types, visited)
+        }
+        _ => false,
     }
 }

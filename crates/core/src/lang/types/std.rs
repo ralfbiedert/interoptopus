@@ -9,13 +9,14 @@ use std::io::{Read, Write};
 use std::mem::MaybeUninit;
 
 macro_rules! impl_ptr {
-    ($t:ty, $name:expr, $kind:tt, $id:expr) => {
+    ($t:ty, $name:expr, $kind:tt, $id:expr, option_ptr_safe = $ops:expr) => {
         unsafe impl<T: TypeInfo> TypeInfo for $t {
             const WIRE_SAFE: bool = false;
             const RAW_SAFE: bool = T::RAW_SAFE;
             const ASYNC_SAFE: bool = false;
             const SERVICE_SAFE: bool = false;
             const SERVICE_CTOR_SAFE: bool = false;
+            const OPTION_PTR_SAFE: bool = $ops;
 
             fn id() -> TypeId {
                 T::id().derive($id)
@@ -53,15 +54,15 @@ macro_rules! impl_ptr {
 }
 
 // All these share the same derived ID of the base type, as all of them are the same ptr type.
-impl_ptr!(std::ptr::NonNull<T>, "*mut T", ReadWritePointer, 0x7EE1DB481C7FEAD63EB329E9812A2F68);
-impl_ptr!(&'_ mut T, "*mut T", ReadWritePointer, 0x7EE1DB481C7FEAD63EB329E9812A2F68);
-impl_ptr!(*mut T, "*mut T", ReadWritePointer, 0x7EE1DB481C7FEAD63EB329E9812A2F68);
-impl_ptr!(Option<&'_ mut T>, "*mut T", ReadPointer, 0x7EE1DB481C7FEAD63EB329E9812A2F68);
+impl_ptr!(std::ptr::NonNull<T>, "*mut T", ReadWritePointer, 0x7EE1DB481C7FEAD63EB329E9812A2F68, option_ptr_safe = true);
+impl_ptr!(&'_ mut T, "*mut T", ReadWritePointer, 0x7EE1DB481C7FEAD63EB329E9812A2F68, option_ptr_safe = true);
+impl_ptr!(*mut T, "*mut T", ReadWritePointer, 0x7EE1DB481C7FEAD63EB329E9812A2F68, option_ptr_safe = false);
+// impl_ptr!(Option<&'_ mut T>, "*mut T", ReadPointer, 0x7EE1DB481C7FEAD63EB329E9812A2F68, option_ptr_safe = false);
 
 // All these share the same derived ID of the base type, as all of them are the same ptr type.
-impl_ptr!(&'_ T, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01FD5E);
-impl_ptr!(*const T, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01FD5E);
-impl_ptr!(Option<&'_ T>, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01FD5E);
+impl_ptr!(&'_ T, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01FD5E, option_ptr_safe = true);
+impl_ptr!(*const T, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01FD5E, option_ptr_safe = false);
+// impl_ptr!(Option<&'_ T>, "*const T", ReadPointer, 0x20973BD3D67EF4E0323195B99A01FD5E, option_ptr_safe = false);
 
 /// Derives the [`TypeId`] of `*const T` from the [`TypeId`] of `T`.
 ///
@@ -356,3 +357,71 @@ impl_tuple_wireio! { A B C D E F G H I }
 impl_tuple_wireio! { A B C D E F G H I J }
 impl_tuple_wireio! { A B C D E F G H I J K }
 impl_tuple_wireio! { A B C D E F G H I J K L }
+
+unsafe impl<T: TypeInfo> TypeInfo for Option<T> {
+    const WIRE_SAFE: bool = true;
+    const RAW_SAFE: bool = T::OPTION_PTR_SAFE;
+    const ASYNC_SAFE: bool = false;
+    const SERVICE_SAFE: bool = T::OPTION_PTR_SAFE;
+    const SERVICE_CTOR_SAFE: bool = T::OPTION_PTR_SAFE;
+
+    fn id() -> TypeId {
+        // If T is option-ptr-safe that means over FFI we'll collapse to a transparent pointer.
+        if T::OPTION_PTR_SAFE {
+            T::id()
+        } else {
+            TypeId::new(0x2A26D428DCB3A7DFECEC0F0D3154C680).derive_id(T::id())
+        }
+    }
+
+    fn kind() -> TypeKind {
+        // If T is option-ptr-safe that means over FFI we'll collapse to a transparent pointer.
+        if T::OPTION_PTR_SAFE {
+            T::kind()
+        } else {
+            TypeKind::WireOnly(WireOnly::Option(T::id()))
+        }
+    }
+
+    fn ty() -> Type {
+        // If T is option-ptr-safe that means over FFI we'll collapse to a transparent pointer.
+        if T::OPTION_PTR_SAFE {
+            T::ty()
+        } else {
+            let t = T::ty();
+            Type { emission: Emission::Builtin, docs: Docs::empty(), visibility: Visibility::Public, name: format!("Option<{}>", t.name), kind: Self::kind() }
+        }
+    }
+
+    fn register(inventory: &mut impl Inventory) {
+        // Ensure base types are registered.
+        T::register(inventory);
+        inventory.register_type(Self::id(), Self::ty());
+    }
+}
+
+unsafe impl<T: WireIO> WireIO for Option<T> {
+    fn write(&self, out: &mut impl Write) -> Result<(), SerializationError> {
+        match self {
+            None => 0u8.write(out),
+            Some(v) => {
+                1u8.write(out)?;
+                v.write(out)
+            }
+        }
+    }
+
+    fn read(input: &mut impl Read) -> Result<Self, SerializationError>
+    where
+        Self: Sized,
+    {
+        match u8::read(input)? {
+            0 => Ok(None),
+            _ => Ok(Some(T::read(input)?)),
+        }
+    }
+
+    fn live_size(&self) -> usize {
+        1 + self.as_ref().map_or(0, WireIO::live_size)
+    }
+}

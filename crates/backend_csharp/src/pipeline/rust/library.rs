@@ -1,10 +1,10 @@
-use crate::Error;
 use crate::extensions::{PostModelPass, PostOutputPass, RustCodegenExtension};
 use crate::pass::meta;
 use crate::pass::model;
 use crate::pass::output;
 use crate::pass::{OperationMode, OutputResult, PassMeta};
-use crate::pipeline::{RustLibraryBuilder, loop_model_passes_until_done};
+use crate::pipeline::{loop_model_passes_until_done, RustLibraryBuilder};
+use crate::Error;
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::output::Multibuf;
 use std::marker::PhantomData;
@@ -26,6 +26,7 @@ pub struct RustLibraryConfig {
     pub model_type_map_enum: model::common::types::kind::r#enum::Config,
     pub model_type_map_opaque: model::common::types::kind::opaque::Config,
     pub model_type_map_struct_fields: model::common::types::kind::struct_fields::Config,
+    pub model_type_map_wire_only: model::common::types::kind::wire_only::Config,
     pub model_type_managed_conversion: model::common::types::info::managed_conversion::Config,
     pub model_type_disposable: model::common::types::info::disposable::Config,
     pub model_type_nullable: model::common::types::info::nullable::Config,
@@ -110,6 +111,7 @@ pub struct ModelPasses {
     pub type_map_enum: model::common::types::kind::r#enum::Pass,
     pub type_map_opaque: model::common::types::kind::opaque::Pass,
     pub type_map_struct_fields: model::common::types::kind::struct_fields::Pass,
+    pub type_map_wire_only: model::common::types::kind::wire_only::Pass,
     pub type_managed_conversion: model::common::types::info::managed_conversion::Pass,
     pub type_disposable: model::common::types::info::disposable::Pass,
     pub type_nullable: model::common::types::info::nullable::Pass,
@@ -263,6 +265,7 @@ impl RustLibrary {
                 type_map_enum: model::common::types::kind::r#enum::Pass::new(config.model_type_map_enum),
                 type_map_opaque: model::common::types::kind::opaque::Pass::new(config.model_type_map_opaque),
                 type_map_struct_fields: model::common::types::kind::struct_fields::Pass::new(config.model_type_map_struct_fields),
+                type_map_wire_only: model::common::types::kind::wire_only::Pass::new(config.model_type_map_wire_only),
                 type_managed_conversion: model::common::types::info::managed_conversion::Pass::new(config.model_type_managed_conversion),
                 type_disposable: model::common::types::info::disposable::Pass::new(config.model_type_disposable),
                 type_nullable: model::common::types::info::nullable::Pass::new(config.model_type_nullable),
@@ -387,6 +390,7 @@ impl RustLibrary {
             r.run(m.type_map_enum.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &m.type_map_enum_variants, &self.inventory.types))?;
             r.run(m.type_map_opaque.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &self.inventory.types))?;
             r.run(m.type_map_struct_fields.process(&mut pass_meta, &m.id_maps, &self.inventory.types))?;
+            r.run(m.type_map_wire_only.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &self.inventory.types))?;
             r.run(m.type_managed_conversion.process(&mut pass_meta, &m.type_all))?;
             r.run(m.type_disposable.process(&mut pass_meta, &m.type_managed_conversion, &m.type_all))?;
             r.run(m.type_nullable.process(&mut pass_meta, &m.type_all))?;
