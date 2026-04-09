@@ -85,6 +85,17 @@ var option = OptionInner.Some(new Inner { x = 123.0f });
 
 If the inner type requires disposal, the Option does too.
 
+Inside `Wire<T>`, `std::Option<T>` maps to C# nullables — `T?` for value types (`uint?`, `int?`) and plain `T` for reference types (classes, `string`, etc.).
+
+```csharp
+// Wire struct with nullable fields
+public partial class MyData
+{
+    public uint? score;         // Option<u32>
+    public string name;         // Option<String> — reference type, inherently nullable
+}
+```
+
 ### Result
 
 Results are discriminated unions with `.IsOk` / `.IsErr` checks and `.AsOk()` / `.AsErr()` extraction.
@@ -163,21 +174,39 @@ If a C# delegate throws, the exception is captured and re-thrown when you call `
 
 ## Wire
 
-Wire types use the `.Wire()` extension method for creation. They are `IDisposable`.
+Wire types use the `.Wire()` extension method for creation and `.Unwire()` to deserialize. They are `IDisposable`.
+
+Wire types support `String`, `Vec<T>`, `HashMap<K, V>`, `Option<T>`, and their compositions — including nested structs containing these types.
 
 ```csharp
 // Pass a struct via Wire
 var x = new MyString { x = "hello world" }.Wire();
 Interop.wire_accept_string_2(x);
 
-// Unwire and rewire
-public WireOfY ProcessWire(WireOfX x)
+// Round-trip with Option fields
+var data = new OptionRoot
 {
-    var dict = x.Unwire();
-    dict["hello"] = "world";
-    return dict.Wire();
-}
+    id = 42,
+    middle = new OptionMiddle { label = "test", leaf = null },
+    items = new List<OptionLeaf>
+    {
+        new OptionLeaf { score = 10, name = "hello" },
+    },
+}.Wire();
+var result = Interop.wire_option_1(data).Unwire();
 ```
+Type mapping works as follows:
+
+
+| Rust | C# |
+|---|---|
+| `String` | `string` |
+| `Vec<T>` | `List<T>` |
+| `HashMap<K, V>` | `Dictionary<K, V>` |
+| `Option<T>` (value type `T`) | `T?` (e.g., `uint?`, `int?`) |
+| `Option<T>` (reference type `T`) | `T` (inherently nullable) |
+| `ffi::Option<T>` | Same as `Option<T>` above |
+| Struct with wire-only fields | `partial class` with managed field types |
 
 
 ## Forward Interop

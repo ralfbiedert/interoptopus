@@ -31,5 +31,5 @@ pub struct ContainsUserProfile {
 pub fn return_profile() -> Wire<ContainsUserProfile> { /* ... */ }
 ```
 
-Wiring is supported for types such as `std::string::String`, `std::vec::Vec`, `std::collections::HashMap`, and their composites. We call types that require wiring _wire-only_, and they are infectious for the types they are contained in.
+Wiring is supported for types such as `std::string::String`, `std::vec::Vec`, `std::collections::HashMap`, `std::option::Option`, and their composites. We call types that require wiring _wire-only_, and they are infectious for the types they are contained in.
 

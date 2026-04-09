@@ -32,6 +32,7 @@
 /// | `#[ffi] struct MyStruct { .. }` | ✅ | All fields must themselves be FFI-safe. |
 /// | `#[ffi] enum MyEnum { .. }` | ✅ | Same as structs. |
 /// | `String`, `Vec<T>`, `HashMap<K, V>` | ✅ | Only if self or parent is within `Wire<T>`. |
+/// | `Option<T>` | ✅ | As above, or if `T` is reference. |
 /// | `&T` / `&mut T` | ✅ | For `T` same a structs. |
 /// | `MyService` | ❌ | Cannot be embedded in fields. |
 /// | [`Wire<T>`](crate::wire::Wire) | ❌ | Only usable on functions, not in fields. |
@@ -76,6 +77,7 @@
 /// | `#[ffi] struct MyStruct { .. }` | ✅ | ✅ | ✅ | All fields must be FFI-safe. |
 /// | `#[ffi] enum MyEnum { .. }` | ✅ | ✅ | ✅ | Same as structs. |
 /// | `String`, `Vec<T>`, `HashMap<K, V>` | ✅ | ✅ | ✅ | Only within `Wire<T>`. |
+/// | `Option<T>` | ✅ | ✅ | ✅ | As above, or if `T` is reference. |
 /// | `&T` / `&mut T` | ✅ | ✅ | ❌ | Caller must uphold `&mut` guarantee! |
 /// | `MyService` | ✅ | ❌ | ❌ | May only appear as `&MyService`. |
 /// | [`Wire<T>`](crate::wire::Wire) | ✅ | ✅ | ✅ | Serialized transfer. |
@@ -169,6 +171,7 @@
 /// | `#[ffi] struct MyStruct { .. }` | ✅ | ✅ | ✅ | All fields must be FFI-safe. |
 /// | `#[ffi] enum MyEnum { .. }` | ✅ | ✅ | ✅ | Same as structs. |
 /// | `String`, `Vec<T>`, `HashMap<K, V>` | ✅ | ✅ | ✅ | Only within `Wire<T>`. |
+/// | `Option<T>` | ✅ | ✅ | ✅ | As above, or if `T` is reference. |
 /// | `&T`, `&mut T` | ✅ | ✅ | ❌ | Caller must uphold `&mut` guarantee! |
 /// | `&self`, `&mut self` | ✅ | ✅ | ❌ | Caller must uphold `&mut self` guarantee! |
 /// | `Async<Self>` | ✅ | ❌ | ✅ | Only inside `async` methods. |
@@ -213,6 +216,7 @@
 #[cfg(feature = "macros")]
 pub use interoptopus_proc::ffi;
 
+
 /// Derives the [`AsyncRuntime`](crate::pattern::asynk::AsyncRuntime) trait for a service struct
 /// by forwarding to one of its fields.
 ///
@@ -251,6 +255,7 @@ pub use interoptopus_proc::ffi;
 /// ```
 #[cfg(feature = "macros")]
 pub use interoptopus_proc::AsyncRuntime;
+
 
 /// Declares a plugin interface for reverse interop, e.g., loading a C# DLL from Rust.
 ///
@@ -351,6 +356,7 @@ pub use interoptopus_proc::AsyncRuntime;
 /// | `#[ffi] struct MyStruct { .. }` | ✅ | ✅ | ✅ | ✅ | All fields must themselves be FFI-safe. |
 /// | `#[ffi] enum MyEnum { .. }` | ✅ | ✅ | ✅ | ✅ | Same as structs.  |
 /// | `String`, `Vec<T>`, `HashMap<K, V>` | ✅ | ✅ | ✅ | ✅ | Only if self or parent within `Wire<T>`. |
+/// | `Option<T>` | ✅ | ✅ | ✅ | ✅ | As above. |
 /// | `&T` | ✅ | ❌ | ❌ | ❌️ | Only supported for services for now. |
 /// | `&mut T` | ❌ | ❌ | ❌ | ❌️ | For now unsupported. |
 /// | `MyService` (an `impl` block) | ✅ | ✅️ | ❌ | ✅ | Cannot be embedded in fields. |
@@ -380,6 +386,7 @@ pub use interoptopus_proc::AsyncRuntime;
 /// the future result can be successfully obtained via `.await`, not until you eventually do it).
 #[cfg(all(feature = "macros", feature = "unstable-plugins"))]
 pub use interoptopus_proc::plugin;
+
 
 /// Strips module paths from a fully-qualified Rust type name, preserving generic structure.
 ///

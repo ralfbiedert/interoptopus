@@ -31,6 +31,8 @@ Nullable values.
 pub fn pattern_ffi_option(x: ffi::Option<Inner>) -> ffi::Option<Inner> { x }
 ```
 
+Note, this refers to the `ffi::Option` type. We also support `std::option::Option` inside `Wire<T>` directly.
+
 
 ## Result
 
@@ -53,6 +55,8 @@ We have an owned UTF-8 string type that can be faster than marshalling in certai
 pub fn utf8_string(x: ffi::String) -> ffi::String { x }
 ```
 
+Note, this refers to the `ffi::String` type. We also support `std::string::String` inside `Wire<T>` directly.
+
 ## Vectors
 
 Owned, growable arrays.
@@ -63,6 +67,8 @@ pub fn pattern_vec() -> ffi::Vec<u32> {
     vec![1, 2, 3].into()
 }
 ```
+
+Note, this refers to the `ffi::Vec` type. We also support `std::vec::Vec` inside `Wire<T>` directly.
 
 ## Callbacks
 
