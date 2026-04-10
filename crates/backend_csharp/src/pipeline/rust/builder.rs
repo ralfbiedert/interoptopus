@@ -33,14 +33,14 @@ impl RustLibraryBuilder {
 
     /// Configures the generation of the file header.
     #[must_use]
-    pub fn header_config(mut self, header_config: HeaderConfig) -> Self {
+    pub fn headers(mut self, header_config: HeaderConfig) -> Self {
         self.config.output_header = header_config;
         self
     }
 
     /// What DLL loading policies to emit.
     #[must_use]
-    pub fn search_path_config(mut self, search_path: SearchPathConfig) -> Self {
+    pub fn search_path(mut self, search_path: SearchPathConfig) -> Self {
         self.config.output_search_path = search_path;
         self
     }

@@ -13,8 +13,8 @@ fn interop() -> Result<(), Box<dyn std::error::Error>> {
             FileEmission::Default => Target::new("Interop.cs", "My.Company"),
             FileEmission::CustomModule(_) => Target::new("Interop.cs", "My.Company"),
         }))
-        .header_config(HeaderConfig { emit_version: false })
-        .search_path_config(SearchPathConfig { import_search_path: DllImportSearchPath::None })
+        .headers(HeaderConfig { emit_version: false })
+        .search_path(SearchPathConfig { import_search_path: DllImportSearchPath::None })
         .build()
         .process()?;
 

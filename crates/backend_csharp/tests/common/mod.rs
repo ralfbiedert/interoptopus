@@ -43,7 +43,7 @@ macro_rules! test_output {
                 FileEmission::Common => Target::new("Interop.Common.cs", "My.Company.Common"),
                 FileEmission::Default | FileEmission::CustomModule(_) => Target::new("Interop.cs", "My.Company"),
             }))
-            .header_config(HeaderConfig { emit_version: false })
+            .headers(HeaderConfig { emit_version: false })
             .build()
             .process()
             .unwrap();
