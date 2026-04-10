@@ -1,3 +1,4 @@
+using System;
 using My.Company;
 using Xunit;
 
@@ -35,7 +36,7 @@ public class TestStructs
     public void struct2_with_null()
     {
         var v = new Vec3f32 { x = 1.0f, y = 2.0f, z = 3.0f };
-        var result = Interop.struct2(v, System.IntPtr.Zero);
+        var result = Interop.struct2(v, IntPtr.Zero);
         Assert.True(result.IsOk);
     }
 }

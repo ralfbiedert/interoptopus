@@ -1,6 +1,3 @@
-using My.Company;
-using Xunit;
-
 public class TestArrayChars
 {
     // [Fact]

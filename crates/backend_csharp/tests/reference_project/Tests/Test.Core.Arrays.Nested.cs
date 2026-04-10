@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 using My.Company;
 using Xunit;
+using Array = My.Company.Array;
 using Interop = My.Company.Interop;
 
 public class TestArrayNested
@@ -50,7 +52,7 @@ public class TestArrayNested
     [Fact]
     public void nested_array_3_throws()
     {
-        Assert.Throws<System.InvalidOperationException>(() =>
+        Assert.Throws<InvalidOperationException>(() =>
         {
             Interop.nested_array_3(new NestedArray
             {
@@ -65,7 +67,6 @@ public class TestArrayNested
 
     private static NestedArray CreateNestedArray()
     {
-
         return new NestedArray
         {
             field_array = [1, 2, 3, 4, 5],
@@ -77,5 +78,3 @@ public class TestArrayNested
         };
     }
 }
-
-

@@ -1,4 +1,3 @@
-using My.Company;
 using My.Company.Common;
 using Xunit;
 using Interop = My.Company.Interop;
@@ -15,7 +14,7 @@ public class TestPatternPrimitives
     [Fact]
     public void pattern_ffi_cchar()
     {
-        byte c = (byte)'A';
+        var c = (byte)'A';
         Assert.Equal(c, Interop.pattern_ffi_cchar(c));
     }
 

@@ -72,5 +72,4 @@ public class TestRefs
         Assert.Equal("2", x[1].IntoString());
         Assert.Equal("3", x[2].IntoString());
     }
-
 }

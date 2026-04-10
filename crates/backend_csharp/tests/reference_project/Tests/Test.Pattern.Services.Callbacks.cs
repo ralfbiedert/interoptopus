@@ -5,7 +5,6 @@ using Xunit;
 
 public class TestPatternServicesCallbacks
 {
-
     [Fact]
     public void CallbackSimple()
     {

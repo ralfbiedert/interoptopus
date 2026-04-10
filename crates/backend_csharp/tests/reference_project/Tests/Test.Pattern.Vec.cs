@@ -54,7 +54,6 @@ public class TestPatternVec
     [Fact]
     public void pattern_ffi_vec_3()
     {
-
         var vec1 = Interop.pattern_vec_1();
         var vec2 = Interop.pattern_vec_3(vec1);
 
@@ -73,7 +72,6 @@ public class TestPatternVec
     [Fact]
     public void pattern_ffi_vec_4()
     {
-
         var vec1 = Interop.pattern_vec_1();
         using var vec2 = Interop.pattern_vec_4(ref vec1);
 
@@ -88,9 +86,8 @@ public class TestPatternVec
     [Fact]
     public void pattern_ffi_vec_5()
     {
-
-        var r = new [] { "1".Utf8(), "2".Utf8(), "3".Utf8() };
-        var v = new [] { "1".Utf8(), "2".Utf8(), "3".Utf8() };
+        var r = new[] { "1".Utf8(), "2".Utf8(), "3".Utf8() };
+        var v = new[] { "1".Utf8(), "2".Utf8(), "3".Utf8() };
         var v1 = VecUtf8String.From(v);
         var v2 = Interop.pattern_vec_5(v1);
 
@@ -107,7 +104,7 @@ public class TestPatternVec
         {
             new() { x = 1, y = 1, z = 1 },
             new() { x = 2, y = 2, z = 2 },
-            new() { x = 3, y = 3, z = 3 },
+            new() { x = 3, y = 3, z = 3 }
         };
 
         var v1 = VecVec3f32.From(v);
@@ -121,28 +118,27 @@ public class TestPatternVec
     [Fact]
     public void pattern_ffi_vec_7()
     {
-        var v = new [] { "1".Utf8(), "2".Utf8(), "3".Utf8() };
+        var v = new[] { "1".Utf8(), "2".Utf8(), "3".Utf8() };
         var v1 = new UseSliceAndVec { s1 = SliceUtf8String.From(v), s2 = VecUtf8String.From(v) };
         Interop.pattern_vec_7(v1);
 
         // Assert.Equal(v[0], v2.s1[0]);
         // Assert.Equal(v[1], v2.s1[1]);
         // Assert.Equal(v[2], v2.s1[2]);
-
     }
 
     [Fact]
     public void pattern_ffi_vec_8()
     {
-        var v = new [] { "1".Utf8(), "2".Utf8(), "3".Utf8() };
+        var v = new[] { "1".Utf8(), "2".Utf8(), "3".Utf8() };
         var v1 = new UseSliceAndVec { s1 = SliceUtf8String.From(v), s2 = VecUtf8String.From(v) };
 
         // TODO: This rval deserialziation of slice inside composite has some issues
         var v2 = Interop.pattern_vec_8(v1);
 
-        // Assert.Equal(v[0], v2.s1[0]);
-        // Assert.Equal(v[1], v2.s1[1]);
-        // Assert.Equal(v[2], v2.s1[2]);
+         //Assert.Equal(v[0], v2.s1[0]);
+         //Assert.Equal(v[1], v2.s1[1]);
+         //Assert.Equal(v[2], v2.s1[2]);
     }
 
     [Fact]
@@ -151,5 +147,4 @@ public class TestPatternVec
         using var empty = VecUtf8String.Empty();
         Assert.Equal(0, empty.Count);
     }
-
 }

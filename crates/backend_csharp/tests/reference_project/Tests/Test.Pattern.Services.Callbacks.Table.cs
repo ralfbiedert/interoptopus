@@ -7,14 +7,14 @@ public class TestPatternServicesCallbacksTable
 {
     private CallbackTable _table = default!;
 
-    void CreatePatternDelegateTable(ServiceCallbacks service)
+    private void CreatePatternDelegateTable(ServiceCallbacks service)
     {
         _table = new CallbackTable
         {
             my_callback = new MyCallback(value => 1),
             sum_delegate_1 = new SumDelegate1(() => { }),
             sum_delegate_2 = new SumDelegate2((x, y) => x + y),
-            sum_delegate_return = new SumDelegateReturn(((i, i1) => ResultVoidError.Ok)),
+            sum_delegate_return = new SumDelegateReturn((i, i1) => ResultVoidError.Ok)
         };
         service.SetDelegateTable(_table);
     }
@@ -23,7 +23,7 @@ public class TestPatternServicesCallbacksTable
     public void InvokeDelegates()
     {
         using var service = ServiceCallbacks.Create();
-    
+
         CreatePatternDelegateTable(service);
         // ^-- this might run at risk of our delegates getting GC'ed if we don't add
         // special handling. For example, if we don't do GC.Collect() it might just pass
@@ -31,8 +31,7 @@ public class TestPatternServicesCallbacksTable
         // below out it'll crash.
         //
         GC.Collect();
-    
+
         service.InvokeDelegates();
     }
-
 }

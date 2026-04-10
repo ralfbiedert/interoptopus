@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 using My.Company;
 using Xunit;
+using Array = My.Company.Array;
 
 public class TestArrayBasic
 {
@@ -21,7 +23,7 @@ public class TestArrayBasic
     [InlineData(null)]
     public void array_1_throws(byte[] array)
     {
-        Assert.Throws<System.InvalidOperationException>(() =>  Interop.array_1(new Array
+        Assert.Throws<InvalidOperationException>(() => Interop.array_1(new Array
         {
             data = array
         }));
@@ -37,7 +39,7 @@ public class TestArrayBasic
     [Fact]
     public void array_3()
     {
-        var result = new Array() { data = new byte[16] };
+        var result = new Array { data = new byte[16] };
         Interop.array_3(ref result);
         Assert.Equal(42, result.data[0]);
     }

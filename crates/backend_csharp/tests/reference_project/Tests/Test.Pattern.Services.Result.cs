@@ -4,7 +4,6 @@ using Xunit;
 
 public class TestPatternServicesResult
 {
-
     [Fact]
     public void New()
     {
@@ -43,7 +42,7 @@ public class TestPatternServicesResult
     public void ResultSlice()
     {
         using var service = ServiceResult.Create();
-        using var slice = new uint[] {0, 1, 2}.Slice();
+        using var slice = new uint[] { 0, 1, 2 }.Slice();
         Assert.Equal(2u, service.ResultSlice(slice, 2ul));
     }
 }

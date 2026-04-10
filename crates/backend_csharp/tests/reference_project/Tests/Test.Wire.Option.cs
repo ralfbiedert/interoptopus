@@ -1,20 +1,19 @@
 using System.Collections.Generic;
 using My.Company;
-using My.Company.Common;
 using Xunit;
 using Interop = My.Company.Interop;
 
 public class TestWireOption
 {
-    private static OptionLeaf MakeLeaf(uint? score1, uint? score2, string name1, string name2)
+    private static OptionLeaf MakeLeaf(uint? score1, uint? score2, string? name1, string? name2)
     {
         return new OptionLeaf
         {
             tags = new Dictionary<string, string> { { "key", "value" } },
             score_1 = score1,
             score_2 = score2,
-            name_1 = name1,
-            name_2 = name2,
+            name_1 = name1!,
+            name_2 = name2!
         };
     }
 
@@ -29,10 +28,8 @@ public class TestWireOption
             {
                 label = "mid",
                 leaf_1 = leaf,
-                leaf_2 = null,
             },
-            middle_2 = null,
-            items = new List<OptionLeaf> { leaf },
+            items = [leaf]
         };
 
         var result = Interop.wire_option_1(root.Wire()).Unwire();
@@ -56,9 +53,7 @@ public class TestWireOption
         var root = new OptionRoot
         {
             id = 1,
-            middle_1 = null,
-            middle_2 = null,
-            items = new List<OptionLeaf> { leaf },
+            items = [leaf]
         };
 
         var result = Interop.wire_option_1(root.Wire()).Unwire();
@@ -78,14 +73,12 @@ public class TestWireOption
         var root = new OptionRoot
         {
             id = 0,
-            middle_1 = null,
-            middle_2 = null,
-            items = new List<OptionLeaf>
-            {
+            items =
+            [
                 MakeLeaf(10, 20, null, null),
                 MakeLeaf(null, 30, null, null),
-                MakeLeaf(5, null, null, null),
-            },
+                MakeLeaf(5, null, null, null)
+            ]
         };
 
         var sum = Interop.wire_option_2(root.Wire());
@@ -98,14 +91,12 @@ public class TestWireOption
         var root = new OptionRoot
         {
             id = 0,
-            middle_1 = null,
-            middle_2 = null,
-            items = new List<OptionLeaf>
-            {
+            items =
+            [
                 MakeLeaf(null, null, "a", null),
                 MakeLeaf(null, null, null, null),
-                MakeLeaf(null, null, "b", null),
-            },
+                MakeLeaf(null, null, "b", null)
+            ]
         };
 
         var count = Interop.wire_option_3(root.Wire());
@@ -122,10 +113,8 @@ public class TestWireOption
             {
                 label = "x",
                 leaf_1 = MakeLeaf(null, 99, null, null),
-                leaf_2 = null,
             },
-            middle_2 = null,
-            items = new List<OptionLeaf>(),
+            items = []
         };
 
         var score = Interop.wire_option_4(root.Wire());
@@ -138,9 +127,7 @@ public class TestWireOption
         var root = new OptionRoot
         {
             id = 0,
-            middle_1 = null,
-            middle_2 = null,
-            items = new List<OptionLeaf>(),
+            items = []
         };
 
         var score = Interop.wire_option_4(root.Wire());

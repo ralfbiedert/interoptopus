@@ -1,8 +1,4 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using My.Company;
-using My.Company.Common;
 using Xunit;
 using Array = My.Company.Array;
 
@@ -19,9 +15,9 @@ public class TestPatternServicesAsyncStructs
             field_array_2 = new ushort[5],
             field_struct = new Array
             {
-                data = new byte[16],
+                data = new byte[16]
             },
-            field_int = 123,
+            field_int = 123
         };
         var r = await s.ProcessStruct(a);
         Assert.Equal(r.field_int, 124);

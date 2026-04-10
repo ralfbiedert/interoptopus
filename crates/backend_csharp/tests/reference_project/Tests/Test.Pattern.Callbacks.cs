@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using My.Company;
 using My.Company.Common;
 using Xunit;
@@ -38,7 +37,6 @@ public class TestPatternDelegates
     }
 
 
-
     [Fact]
     public void pattern_callback_4()
     {
@@ -59,14 +57,13 @@ public class TestPatternDelegates
     {
         using var cb = Interop.pattern_callback_6();
         var rval = cb.Call(1, 2);
-        
+
         Assert.Equal(3, rval);
     }
-    
+
     [Fact]
     public void pattern_ffi_slice_delegate()
     {
-
         Interop.pattern_ffi_slice_delegate(x =>
         {
             Assert.Equal(x.Count, 10);
@@ -80,7 +77,6 @@ public class TestPatternDelegates
             Assert.Equal(arr[5], 5);
 
             return x[0];
-
         });
     }
 
@@ -119,7 +115,9 @@ public class TestPatternDelegates
             Assert.Equal(rval, 6);
             called_c2 = true;
             throw new Exception("Unchecked callback which we didn't handle. Comment this out and see the test fail.");
-        };
+        }
+
+        ;
 
         var cc1 = new SumDelegateReturn(C1);
         var cc2 = new SumDelegateReturn2(C2);
@@ -151,10 +149,7 @@ public class TestPatternDelegates
         var r2a = string.Empty;
         var r2b = string.Empty;
 
-        Interop.pattern_callback_8((s) =>
-        {
-            r1 = s.IntoString();
-        }, s =>
+        Interop.pattern_callback_8(s => { r1 = s.IntoString(); }, s =>
         {
             r2a = s.s1.IntoString();
             r2b = s.s2.IntoString();
@@ -169,7 +164,7 @@ public class TestPatternDelegates
     [Fact]
     public void pattern_callback_9()
     {
-        var result = Interop.pattern_callback_9((IntPtr x, IntPtr y) =>
+        var result = Interop.pattern_callback_9((x, y) =>
         {
             Marshal.ReadInt32(x);
             Marshal.ReadInt32(y);

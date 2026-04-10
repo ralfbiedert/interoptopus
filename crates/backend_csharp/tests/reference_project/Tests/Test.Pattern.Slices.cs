@@ -17,10 +17,11 @@ public class TestPatternSlices
     [Fact]
     public void pattern_ffi_slice_2()
     {
-        using var data = new Vec3f32[] {
+        using var data = new Vec3f32[]
+        {
             new() { x = 1.0f, y = 2.0f, z = 3.0f },
             new() { x = 4.0f, y = 5.0f, z = 6.0f },
-            new() { x = 7.0f, y = 8.0f, z = 9.0f },
+            new() { x = 7.0f, y = 8.0f, z = 9.0f }
         }.Slice();
 
         var result = Interop.pattern_ffi_slice_2(data, 1);
@@ -35,7 +36,7 @@ public class TestPatternSlices
     {
         using var data = new byte[100_000].SliceMut();
 
-        Interop.pattern_ffi_slice_3(data, (slice) =>
+        Interop.pattern_ffi_slice_3(data, slice =>
         {
             slice[0] = 1;
             slice[1] = 100;
@@ -59,7 +60,7 @@ public class TestPatternSlices
     [Fact]
     public void pattern_ffi_slice_6()
     {
-        var data = new byte[] {1, 2, 3}.SliceMut();
+        var data = new byte[] { 1, 2, 3 }.SliceMut();
 
         using var callback = new CallbackU8(x =>
         {
@@ -91,8 +92,7 @@ public class TestPatternSlices
     [Fact]
     public void pattern_ffi_slice_9()
     {
-
-        using var use_string = new UseString()
+        using var use_string = new UseString
         {
             s1 = "hello".Utf8(),
             s2 = "world".Utf8()

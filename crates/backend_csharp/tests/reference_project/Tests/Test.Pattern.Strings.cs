@@ -1,4 +1,3 @@
-using System;
 using My.Company;
 using My.Company.Common;
 using Xunit;
@@ -19,7 +18,7 @@ public class TestPatternStrings
         var rval = Interop.pattern_ascii_pointer_2();
         Assert.Equal(rval, "hello.world");
     }
-    
+
     [Fact]
     public void pattern_string_1()
     {
@@ -63,7 +62,7 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_7()
     {
-        var slice = SliceUtf8String.From(new[] { "hello".Utf8(), "world".Utf8() });
+        var slice = SliceUtf8String.From(["hello".Utf8(), "world".Utf8()]);
         var r1 = Interop.pattern_string_7(slice, 0).AsOk();
         var r2 = Interop.pattern_string_7(slice, 1).AsOk();
         Assert.Equal("hello", r1.String);
@@ -76,7 +75,7 @@ public class TestPatternStrings
         var x = new UseString[]
         {
             new() { s1 = "hello1".Utf8(), s2 = "world1".Utf8() },
-            new() { s1 = "hello2".Utf8(), s2 = "world2".Utf8() },
+            new() { s1 = "hello2".Utf8(), s2 = "world2".Utf8() }
         };
 
         var slice = SliceUseString.From(x);
@@ -123,9 +122,7 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_13()
     {
-
     }
-
 
 
     [Fact]
@@ -133,10 +130,7 @@ public class TestPatternStrings
     {
         // TODO - Can we somehow measure memory use?
         var w = new UseString { s1 = "hello".Utf8(), s2 = "world".Utf8() };
-        for (var i = 0; i < 1024 * 1024; i++)
-        {
-            Interop.pattern_string_6a(ref w);
-        }
+        for (var i = 0; i < 1024 * 1024; i++) Interop.pattern_string_6a(ref w);
     }
 
     [Fact]
@@ -170,5 +164,4 @@ public class TestPatternStrings
         s1.Dispose();
         s1.Dispose();
     }
-
 }

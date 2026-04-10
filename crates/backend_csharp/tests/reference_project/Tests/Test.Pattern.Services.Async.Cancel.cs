@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using My.Company;
-using My.Company.Common;
 using Xunit;
 
 public class TestPatternServicesAsyncCancel

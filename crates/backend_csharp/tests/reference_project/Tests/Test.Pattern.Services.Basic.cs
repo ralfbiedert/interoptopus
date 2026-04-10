@@ -8,5 +8,4 @@ public class TestPatternServicesBasic
     {
         using var service = ServiceBasic.Create();
     }
-
 }

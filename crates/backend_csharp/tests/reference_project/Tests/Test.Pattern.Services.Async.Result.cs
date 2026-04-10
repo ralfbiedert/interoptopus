@@ -1,11 +1,6 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using My.Company;
 using My.Company.Common;
 using Xunit;
-using Array = My.Company.Array;
-
 
 public class TestPatternServicesAsyncResult
 {
@@ -22,7 +17,10 @@ public class TestPatternServicesAsyncResult
         var exceptionThrown = false;
         using var s = ServiceAsyncResult.Create();
 
-        try { await s.Fail(); }
+        try
+        {
+            await s.Fail();
+        }
         catch (EnumException<Error> e)
         {
             Assert.True(e.Value.IsFail);

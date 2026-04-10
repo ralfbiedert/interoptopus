@@ -76,13 +76,13 @@ public class TestEnums
         var b = "world".Utf8();
         var v = VecUtf8String.Empty();
 
-        var l1 = new Layer1String()
+        var l1 = new Layer1String
         {
             maybe_1 = OptionUtf8String.None,
             maybe_2 = v,
             maybe_3 = a.Clone()
         };
-        var l2 = new Layer2String()
+        var l2 = new Layer2String
         {
             layer_1 = l1,
             strings = new[]
@@ -97,5 +97,4 @@ public class TestEnums
 
         Assert.Equal("hello", Interop.enums_4(l3).String);
     }
-
 }

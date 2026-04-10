@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using My.Company;
 using Xunit;
 

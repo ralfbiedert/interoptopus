@@ -1,17 +1,26 @@
 using My.Company;
 using My.Company.Common;
 using Xunit;
-using Interop = My.Company.Interop;
 
 public class TestPatternServicesMultipleCtors
 {
-
     [Fact]
     public void MultipleCtors()
     {
-        using (ServiceMultipleCtors.NewWith(123)) { }
-        using (ServiceMultipleCtors.NewWithout()) { };
-        using (ServiceMultipleCtors.NewWithString("hello world")) { };
+        using (ServiceMultipleCtors.NewWith(123))
+        {
+        }
+
+        using (ServiceMultipleCtors.NewWithout())
+        {
+        }
+
+        ;
+        using (ServiceMultipleCtors.NewWithString("hello world"))
+        {
+        }
+
+        ;
     }
 
     [Fact]
@@ -22,7 +31,8 @@ public class TestPatternServicesMultipleCtors
             var serviceMultipleCtors = ServiceMultipleCtors.NewFailing(123);
             Assert.True(false);
         }
-        catch (InteropException) { }
+        catch (InteropException)
+        {
+        }
     }
-
 }
