@@ -21,10 +21,10 @@ impl Dispatch {
         Self { dispatch: Box::new(f) }
     }
 
-    /// Creates a dispatcher that puts everything into a single `Interop.cs` file.
+    /// Puts everything into a single `Interop.cs` file with the given namespace.
     #[must_use]
-    pub fn single_file() -> Self {
-        Self::custom(|_, _| Target::new("Interop.cs", "My.Company"))
+    pub fn single_file(ns: impl AsRef<str> + 'static) -> Self {
+        Self::custom(move |_, _| Target::new("Interop.cs", ns.as_ref()))
     }
 
     #[cfg(any(feature = "unstable-plugins", docsrs))]
@@ -52,7 +52,7 @@ impl Dispatch {
 
 impl Default for Dispatch {
     fn default() -> Self {
-        Self::single_file()
+        Self::single_file("My.Company")
     }
 }
 
