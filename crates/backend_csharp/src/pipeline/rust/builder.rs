@@ -1,6 +1,7 @@
 use crate::RustLibrary;
 use crate::config::{HeaderConfig, SearchPathConfig};
 use crate::dispatch::Dispatch;
+use crate::extensions::RustCodegenExtension;
 use crate::pipeline::RustLibraryConfig;
 use interoptopus::inventory::RustInventory;
 use interoptopus_backends::template::TemplateEngine;
@@ -10,6 +11,7 @@ use interoptopus_backends::template::TemplateEngine;
 pub struct RustLibraryBuilder {
     inventory: RustInventory,
     config: RustLibraryConfig,
+    extensions: Vec<Box<dyn RustCodegenExtension>>,
 }
 
 impl RustLibraryBuilder {
@@ -54,9 +56,16 @@ impl RustLibraryBuilder {
         self
     }
 
+    /// Registers an extension that can hook into model and output passes.
+    #[must_use]
+    pub fn with_extension(mut self, extension: impl RustCodegenExtension + 'static) -> Self {
+        self.extensions.push(Box::new(extension));
+        self
+    }
+
     /// Builds the configured [`RustLibrary`], ready for [`process`](RustLibrary::process).
     #[must_use]
     pub fn build(self) -> RustLibrary {
-        RustLibrary::with_config(self.inventory, self.config)
+        RustLibrary::with_config_extensions(self.inventory, self.config, self.extensions)
     }
 }

@@ -9,8 +9,8 @@ macro_rules! test_model {
         $(let _ = inventory.register($item);)*
         let inventory = inventory.validate();
         ::interoptopus_csharp::RustLibrary::builder(inventory)
+            .with_extension($plugin)
             .build()
-            .register_extension($plugin)
             .process()
     }};
 }

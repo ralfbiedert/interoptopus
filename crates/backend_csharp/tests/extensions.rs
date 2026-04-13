@@ -44,7 +44,7 @@ fn can_register() -> Result<(), Box<dyn Error>> {
     let post_output_called = Arc::new(AtomicBool::new(false));
     let ext = MyExtension { init_called: init_called.clone(), post_model_called: post_model_called.clone(), post_output_called: post_output_called.clone() };
 
-    let _ = RustLibrary::new(inventory).register_extension(ext).process()?;
+    let _ = RustLibrary::builder(inventory).with_extension(ext).build().process()?;
 
     assert!(init_called.load(Ordering::Relaxed));
     assert!(post_model_called.load(Ordering::Relaxed));

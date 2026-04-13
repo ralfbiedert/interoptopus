@@ -229,7 +229,7 @@ pub struct RustLibrary {
     // Output
     output: Multibuf,
 
-    // Plugins
+    // Extensions
     extensions: Vec<Box<dyn RustCodegenExtension>>,
 }
 
@@ -237,7 +237,7 @@ impl RustLibrary {
     /// Creates a new `RustLibrary` with default configuration.
     #[must_use]
     pub fn new(inventory: RustInventory) -> Self {
-        Self::with_config(inventory, RustLibraryConfig::default())
+        Self::with_config_extensions(inventory, RustLibraryConfig::default(), Vec::new())
     }
 
     /// Returns a builder for configuring the code generation pipeline.
@@ -247,7 +247,7 @@ impl RustLibrary {
     }
 
     #[allow(clippy::default_trait_access)]
-    pub(crate) fn with_config(inventory: RustInventory, config: RustLibraryConfig) -> Self {
+    pub(crate) fn with_config_extensions(inventory: RustInventory, config: RustLibraryConfig, extensions: Vec<Box<dyn RustCodegenExtension>>) -> Self {
         Self {
             inventory,
             meta_info: meta::rust::info::Pass::new(config.meta_info),
@@ -338,15 +338,8 @@ impl RustLibrary {
             },
             output_final: output::rust::all::Pass::new(config.output_final),
             output: Multibuf::default(),
-            extensions: vec![],
+            extensions,
         }
-    }
-
-    /// Registers an extension that can hook into model and output passes.
-    #[must_use]
-    pub fn register_extension(mut self, extension: impl RustCodegenExtension + 'static) -> Self {
-        self.extensions.push(Box::new(extension));
-        self
     }
 
     fn extension_init_pass(&mut self) {
