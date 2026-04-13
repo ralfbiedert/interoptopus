@@ -39,22 +39,14 @@ impl WireCodeGen<'_> {
             }
             RsTypeKind::WireOnly(WireOnly::Option(inner)) => {
                 let inner_name = self.cs_type_name(*inner);
-                if is_cs_value_type(*inner, self.rs_types) {
-                    format!("{inner_name}?")
-                } else {
-                    inner_name
-                }
+                format!("{inner_name}?")
             }
             RsTypeKind::Struct(_) => ty.name.clone(),
             RsTypeKind::Enum(_) => ty.name.clone(),
             RsTypeKind::Array(arr) => format!("{}[]", self.cs_type_name(arr.ty)),
             RsTypeKind::TypePattern(interoptopus::lang::types::TypePattern::Option(inner)) => {
                 let inner_name = self.cs_type_name(*inner);
-                if is_cs_value_type(*inner, self.rs_types) {
-                    format!("{inner_name}?")
-                } else {
-                    inner_name
-                }
+                format!("{inner_name}?")
             }
             _ => "object".to_string(),
         }

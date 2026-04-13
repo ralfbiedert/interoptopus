@@ -24,6 +24,7 @@ pub struct OptionRoot {
     pub middle_1: Option<OptionMiddle>,
     pub middle_2: ffi::Option<OptionMiddle>,
     pub items: Vec<OptionLeaf>,
+    pub more_items: Vec<Option<OptionLeaf>>,
 }
 
 /// Round-trips the root, proving serialize/deserialize works for all option variants.

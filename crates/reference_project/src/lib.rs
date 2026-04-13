@@ -156,6 +156,7 @@ pub fn inventory() -> RustInventory {
         .register(function!(patterns::option::pattern_ffi_option_1))
         .register(function!(patterns::option::pattern_ffi_option_2))
         .register(function!(patterns::option::pattern_ffi_option_3))
+        .register(function!(patterns::option::pattern_ffi_option_4))
         .register(function!(patterns::primitive::pattern_ffi_bool))
         .register(function!(patterns::primitive::pattern_ffi_cchar))
         .register(function!(patterns::primitive::pattern_ffi_cchar_const_pointer))

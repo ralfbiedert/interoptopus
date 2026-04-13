@@ -7,6 +7,11 @@ pub struct Inner {
 }
 
 #[ffi]
+pub struct Outer {
+    pub inner: Option<Inner>,
+}
+
+#[ffi]
 pub fn pattern_ffi_option_1(x: Option<Inner>) -> Option<Inner> {
     x
 }
@@ -19,4 +24,9 @@ pub fn pattern_ffi_option_2(x: Option<Inner>) -> Inner {
 #[ffi]
 pub fn pattern_ffi_option_3(x: Option<Option<Result<Option<String>, super::result::Error>>>) -> Option<Option<Result<Option<String>, super::result::Error>>> {
     x
+}
+
+#[ffi]
+pub fn pattern_ffi_option_4(x: Outer) -> Inner {
+    x.inner.into_option().unwrap_or(Inner { x: f32::NAN })
 }

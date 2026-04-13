@@ -30,7 +30,7 @@ macro_rules! define_plugin {
 
         let base = ::std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join($base);
         multibuf.write_buffers_to(base.join($name))?;
-        // insta::assert_snapshot!(multibuf);
+        insta::assert_snapshot!(multibuf);
     }};
 }
 
