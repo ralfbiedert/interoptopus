@@ -94,9 +94,9 @@ PRs are very welcome!
 [rust-version-url]: https://github.com/ralfbiedert/interoptopus
 [rust-build-badge]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml/badge.svg
 [rust-build-url]: https://github.com/ralfbiedert/interoptopus/actions/workflows/rust.yml
-[interoptopus_csharp]: https://crates.io/crates/interoptopus_csharp
-[interoptopus_c]: https://crates.io/crates/interoptopus_backend_c
-[interoptopus_cpython]: https://crates.io/crates/interoptopus_backend_cpython
+[interoptopus_csharp]: https://docs.rs/interoptopus_csharp
+[interoptopus_c]: https://docs.rs/interoptopus_c
+[interoptopus_cpython]: https://docs.rs/interoptopus_cpython
 [interop-cs]: https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/csharp_reference_project/Interop.cs
 [reference-project]: https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src
 [new-backends]: https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends
