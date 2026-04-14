@@ -1,5 +1,6 @@
 #if defined(_WIN32)
 #include <windows.h>
+#include <malloc.h>
 static int {{ load_fn }}(const char* path, {{ api_name }}* api)
 {
     int len = MultiByteToWideChar(CP_UTF8, 0, path, -1, NULL, 0);

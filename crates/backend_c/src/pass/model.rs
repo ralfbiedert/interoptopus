@@ -56,7 +56,9 @@ fn c_function_name(rust_name: &str, naming: &NamingConfig) -> String {
 
 /// Apply parameter naming style (no prefix — parameters are local).
 fn c_param_name(rust_name: &str, naming: &NamingConfig) -> String {
-    apply_naming_style(rust_name, naming.function_parameter_naming)
+    let styled = apply_naming_style(rust_name, naming.function_parameter_naming);
+    // Rust allows `_` as a parameter name (unused), but C requires an identifier.
+    if styled.is_empty() { "param".to_string() } else { styled }
 }
 
 /// Apply const naming style + prefix (for tag enum names like `SHAPE_TAG`).
