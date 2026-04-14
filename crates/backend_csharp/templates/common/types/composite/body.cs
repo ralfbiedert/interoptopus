@@ -1,8 +1,6 @@
 [NativeMarshalling(typeof(MarshallerMeta))]
 {{ visibility }} partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposable{% endif %}
 {
-    public {{name}}() { }
-
     {{ unmanaged | indent }}
 
     {{ to_unmanaged | indent }}
