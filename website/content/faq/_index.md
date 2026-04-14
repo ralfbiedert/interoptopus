@@ -39,10 +39,32 @@ impl ServiceBasic {
 They need explicitly defined constructors, and come with destructors under the hood. As such they have a well-defined lifecycle. In practical terms a Rust service becomes a C# class and methods, whereas a plugin-based service becomes a droppable Rust struct with methods. The term 'service' was chosen (over instance or similar) because services have restrictions where and how they can be used and composed. For example, services can't be put in fields.
 
 
-**Plugins** are a way to extend a Rust application through 'reverse interop'. Based on the `plugin!` macro, they allow you to define APIs that can be fulfilled by other languages, e.g., C#.
+**Plugins** are a way to extend a Rust application through 'reverse interop'. Based on the `plugin!` macro found in the core `interoptopus` crate, they allow you to define APIs that can be fulfilled by other languages, e.g., C#:
 
+```rust
+plugin!(MyPlugin {
+    fn foo(vec: Vec3f32) -> Vec3f32;
+    fn bar(x: u32);
+});
+```
 
-**Extensions** are a feature of some codegen backends like `backend_csharp`. In essence, you can register extensions with a pipeline, and these extensions will then be able to modify or inspect the emitted code through APIs. 
+Once you defined your plugin you use a backend crate (e.g., `interoptopus_csharp`) to emit a plugin stub for the respective language (e.g., `interoptopus_csharp::DotnetLibrary`). You then implement and compile the plugin (e.g., via `dotnet build`) and eventually load it through the backends's provided plugin runtime (e.g., `interoptopus_csharp::rt::dynamic`). 
+
+**Extensions** on the other hand are a feature of some codegen backends like `backend_csharp`. In essence, you can register extensions with a codegen pipeline, and these extensions will then be able to modify or inspect the emitted code through APIs:
+
+```rust
+impl RustCodegenExtension for MyExtension {
+    fn init(&mut self, _: &mut RustInventory) {}
+    fn post_model_cycle(&mut self, _: &RustInventory, _: PostModelPass) -> ModelResult {}
+    fn post_model_all(&mut self, _: &RustInventory, _: PostModelPass) -> Result<(), Error> {}
+    fn post_output(&mut self, _: &mut Multibuf, _: PostOutputPass) -> OutputResult {}
+}
+
+RustLibrary::builder(inventory)
+  .with_extension(MyExtension::new())
+  .build()
+  .process()?;
+```
 
 
 ## Performance

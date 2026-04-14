@@ -7,8 +7,7 @@ weight = 300
 ## 0.16
 
 Having been in the works for over a year, this is essentially a total project rewrite. High-level things that changed:
-
-- Interoptopus is entirely 'model-based' now. While earlier versions had the concept of an `Inventory` (a list of items used around an FFI boundary), due to flaws how the inventory was structured, many places used and transformed the contained items in a very ad hoc fashion. For example, the C# codegen that wrote  `Service.Foo(byte[]) {}` just had to assume another part actually wrote `service_foo(IntPtr, IntPtr)` without actually knowing. That made it hard to reason about the code and refactor it. 
+- Interoptopus is entirely 'model-based' now. While earlier versions had the concept of an `Inventory` (a list of items used around an FFI boundary), due to flaws how the inventory was structured, many places used and transformed the contained items in a very ad hoc fashion. For example, the C# codegen that wrote  `Service.Foo(byte[]) {}` just had to assume another part wrote `service_foo(IntPtr, IntPtr)` without actually knowing. That made it hard to reason about the code and refactor it. 
 - All models are fully ID based and deduplicated. In earlier versions, in a method `fn f(Foo(Bar(u32)), Bar(u32)) {}`, the type `Bar` would be represented twice, despite it being the same item. This made it nearly impossible for anyone to modify or even analyze API definitions programmatically. 
 - Backends emit code via templates now instead of hard-coded string fragments. This is another massive QOL improvement for maintenance and readability. 
 - Many codegen constructs have seen a long-needed refresh and UX improvements. The new `#[ffi]` attribute is easier to use, patterns feel fresh and modern and are much more composable, and the generated code has been decrufted.
