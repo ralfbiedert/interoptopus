@@ -45,26 +45,26 @@ impl Pass {
                 .iter()
                 .map(|f| {
                     let mut m = HashMap::new();
-                    m.insert("name", Value::String(f.name.clone()));
+                    m.insert("name", Value::normal_string(&f.name));
 
                     // Arrays need special `fixed` buffer syntax in unmanaged structs.
                     if let Some(TypeKind::Array(arr)) = types.get(f.ty).map(|t| &t.kind) {
                         let element_name = types.get(arr.ty).map_or("byte", |t| t.name.as_str());
-                        m.insert("is_fixed_array", Value::Bool(true));
-                        m.insert("element_type", Value::String(element_name.to_string()));
+                        m.insert("is_fixed_array", Value::from(true));
+                        m.insert("element_type", Value::normal_string(element_name));
                         m.insert("len", Value::from(arr.len as u64));
                     } else {
                         let ty_name = unmanaged_names
                             .name(f.ty)
                             .cloned()
                             .unwrap_or_else(|| types.get(f.ty).map(|t| t.name.clone()).unwrap_or_default());
-                        m.insert("type", Value::String(ty_name));
+                        m.insert("type", Value::normal_string(&ty_name));
                     }
 
                     let to_managed = managed.to_managed_suffix(f.ty).to_string();
-                    m.insert("to_managed", Value::String(to_managed));
+                    m.insert("to_managed", Value::normal_string(&to_managed));
                     if let Some(custom) = field_conversions.custom_to_managed(*type_id, &f.name) {
-                        m.insert("custom_to_managed", Value::String(custom.to_string()));
+                        m.insert("custom_to_managed", Value::normal_string(custom));
                     }
                     m
                 })

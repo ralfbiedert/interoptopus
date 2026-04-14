@@ -85,7 +85,7 @@ impl Pass {
                     .filter(|v| v.ty.is_some_and(|ty| disposable.is_disposable(ty).unwrap_or(false)))
                     .map(|v| {
                         let mut m = HashMap::new();
-                        m.insert("name", Value::String(format!("_{}", v.name)));
+                        m.insert("name", Value::normal_string(&format!("_{}", v.name)));
                         m.insert("tag", Value::from(v.tag as i64));
                         m
                     })

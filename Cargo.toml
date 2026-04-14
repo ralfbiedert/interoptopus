@@ -52,7 +52,7 @@ serde_json = "1.0.145"
 syn = "2.0.104"
 tar = "0.4.44"
 tempfile = "3"
-tera = "1"
+tera = "2.0.0-alpha.2"
 tokio = "1.48.0"
 trybuild = "1.0.111"
 

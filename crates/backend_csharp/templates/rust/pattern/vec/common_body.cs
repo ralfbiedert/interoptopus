@@ -14,7 +14,7 @@ public partial class {{ name }}
     /// The number of elements in this vector.
     public int Count
     {
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         get { if (_ptr == IntPtr.Zero) { throw new NullReferenceException(); } else { return (int) _len; } }
     }
 
@@ -82,8 +82,8 @@ public partial class {{ name }}
         internal ulong _len;
         internal ulong _capacity;
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
-        {{ _fns_decorators_internal | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
+        {{ _fns_decorators_internal | indent(width = 8) }}
         internal {{ name }} IntoManaged()
         {
             var rval = new {{ name }}();
@@ -99,25 +99,25 @@ public partial class {{ name }}
         private {{ name }} _managed;
         private Unmanaged _unmanaged;
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Marshaller({{ name }} managed) { _managed = managed; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void FromManaged({{ name }} managed) { _managed = managed; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public {{ name }} ToManaged() { return _unmanaged.IntoManaged(); }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void Free() {}
     }
 }

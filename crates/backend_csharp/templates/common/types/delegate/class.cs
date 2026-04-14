@@ -151,8 +151,8 @@ delegate void {{ name }}Destructor(IntPtr data);
         internal IntPtr _data;
         internal IntPtr _destructor;
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
-        {{ _fns_decorators_internal | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
+        {{ _fns_decorators_internal | indent(width = 8) }}
         internal {{ name }} IntoManaged()
         {
             var rval = new {{ name }}();
@@ -169,25 +169,25 @@ delegate void {{ name }}Destructor(IntPtr data);
         private {{ name }} _managed;
         private Unmanaged _unmanaged;
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Marshaller({{ name }} managed) { _managed = managed; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void FromManaged({{ name }} managed) { _managed = managed; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public {{ name }} ToManaged() { return _unmanaged.IntoManaged(); }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void Free() {}
     }
 }

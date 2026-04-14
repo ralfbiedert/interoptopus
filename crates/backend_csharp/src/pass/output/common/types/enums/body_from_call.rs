@@ -53,8 +53,8 @@ impl Pass {
             .iter()
             .map(|e| {
                 let mut m = HashMap::new();
-                m.insert("name", Value::String(e.name().to_string()));
-                m.insert("id", Value::String(format!("0x{:X}UL", e.id())));
+                m.insert("name", Value::normal_string(e.name()));
+                m.insert("id", Value::normal_string(&format!("0x{:X}UL", e.id())));
                 m
             })
             .collect();

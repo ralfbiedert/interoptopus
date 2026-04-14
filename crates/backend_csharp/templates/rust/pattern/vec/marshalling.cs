@@ -29,7 +29,7 @@ public partial class {{ name }} : IDisposable
     /// Gets the element at the given index, marshalling from its unmanaged form.
     public unsafe {{ element_type }} this[int i]
     {
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         get
         {
             if (i >= Count) throw new IndexOutOfRangeException();

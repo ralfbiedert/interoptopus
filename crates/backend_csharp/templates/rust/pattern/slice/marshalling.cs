@@ -20,7 +20,7 @@ public partial class {{ name }} : IDisposable
     /// Gets the element at the given index, marshalling from its unmanaged form.
     public unsafe {{ element_type }} this[int i]
     {
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         get
         {
             if (i >= (int) _len) throw new IndexOutOfRangeException();
@@ -84,8 +84,8 @@ public partial class {{ name }} : IDisposable
         public IntPtr _data;
         public ulong _len;
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
-        {{ _fns_decorators_internal | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
+        {{ _fns_decorators_internal | indent(width = 8) }}
         internal {{ name }} ToManaged()
         {
             var _managed = new {{ name }}();

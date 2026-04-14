@@ -5,11 +5,11 @@ public partial class {{ name }} : IDisposable
     private {{ name }}() {}
 
     {% for ctor in ctors %}
-    {{ ctor | indent(prefix="    ") }}
+    {{ ctor | indent(width = 4) }}
     {% endfor %}
 
     {% for method in methods %}
-    {{ method | indent(prefix="    ") }}
+    {{ method | indent(width = 4) }}
     {% endfor %}
 
     {{ _fns_decorators_all | indent }}

@@ -56,7 +56,7 @@ impl TemplateEngine {
 
         // Inject all globals, see comment above for reasons.
         for (key, value) in &self.globals {
-            ctx.insert(key.as_str(), value);
+            ctx.insert(key.as_str().to_string(), value);
         }
 
         let rendered = self.tera.render(path.as_ref(), &ctx)?;

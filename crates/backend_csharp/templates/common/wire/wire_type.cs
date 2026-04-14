@@ -42,7 +42,7 @@ public partial class {{ wire_name }} : IDisposable
         try
         {
             using var writer = wire.Buffer.Writer();
-            {{ serialize_body | indent(prefix = "            ") }}
+            {{ serialize_body | indent(width = 12) }}
             return wire;
         }
         catch
@@ -57,13 +57,13 @@ public partial class {{ wire_name }} : IDisposable
     public {{ inner_type }} Unwire()
     {
         using var reader = Buffer.Reader();
-        {{ deserialize_body | indent(prefix = "        ") }}
+        {{ deserialize_body | indent(width = 8) }}
     }
 
     {{ _fns_decorators_all | indent }}
     static int CalculateSize({{ inner_type }} value)
     {
-        {{ size_body | indent(prefix = "        ") }}
+        {{ size_body | indent(width = 8) }}
     }
 
     /// Frees the underlying wire buffer.
@@ -97,8 +97,8 @@ public partial class {{ wire_name }} : IDisposable
     {
         public WireBuffer Buffer;
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
-        {{ _fns_decorators_internal | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
+        {{ _fns_decorators_internal | indent(width = 8) }}
         internal {{ wire_name }} IntoManaged()
         {
             return new {{ wire_name }} { Buffer = Buffer };
@@ -110,25 +110,25 @@ public partial class {{ wire_name }} : IDisposable
         private {{ wire_name }} _managed;
         private Unmanaged _unmanaged;
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Marshaller({{ wire_name }} managed) { _managed = managed; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void FromManaged({{ wire_name }} managed) { _managed = managed; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Unmanaged ToUnmanaged() { return _managed.IntoUnmanaged(); }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public {{ wire_name }} ToManaged() { return _unmanaged.IntoManaged(); }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void Free() {}
     }
 }

@@ -24,7 +24,7 @@ internal unsafe struct Unmanaged
 {%- endif %}
         {%- for field in fields %}
         {%- if field.custom_to_managed %}
-        {{ field.custom_to_managed | indent(prefix = "        ") }}
+        {{ field.custom_to_managed | indent(width = 8) }}
         {%- else %}
         _managed.{{ field.name }} = {{ field.name }}{{ field.to_managed }};
         {%- endif %}

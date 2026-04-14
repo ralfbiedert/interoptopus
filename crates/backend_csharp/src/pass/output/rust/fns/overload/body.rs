@@ -162,7 +162,7 @@ fn resolve_args(
 
     for (arg, transform) in args.iter().zip(transforms) {
         let mut m = HashMap::new();
-        m.insert("name", Value::String(arg.name.clone()));
+        m.insert("name", Value::normal_string(&arg.name));
 
         match transform {
             ArgTransform::PassThrough => {
@@ -173,9 +173,9 @@ fn resolve_args(
                     Some(d) => format!("{d} {}", arg_type.name),
                     None => arg_type.name.clone(),
                 };
-                m.insert("ty", Value::String(decorated));
-                m.insert("is_ref", Value::String("false".into()));
-                m.insert("is_wrap", Value::String("false".into()));
+                m.insert("ty", Value::normal_string(&decorated));
+                m.insert("is_ref", Value::normal_string("false"));
+                m.insert("is_wrap", Value::normal_string("false"));
             }
             ArgTransform::Ref => {
                 let Some(OverloadFamily::Pointer(family)) = type_overloads.get(arg.ty) else {
@@ -188,9 +188,9 @@ fn resolve_args(
                     Some(d) => format!("{d} {}", arg_type.name),
                     None => arg_type.name.clone(),
                 };
-                m.insert("ty", Value::String(decorated));
-                m.insert("is_ref", Value::String("true".into()));
-                m.insert("is_wrap", Value::String("false".into()));
+                m.insert("ty", Value::normal_string(&decorated));
+                m.insert("is_ref", Value::normal_string("true"));
+                m.insert("is_wrap", Value::normal_string("false"));
             }
             ArgTransform::WrapDelegate => {
                 let Some(OverloadFamily::Delegate(family)) = type_overloads.get(arg.ty) else {
@@ -204,10 +204,10 @@ fn resolve_args(
                     .get(family.class)
                     .map(|t| &t.name)
                     .ok_or_else(|| crate::Error::from(format!("delegate class for arg `{}` of overload `{}`", arg.name, fn_name)))?;
-                m.insert("ty", Value::String(sig_name.clone()));
-                m.insert("is_ref", Value::String("false".into()));
-                m.insert("is_wrap", Value::String("true".into()));
-                m.insert("wrapper_type", Value::String(class_name.clone()));
+                m.insert("ty", Value::normal_string(sig_name));
+                m.insert("is_ref", Value::normal_string("false"));
+                m.insert("is_wrap", Value::normal_string("true"));
+                m.insert("wrapper_type", Value::normal_string(class_name));
                 has_wraps = true;
             }
             ArgTransform::Service => {
@@ -215,20 +215,20 @@ fn resolve_args(
                 let service_ty = types
                     .get(arg.ty)
                     .ok_or_else(|| crate::Error::from(format!("service type for arg `{}` of overload `{}`", arg.name, fn_name)))?;
-                m.insert("ty", Value::String(service_ty.name.clone()));
-                m.insert("is_ref", Value::String("false".into()));
-                m.insert("is_wrap", Value::String("false".into()));
+                m.insert("ty", Value::normal_string(&service_ty.name));
+                m.insert("is_ref", Value::normal_string("false"));
+                m.insert("is_wrap", Value::normal_string("false"));
             }
             ArgTransform::CancellationToken => {
-                m.insert("ty", Value::String("CancellationToken".into()));
-                m.insert("is_ref", Value::String("false".into()));
-                m.insert("is_wrap", Value::String("false".into()));
-                m.insert("has_default", Value::String("true".into()));
-                m.insert("default_value", Value::String("default".into()));
+                m.insert("ty", Value::normal_string("CancellationToken"));
+                m.insert("is_ref", Value::normal_string("false"));
+                m.insert("is_wrap", Value::normal_string("false"));
+                m.insert("has_default", Value::normal_string("true"));
+                m.insert("default_value", Value::normal_string("default"));
             }
         }
         // Ensure has_default is always present for template access
-        m.entry("has_default").or_insert_with(|| Value::String("false".into()));
+        m.entry("has_default").or_insert_with(|| Value::normal_string("false"));
         out.push(m);
     }
 
@@ -247,7 +247,7 @@ fn build_native_args(args: &[Argument], transforms: &[ArgTransform]) -> Vec<Hash
                 ArgTransform::CancellationToken => unreachable!("CancellationToken has no native counterpart"),
             };
             let mut m = HashMap::new();
-            m.insert("name", Value::String(forwarded));
+            m.insert("name", Value::normal_string(&forwarded));
             m
         })
         .collect()

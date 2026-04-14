@@ -154,10 +154,10 @@ fn build_args(args: &[crate::lang::functions::Argument], types: &model::common::
             };
             let mut m = make_arg(&arg.name, &decorated, is_ref);
             if arg.ty == crate::lang::types::csharp::CANCELLATION_TOKEN {
-                m.insert("has_default", Value::String("true".into()));
-                m.insert("default_value", Value::String("default".into()));
+                m.insert("has_default", Value::normal_string("true"));
+                m.insert("default_value", Value::normal_string("default"));
             } else {
-                m.insert("has_default", Value::String("false".into()));
+                m.insert("has_default", Value::normal_string("false"));
             }
             Some(m)
         })
@@ -166,9 +166,9 @@ fn build_args(args: &[crate::lang::functions::Argument], types: &model::common::
 
 fn make_arg(name: &str, ty: &str, is_ref: bool) -> HashMap<&'static str, Value> {
     let mut m = HashMap::new();
-    m.insert("name", Value::String(name.to_string()));
-    m.insert("ty", Value::String(ty.to_string()));
-    m.insert("is_ref", Value::Bool(is_ref));
+    m.insert("name", Value::normal_string(name));
+    m.insert("ty", Value::normal_string(ty));
+    m.insert("is_ref", Value::from(is_ref));
     m
 }
 

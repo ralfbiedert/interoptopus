@@ -120,8 +120,8 @@ public partial class Utf8String : IDisposable
         public ulong _len;
         public ulong _capacity;
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
-        {{ _fns_decorators_internal | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
+        {{ _fns_decorators_internal | indent(width = 8) }}
         internal Utf8String IntoManaged()
         {
             var _managed = new Utf8String();
@@ -136,17 +136,17 @@ public partial class Utf8String : IDisposable
     internal partial class InteropHelper
     {
         [LibraryImport(Interop.NativeLib, EntryPoint = "{{ create_entry_point }}")]
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
 
         public static partial long interoptopus_string_create(IntPtr utf8, ulong len, out Unmanaged rval);
 
         [LibraryImport(Interop.NativeLib, EntryPoint = "{{ destroy_entry_point }}")]
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
 
         public static partial long interoptopus_string_destroy(Unmanaged utf8);
 
         [LibraryImport(Interop.NativeLib, EntryPoint = "{{ clone_entry_point }}")]
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
 
         public static partial long interoptopus_string_clone(ref Unmanaged orig, ref Unmanaged cloned);
     }
@@ -159,29 +159,29 @@ public partial class Utf8String : IDisposable
         private Utf8String _managed; // Used when converting managed -> unmanaged
         private Unmanaged _unmanaged; // Used when converting unmanaged -> managed
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Marshaller(Utf8String managed) { _managed = managed; }
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void FromManaged(Utf8String managed) { _managed = managed; }
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public unsafe Unmanaged ToUnmanaged()
         {
             return _managed.IntoUnmanaged();
         }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public unsafe Utf8String ToManaged()
         {
             return _unmanaged.IntoManaged();
         }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void Free() { }
     }
 }

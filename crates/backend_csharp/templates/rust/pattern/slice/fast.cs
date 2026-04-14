@@ -24,21 +24,21 @@ public partial class {{ name }} : IEnumerable<{{ element_type }}>, IDisposable
     /// Returns a <see cref="ReadOnlySpan{T}"/> over the underlying data without copying.
     public unsafe ReadOnlySpan<{{ element_type }}> ReadOnlySpan
     {
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         get => new(_data.ToPointer(), (int)_len);
     }
 
     /// Gets {% if is_mut %}or sets {% endif %}the element at the given index.
     public unsafe {{ element_type }} this[int i]
     {
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         get
         {
             if (i >= Count) throw new IndexOutOfRangeException();
             return Unsafe.Read<{{ element_type }}>((void*)IntPtr.Add(_data, i * Unsafe.SizeOf<{{ element_type }}>()));
         }
 {% if is_mut %}
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         set
         {
             if (i >= Count) throw new IndexOutOfRangeException();
@@ -107,8 +107,8 @@ public partial class {{ name }} : IEnumerable<{{ element_type }}>, IDisposable
         public IntPtr _data;
         public ulong _len;
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
-        {{ _fns_decorators_internal | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
+        {{ _fns_decorators_internal | indent(width = 8) }}
         internal {{ name }} ToManaged()
         {
             return {{ name }}.From(_data, _len);

@@ -54,7 +54,7 @@ impl Pass {
                     .filter(|f| disposable.is_disposable(f.ty).unwrap_or(false))
                     .map(|f| {
                         let mut m = HashMap::new();
-                        m.insert("name", Value::String(f.name.clone()));
+                        m.insert("name", Value::normal_string(&f.name));
                         m
                     })
                     .collect()

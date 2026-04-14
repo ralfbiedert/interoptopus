@@ -5,8 +5,8 @@ public partial class {{ name }} : IDisposable
     {
         internal IntPtr _handle;
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
-        {{ _fns_decorators_internal | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
+        {{ _fns_decorators_internal | indent(width = 8) }}
         internal {{ name }} IntoManaged()
         {
             var h = GCHandle.FromIntPtr(_handle);
@@ -15,8 +15,8 @@ public partial class {{ name }} : IDisposable
             return obj;
         }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
-        {{ _fns_decorators_internal | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
+        {{ _fns_decorators_internal | indent(width = 8) }}
         internal {{ name }} AsManaged()
         {
             return ({{ name }})GCHandle.FromIntPtr(_handle).Target!;

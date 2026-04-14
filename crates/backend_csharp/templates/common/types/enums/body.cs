@@ -38,25 +38,25 @@
         private {{ name }} _managed;
         private Unmanaged _unmanaged;
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Marshaller({{ name }} managed) { _managed = managed; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Marshaller(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void FromManaged({{ name }} managed) { _managed = managed; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void FromUnmanaged(Unmanaged unmanaged) { _unmanaged = unmanaged; }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public Unmanaged ToUnmanaged() { return _managed.{{ marshaller_to_unmanaged }}(); }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public {{ name }} ToManaged() { return _unmanaged.{{ marshaller_to_managed }}(); }
 
-        {{ _fns_decorators_all | indent(prefix="        ") }}
+        {{ _fns_decorators_all | indent(width = 8) }}
         public void Free() {}
     }
 
