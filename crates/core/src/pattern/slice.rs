@@ -177,7 +177,7 @@ impl<T> Default for SliceMut<'_, T> {
 impl<'a, T> SliceMut<'a, T> {
     /// Create new Self from a normal slice.
     pub fn from_slice(slice: &'a mut [T]) -> Self {
-        SliceMut { data: slice.as_mut_ptr(), len: slice.len() as u64, _phantom: PhantomData::default() }
+        SliceMut { data: slice.as_mut_ptr(), len: slice.len() as u64, _phantom: PhantomData }
     }
 
     /// Returns a safe, mutable Rust slice.

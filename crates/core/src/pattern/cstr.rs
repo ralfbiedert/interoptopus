@@ -56,14 +56,14 @@ unsafe impl Sync for CStrPtr<'_> {}
 
 impl Default for CStrPtr<'_> {
     fn default() -> Self {
-        Self { ptr: null(), _phantom: PhantomData::default() }
+        Self { ptr: null(), _phantom: PhantomData }
     }
 }
 
 impl<'a> CStrPtr<'a> {
     #[must_use]
     pub fn empty() -> Self {
-        Self { ptr: EMPTY.as_ptr().cast(), _phantom: PhantomData::default() }
+        Self { ptr: EMPTY.as_ptr().cast(), _phantom: PhantomData }
     }
 
     /// Create a `CStrPointer` from a `&[u8]` slice reference.
@@ -87,13 +87,13 @@ impl<'a> CStrPtr<'a> {
         //     return Err(Error::Ascii);
         // }
 
-        Ok(Self { ptr: cstr_with_nul.as_ptr().cast(), _phantom: PhantomData::default() })
+        Ok(Self { ptr: cstr_with_nul.as_ptr().cast(), _phantom: PhantomData })
     }
 
     /// Create a pointer from a `CStr`.
     #[must_use]
     pub fn from_cstr(cstr: &'a CStr) -> Self {
-        Self { ptr: cstr.as_ptr(), _phantom: PhantomData::default() }
+        Self { ptr: cstr.as_ptr(), _phantom: PhantomData }
     }
 
     /// Create a [`CStr`] for the pointer.
