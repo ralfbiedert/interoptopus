@@ -40,6 +40,7 @@ fn fn_entries_value(entries: &[FnEntry<'_>]) -> Value {
             let mut m = tera::Map::new();
             m.insert("name".into(), Value::String(e.func.name.clone()));
             m.insert("symbol".into(), Value::String(e.func.symbol.clone()));
+            m.insert("field_name".into(), Value::String(e.func.field_name.clone()));
             m.insert("rval".into(), Value::String(e.func.rval.clone()));
             m.insert("param_types".into(), Value::String(e.func.param_types.clone()));
             m.insert("params".into(), Value::String(e.func.params.clone()));

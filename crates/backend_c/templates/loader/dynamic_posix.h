@@ -12,7 +12,7 @@ static int {{ load_fn }}(const char* path, {{ api_name }}* api)
 {%- endif %}
     sym = dlsym(lib, "{{ fn.symbol }}");
     if (!sym) return -1;
-    memcpy(&api->{{ fn.name }}, &sym, sizeof(sym));
+    memcpy(&api->{{ fn.field_name }}, &sym, sizeof(sym));
 {%- endfor %}
     return 0;
 }

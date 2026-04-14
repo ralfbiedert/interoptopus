@@ -288,6 +288,7 @@ fn build_functions(inv: &RustInventory, naming: &NamingConfig) -> Vec<CFunction>
         .map(|f| CFunction {
             name: c_function_name(&f.name, naming),
             symbol: f.name.clone(),
+            field_name: apply_naming_style(&f.name, naming.function_naming),
             rval: type_spec(inv, &f.signature.rval, naming),
             params: param_list(inv, f, naming),
             param_types: param_types(inv, f, naming),

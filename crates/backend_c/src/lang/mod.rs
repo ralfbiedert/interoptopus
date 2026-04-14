@@ -219,6 +219,9 @@ pub struct CFunction {
     pub name: String,
     /// The original symbol name exported by the Rust cdylib (used in `dlsym`/`GetProcAddress`).
     pub symbol: String,
+    /// Styled but unprefixed name — used as the field name inside the API dispatch struct,
+    /// where the struct scope already provides namespacing.
+    pub field_name: String,
     pub rval: String,
     pub params: String,
     pub param_types: String,
