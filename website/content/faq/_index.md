@@ -7,7 +7,7 @@ weight = 400
 
 #### Where can I ask questions?
 
-Use [Github Discussions](https://github.com/ralfbiedert/interoptopus/discussions).
+Use [GitHub Discussions](https://github.com/ralfbiedert/interoptopus/discussions).
 
 
 #### How do you pronounce it?
@@ -16,6 +16,33 @@ Inter‧op‧topus, just as one word.
 
 Once we support eight backend languages, we might rename it to Interoctopus.
 
+## Technical 
+
+#### What is a {service, plugin, extension}?
+
+In Interoptopus these are three unrelated concepts each with a well-defined meaning.
+
+**Services** are constructs you can define in Rust and expose over an FFI boundary. Each service consists of an (opaque) type and a number of methods operating on that type:
+
+```rust
+#[ffi(service)]
+pub struct ServiceBasic {}
+
+#[ffi]
+impl ServiceBasic {
+    pub fn create() -> ffi::Result<Self, Error> {
+        ffi::Ok(Self {})
+    }
+}
+```
+
+They need explicitly defined constructors, and come with destructors under the hood. As such they have a well-defined lifecycle. In practical terms a Rust service becomes a C# class and methods, whereas a plugin-based service becomes a droppable Rust struct with methods. The term 'service' was chosen (over instance or similar) because services have restrictions where and how they can be used and composed. For example, services can't be put in fields.
+
+
+**Plugins** are a way to extend a Rust application through 'reverse interop'. Based on the `plugin!` macro, they allow you to define APIs that can be fulfilled by other languages, e.g., C#.
+
+
+**Extensions** are a feature of some codegen backends like `backend_csharp`. In essence, you can register extensions with a pipeline, and these extensions will then be able to modify or inspect the emitted code through APIs. 
 
 
 ## Performance
@@ -45,7 +72,7 @@ Here, when a `.NET` callback completes and needs to resume a Tokio task, it call
 </div>
 
 With other tasks already running, the waker hands off
-directly to an active thread and the overhead drops a dramatic 8x despite 64x more work in flight:
+directly to an active thread and the overhead drops by a dramatic 8x despite 64x more work in flight:
 
 <div style="font-family: system-ui, sans-serif; font-size: 14px; max-width: 600px;">
     <div>
@@ -57,7 +84,7 @@ directly to an active thread and the overhead drops a dramatic 8x despite 64x mo
   </div>
 </div>
 
-Part of that wakeup can be CPU cost, part of it is just waiting for a time slice. In practice, workloads with many concurrent async calls will not pay the elevated wake up cost;
+Part of that wakeup can be CPU cost; part of it is just waiting for a time slice. In practice, workloads with many concurrent async calls will not pay the elevated wake-up cost;
 and applications with few tasks in flight doing actual `async` work will benefit from sleeping threads.
 
 
