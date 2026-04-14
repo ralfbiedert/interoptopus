@@ -67,7 +67,7 @@ impl WireCodeGen<'_> {
     #[must_use]
     pub fn deserialize_struct_body(&self, s: &Struct, type_name: &str) -> String {
         let mut lines = Vec::new();
-        lines.push(format!("var result = new {type_name}();"));
+        lines.push(format!("var result = ({type_name})System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof({type_name}));"));
         for f in &s.fields {
             let target = format!("result.{}", f.name);
             self.emit_deserialize(&mut lines, f.ty, &target, 0, 0);
@@ -229,7 +229,7 @@ impl WireCodeGen<'_> {
             }
             RsTypeKind::Struct(s) => {
                 let struct_name = self.cs_type_name(ty_id);
-                lines.push(format!("{p}{target} = new {struct_name}();"));
+                lines.push(format!("{p}{target} = ({struct_name})System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof({struct_name}));"));
                 for f in &s.fields {
                     self.emit_deserialize(lines, f.ty, &format!("{target}.{}", f.name), depth, indent);
                 }

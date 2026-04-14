@@ -12,9 +12,13 @@ public class TestPatternServicesCallbacksTable
         _table = new CallbackTable
         {
             my_callback = new MyCallback(value => 1),
+            my_callback_namespaced = new MyCallbackNamespaced(_ => 0),
+            my_callback_void = new MyCallbackVoid(ptr => { }),
+            my_callback_contextual = new MyCallbackContextual((context, value) => { }),
             sum_delegate_1 = new SumDelegate1(() => { }),
             sum_delegate_2 = new SumDelegate2((x, y) => x + y),
-            sum_delegate_return = new SumDelegateReturn((i, i1) => ResultVoidError.Ok)
+            sum_delegate_return = new SumDelegateReturn((i, i1) => ResultVoidError.Ok),
+            sum_delegate_return_2 = new SumDelegateReturn2((i, i1) => { })
         };
         service.SetDelegateTable(_table);
     }

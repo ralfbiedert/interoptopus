@@ -11,13 +11,16 @@ public class TestPatternServicesAsyncStructs
         using var s = ServiceAsyncStructs.Create();
         var a = new NestedArray
         {
+            field_enum = EnumRenamed.X,
+            field_vec = new Vec3f32 { x = 0, y = 0, z = 0 },
+            field_bool = false,
+            field_int = 123,
             field_array = new ushort[5],
             field_array_2 = new ushort[5],
             field_struct = new Array
             {
                 data = new byte[16]
-            },
-            field_int = 123
+            }
         };
         var r = await s.ProcessStruct(a);
         Assert.Equal(r.field_int, 124);

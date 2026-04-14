@@ -440,7 +440,7 @@ impl RustLibrary {
         o.enums.process(&mut pass_meta, &self.output_master, &m.type_all, &o.enum_ty, &o.enum_body)?;
         o.conversion_fields.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.composite_ty.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable)?;
-        o.composite_body_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.unmanaged_names, &o.conversion_fields)?;
+        o.composite_body_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &o.unmanaged_conversion, &o.unmanaged_names, &o.conversion_fields)?;
         o.composite_body_to_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields, &m.type_nullable)?;
         o.composite_body_as_unmanaged.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_conversion, &o.conversion_fields, &m.type_nullable)?;
         o.composite_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.unmanaged_conversion, &o.composite_body_unmanaged, &o.composite_body_to_unmanaged, &o.composite_body_as_unmanaged)?;

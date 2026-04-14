@@ -9,7 +9,7 @@ public class TestEnums
     public void enum1()
     {
         Interop.enums_1(EnumPayload.A);
-        Interop.enums_1(EnumPayload.B(new Vec3f32()));
+        Interop.enums_1(EnumPayload.B(new Vec3f32 { x = 0, y = 0, z = 0 }));
         Interop.enums_1(EnumPayload.C(123));
     }
 
@@ -90,7 +90,7 @@ public class TestEnums
                 a.Clone(),
                 b.Clone()
             }.IntoVec(),
-            vec = new Vec3f32(),
+            vec = new Vec3f32 { x = 0, y = 0, z = 0 },
             the_enum = EnumPayload.A
         };
         using var l3 = Layer3String.B(l2);

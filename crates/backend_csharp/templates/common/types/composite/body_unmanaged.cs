@@ -17,7 +17,11 @@ internal unsafe struct Unmanaged
     {{ _fns_decorators_internal | indent }}
     internal {{ name }} {{ to_managed_method }}()
     {
-        var _managed = new {{ name }}();
+{%- if is_struct %}
+        var _managed = default({{ name }});
+{%- else %}
+        var _managed = ({{ name }})System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(typeof({{ name }}));
+{%- endif %}
         {%- for field in fields %}
         {%- if field.custom_to_managed %}
         {{ field.custom_to_managed | indent(prefix = "        ") }}

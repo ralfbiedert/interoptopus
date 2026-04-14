@@ -61,7 +61,7 @@ impl Pass {
                 .iter()
                 .map(|f| {
                     let field_type_name = resolve_field_type_name(f.ty, types, id_map, &codegen);
-                    format!("public {field_type_name} {};", f.name)
+                    format!("public required {field_type_name} {};", f.name)
                 })
                 .collect();
 

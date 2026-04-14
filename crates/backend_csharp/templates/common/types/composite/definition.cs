@@ -10,6 +10,6 @@
     {%- if field.docs %}
     {{ field.docs | indent }}
     {%- endif %}
-    public {{ field.managed_name }} {{ field.name }};
+    public required {{ field.managed_name }} {{ field.name }};
     {%- endfor %}
 }

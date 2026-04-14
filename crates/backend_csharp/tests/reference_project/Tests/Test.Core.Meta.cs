@@ -50,7 +50,7 @@ public class TestMeta
     [Fact]
     public void meta_documented()
     {
-        var s = new StructDocumented();
+        var s = new StructDocumented { x = 0 };
         var result = Interop.meta_documented(s);
         Assert.Equal(EnumDocumented.A, result);
     }

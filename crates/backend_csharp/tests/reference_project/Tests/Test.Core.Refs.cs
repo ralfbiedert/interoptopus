@@ -42,7 +42,7 @@ public class TestRefs
     [Fact]
     public void ref5()
     {
-        var v = new Vec3f32();
+        var v = new Vec3f32 { x = 0, y = 0, z = 0 };
         var x = EnumPayload.B(v);
 
         Interop.ref5(ref x);

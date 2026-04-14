@@ -78,7 +78,10 @@ impl Pass {
                     let fields: Vec<String> = if inner_is_composite {
                         vec![]
                     } else {
-                        s.fields.iter().map(|f| format!("public {} {};", codegen.cs_type_name(f.ty), f.name)).collect()
+                        s.fields
+                            .iter()
+                            .map(|f| format!("public required {} {};", codegen.cs_type_name(f.ty), f.name))
+                            .collect()
                     };
                     (true, fields, codegen.serialize_struct_body(s, "value"), codegen.deserialize_struct_body(s, &inner_name), codegen.size_struct_body(s, "value"))
                 } else {

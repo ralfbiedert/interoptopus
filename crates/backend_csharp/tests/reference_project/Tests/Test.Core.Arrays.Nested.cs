@@ -56,7 +56,12 @@ public class TestArrayNested
         {
             Interop.nested_array_3(new NestedArray
             {
+                field_enum = EnumRenamed.X,
+                field_vec = new Vec3f32 { x = 0, y = 0, z = 0 },
+                field_bool = false,
+                field_int = 0,
                 field_array = [1, 2, 3],
+                field_array_2 = [0, 0, 0, 0, 0],
                 field_struct = new Array
                 {
                     data = Enumerable.Range(1, 16).Select(i => (byte)i).ToArray()
@@ -69,6 +74,10 @@ public class TestArrayNested
     {
         return new NestedArray
         {
+            field_enum = EnumRenamed.X,
+            field_vec = new Vec3f32 { x = 0, y = 0, z = 0 },
+            field_bool = false,
+            field_int = 0,
             field_array = [1, 2, 3, 4, 5],
             field_array_2 = [1, 2, 3, 4, 5],
             field_struct = new Array

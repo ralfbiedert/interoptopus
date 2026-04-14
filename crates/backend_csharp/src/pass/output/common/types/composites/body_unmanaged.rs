@@ -28,6 +28,7 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         types: &model::common::types::all::Pass,
+        struct_class: &model::common::types::info::struct_class::Pass,
         managed: &output::common::conversion::unmanaged_conversion::Pass,
         unmanaged_names: &output::common::conversion::unmanaged_names::Pass,
         field_conversions: &output::common::conversion::fields::Pass,
@@ -72,12 +73,14 @@ impl Pass {
             let to_managed_method = managed.to_managed_name(*type_id);
 
             let is_packed = composite.repr.layout == Layout::Packed;
+            let is_struct = struct_class.is_struct(*type_id);
 
             let mut context = Context::new();
             context.insert("name", name);
             context.insert("to_managed_method", to_managed_method);
             context.insert("fields", &fields);
             context.insert("is_packed", &is_packed);
+            context.insert("is_struct", &is_struct);
 
             let rendered = templates.render("common/types/composite/body_unmanaged.cs", &context)?;
             self.composite_body_unmanaged.insert(*type_id, rendered);
