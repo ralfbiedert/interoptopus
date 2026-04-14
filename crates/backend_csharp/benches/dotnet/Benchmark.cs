@@ -22,7 +22,7 @@ static class Benchmark {
         var short_byte = SliceByte.From(new byte[10]);
         var short_byte_mut = SliceMutByte.From(new byte[10]);
         var long_vec = SliceVec3f32.From(new Vec3f32[100_000]);
-        var tupled = new Tupled();
+        var tupled = new Tupled { field_0 = 0 };
         var callback_huge_prealloc = new CallbackHugeVecSlice(x => x[0]);
         var serviceAsync = ServiceAsyncBasic.Create();
         var hello_world = "hello world".Utf8();

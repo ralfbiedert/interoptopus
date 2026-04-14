@@ -7,7 +7,7 @@ public static {{ name }} FromCall(Func<{{ ok_type }}> func)
 {%- for ex in exceptions %}
     catch ({{ ex.name }}) { return Err(new {{ err_type }} { exception_id = {{ ex.id }} }); }
 {%- endfor %}
-    catch (Exception) { return Err(new {{ err_type }}()); }
+    catch (Exception) { return Err(new {{ err_type }} { exception_id = 0 }); }
 {%- else %}
     catch (Exception) { return Panic; }
 {%- endif %}
@@ -20,7 +20,7 @@ public static async Task<{{ name }}> FromCallAsync(Func<Task<{{ ok_type }}>> fun
 {%- for ex in exceptions %}
     catch ({{ ex.name }}) { return Err(new {{ err_type }} { exception_id = {{ ex.id }} }); }
 {%- endfor %}
-    catch (Exception) { return Err(new {{ err_type }}()); }
+    catch (Exception) { return Err(new {{ err_type }} { exception_id = 0 }); }
 {%- else %}
     catch (Exception) { return Panic; }
 {%- endif %}
@@ -33,7 +33,7 @@ public static {{ name }} FromCall(Action action)
 {%- for ex in exceptions %}
     catch ({{ ex.name }}) { return Err(new {{ err_type }} { exception_id = {{ ex.id }} }); }
 {%- endfor %}
-    catch (Exception) { return Err(new {{ err_type }}()); }
+    catch (Exception) { return Err(new {{ err_type }} { exception_id = 0 }); }
 {%- else %}
     catch (Exception) { return Panic; }
 {%- endif %}
@@ -46,7 +46,7 @@ public static async Task<{{ name }}> FromCallAsync(Func<Task> func)
 {%- for ex in exceptions %}
     catch ({{ ex.name }}) { return Err(new {{ err_type }} { exception_id = {{ ex.id }} }); }
 {%- endfor %}
-    catch (Exception) { return Err(new {{ err_type }}()); }
+    catch (Exception) { return Err(new {{ err_type }} { exception_id = 0 }); }
 {%- else %}
     catch (Exception) { return Panic; }
 {%- endif %}
