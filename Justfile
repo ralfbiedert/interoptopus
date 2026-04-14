@@ -5,7 +5,7 @@ alias doc := docs
 
 # Runs all tests CI would perform before merging a PR.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
-ci verbose="": (build verbose) (test verbose) test-dotnet lint
+ci verbose="": (build verbose) (test verbose) test-dotnet test-c lint
 
 # Builds the workspace with all features.
 [arg("verbose", long="verbose", short="v", value="--verbose")]
@@ -37,6 +37,21 @@ test-dotnet:
     cargo build -p reference_project  --all-features
     cargo test --test mod reference_project::interop  --all-features
     dotnet test crates/backend_csharp/tests/reference_project/Tests/Tests.csproj
+    # hello_world example
+    cargo build -p hello_world
+    cargo test -p hello_world -- generate_csharp_bindings
+    dotnet test examples/hello_world/bindings_csharp/hello_world.csproj
+
+# Runs C/C++ tests (gtest).
+test-c: (_test_c "hello_world" "examples/hello_world/bindings_c") (_test_c "reference_project_c" "crates/backend_c/tests/reference_project")
+
+# Helper: cmake configure + build + ctest. The --config / -C Debug flags are
+# needed for multi-config generators (MSVC) and are harmless on single-config ones.
+_test_c rust_crate dir:
+    cargo build -p {{ rust_crate }}
+    cmake -S {{ dir }} -B {{ dir }}/build -DCMAKE_BUILD_TYPE=Debug -DRUST_LIB_DIR={{`pwd`}}/target/debug
+    cmake --build {{ dir }}/build --config Debug
+    ctest --test-dir {{ dir }}/build --output-on-failure -C Debug
 
 # Runs .NET benchmarks.
 bench-dotnet:
@@ -44,6 +59,14 @@ bench-dotnet:
     cargo build -p reference_project --release  --all-features
     cargo test --test mod reference_project::interop  --all-features
     dotnet run -c Release --project crates/backend_csharp/benches/dotnet/dotnet_benchmarks.csproj
+
+# Runs C/C++ benchmarks (Google Benchmark).
+bench-c:
+    cargo build -p reference_project_c --release
+    cargo test -p interoptopus_c --test mod reference_project::interop
+    cmake -S crates/backend_c/benches -B crates/backend_c/benches/build -DCMAKE_BUILD_TYPE=Release -DRUST_LIB_DIR={{`pwd`}}/target/release
+    cmake --build crates/backend_c/benches/build --config Release
+    ctest --test-dir crates/backend_c/benches/build -V -C Release
 
 # Run linters, check tidiness.
 lint:

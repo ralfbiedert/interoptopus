@@ -9,6 +9,7 @@ members = [
     "crates/proc_macros_impl",
     "crates/reference_project",
     "examples/hello_world",
+    "crates/backend_c/reference_project",
     "examples/production_project/*",
 ]
 

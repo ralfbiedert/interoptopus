@@ -11,6 +11,15 @@ homepage.workspace = true
 
 [dependencies]
 interoptopus.workspace = true
+interoptopus_backends.workspace = true
+tera.workspace = true
+
+[build-dependencies]
+interoptopus_backends.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+reference_project_c = { path = "reference_project" }
 
 [lints]
 workspace = true
