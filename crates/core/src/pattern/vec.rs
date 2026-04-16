@@ -52,6 +52,7 @@ unsafe impl<T> Sync for Vec<T> where T: Sync {}
 
 impl<T> Vec<T> {
     #[must_use]
+    #[allow(clippy::mem_forget)]
     pub fn from_vec(mut s: std::vec::Vec<T>) -> Self {
         let ptr = s.as_mut_ptr();
         let capacity = s.capacity() as u64;
@@ -73,6 +74,7 @@ impl<T> Vec<T> {
 
     #[must_use]
     #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::mem_forget)]
     pub fn into_vec(self) -> std::vec::Vec<T> {
         let rval = unsafe { std::vec::Vec::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize) };
         forget(self);

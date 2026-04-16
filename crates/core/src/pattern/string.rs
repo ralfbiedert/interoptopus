@@ -45,6 +45,7 @@ unsafe impl Sync for String {}
 
 impl String {
     #[must_use]
+    #[allow(clippy::mem_forget)]
     pub fn from_string(mut s: std::string::String) -> Self {
         let ptr = s.as_mut_ptr();
         let capacity = s.capacity() as u64;
@@ -65,6 +66,7 @@ impl String {
 
     #[must_use]
     #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::mem_forget)]
     pub fn into_string(self) -> std::string::String {
         let rval = unsafe { std::string::String::from_raw_parts(self.ptr, self.len as usize, self.capacity as usize) };
         forget(self);

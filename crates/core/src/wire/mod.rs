@@ -361,11 +361,13 @@ macro_rules! __wire_destroy_body {
 macro_rules! builtins_wire {
     () => {{
         #[$crate::ffi(export = unique)]
+        #[allow(clippy::mem_forget)]
         pub fn interoptopus_wire_create(size: i32, out_len: &mut i32, out_capacity: &mut i32) -> *mut u8 {
             $crate::__wire_create_body!(size, out_len, out_capacity)
         }
 
         #[$crate::ffi(export = unique)]
+        #[allow(clippy::mem_forget)]
         pub fn interoptopus_wire_destroy(data: *mut u8, len: i32, capacity: i32) {
             $crate::__wire_destroy_body!(data, len, capacity)
         }

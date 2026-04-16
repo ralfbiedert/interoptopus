@@ -65,6 +65,25 @@ style = { level = "deny", priority = -1 }
 pedantic = { level = "deny", priority = -1 }
 nursery = { level = "deny", priority = -1 }     # We might want to disable this if it causes issues.
 
+# Pragmatic Rust Guidelines
+as_pointer_underscore = "deny"
+assertions_on_result_states = "deny"
+clone_on_ref_ptr = "deny"
+deref_by_slicing = "deny"
+disallowed_script_idents = "deny"
+empty_drop = "deny"
+empty_enum_variants_with_brackets = "deny"
+fn_to_numeric_cast_any = "deny"
+map_err_ignore = "deny"
+redundant_type_annotations = "deny"
+implicit_clone = "deny"
+unnecessary_safety_comment = "deny"
+unnecessary_safety_doc = "deny"
+unneeded_field_pattern = "deny"
+unused_result_ok = "deny"
+mem_forget = "deny"
+
+# Things we allow
 option_if_let_else = "allow"               # trips up on `darling`
 match_same_arms = "allow"                  # too many
 missing_const_for_fn = "allow"
@@ -72,3 +91,4 @@ missing_errors_doc = "allow"
 missing_panics_doc = "allow"
 default_constructed_unit_structs = "allow"
 unreadable_literal = "allow" # For the hex IDs
+

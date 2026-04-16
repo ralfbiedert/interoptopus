@@ -548,6 +548,7 @@ impl<T: TypeInfo + CancelValue> AsyncCallbackGuard<T> {
 }
 
 impl<T: TypeInfo + CancelValue> Drop for AsyncCallbackGuard<T> {
+    #[allow(clippy::mem_forget)]
     fn drop(&mut self) {
         if !self.completed.swap(true, Ordering::AcqRel) {
             let v = T::cancel_value();
@@ -557,6 +558,8 @@ impl<T: TypeInfo + CancelValue> Drop for AsyncCallbackGuard<T> {
             unsafe {
                 self.callback.call(&raw const v);
             }
+
+            // The other side took a copy of value (so we effectively lost it)
             std::mem::forget(v);
         }
     }

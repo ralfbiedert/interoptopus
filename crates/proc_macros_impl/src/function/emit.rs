@@ -271,8 +271,8 @@ impl FunctionModel {
         struct LifetimeElisor;
 
         impl VisitMut for LifetimeElisor {
-            fn visit_lifetime_mut(&mut self, lifetime: &mut syn::Lifetime) {
-                *lifetime = syn::Lifetime::new("'_", lifetime.span());
+            fn visit_lifetime_mut(&mut self, i: &mut syn::Lifetime) {
+                *i = syn::Lifetime::new("'_", i.span());
             }
         }
 

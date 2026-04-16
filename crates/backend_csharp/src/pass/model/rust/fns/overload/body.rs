@@ -72,7 +72,7 @@ impl Pass {
             // Determine which args to check for body transforms (exclude callback if async)
             let transformable_args = match async_result_ty {
                 Some(_) => &args[..args.len() - 1],
-                None => &args[..],
+                None => args,
             };
 
             let has_delegate = transformable_args.iter().any(|a| is_delegate_class(a.ty, types));

@@ -21,12 +21,14 @@ unsafe impl Sync for WireBuffer {}
 impl WireBuffer {
     /// Create a new owned buffer from a Vec
     #[must_use]
+    #[allow(clippy::mem_forget)]
     pub fn from_vec(mut vec: Vec<u8>) -> Self {
         let data = vec.as_mut_ptr();
         let len = i32::try_from(vec.len()).expect("Too large Wire buffer!");
         let capacity = i32::try_from(vec.capacity()).expect("Too large Wire buffer!");
 
-        std::mem::forget(vec); // LEAKS the vec here, must use interoptopus_wire_destroy() to free it
+        // LEAKS the vec here, must use interoptopus_wire_destroy() to free it
+        std::mem::forget(vec);
 
         Self { data, len, capacity }
     }

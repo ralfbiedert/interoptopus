@@ -102,7 +102,7 @@ fn render(
     let original_args = if is_async {
         &original_fn.signature.arguments[..original_fn.signature.arguments.len() - 1]
     } else {
-        &original_fn.signature.arguments[..]
+        &*original_fn.signature.arguments
     };
 
     // Resolve overloaded arg types + detect wraps.
