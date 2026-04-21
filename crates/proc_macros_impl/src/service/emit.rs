@@ -230,15 +230,11 @@ impl ServiceModel {
         // Extract error type from the constructor's return type
         let error_type = Self::extract_error_type_from_constructor(ctor);
 
-        // Use Box for non-async services, Arc for async services
-        let into_raw_call = if self.is_async {
-            quote_spanned! { ctor.name.span() =>
-                ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
-            }
-        } else {
-            quote_spanned! { ctor.name.span() =>
-                ::std::boxed::Box::into_raw(::std::boxed::Box::new(service_instance))
-            }
+        // Always use Arc for all services. This ensures cross-service factory methods
+        // (where an async method on ServiceA returns ServiceB) allocate consistently
+        // with the destructor, regardless of whether ServiceB is async or sync.
+        let into_raw_call = quote_spanned! { ctor.name.span() =>
+            ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
         };
 
         let ffi_attr = self.emit_ffi_attr(&function_name);
@@ -379,11 +375,9 @@ impl ServiceModel {
         let service_type = &self.service_type;
         let generics = &self.generics;
 
-        // Use Box for non-async services, Arc for async services
-        let from_raw_call = if self.is_async {
-            quote_spanned! { self.service_name.span() => let _ = ::std::sync::Arc::from_raw(instance); }
-        } else {
-            quote_spanned! { self.service_name.span() => let _ = ::std::boxed::Box::from_raw(instance as *mut #service_type); }
+        // Always use Arc for all services (matching the unified Arc allocation in constructors).
+        let from_raw_call = quote_spanned! { self.service_name.span() =>
+            let _ = ::std::sync::Arc::from_raw(instance);
         };
 
         let ffi_attr = self.emit_ffi_attr(&function_name);
@@ -516,6 +510,29 @@ impl ServiceModel {
         // keeps method.name.span() so errors point back to the user's code.
         let unsafe_token = quote_spanned! { Span::call_site() => unsafe };
 
+        // Generate the callback invocation code.
+        // When the return type is ffi::Result<T, E> and T is a service type,
+        // we must convert the Ok value to a raw pointer matching the service's
+        // ownership convention (Arc for async, Box for sync services).
+        let callback_invocation = if let Some((ok_type, error_type)) = Self::extract_result_types(&method.output) {
+            // Return type is ffi::Result<T, E>. Generate code that checks at
+            // compile time whether T is a service, and if so, converts it to
+            // a raw pointer before passing through the callback.
+            Self::emit_service_aware_callback(
+                &callback_type,
+                &ok_type,
+                &error_type,
+                method.name.span(),
+            )
+        } else {
+            // Non-Result return type (e.g., (), u32): pass through as-is.
+            quote_spanned! { method.name.span() =>
+                _guard.mark_completed();
+                callback.call(&raw const _result);
+                ::std::mem::forget(_result);
+            }
+        };
+
         quote_spanned! { method.name.span() =>
             #docs
             #[allow(clippy::used_underscore_items, clippy::forget_non_drop)]
@@ -539,11 +556,7 @@ impl ServiceModel {
                         let _guard = _guard;
                         let _async_this = ::interoptopus::pattern::asynk::Async::new(_instance_inside, _ctx);
                         let _result = #service_type::#method_name(_async_this, #param_names).await;
-                        _guard.mark_completed();
-                        callback.call(&raw const _result);
-                        // Prevent Rust from dropping owned data (e.g. ffi::String) after the
-                        // callback, since the callee took ownership via ptr::read.
-                        ::std::mem::forget(_result);
+                        #callback_invocation
                     })
                 }
 
@@ -630,6 +643,69 @@ impl ServiceModel {
                 quote_spanned! { ctor.name.span() => Error }
             }
             ReturnType::Default => quote_spanned! { ctor.name.span() => Error },
+        }
+    }
+
+    /// Extracts (OkType, ErrType) from a return type of form `ffi::Result<T, E>`.
+    /// Returns None if the return type is not a Result.
+    fn extract_result_types(return_type: &ReturnType) -> Option<(TokenStream, TokenStream)> {
+        let ReturnType::Type(_, ty) = return_type else { return None };
+        let Type::Path(path) = ty.as_ref() else { return None };
+        let segment = path.path.segments.last()?;
+        if segment.ident != "Result" {
+            return None;
+        }
+        let syn::PathArguments::AngleBracketed(args) = &segment.arguments else { return None };
+        let syn::GenericArgument::Type(ok_type) = args.args.first()? else { return None };
+        let syn::GenericArgument::Type(err_type) = args.args.iter().nth(1)? else { return None };
+        Some((ok_type.to_token_stream(), err_type.to_token_stream()))
+    }
+
+    /// Generates callback invocation code that handles service Ok types correctly.
+    ///
+    /// Uses `SERVICE_CTOR_SAFE` (a compile-time constant) to branch:
+    /// - For service types: converts Ok value to a raw pointer via `ServiceRawConvert`,
+    ///   then transmutes the callback to accept the pointer-based Result.
+    /// - For non-service types: passes the Result through directly.
+    ///
+    /// Both branches compile for all types; only the correct one executes.
+    fn emit_service_aware_callback(
+        callback_type: &TokenStream,
+        ok_type: &TokenStream,
+        error_type: &TokenStream,
+        span: Span,
+    ) -> TokenStream {
+        quote_spanned! { span =>
+            // Compile-time check: is the Ok type a service?
+            if <#callback_type as ::interoptopus::lang::types::TypeInfo>::SERVICE_CTOR_SAFE {
+                // Ok type is a service — convert to raw pointer via Arc (all
+                // services use Arc for uniform lifecycle management).
+                type _PtrResult = <::interoptopus::ffi::Result<(), #error_type>
+                    as ::interoptopus::pattern::result::ResultAs>::AsT<*const #ok_type>;
+
+                let _cb_result: _PtrResult = match _result {
+                    ::interoptopus::ffi::Ok(v) => {
+                        let _raw = ::std::sync::Arc::into_raw(::std::sync::Arc::new(v));
+                        ::interoptopus::ffi::Ok(_raw)
+                    }
+                    ::interoptopus::ffi::Err(e) => ::interoptopus::ffi::Err(e),
+                    ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
+                    ::interoptopus::ffi::Result::Null => ::interoptopus::ffi::Result::Null,
+                };
+
+                _guard.mark_completed();
+                // SAFETY: AsyncCallback<T> is repr(C) and layout-identical regardless of T.
+                // Both instantiations are (extern "C" fn(*const _, *const c_void), *const c_void).
+                let _cb: ::interoptopus::pattern::asynk::AsyncCallback<_PtrResult> =
+                    ::std::mem::transmute(callback);
+                _cb.call(&raw const _cb_result);
+                ::std::mem::forget(_cb_result);
+            } else {
+                // Non-service Ok type — pass through as-is.
+                _guard.mark_completed();
+                callback.call(&raw const _result);
+                ::std::mem::forget(_result);
+            }
         }
     }
 

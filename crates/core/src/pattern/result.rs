@@ -23,7 +23,7 @@
 
 use crate::inventory::{Inventory, TypeId};
 use crate::lang::meta::{Docs, Visibility, common_or_module_emission};
-use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO};
+use crate::lang::types::{Type, TypeInfo, TypeKind, TypePattern, WireIO, type_id_ptr};
 use crate::pattern::asynk::CancelValue;
 use crate::wire::SerializationError;
 use std::fmt::Debug;
@@ -102,11 +102,17 @@ unsafe impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
     const SERVICE_CTOR_SAFE: bool = T::SERVICE_SAFE;
 
     fn id() -> TypeId {
-        TypeId::new(0x9BCBD2325F73A8CBDAE991B5BB8EB6FC).derive_id(T::id()).derive_id(E::id())
+        // When T is a service type, the FFI representation uses *const T (a pointer)
+        // rather than T directly, because services are always passed as opaque pointers
+        // across the FFI boundary. This makes Result<ServiceType, E> register with the
+        // same identity as Result<*const ServiceType, E>, matching the constructor pattern.
+        let ok_id = if T::SERVICE_SAFE { type_id_ptr(T::id()) } else { T::id() };
+        TypeId::new(0x9BCBD2325F73A8CBDAE991B5BB8EB6FC).derive_id(ok_id).derive_id(E::id())
     }
 
     fn kind() -> TypeKind {
-        TypeKind::TypePattern(TypePattern::Result(T::id(), E::id()))
+        let ok_id = if T::SERVICE_SAFE { type_id_ptr(T::id()) } else { T::id() };
+        TypeKind::TypePattern(TypePattern::Result(ok_id, E::id()))
     }
 
     fn ty() -> Type {
@@ -125,6 +131,11 @@ unsafe impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
         // Ensure base types are registered.
         T::register(inventory);
         E::register(inventory);
+        // When T is a service, also register *const T so the pointer type exists
+        // in the inventory for the Ok variant.
+        if T::SERVICE_SAFE {
+            <*const T as TypeInfo>::register(inventory);
+        }
         inventory.register_type(Self::id(), Self::ty());
     }
 }
