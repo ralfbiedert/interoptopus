@@ -518,12 +518,7 @@ impl ServiceModel {
             // Return type is ffi::Result<T, E>. Generate code that checks at
             // compile time whether T is a service, and if so, converts it to
             // a raw pointer before passing through the callback.
-            Self::emit_service_aware_callback(
-                &callback_type,
-                &ok_type,
-                &error_type,
-                method.name.span(),
-            )
+            Self::emit_service_aware_callback(&callback_type, &ok_type, &error_type, method.name.span())
         } else {
             // Non-Result return type (e.g., (), u32): pass through as-is.
             quote_spanned! { method.name.span() =>
@@ -655,9 +650,13 @@ impl ServiceModel {
         if segment.ident != "Result" {
             return None;
         }
-        let syn::PathArguments::AngleBracketed(args) = &segment.arguments else { return None };
+        let syn::PathArguments::AngleBracketed(args) = &segment.arguments else {
+            return None;
+        };
         let syn::GenericArgument::Type(ok_type) = args.args.first()? else { return None };
-        let syn::GenericArgument::Type(err_type) = args.args.iter().nth(1)? else { return None };
+        let syn::GenericArgument::Type(err_type) = args.args.iter().nth(1)? else {
+            return None;
+        };
         Some((ok_type.to_token_stream(), err_type.to_token_stream()))
     }
 
@@ -669,12 +668,7 @@ impl ServiceModel {
     /// - For non-service types: passes the Result through directly.
     ///
     /// Both branches compile for all types; only the correct one executes.
-    fn emit_service_aware_callback(
-        _callback_type: &TokenStream,
-        ok_type: &TokenStream,
-        error_type: &TokenStream,
-        span: Span,
-    ) -> TokenStream {
+    fn emit_service_aware_callback(_callback_type: &TokenStream, ok_type: &TokenStream, error_type: &TokenStream, span: Span) -> TokenStream {
         quote_spanned! { span =>
             // Runtime check: is the Ok type a service?
             if matches!(<#ok_type as ::interoptopus::lang::types::TypeInfo>::kind(), ::interoptopus::lang::types::TypeKind::Service) {
