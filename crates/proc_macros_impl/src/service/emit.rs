@@ -663,21 +663,21 @@ impl ServiceModel {
 
     /// Generates callback invocation code that handles service Ok types correctly.
     ///
-    /// Uses `SERVICE_CTOR_SAFE` (a compile-time constant) to branch:
-    /// - For service types: converts Ok value to a raw pointer via `ServiceRawConvert`,
+    /// Uses a runtime `kind()` check to determine if the Ok type is a service:
+    /// - For service types: converts Ok value to a raw pointer via `Arc`,
     ///   then transmutes the callback to accept the pointer-based Result.
     /// - For non-service types: passes the Result through directly.
     ///
     /// Both branches compile for all types; only the correct one executes.
     fn emit_service_aware_callback(
-        callback_type: &TokenStream,
+        _callback_type: &TokenStream,
         ok_type: &TokenStream,
         error_type: &TokenStream,
         span: Span,
     ) -> TokenStream {
         quote_spanned! { span =>
-            // Compile-time check: is the Ok type a service?
-            if <#callback_type as ::interoptopus::lang::types::TypeInfo>::SERVICE_CTOR_SAFE {
+            // Runtime check: is the Ok type a service?
+            if matches!(<#ok_type as ::interoptopus::lang::types::TypeInfo>::kind(), ::interoptopus::lang::types::TypeKind::Service) {
                 // Ok type is a service — convert to raw pointer via Arc (all
                 // services use Arc for uniform lifecycle management).
                 type _PtrResult = <::interoptopus::ffi::Result<(), #error_type>

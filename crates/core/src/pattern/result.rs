@@ -106,12 +106,14 @@ unsafe impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
         // rather than T directly, because services are always passed as opaque pointers
         // across the FFI boundary. This makes Result<ServiceType, E> register with the
         // same identity as Result<*const ServiceType, E>, matching the constructor pattern.
-        let ok_id = if T::SERVICE_SAFE { type_id_ptr(T::id()) } else { T::id() };
+        let is_service = matches!(T::kind(), TypeKind::Service);
+        let ok_id = if is_service { type_id_ptr(T::id()) } else { T::id() };
         TypeId::new(0x9BCBD2325F73A8CBDAE991B5BB8EB6FC).derive_id(ok_id).derive_id(E::id())
     }
 
     fn kind() -> TypeKind {
-        let ok_id = if T::SERVICE_SAFE { type_id_ptr(T::id()) } else { T::id() };
+        let is_service = matches!(T::kind(), TypeKind::Service);
+        let ok_id = if is_service { type_id_ptr(T::id()) } else { T::id() };
         TypeKind::TypePattern(TypePattern::Result(ok_id, E::id()))
     }
 
@@ -133,7 +135,7 @@ unsafe impl<T: TypeInfo, E: TypeInfo> TypeInfo for Result<T, E> {
         E::register(inventory);
         // When T is a service, also register *const T so the pointer type exists
         // in the inventory for the Ok variant.
-        if T::SERVICE_SAFE {
+        if matches!(T::kind(), TypeKind::Service) {
             <*const T as TypeInfo>::register(inventory);
         }
         inventory.register_type(Self::id(), Self::ty());
