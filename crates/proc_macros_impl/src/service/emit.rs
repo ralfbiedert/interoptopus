@@ -641,7 +641,7 @@ impl ServiceModel {
         }
     }
 
-    /// Extracts (OkType, ErrType) from a return type of form `ffi::Result<T, E>`.
+    /// Extracts (`OkType`, `ErrType`) from a return type of form `ffi::Result<T, E>`.
     /// Returns None if the return type is not a Result.
     fn extract_result_types(return_type: &ReturnType) -> Option<(TokenStream, TokenStream)> {
         let ReturnType::Type(_, ty) = return_type else { return None };
