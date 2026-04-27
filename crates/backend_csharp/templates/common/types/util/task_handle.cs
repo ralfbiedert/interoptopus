@@ -37,7 +37,7 @@
     }
 
     /// Creates a <see cref="TaskHandle"/> backed by a <see cref="CancellationTokenSource"/>.
-    /// Calling <c>Abort</c> on the returned handle triggers <see cref="CancellationTokenSource.Cancel"/>;
+    /// Calling <c>Abort</c> on the returned handle triggers <see cref="CancellationTokenSource.Cancel()"/>;
     /// calling <c>Dispose</c> frees the pinned GCHandle.
     {{ _fns_decorators_all | indent }}
     {{ _fns_decorators_internal | indent }}
