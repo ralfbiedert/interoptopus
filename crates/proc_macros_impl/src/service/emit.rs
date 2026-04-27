@@ -230,11 +230,17 @@ impl ServiceModel {
         // Extract error type from the constructor's return type
         let error_type = Self::extract_error_type_from_constructor(ctor);
 
-        // Always use Arc for all services. This ensures cross-service factory methods
-        // (where an async method on ServiceA returns ServiceB) allocate consistently
-        // with the destructor, regardless of whether ServiceB is async or sync.
-        let into_raw_call = quote_spanned! { ctor.name.span() =>
-            ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
+        // Use Box for non-async services, Arc for async services.
+        // Box gives write provenance, so &mut self methods are sound.
+        // Arc is needed for async services where the runtime holds a second clone.
+        let into_raw_call = if self.is_async {
+            quote_spanned! { ctor.name.span() =>
+                ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
+            }
+        } else {
+            quote_spanned! { ctor.name.span() =>
+                ::std::boxed::Box::into_raw(::std::boxed::Box::new(service_instance))
+            }
         };
 
         let ffi_attr = self.emit_ffi_attr(&function_name);
@@ -375,9 +381,11 @@ impl ServiceModel {
         let service_type = &self.service_type;
         let generics = &self.generics;
 
-        // Always use Arc for all services (matching the unified Arc allocation in constructors).
-        let from_raw_call = quote_spanned! { self.service_name.span() =>
-            let _ = ::std::sync::Arc::from_raw(instance);
+        // Use Box for non-async services, Arc for async services (matching constructors).
+        let from_raw_call = if self.is_async {
+            quote_spanned! { self.service_name.span() => let _ = ::std::sync::Arc::from_raw(instance); }
+        } else {
+            quote_spanned! { self.service_name.span() => let _ = ::std::boxed::Box::from_raw(instance as *mut #service_type); }
         };
 
         let ffi_attr = self.emit_ffi_attr(&function_name);
@@ -662,25 +670,24 @@ impl ServiceModel {
 
     /// Generates callback invocation code that handles service Ok types correctly.
     ///
-    /// Uses a runtime `kind()` check to determine if the Ok type is a service:
-    /// - For service types: converts Ok value to a raw pointer via `Arc`,
-    ///   then transmutes the callback to accept the pointer-based Result.
-    /// - For non-service types: passes the Result through directly.
+    /// Uses a runtime `kind()` check to determine if the `OkType` is a service.
+    /// Service Ok values are wrapped in a `Box` and passed as raw pointers through
+    /// the callback, matching the produced service's destructor.
     ///
-    /// Both branches compile for all types; only the correct one executes.
+    /// Note: currently this always uses `Box` allocation for produced services.
+    /// If a future use case requires returning an `Arc`-backed (async) service
+    /// from another async method, this will need a dispatch mechanism.
     fn emit_service_aware_callback(_callback_type: &TokenStream, ok_type: &TokenStream, error_type: &TokenStream, span: Span) -> TokenStream {
         quote_spanned! { span =>
             // Runtime check: is the Ok type a service?
             if matches!(<#ok_type as ::interoptopus::lang::types::TypeInfo>::kind(), ::interoptopus::lang::types::TypeKind::Service) {
-                // Ok type is a service — convert to raw pointer via Arc (all
-                // services use Arc for uniform lifecycle management).
+                // Ok type is a service — convert to a raw pointer via Box.
                 type _PtrResult = <::interoptopus::ffi::Result<(), #error_type>
                     as ::interoptopus::pattern::result::ResultAs>::AsT<*const #ok_type>;
 
                 let _cb_result: _PtrResult = match _result {
                     ::interoptopus::ffi::Ok(v) => {
-                        let _raw = ::std::sync::Arc::into_raw(::std::sync::Arc::new(v));
-                        ::interoptopus::ffi::Ok(_raw)
+                        ::interoptopus::ffi::Ok(::std::boxed::Box::into_raw(::std::boxed::Box::new(v)) as *const #ok_type)
                     }
                     ::interoptopus::ffi::Err(e) => ::interoptopus::ffi::Err(e),
                     ::interoptopus::ffi::Result::Panic => ::interoptopus::ffi::Result::Panic,
