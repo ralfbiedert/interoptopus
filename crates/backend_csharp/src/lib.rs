@@ -6,7 +6,11 @@
 #![allow(clippy::type_complexity)] // Complex types in pass pipeline are expected
 
 pub mod dispatch;
+#[cfg(any(feature = "unstable-extensions", docsrs))]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable-extensions")))]
 pub mod extensions;
+#[cfg(not(any(feature = "unstable-extensions", docsrs)))]
+pub(crate) mod extensions;
 pub mod lang;
 pub mod output;
 pub mod pass;
@@ -20,8 +24,8 @@ mod pipeline;
 pub use error::Error;
 
 pub mod pattern;
-#[cfg(any(feature = "rt-aot", feature = "rt-dotnet", docsrs))]
-#[cfg_attr(docsrs, doc(cfg(any(feature = "rt-aot", feature = "rt-dotnet"))))]
+#[cfg(any(feature = "unstable-rt-aot", feature = "unstable-rt-dotnet", docsrs))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = "unstable-rt-aot", feature = "unstable-rt-dotnet"))))]
 pub mod rt;
 
 #[cfg(any(feature = "unstable-plugins", docsrs))]
