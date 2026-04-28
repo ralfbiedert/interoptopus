@@ -26,6 +26,7 @@ pub mod services {
         pub mod async_ctor;
         pub mod basic;
         pub mod cancel;
+        pub mod panic;
         pub mod result;
         pub mod sleep;
         pub mod structs;
@@ -209,6 +210,7 @@ pub fn inventory() -> RustInventory {
         .register(service!(services::asynk::async_ctor::ServiceAsyncCtor))
         .register(service!(services::asynk::basic::ServiceAsyncBasic))
         .register(service!(services::asynk::cancel::ServiceAsyncCancel))
+        .register(service!(services::asynk::panic::ServiceAsyncPanic))
         .register(service!(services::asynk::sleep::ServiceAsyncSleep))
         .register(service!(services::asynk::vecstring::ServiceAsyncVecString))
         .register(service!(services::asynk::result::ServiceAsyncResult))
