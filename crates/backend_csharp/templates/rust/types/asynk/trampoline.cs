@@ -30,7 +30,7 @@ internal class {{ trampoline_name }}
     {{ _fns_decorators_internal | indent }}
     internal (AsyncCallbackCommonNative, Task{% if not is_task_void %}<{{ task_inner_ty }}>{% endif %}) NewCall()
     {
-        var tcs = new TaskCompletionSource<{% if is_task_void %}bool{% else %}{{ task_inner_ty }}{% endif %}>();
+        var tcs = new TaskCompletionSource<{% if is_task_void %}bool{% else %}{{ task_inner_ty }}{% endif %}>(TaskCreationOptions.RunContinuationsAsynchronously);
         var id = Interlocked.Increment(ref Id);
 
         lock (InFlight) { InFlight.TryAdd(id, tcs); }
