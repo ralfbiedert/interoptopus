@@ -5,20 +5,20 @@
 
 use crate::lang::FunctionId;
 use crate::lang::functions::{Function, FunctionKind};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 #[derive(Default)]
 pub struct Config {}
 
 #[derive(Debug)]
 pub struct Pass {
-    functions: HashMap<FunctionId, Function>,
+    functions: BTreeMap<FunctionId, Function>,
 }
 
 impl Pass {
     #[must_use]
     pub fn new(_: Config) -> Self {
-        Self { functions: HashMap::default() }
+        Self { functions: BTreeMap::default() }
     }
 
     pub fn register(&mut self, id: FunctionId, function: Function) {

@@ -1,8 +1,8 @@
 use interoptopus::lang::meta::FileEmission;
-use interoptopus_csharp::RustLibrary;
 use interoptopus_csharp::config::{DllImportSearchPath, HeaderConfig, SearchPathConfig};
 use interoptopus_csharp::dispatch::Dispatch;
 use interoptopus_csharp::output::Target;
+use interoptopus_csharp::RustLibrary;
 
 #[test]
 fn interop() -> Result<(), Box<dyn std::error::Error>> {
@@ -21,7 +21,7 @@ fn interop() -> Result<(), Box<dyn std::error::Error>> {
     multibuf.write_buffers_to("tests/reference_project/Bindings")?;
     multibuf.write_buffers_to("benches/dotnet")?;
 
-    // insta::assert_snapshot!(multibuf);
+    insta::assert_snapshot!(multibuf);
 
     Ok(())
 }

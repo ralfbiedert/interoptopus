@@ -32,20 +32,20 @@ use crate::lang::constant::Constant;
 use crate::lang::function::Function;
 use crate::lang::service::Service;
 use crate::lang::types::Type;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 pub use id::{ConstantId, FunctionId, Id, PluginId, ServiceId, TypeId, hash_str};
 pub use plugin::PluginInventory;
 pub use rust::RustInventory;
 
 /// All registered types.
-pub type Types = HashMap<TypeId, Type>;
+pub type Types = BTreeMap<TypeId, Type>;
 /// All registered functions.
-pub type Functions = HashMap<FunctionId, Function>;
+pub type Functions = BTreeMap<FunctionId, Function>;
 /// All registered constants.
-pub type Constants = HashMap<ConstantId, Constant>;
+pub type Constants = BTreeMap<ConstantId, Constant>;
 /// All registered services.
-pub type Services = HashMap<ServiceId, Service>;
+pub type Services = BTreeMap<ServiceId, Service>;
 
 /// Trait implemented by inventory types that can accept FFI item registrations.
 ///

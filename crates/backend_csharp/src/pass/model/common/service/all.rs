@@ -10,20 +10,20 @@ use crate::pass::Outcome::Unchanged;
 use crate::pass::{ModelResult, PassInfo, model};
 use crate::try_resolve;
 use interoptopus::inventory::Services;
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 #[derive(Default)]
 pub struct Config {}
 
 pub struct Pass {
     info: PassInfo,
-    services: HashMap<ServiceId, Service>,
+    services: BTreeMap<ServiceId, Service>,
 }
 
 impl Pass {
     #[must_use]
     pub fn new(_: Config) -> Self {
-        Self { info: PassInfo { name: file!() }, services: HashMap::default() }
+        Self { info: PassInfo { name: file!() }, services: BTreeMap::default() }
     }
 
     pub fn process(&mut self, pass_meta: &mut crate::pass::PassMeta, id_map: &model::common::id_map::Pass, rs_services: &Services) -> ModelResult {
