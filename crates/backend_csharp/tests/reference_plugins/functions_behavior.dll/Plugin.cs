@@ -14,4 +14,16 @@ public class Plugin : IPlugin
     {
         throw new Exception("Panic!");
     }
+
+    public static async Task PanicAsync(CancellationToken ct)
+    {
+        await Task.Yield();
+        throw new Exception("Panic async!");
+    }
+
+    public static async Task<ResultVoidError> PanicAsyncWithResult(CancellationToken ct)
+    {
+        await Task.Yield();
+        throw new Exception("Panic async with result!");
+    }
 }

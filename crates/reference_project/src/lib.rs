@@ -28,6 +28,7 @@ pub mod services {
         pub mod cancel;
         pub mod panic;
         pub mod result;
+        pub mod rval;
         pub mod sleep;
         pub mod structs;
         pub mod vecstring;
@@ -39,6 +40,7 @@ pub mod services {
     pub mod ignored;
     pub mod multiple_ctors;
     pub mod result;
+    pub mod rval;
     pub mod slice;
     pub mod string;
 }
@@ -215,12 +217,14 @@ pub fn inventory() -> RustInventory {
         .register(service!(services::asynk::sleep::ServiceAsyncSleep))
         .register(service!(services::asynk::vecstring::ServiceAsyncVecString))
         .register(service!(services::asynk::result::ServiceAsyncResult))
+        .register(service!(services::asynk::rval::ServiceAsyncRval))
         .register(service!(services::asynk::structs::ServiceAsyncStructs))
         .register(service!(services::asynk::wire::ServiceAsyncWire))
         .register(service!(services::basic::ServiceBasic))
         .register(service!(services::dependent::ServiceMain))
         .register(service!(services::dependent::ServiceDependent))
         .register(service!(services::result::ServiceResult))
+        .register(service!(services::rval::ServiceRval))
         .register(service!(services::callback::ServiceCallbacks))
         .register(service!(services::ignored::ServiceIgnoringMethods))
         .register(service!(services::multiple_ctors::ServiceMultipleCtors))

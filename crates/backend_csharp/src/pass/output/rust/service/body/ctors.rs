@@ -3,10 +3,15 @@
 //! Async constructors (those whose native function has an `AsyncCallback` as the last
 //! argument) are rendered via `service/body_ctors_async.cs` instead, using the async
 //! overload from the central overload registry.
+//!
+//! Whether to apply `.AsOk()` on the FFI return value is determined by the
+//! `service_ctor_shape` model pass: bare-`Self` ctors return `*const Service`
+//! directly and skip `.AsOk()`, Result-wrapped ctors apply it.
 
 use crate::lang::ServiceId;
 use crate::lang::functions::FunctionKind;
 use crate::lang::functions::overload::OverloadKind;
+use crate::pass::model::common::service::ctor_shape::CtorShape;
 use crate::pass::{OutputResult, PassInfo, format_docs, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
@@ -30,6 +35,7 @@ impl Pass {
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
         services: &model::common::service::all::Pass,
+        ctor_shapes: &model::common::service::ctor_shape::Pass,
         fns: &model::common::fns::all::Pass,
         types: &model::common::types::all::Pass,
         method_names: &model::rust::service::method::names::Pass,
@@ -44,8 +50,8 @@ impl Pass {
             for ctor_fn_id in &service.sources.ctors {
                 let Some(ctor_fn) = fns.get(*ctor_fn_id) else { continue };
                 let Some(method_name) = method_names.get(*ctor_fn_id) else { continue };
+                let needs_asok = matches!(ctor_shapes.get(*ctor_fn_id), Some(CtorShape::ResultWrapped));
 
-                // Check if this constructor has an async overload
                 let async_overload = fns.overloads_for(*ctor_fn_id).find_map(|(overload_id, func)| {
                     if let FunctionKind::Overload(o) = &func.kind
                         && let OverloadKind::Async(_) = &o.kind
@@ -55,7 +61,6 @@ impl Pass {
                     None
                 });
 
-                // Check if this constructor has a body overload (service arg transforms)
                 let body_overload = fns.overloads_for(*ctor_fn_id).find_map(|(overload_id, func)| {
                     if let FunctionKind::Overload(o) = &func.kind
                         && matches!(&o.kind, OverloadKind::Body(_))
@@ -67,51 +72,28 @@ impl Pass {
 
                 let docs = format_docs(&ctor_fn.docs);
 
-                if let Some(overload_id) = async_overload {
-                    let Some(overload_fn) = fns.get(overload_id) else { continue };
-
-                    let args = build_args(&overload_fn.signature.arguments, types);
-
-                    let mut context = Context::new();
-                    context.insert("name", name);
-                    context.insert("method_name", method_name);
-                    context.insert("interop_name", &overload_fn.name);
-                    context.insert("args", &args);
-                    context.insert("docs", &docs);
-                    context.insert("visibility", "public");
-
-                    let rendered = templates.render("rust/service/body_ctors_async.cs", &context)?;
-                    rendered_ctors.push(rendered);
+                let (interop_fn, template) = if let Some(overload_id) = async_overload {
+                    (fns.get(overload_id), "rust/service/body_ctors_async.cs")
                 } else if let Some(overload_id) = body_overload {
-                    let Some(overload_fn) = fns.get(overload_id) else { continue };
-
-                    let args = build_args(&overload_fn.signature.arguments, types);
-
-                    let mut context = Context::new();
-                    context.insert("name", name);
-                    context.insert("method_name", method_name);
-                    context.insert("interop_name", &overload_fn.name);
-                    context.insert("args", &args);
-                    context.insert("docs", &docs);
-                    context.insert("visibility", "public");
-
-                    let rendered = templates.render("rust/service/body_ctors.cs", &context)?;
-                    rendered_ctors.push(rendered);
+                    (fns.get(overload_id), "rust/service/body_ctors.cs")
                 } else {
-                    // Sync constructor with no overload — render with original args
-                    let args = build_args(&ctor_fn.signature.arguments, types);
+                    (Some(ctor_fn), "rust/service/body_ctors.cs")
+                };
 
-                    let mut context = Context::new();
-                    context.insert("name", name);
-                    context.insert("method_name", method_name);
-                    context.insert("interop_name", &ctor_fn.name);
-                    context.insert("args", &args);
-                    context.insert("docs", &docs);
-                    context.insert("visibility", "public");
+                let Some(interop_fn) = interop_fn else { continue };
+                let args = build_args(&interop_fn.signature.arguments, types);
 
-                    let rendered = templates.render("rust/service/body_ctors.cs", &context)?;
-                    rendered_ctors.push(rendered);
-                }
+                let mut context = Context::new();
+                context.insert("name", name);
+                context.insert("method_name", method_name);
+                context.insert("interop_name", &interop_fn.name);
+                context.insert("args", &args);
+                context.insert("docs", &docs);
+                context.insert("visibility", "public");
+                context.insert("needs_asok", &needs_asok);
+
+                let rendered = templates.render(template, &context)?;
+                rendered_ctors.push(rendered);
             }
 
             self.body_ctors.insert(*service_id, rendered_ctors);

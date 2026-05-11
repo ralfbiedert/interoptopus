@@ -2,8 +2,8 @@ use crate::{define_plugin, load_plugin};
 use interoptopus_csharp::rt::dynamic::runtime as dotnet_runtime;
 use reference_project::plugins::functions::{Behavior, Primitives};
 use std::error::Error;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
 #[test]
 fn define_plugins() -> Result<(), Box<dyn Error>> {
@@ -45,6 +45,28 @@ fn load_plugin_functions_behavior() -> Result<(), Box<dyn Error>> {
     plugin.panic();
 
     assert!(exception_called.load(Ordering::SeqCst), "exception handler was not called after panic");
+
+    Ok(())
+}
+
+// Async exceptions from the .NET side must surface via the registered
+// `Trampoline.UncaughtException` hook so the Rust caller can observe them.
+//
+// On the wire the byte is still `AsyncOutcome::Cancelled` (we don't yet
+// split Cancelled vs Panic on the wire), so the Rust future resolves to
+// `Err`. The exception text reaches the host through the exception handler
+// side-channel — that part is what this test pins.
+#[tokio::test]
+async fn load_plugin_functions_behavior_async_throw() -> Result<(), Box<dyn Error>> {
+    let rt = dotnet_runtime()?;
+
+    let plugin = rt.load::<Behavior>(crate::dll_path_for(super::BASE, "functions_behavior.dll"))?;
+
+    let result = plugin.panic_async().await;
+    assert!(result.is_err());
+
+    let result = plugin.panic_async_with_result().await;
+    assert!(result.is_err());
 
     Ok(())
 }

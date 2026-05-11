@@ -131,7 +131,7 @@ async fn load_plugin_service_async_cancel() -> Result<(), Box<dyn Error>> {
 
     // Service async method: same pattern via service instance.
     {
-        let svc = plugin.async_cancellation_create().await;
+        let svc = plugin.async_cancellation_create().await.unwrap();
         let fut = svc.run_long();
         tokio::time::sleep(std::time::Duration::from_millis(300)).await;
         let counter_before = svc.get();
@@ -152,32 +152,32 @@ async fn load_plugin_service_async_cancel() -> Result<(), Box<dyn Error>> {
 async fn load_plugin_service_async() -> Result<(), Box<dyn Error>> {
     let plugin = load_plugin!(ServiceAsync, "service_async.dll", super::BASE);
 
-    plugin.call_void().await;
-    let i = plugin.add_one(1).await;
+    plugin.call_void().await.unwrap();
+    let i = plugin.add_one(1).await.unwrap();
     assert_eq!(i, 2);
 
     let hashmap = HashMap::from([("foo".to_string(), "bar".to_string())]);
-    let mut result = plugin.wire_1(Wire::from(hashmap.clone())).await;
+    let mut result = plugin.wire_1(Wire::from(hashmap.clone())).await?;
     let map = result.unwire();
     assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
     assert_eq!(map.get("hello").map(String::as_str), Some("world"));
 
-    let result = plugin.wire_2(Wire::from(hashmap.clone())).await;
+    let result = plugin.wire_2(Wire::from(hashmap.clone())).await.unwrap();
     let map = result.unwrap().unwire();
     assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
     assert_eq!(map.get("hello").map(String::as_str), Some("world"));
 
     let svc = plugin.async_basic_create();
-    svc.call_void().await;
-    let i = svc.add_one(1).await;
+    svc.call_void().await.unwrap();
+    let i = svc.add_one(1).await.unwrap();
     assert_eq!(i, 2);
 
-    let mut result = svc.wire_1(Wire::from(hashmap.clone())).await;
+    let mut result = svc.wire_1(Wire::from(hashmap.clone())).await.unwrap();
     let map = result.unwire();
     assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
     assert_eq!(map.get("hello").map(String::as_str), Some("world"));
 
-    let result = svc.wire_2(Wire::from(hashmap)).await;
+    let result = svc.wire_2(Wire::from(hashmap)).await.unwrap();
     let map = result.unwrap().unwire();
     assert_eq!(map.get("foo").map(String::as_str), Some("bar"));
     assert_eq!(map.get("hello").map(String::as_str), Some("world"));

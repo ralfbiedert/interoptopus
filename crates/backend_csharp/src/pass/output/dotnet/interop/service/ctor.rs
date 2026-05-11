@@ -80,12 +80,13 @@ impl Pass {
 
                 let continuation = if let Some(inner_id) = cb_inner {
                     if resolve_ptr_to_service_name(inner_id, types).is_some() {
-                        "ContinueWith(t => cb.UnsafeComplete(t.Result.IntoUnmanaged()))".to_string()
+                        "ContinueWith(t => { if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })"
+                            .to_string()
                     } else {
                         async_continuation(inner_id, types, unmanaged_conversion)
                     }
                 } else {
-                    "ContinueWith(_ => cb.UnsafeComplete())".to_string()
+                    "ContinueWith(t => { if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(); })".to_string()
                 };
 
                 let mut ctx = Context::new();

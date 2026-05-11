@@ -143,7 +143,7 @@ async fn load_plugin_async() -> Result<(), Box<dyn Error>> {
 
     // Warm up.
     {
-        let _warm = plugin.heavy_new_self_async(1024).await.ok()?;
+        let _warm = plugin.heavy_new_self_async(1024).await.unwrap().ok()?;
     }
     plugin.gc();
     tokio::time::sleep(std::time::Duration::from_millis(200)).await;
@@ -152,30 +152,30 @@ async fn load_plugin_async() -> Result<(), Box<dyn Error>> {
 
     for cycle in 0..NUM_CYCLES {
         // Allocate via async.
-        let h1 = plugin.heavy_new_self_async(CHUNK).await.ok()?;
+        let h1 = plugin.heavy_new_self_async(CHUNK).await.unwrap().ok()?;
         let h2 = plugin.heavy_new_self(CHUNK, 2).ok()?;
         let h3 = plugin.heavy_new_self(CHUNK, 3).ok()?;
         let h4 = plugin.heavy_new_self(CHUNK, 4).ok()?;
 
         // Create Fliparoo via async create_2 (takes refs).
-        let flip = plugin.fliparoo_create_2(&h1, &h2).await.ok()?;
+        let flip = plugin.fliparoo_create_2(&h1, &h2).await.unwrap().ok()?;
 
         // Verify initial state.
         assert_eq!(flip.get_left().get(0), 0, "cycle {cycle}: async-created left");
         assert_eq!(flip.get_right().get(0), 2, "cycle {cycle}: async-created right");
 
         // Async replace left (ownership transfer).
-        let old_left = flip.replace_left_async(h3).await;
+        let old_left = flip.replace_left_async(h3).await.unwrap();
         assert_eq!(old_left.get(0), 0, "cycle {cycle}: async old left");
         assert_eq!(flip.get_left().get(0), 3, "cycle {cycle}: async new left");
 
         // Async replace right (ref — no ownership transfer).
-        let old_right = flip.replace_right_async(&h4).await;
+        let old_right = flip.replace_right_async(&h4).await.unwrap();
         assert_eq!(old_right.get(0), 2, "cycle {cycle}: async old right");
         assert_eq!(flip.get_right().get(0), 4, "cycle {cycle}: async new right");
 
         // Create via async create_3 (mixed: ref + owned).
-        let flip2 = plugin.fliparoo_create_3(&old_left, old_right).await.ok()?;
+        let flip2 = plugin.fliparoo_create_3(&old_left, old_right).await.unwrap().ok()?;
         assert_eq!(flip2.get_left().get(0), 0, "cycle {cycle}: flip2 left");
         assert_eq!(flip2.get_right().get(0), 2, "cycle {cycle}: flip2 right");
 

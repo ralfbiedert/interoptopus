@@ -1,5 +1,6 @@
 using My.Company;
 using My.Company.Common;
+using System.Threading.Tasks;
 using Xunit;
 
 public class TestPatternServicesAsyncPanic
@@ -9,7 +10,10 @@ public class TestPatternServicesAsyncPanic
     {
         using var s = ServiceAsyncPanic.Create();
 
-        await Assert.ThrowsAsync<EnumException>(async () =>
+        // A panic inside an async method aborts the future; the cancellation
+        // guard then signals `AsyncOutcome::Cancelled`, which the trampoline
+        // turns into a TaskCanceledException on the .NET side.
+        await Assert.ThrowsAsync<TaskCanceledException>(async () =>
         {
             await s.Panicking();
         });
@@ -28,7 +32,7 @@ public class TestPatternServicesAsyncPanic
         using var s = ServiceAsyncPanic.Create();
 
         // First call panics
-        await Assert.ThrowsAsync<EnumException>(async () =>
+        await Assert.ThrowsAsync<TaskCanceledException>(async () =>
         {
             await s.Panicking();
         });
@@ -44,7 +48,7 @@ public class TestPatternServicesAsyncPanic
 
         for (int i = 0; i < 10; i++)
         {
-            await Assert.ThrowsAsync<EnumException>(async () =>
+            await Assert.ThrowsAsync<TaskCanceledException>(async () =>
             {
                 await s.Panicking();
             });

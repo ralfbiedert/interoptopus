@@ -28,7 +28,10 @@ impl TypeModel {
                 const RAW_SAFE: bool = #raw_safe;
                 const ASYNC_SAFE: bool = #async_safe;
                 const SERVICE_SAFE: bool = #service_safe;
-                const SERVICE_CTOR_SAFE: bool = false;
+                // Service types are valid bare ctor return types (e.g. `pub fn new() -> Self`).
+                // For non-service types, only specific patterns (Result, Wire, Option<ptr>) flip
+                // this on individually; structs/enums never directly return Self from a ctor.
+                const SERVICE_CTOR_SAFE: bool = #service_safe;
                 const OPTION_PTR_SAFE: bool = false;
 
                 fn id() -> ::interoptopus::inventory::TypeId {

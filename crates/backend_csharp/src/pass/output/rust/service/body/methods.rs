@@ -38,6 +38,7 @@ impl Pass {
         fns: &model::common::fns::all::Pass,
         types: &model::common::types::all::Pass,
         method_names: &model::rust::service::method::names::Pass,
+        trampoline: &model::rust::types::info::trampoline::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -77,17 +78,13 @@ impl Pass {
                         let docs = format_docs(&method_fn.docs);
                         let self_arg = if has_service_self_arg(method_fn, types) { "this" } else { "_context" };
 
-                        if let OverloadKind::Async(transforms) = &overload.kind {
+                        if let OverloadKind::Async(_) = &overload.kind {
                             let task_rval = types.get(method_fn.signature.rval).map_or_else(|| "Task".to_string(), |t| t.name.clone());
                             let async_args = build_args(&method_fn.signature.arguments[1..], types);
 
-                            let (trampoline_field, is_task_void) = if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval {
-                                let result_ty = types.get(result_ty_id);
-                                let field = result_ty.map_or_else(|| "_trampoline".to_string(), |t| format!("_trampoline{}", t.name));
-                                let is_void = task_rval == "Task";
-                                (field, is_void)
-                            } else {
-                                ("_trampoline".to_string(), false)
+                            let (trampoline_field, is_task_void) = match trampoline.for_function(method_fn_id) {
+                                Some(t) => (crate::pass::output::rust::types::asynk_naming::field_name(t, types), task_rval == "Task"),
+                                None => ("_trampoline".to_string(), false),
                             };
 
                             rendered_methods.push(render_async(

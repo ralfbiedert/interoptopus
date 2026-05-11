@@ -91,16 +91,20 @@ fn async_callback_inner_from_args(args: &[Argument], types: &model::common::type
 }
 
 /// Returns the `.ContinueWith(...)` expression that invokes `cb.UnsafeComplete` after the task.
+///
+/// On a faulted or cancelled Task we send `AsyncOutcome::Cancelled` over the wire so the
+/// awaiting Rust future surfaces `Err(AsyncCancelled)` instead of hanging forever.
 pub(super) fn async_continuation(
     inner_id: TypeId,
     types: &model::common::types::all::Pass,
     unmanaged_conversion: &output::common::conversion::unmanaged_conversion::Pass,
 ) -> String {
     let is_void = matches!(types.get(inner_id).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
-    if is_void {
-        "ContinueWith(_ => cb.UnsafeComplete())".to_string()
+    let success = if is_void {
+        "cb.UnsafeComplete()".to_string()
     } else {
         let suffix = unmanaged_conversion.to_unmanaged_suffix(inner_id);
-        format!("ContinueWith(t => cb.UnsafeComplete(t.Result{suffix}))")
-    }
+        format!("cb.UnsafeComplete(t.Result{suffix})")
+    };
+    format!("ContinueWith(t => {{ if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else {success}; }})")
 }

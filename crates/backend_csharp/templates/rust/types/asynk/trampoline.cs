@@ -14,16 +14,43 @@ internal class {{ trampoline_name }}
     }
 
     {{ _fns_decorators_all | indent }}
-    private static void Call(IntPtr data, IntPtr csPtr)
+    private static unsafe void Call(IntPtr data, IntPtr csPtr)
     {
         TaskCompletionSource<{% if is_task_void %}bool{% else %}{{ task_inner_ty }}{% endif %}> tcs;
 
         lock (InFlight) { InFlight.Remove((ulong) csPtr, out tcs); }
 
-        {% if has_unmanaged %}var unmanaged = Marshal.PtrToStructure<{{ unmanaged_result_ty }}>(data);
-        var managed = unmanaged.{{ result_to_managed }}();{% else %}var managed = Marshal.PtrToStructure<{{ result_ty_name }}>(data);{% endif %}
+        // Wire layout matches Rust's `#[repr(C, u8)]` AsyncOutcome<T>:
+        // byte 0 is the discriminant, payload (if any) follows at T's natural alignment.
+        // `Marshal.PtrToStructure<T>` rejects generic types, so we deref via raw
+        // pointer instead (the surrounding method is `unsafe`).
+        var tag = Marshal.ReadByte(data, 0);
+        if (tag == AsyncOutcomeTag.Cancelled)
+        {
+            tcs.SetException(new TaskCanceledException("Async operation was cancelled by the Rust side."));
+            return;
+        }
+
+        {% if shape == "BareVoid" -%}
+        tcs.SetResult(true);
+        {%- elif shape == "BareDirect" -%}
+        var outcome = *({{ payload_full }}*)data;
+        tcs.SetResult(outcome.Value);
+        {%- elif shape == "BareUnmanaged" -%}
+        var outcome = *({{ payload_full }}*)data;
+        var managed = outcome.Value.{{ result_to_managed }}();
+        tcs.SetResult(managed);
+        {%- elif shape == "ResultDirect" -%}
+        var outcome = *({{ payload_full }}*)data;
+        var managed = outcome.Value;
         if (managed.IsOk) { tcs.SetResult({% if is_task_void %}true{% else %}managed.AsOk(){% endif %}); }
         else { tcs.SetException(managed.ExceptionForVariant()); }
+        {%- elif shape == "ResultUnmanaged" -%}
+        var outcome = *({{ payload_full }}*)data;
+        var managed = outcome.Value.{{ result_to_managed }}();
+        if (managed.IsOk) { tcs.SetResult({% if is_task_void %}true{% else %}managed.AsOk(){% endif %}); }
+        else { tcs.SetException(managed.ExceptionForVariant()); }
+        {%- endif %}
     }
 
     {{ _fns_decorators_all | indent }}

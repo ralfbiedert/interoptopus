@@ -78,5 +78,5 @@ ids:
 test-agent:
     # Agents: Feel free to update the test logic here for the task at hand.
     cargo build -p reference_project --all-features
-    INSTA_UPDATE=always cargo test -p interoptopus_csharp --test mod reference_project::interop --all-features
-    dotnet test crates/backend_csharp/tests/reference_project/Tests/Tests.csproj --filter "TestWireEnum"
+    cargo test -p interoptopus_csharp --test mod reference_project::interop --all-features
+    dotnet test crates/backend_csharp/tests/reference_project/Tests/Tests.csproj

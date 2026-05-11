@@ -181,6 +181,8 @@ impl Pass {
                     Util::WireBuffer => ManagedConversion::Into,
                     Util::ConstCStrMarshaller => ManagedConversion::AsIs,
                     Util::TaskHandle => ManagedConversion::AsIs,
+                    Util::AsyncOutcome => ManagedConversion::AsIs,
+                    Util::AsyncOutcomePayload => ManagedConversion::AsIs,
                 },
                 TypeKind::WireOnly(_) => ManagedConversion::Into,
             };

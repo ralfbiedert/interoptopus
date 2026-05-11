@@ -44,7 +44,9 @@ pub struct RustLibraryConfig {
     pub model_fn_overload_simple: model::rust::fns::overload::simple::Config,
     pub model_fn_overload_body: model::rust::fns::overload::body::Config,
     pub model_type_async_types: model::rust::types::info::async_types::Config,
+    pub model_type_trampoline: model::rust::types::info::trampoline::Config,
     pub model_service_map: model::common::service::all::Config,
+    pub model_service_ctor_shape: model::common::service::ctor_shape::Config,
     pub model_service_method_names: model::rust::service::method::names::Config,
     pub model_service_method_overload: model::rust::service::method::overload::Config,
     pub model_pattern_string: model::rust::pattern::string::Config,
@@ -129,7 +131,9 @@ pub struct ModelPasses {
     pub fn_overload_body: model::rust::fns::overload::body::Pass,
     pub fn_visibility: model::common::fns::visibility::Pass,
     pub type_async_types: model::rust::types::info::async_types::Pass,
+    pub type_trampoline: model::rust::types::info::trampoline::Pass,
     pub service_all: model::common::service::all::Pass,
+    pub service_ctor_shape: model::common::service::ctor_shape::Pass,
     pub service_method_names: model::rust::service::method::names::Pass,
     pub service_method_overload: model::rust::service::method::overload::Pass,
     pub pattern_string: model::rust::pattern::string::Pass,
@@ -283,7 +287,9 @@ impl RustLibrary {
                 fn_overload_body: model::rust::fns::overload::body::Pass::new(config.model_fn_overload_body),
                 fn_visibility: model::common::fns::visibility::Pass::new(config.model_fn_visibility),
                 type_async_types: model::rust::types::info::async_types::Pass::new(config.model_type_async_types),
+                type_trampoline: model::rust::types::info::trampoline::Pass::new(config.model_type_trampoline),
                 service_all: model::common::service::all::Pass::new(config.model_service_map),
+                service_ctor_shape: model::common::service::ctor_shape::Pass::new(config.model_service_ctor_shape),
                 service_method_names: model::rust::service::method::names::Pass::new(config.model_service_method_names),
                 service_method_overload: model::rust::service::method::overload::Pass::new(config.model_service_method_overload),
                 pattern_string: model::rust::pattern::string::Pass::new(config.model_pattern_string),
@@ -400,11 +406,13 @@ impl RustLibrary {
             r.run(m.fn_overload_body.process(&mut pass_meta, &mut m.fns_all, &mut m.type_kinds, &mut m.type_names, &mut m.type_all, &m.type_overload_all))?;
             r.run(m.fn_visibility.process(&mut pass_meta, &mut m.fns_all, &m.type_all, &m.service_all))?;
             r.run(m.type_async_types.process(&mut pass_meta, &m.fns_all))?;
+            r.run(m.type_trampoline.process(&mut pass_meta, &m.fns_all, &m.type_all, &m.type_managed_conversion))?;
             r.run(m.pattern_string.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.pattern_vec.process(&mut pass_meta, &m.id_maps, &self.inventory.functions, &self.inventory.types))?;
             r.run(m.wire_helpers.process(&mut pass_meta, &self.inventory.functions))?;
             r.run(m.wire_nested.process(&mut pass_meta, &m.id_maps, &mut m.type_kinds, &mut m.type_names, &self.inventory.types))?;
             r.run(m.service_all.process(&mut pass_meta, &m.id_maps, &self.inventory.services))?;
+            r.run(m.service_ctor_shape.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
             r.run(m.service_method_names.process(&mut pass_meta, &m.service_all, &m.fns_all, &m.type_all))?;
             r.run(m.service_method_overload.process(&mut pass_meta, &mut m.service_all, &m.fns_all, &m.type_all))?;
 
@@ -452,10 +460,10 @@ impl RustLibrary {
         o.fns_rust.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all)?;
         o.fns_guard.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all, &self.meta_info)?;
         o.fns_overload_simple.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all)?;
-        o.fns_overload_body.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all, &m.type_overload_all)?;
-        o.asynk.process(&mut pass_meta, &self.output_master, &m.type_async_types, &m.type_all, &m.type_managed_conversion)?;
-        o.service_body_ctors.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names)?;
-        o.service_body_methods.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names)?;
+        o.fns_overload_body.process(&mut pass_meta, &self.output_master, &m.fns_all, &m.type_all, &m.type_overload_all, &m.type_trampoline)?;
+        o.asynk.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_trampoline)?;
+        o.service_body_ctors.process(&mut pass_meta, &self.output_master, &m.service_all, &m.service_ctor_shape, &m.fns_all, &m.type_all, &m.service_method_names)?;
+        o.service_body_methods.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &m.service_method_names, &m.type_trampoline)?;
         o.services.process(&mut pass_meta, &self.output_master, &m.service_all, &m.fns_all, &m.type_all, &o.service_body_ctors, &o.service_body_methods)?;
         o.header.process(&mut pass_meta, &self.output_master, &self.meta_info)?;
         o.pattern_bools.process(&mut pass_meta, &self.output_master, &m.type_all)?;

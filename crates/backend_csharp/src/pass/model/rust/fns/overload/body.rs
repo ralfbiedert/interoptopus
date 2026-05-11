@@ -97,13 +97,13 @@ impl Pass {
                 continue;
             }
 
-            // Also verify async result type is a Result if present
+            // Verify the async result type is one we can render. Almost any
+            // type is fine now — the AsyncOutcome wire wrapper carries cancellation
+            // out of band — but we still bail on types we can't materialize as a
+            // bound `T` in `Task<T>` (e.g. unmaterialized opaque pointers other
+            // than service handles).
             if let Some(result_ty_id) = async_result_ty {
-                let Some(result_ty) = types.get(result_ty_id) else { continue };
-                if !matches!(&result_ty.kind, TypeKind::TypePattern(TypePattern::Result(_, _, _))) {
-                    self.processed.insert(original_id);
-                    continue;
-                }
+                let Some(_result_ty) = types.get(result_ty_id) else { continue };
             }
 
             // Compute arg transforms for the transformable args
@@ -162,11 +162,12 @@ impl Pass {
     }
 }
 
-/// Resolves or creates a `Task` / `Task<T>` type for the given Result type.
+/// Resolves or creates a `Task` / `Task<T>` type for the given inner type.
 ///
-/// Given a `Result<OkTy, ErrTy>`, creates:
-/// - `Task` if `OkTy` is void
-/// - `Task<OkName>` otherwise
+/// The `inner_ty_id` is the inner type carried by the `AsyncCallback<T>`. It is
+/// either:
+/// - A `Result<OkTy, ErrTy>`: produces `Task` (if `OkTy` is void) or `Task<OkName>`.
+/// - A `*const Service` (bare-Self async ctor): produces `Task<IntPtr>`.
 ///
 /// Returns the `TypeId` of the Task type.
 fn resolve_or_create_task_type(
@@ -187,7 +188,17 @@ fn resolve_or_create_task_type(
                 (Some(*ok_ty), format!("Task<{ok_name}>"))
             }
         }
-        _ => (None, "Task".to_string()),
+        Some(TypeKind::Pointer(_)) => {
+            let inner_name = result_ty.map_or_else(|| "IntPtr".to_string(), |t| t.name.clone());
+            (Some(result_ty_id), format!("Task<{inner_name}>"))
+        }
+        Some(TypeKind::Primitive(Primitive::Void)) => (None, "Task".to_string()),
+        // Bare T (e.g. `u32`, a struct) — wrap in `Task<T>` with T as the inner.
+        Some(_) => {
+            let inner_name = result_ty.map_or_else(|| "void".to_string(), |t| t.name.clone());
+            (Some(result_ty_id), format!("Task<{inner_name}>"))
+        }
+        None => (None, "Task".to_string()),
     };
 
     // Derive a stable TypeId from the result type

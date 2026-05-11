@@ -80,7 +80,7 @@ impl Pass {
 
             // Async service return: use .IntoUnmanaged() in continuation.
             let continuation = if resolve_ptr_to_service_name(inner_id, types).is_some() {
-                "ContinueWith(t => cb.UnsafeComplete(t.Result.IntoUnmanaged()))".to_string()
+                "ContinueWith(t => { if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })".to_string()
             } else {
                 async_continuation(inner_id, types, unmanaged_conversion)
             };

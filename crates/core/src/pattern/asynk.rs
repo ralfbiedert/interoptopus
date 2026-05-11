@@ -80,10 +80,56 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, Waker};
 
+/// The wire payload delivered to an [`AsyncCallback`].
+///
+/// `AsyncCallback<T>` always invokes its function pointer with a
+/// `*const AsyncOutcome<T>`. The discriminant tells the foreign side whether
+/// the payload is a value or a cancellation signal:
+///
+/// * `Ok(T)` — the future completed successfully and the foreign side should
+///   take ownership of `T`.
+/// * `Cancelled` — the future was dropped before completion (e.g. the runtime
+///   was shut down or the task was aborted). On the C# side this is surfaced
+///   as a `TaskCanceledException`.
+///
+/// Users do not normally construct this directly — call
+/// [`AsyncCallback::call_ok`] or [`AsyncCallback::call_cancelled`] instead.
+#[doc(hidden)]
+#[repr(C, u8)]
+pub enum AsyncOutcome<T> {
+    Ok(T) = 0,
+    Cancelled = 1,
+}
+
+/// Returned by reverse-interop async futures (e.g. plugin services) when the
+/// other side cancelled the operation rather than producing a value.
+///
+/// This is the `Err` variant of `AsyncCallbackFuture::Output` for plugin code
+/// loaded from .NET; it indicates that the managed `Task` faulted, was
+/// cancelled, or was disposed before producing a value. Plugin authors that
+/// don't care about the distinction can use `?` to propagate the cancellation
+/// or `.unwrap()` to panic.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AsyncCancelled;
+
+impl ::std::fmt::Display for AsyncCancelled {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        f.write_str("async operation was cancelled")
+    }
+}
+
+impl ::std::error::Error for AsyncCancelled {}
+
 /// When used as the last parameter, makes a function `async`.
+///
+/// The wire payload is always `AsyncOutcome<T>` (a tag byte followed by the
+/// `T` payload when `Ok`). Use [`AsyncCallback::call_ok`] to deliver a value
+/// or [`AsyncCallback::call_cancelled`] to signal that the operation was
+/// cancelled (e.g. because the runtime was dropped before the future
+/// completed).
 #[doc(hidden)]
 #[repr(C)]
-pub struct AsyncCallback<T>(Option<extern "C" fn(*const T, *const c_void) -> ()>, *const c_void);
+pub struct AsyncCallback<T>(Option<extern "C" fn(*const AsyncOutcome<T>, *const c_void) -> ()>, *const c_void);
 
 // Manual Clone/Copy: the derive would add `T: Copy` / `T: Clone` bounds,
 // but `T` only appears behind pointers in the struct fields so these impls
@@ -104,26 +150,55 @@ unsafe impl<T> Sync for AsyncCallback<T> {}
 
 impl<T: TypeInfo> AsyncCallback<T> {
     ///   Creates a new instance of the callback using  `extern "C" fn`
-    pub fn new(func: extern "C" fn(*const T, *const c_void)) -> Self {
+    pub fn new(func: extern "C" fn(*const AsyncOutcome<T>, *const c_void)) -> Self {
         Self(Some(func), null())
     }
 
     /// Creates a callback with an explicit context pointer (e.g., a leaked `Arc` for use with [`AsyncCallbackFuture`]).
-    pub fn with_context(func: extern "C" fn(*const T, *const c_void), context: *const c_void) -> Self {
+    pub fn with_context(func: extern "C" fn(*const AsyncOutcome<T>, *const c_void), context: *const c_void) -> Self {
         Self(Some(func), context)
     }
 
-    /// Will call function if it exists, panic otherwise.
+    /// Deliver a successful result to the foreign side.
+    ///
+    /// Wraps `t` in [`AsyncOutcome::Ok`] and invokes the underlying callback.
+    /// The foreign side takes ownership of `t` (the callback reads it via
+    /// `ptr::read`); the caller must `mem::forget(t)` afterwards if `T` owns
+    /// resources that would otherwise be double-dropped.
     ///
     /// # Safety
     ///
     /// `AsyncCallback` has blanket `Send` and `Sync` impls regardless of `T`.
     /// The caller must ensure that `T` is actually safe to send across threads,
-    /// that the callback pointer and context are still valid, and that the
-    /// pointee will not be used after this call (the callee takes ownership
-    /// via `ptr::read`).
-    pub unsafe fn call(&self, t: *const T) {
-        self.0.expect("Assumed function would exist but it didn't.")(t, self.1);
+    /// and that the callback pointer and context are still valid.
+    pub unsafe fn call_ok(&self, t: *const T) {
+        let f = self.0.expect("Assumed function would exist but it didn't.");
+        // Build the wire-shaped outcome by reading the user value, wrapping it,
+        // and handing the wrapper to the foreign side. The wrapper is a stack
+        // value whose payload is `T`; the callee reads the payload via
+        // `ptr::read`. We `mem::forget` the local wrapper so its `T` payload
+        // is not double-dropped when this function returns.
+        let outcome = AsyncOutcome::Ok(unsafe { ::std::ptr::read(t) });
+        f(&raw const outcome, self.1);
+        #[allow(clippy::mem_forget)]
+        ::std::mem::forget(outcome);
+    }
+
+    /// Signal that the operation was cancelled.
+    ///
+    /// Used by [`AsyncCallbackGuard`] when its future is dropped before
+    /// completing. The C# side translates this to a `TaskCanceledException`.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the callback pointer and context are still
+    /// valid (the callback has not yet been invoked).
+    pub unsafe fn call_cancelled(&self) {
+        let f = self.0.expect("Assumed function would exist but it didn't.");
+        let outcome: AsyncOutcome<T> = AsyncOutcome::Cancelled;
+        f(&raw const outcome, self.1);
+        // `Cancelled` carries no payload — no `mem::forget` needed; dropping
+        // a `Cancelled` variant is a no-op anyway.
     }
 
     /// Will call function only if it exists.
@@ -132,26 +207,27 @@ impl<T: TypeInfo> AsyncCallback<T> {
     ///
     /// `AsyncCallback` has blanket `Send` and `Sync` impls regardless of `T`.
     /// The caller must ensure that `T` is actually safe to send across threads,
-    /// that the callback pointer and context are still valid, and that the
-    /// pointee will not be used after this call (the callee takes ownership
-    /// via `ptr::read`).
-    pub unsafe fn call_if_some(&self, t: *const T) -> Option<()> {
+    /// and that the callback pointer and context are still valid.
+    pub unsafe fn call_ok_if_some(&self, t: *const T) -> Option<()> {
         match self.0 {
-            Some(c) => {
-                c(t, self.1);
+            Some(f) => {
+                let outcome = AsyncOutcome::Ok(unsafe { ::std::ptr::read(t) });
+                f(&raw const outcome, self.1);
+                #[allow(clippy::mem_forget)]
+                ::std::mem::forget(outcome);
                 Some(())
             }
             None => None,
         }
     }
 }
-impl<T: TypeInfo> From<extern "C" fn(*const T, *const c_void)> for AsyncCallback<T> {
-    fn from(x: extern "C" fn(*const T, *const c_void) -> ()) -> Self {
+impl<T: TypeInfo> From<extern "C" fn(*const AsyncOutcome<T>, *const c_void)> for AsyncCallback<T> {
+    fn from(x: extern "C" fn(*const AsyncOutcome<T>, *const c_void) -> ()) -> Self {
         Self(Some(x), null())
     }
 }
 
-impl<T: TypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(*const T, *const c_void)> {
+impl<T: TypeInfo> From<AsyncCallback<T>> for Option<extern "C" fn(*const AsyncOutcome<T>, *const c_void)> {
     fn from(x: AsyncCallback<T>) -> Self {
         x.0
     }
@@ -206,12 +282,12 @@ unsafe impl<T: WireIO> WireIO for AsyncCallback<T> {
 
 /// Internal payload used by `AsyncCallbackFuture`.
 struct FutureState<T> {
-    result: Option<T>,
+    result: Option<Result<T, AsyncCancelled>>,
     waker: Option<Waker>,
     on_complete: Option<Box<dyn FnOnce() + Send + 'static>>,
 }
 
-extern "C" fn async_callback_complete<T: Send + 'static>(value: *const T, context: *const c_void) {
+extern "C" fn async_callback_complete<T: Send + 'static>(value: *const AsyncOutcome<T>, context: *const c_void) {
     // Safety: `context` is always an `Arc<Mutex<FutureState<T>>>` created in
     // `AsyncCallbackFuture::new` via `Arc::into_raw`. We reclaim ownership here —
     // this matches the one extra strong count deposited by `into_raw`.
@@ -219,7 +295,13 @@ extern "C" fn async_callback_complete<T: Send + 'static>(value: *const T, contex
     let mut lock = state.lock().unwrap();
     // Safety: The caller guarantees `value` is valid and that the pointee will not
     // be used afterwards (the caller forgets the original to prevent double-drop).
-    lock.result = Some(unsafe { std::ptr::read(value) });
+    // We read the outcome wrapper itself; on `Ok` the inner `T` is moved into the
+    // future state, on `Cancelled` we surface an `AsyncCancelled` error.
+    let outcome = unsafe { std::ptr::read(value) };
+    lock.result = Some(match outcome {
+        AsyncOutcome::Ok(t) => Ok(t),
+        AsyncOutcome::Cancelled => Err(AsyncCancelled),
+    });
     if let Some(on_complete) = lock.on_complete.take() {
         on_complete();
     }
@@ -233,6 +315,13 @@ extern "C" fn async_callback_complete<T: Send + 'static>(value: *const T, contex
 /// Use [`AsyncCallbackFuture::new`] to produce a matched `(future, callback)` pair.
 /// Pass the callback to any FFI function accepting [`AsyncCallback<T>`], then
 /// `.await` the future to receive the result.
+///
+/// # Output
+///
+/// The future resolves to `Result<T, AsyncCancelled>`. `Ok(t)` carries the
+/// payload supplied via [`AsyncCallback::call_ok`]; `Err(AsyncCancelled)` is
+/// produced when the foreign side cancels (e.g. a managed `Task` faulted or
+/// was disposed) and signals via [`AsyncCallback::call_cancelled`].
 ///
 /// # Lifetimes / cancellation
 ///
@@ -268,9 +357,9 @@ impl<T: Send + 'static + TypeInfo> AsyncCallbackFuture<T> {
 }
 
 impl<T: Send + 'static> Future for AsyncCallbackFuture<T> {
-    type Output = T;
+    type Output = Result<T, AsyncCancelled>;
 
-    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<T> {
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         let mut lock = self.state.lock().unwrap();
         if let Some(result) = lock.result.take() {
             Poll::Ready(result)
@@ -494,23 +583,14 @@ unsafe impl WireIO for TaskHandle {
     }
 }
 
-/// Trait for types that can produce a cancellation/fallback value.
-///
-/// Implemented by [`ffi::Result`](crate::ffi::Result) to produce
-/// the `Panic` variant when an async task is aborted.
-#[doc(hidden)]
-pub trait CancelValue {
-    /// Creates the value used to signal cancellation to the foreign side.
-    fn cancel_value() -> Self;
-}
-
 /// Drop guard ensuring an [`AsyncCallback`] is always invoked.
 ///
 /// When a spawned future completes normally, call [`mark_completed`](Self::mark_completed)
 /// before invoking the callback. If the future is aborted (e.g. via
 /// [`TaskHandle::abort`]) the guard's [`Drop`] impl fires the callback
-/// with [`CancelValue::cancel_value`] (typically `ffi::Result::Panic`)
-/// so the foreign side's task-completion mechanism is never leaked.
+/// with [`AsyncOutcome::Cancelled`] so the foreign side's task-completion
+/// mechanism is never leaked. The C# trampoline turns this into a
+/// `TaskCanceledException` thrown out of the awaiting `Task<T>`.
 ///
 /// # Zero allocation
 ///
@@ -526,12 +606,12 @@ pub trait CancelValue {
 /// `.await`) and `Drop` (called when the future is dropped). The atomic
 /// is a defence-in-depth measure.
 #[doc(hidden)]
-pub struct AsyncCallbackGuard<T: TypeInfo + CancelValue> {
+pub struct AsyncCallbackGuard<T: TypeInfo> {
     completed: AtomicBool,
     callback: AsyncCallback<T>,
 }
 
-impl<T: TypeInfo + CancelValue> AsyncCallbackGuard<T> {
+impl<T: TypeInfo> AsyncCallbackGuard<T> {
     /// Creates a guard from the callback to protect.
     #[must_use]
     pub fn new(callback: AsyncCallback<T>) -> Self {
@@ -547,20 +627,15 @@ impl<T: TypeInfo + CancelValue> AsyncCallbackGuard<T> {
     }
 }
 
-impl<T: TypeInfo + CancelValue> Drop for AsyncCallbackGuard<T> {
-    #[allow(clippy::mem_forget)]
+impl<T: TypeInfo> Drop for AsyncCallbackGuard<T> {
     fn drop(&mut self) {
         if !self.completed.swap(true, Ordering::AcqRel) {
-            let v = T::cancel_value();
             // SAFETY: The callback was created by the foreign side and is valid
             // until it has been called exactly once. `mark_completed` ensures
             // only one of normal-completion or cancel-on-drop fires.
             unsafe {
-                self.callback.call(&raw const v);
+                self.callback.call_cancelled();
             }
-
-            // The other side took a copy of value (so we effectively lost it)
-            std::mem::forget(v);
         }
     }
 }

@@ -60,6 +60,8 @@ impl Pass {
                 (csharp::UTIL_WIRE_BUFFER, "WireBuffer", Util::WireBuffer, Visibility::Internal),
                 (csharp::UTIL_CONST_CSTR_MARSHALLER, "ConstCStrMarshaller", Util::ConstCStrMarshaller, Visibility::Internal),
                 (csharp::UTIL_TASK_HANDLE, "TaskHandle", Util::TaskHandle, Visibility::Internal),
+                (csharp::UTIL_ASYNC_OUTCOME, "AsyncOutcome", Util::AsyncOutcome, Visibility::Internal),
+                (csharp::UTIL_ASYNC_OUTCOME_PAYLOAD, "AsyncOutcomeOf", Util::AsyncOutcomePayload, Visibility::Internal),
             ];
 
             for (id, name, variant, visibility) in utils {

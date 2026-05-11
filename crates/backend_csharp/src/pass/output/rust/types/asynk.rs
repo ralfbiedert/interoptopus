@@ -1,15 +1,21 @@
 //! Renders async trampoline classes and their static field declarations.
 //!
-//! For each unique async Result type used by async callbacks, generates:
-//! - A trampoline class (`AsyncTrampoline*`) that manages in-flight tasks
-//! - A static field declaration for the `Interop` class
+//! Reads the [`model::rust::types::info::trampoline::Pass`] records to drive
+//! emission. All identifier and shape decisions live in that model pass; this
+//! output pass is a pure render-and-route layer that:
+//!
+//! - Iterates trampoline records, gating each into the right output file via
+//!   the trampoline's `routing_id` (Result trampolines stay scoped to the
+//!   file that owns the Result type; stateless bare trampolines emit into
+//!   every file and dedupe by class name).
+//! - Renders [`templates/rust/types/asynk/trampoline.cs`] with a single
+//!   `shape` enum string plus the resolved payload, task and class names.
 
-use crate::lang::types::ManagedConversion;
-use crate::lang::types::kind::{Primitive, TypeKind, TypePattern};
 use crate::output::{FileType, Output};
+use crate::pass::output::rust::types::asynk_naming;
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Default)]
 pub struct Config {}
@@ -30,72 +36,48 @@ impl Pass {
         &mut self,
         _pass_meta: &mut crate::pass::PassMeta,
         output_master: &output::common::master::Pass,
-        async_types: &model::rust::types::info::async_types::Pass,
         types: &model::common::types::all::Pass,
-        managed_conversion: &model::common::types::info::managed_conversion::Pass,
+        trampoline: &model::rust::types::info::trampoline::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
         for file in output_master.outputs_of(FileType::Csharp) {
             let mut rendered_trampolines = Vec::new();
             let mut rendered_fields = Vec::new();
+            // Bare-Self async ctors all share a single `AsyncTrampolineIntPtr` class
+            // (every `*const Service` maps to `IntPtr` in C# and the trampoline body is
+            // identical), so dedupe by trampoline class name across distinct TypeIds.
+            let mut emitted_trampoline_names: HashSet<String> = HashSet::new();
 
-            for &result_ty_id in async_types.trampoline_types() {
-                if !output_master.type_belongs_to(result_ty_id, file) {
+            for (_, t) in trampoline.iter() {
+                // Stateless bare trampolines emit into every output; Result-shaped
+                // trampolines route through `type_belongs_to` so they live next to
+                // the Result definition.
+                if !t.emit_in_every_output && !output_master.type_belongs_to(t.routing_id, file) {
                     continue;
                 }
 
-                let Some(result_ty) = types.get(result_ty_id) else { continue };
-                let result_ty_name = &result_ty.name;
+                let names = asynk_naming::names_for(t, types);
 
-                // The trampoline class name and field name
-                let trampoline_name = format!("AsyncTrampoline{result_ty_name}");
-                let trampoline_field = format!("_trampoline{result_ty_name}");
-
-                // Determine the Task<T> inner type from the Result's Ok variant
-                let (task_inner_ty, is_task_void) = match &result_ty.kind {
-                    TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _)) => {
-                        let ok_kind = types.get(*ok_ty).map(|t| &t.kind);
-                        if matches!(ok_kind, Some(TypeKind::Primitive(Primitive::Void))) {
-                            ("void".to_string(), true)
-                        } else {
-                            let ok_name = types.get(*ok_ty).map_or_else(|| "void".to_string(), |t| t.name.clone());
-                            (ok_name, false)
-                        }
-                    }
-                    _ => continue,
-                };
-
-                // Check if the result type has an unmanaged representation
-                let has_unmanaged = matches!(managed_conversion.managed_conversion(result_ty_id), Some(ManagedConversion::To | ManagedConversion::Into));
-
-                let unmanaged_result_ty = if has_unmanaged {
-                    format!("{result_ty_name}.Unmanaged")
-                } else {
-                    result_ty_name.clone()
-                };
-
-                let result_to_managed = match managed_conversion.managed_conversion(result_ty_id) {
-                    Some(ManagedConversion::Into) => "IntoManaged",
-                    _ => "ToManaged",
-                };
+                if !emitted_trampoline_names.insert(names.class_name.clone()) {
+                    continue;
+                }
 
                 let mut context = Context::new();
-                context.insert("trampoline_name", &trampoline_name);
-                context.insert("result_ty_name", result_ty_name);
-                context.insert("unmanaged_result_ty", &unmanaged_result_ty);
-                context.insert("task_inner_ty", &task_inner_ty);
-                context.insert("is_task_void", &is_task_void);
-                context.insert("has_unmanaged", &has_unmanaged);
-                context.insert("result_to_managed", result_to_managed);
+                context.insert("trampoline_name", &names.class_name);
+                context.insert("shape", names.shape.as_str());
+                context.insert("payload_full", &names.payload_full);
+                context.insert("task_inner_ty", &names.task_inner_name);
+                context.insert("is_task_void", &names.is_task_void);
+                context.insert("result_to_managed", &names.managed_conversion_method);
 
                 let rendered = templates.render("rust/types/asynk/trampoline.cs", &context)?;
                 rendered_trampolines.push(rendered);
 
                 // Render the static field declaration
                 let mut field_context = Context::new();
-                field_context.insert("trampoline_name", &trampoline_name);
-                field_context.insert("trampoline_field", &trampoline_field);
+                field_context.insert("trampoline_name", &names.class_name);
+                field_context.insert("trampoline_field", &names.field_name);
                 let field_rendered = templates.render("rust/types/asynk/trampoline_field.cs", &field_context)?;
                 rendered_fields.push(field_rendered);
             }

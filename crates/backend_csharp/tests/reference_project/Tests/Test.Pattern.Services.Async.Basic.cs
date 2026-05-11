@@ -4,9 +4,9 @@ using Xunit;
 public class TestPatternServicesAsyncBasic
 {
     [Fact]
-    public async void Call()
+    public async void Create()
     {
-        var s = ServiceAsyncBasic.Create();
-        await s.Call();
+        using var s = ServiceAsyncBasic.Simple();
     }
+
 }

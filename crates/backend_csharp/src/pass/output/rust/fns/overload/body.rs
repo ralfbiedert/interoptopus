@@ -6,6 +6,7 @@
 //! Async overloads set `is_async = true` which switches the template to
 //! trampoline + Task return.
 
+use crate::lang::FunctionId;
 use crate::lang::functions::FunctionKind;
 use crate::lang::functions::overload::{ArgTransform, FnTransforms, OverloadKind, RvalTransform};
 use crate::lang::functions::{Argument, Function};
@@ -38,6 +39,7 @@ impl Pass {
         fns_all: &model::common::fns::all::Pass,
         types: &model::common::types::all::Pass,
         type_overloads: &model::rust::types::overload::all::Pass,
+        trampoline: &model::rust::types::info::trampoline::Pass,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -57,10 +59,10 @@ impl Pass {
 
                 match &overload.kind {
                     OverloadKind::Body(transforms) => {
-                        body.push(render(original_fn, function, transforms, types, type_overloads, templates)?);
+                        body.push(render(original_fn, function, transforms, types, type_overloads, trampoline, overload_id, templates)?);
                     }
                     OverloadKind::Async(transforms) => {
-                        asynk.push(render(original_fn, function, transforms, types, type_overloads, templates)?);
+                        asynk.push(render(original_fn, function, transforms, types, type_overloads, trampoline, overload_id, templates)?);
                     }
                     OverloadKind::Simple => {}
                 }
@@ -92,6 +94,8 @@ fn render(
     transforms: &FnTransforms,
     types: &model::common::types::all::Pass,
     type_overloads: &model::rust::types::overload::all::Pass,
+    trampoline: &model::rust::types::info::trampoline::Pass,
+    overload_id: FunctionId,
     templates: &TemplateEngine,
 ) -> Result<String, crate::Error> {
     let name = &original_fn.name;
@@ -138,11 +142,10 @@ fn render(
     context.insert("docs", &docs);
     context.insert("visibility", &overload_fn.visibility.to_string());
 
-    if let RvalTransform::AsyncTask(result_ty_id) = transforms.rval
-        && let Some(result_ty) = types.get(result_ty_id)
+    if let RvalTransform::AsyncTask(_) = transforms.rval
+        && let Some(t) = trampoline.for_function(overload_id)
     {
-        let trampoline_field = format!("_trampoline{}", result_ty.name);
-        context.insert("trampoline_field", &trampoline_field);
+        context.insert("trampoline_field", &crate::pass::output::rust::types::asynk_naming::field_name(t, types));
         let is_task_void = rval == "Task";
         context.insert("is_task_void", &is_task_void);
     }

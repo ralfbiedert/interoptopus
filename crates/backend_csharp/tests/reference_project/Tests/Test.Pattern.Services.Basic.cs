@@ -4,7 +4,7 @@ using Xunit;
 public class TestPatternServicesBasic
 {
     [Fact]
-    public void NewDispose()
+    public void Create()
     {
         using var service = ServiceBasic.Create();
     }

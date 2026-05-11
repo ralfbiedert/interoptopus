@@ -7,4 +7,6 @@ pub enum Util {
     WireBuffer,
     ConstCStrMarshaller,
     TaskHandle,
+    AsyncOutcome,
+    AsyncOutcomePayload,
 }

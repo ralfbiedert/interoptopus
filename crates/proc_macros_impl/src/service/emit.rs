@@ -227,9 +227,6 @@ impl ServiceModel {
             quote_spanned! { ctor.name.span() => <#service_type>::#ctor_name }
         };
 
-        // Extract error type from the constructor's return type
-        let error_type = Self::extract_error_type_from_constructor(ctor);
-
         // Use Box for non-async services, Arc for async services
         let into_raw_call = if self.is_async {
             quote_spanned! { ctor.name.span() =>
@@ -242,6 +239,21 @@ impl ServiceModel {
         };
 
         let ffi_attr = self.emit_ffi_attr(&function_name);
+
+        // Bare ctors (`fn new() -> Self`) emit a simpler body without Result wrapping.
+        if self.is_bare_self_ctor(ctor) {
+            return quote_spanned! { ctor.name.span() =>
+                #docs
+                #ffi_attr
+                unsafe fn #function_name #generics(#params) -> *const #service_type {
+                    let service_instance = #service_call(#param_names);
+                    #into_raw_call
+                }
+            };
+        }
+
+        // Extract error type from the constructor's return type
+        let error_type = Self::extract_error_type_from_constructor(ctor);
 
         quote_spanned! { ctor.name.span() =>
             #docs
@@ -260,6 +272,7 @@ impl ServiceModel {
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn emit_async_constructor_function(&self, ctor: &ServiceMethod) -> TokenStream {
         let service_name_snake = self.service_name_snake_case();
         let ctor_name = &ctor.name;
@@ -278,8 +291,8 @@ impl ServiceModel {
             unreachable!("emit_async_constructor_function called with non-AsyncCtor receiver")
         };
 
-        // Extract error type from the constructor's return type
-        let error_type = Self::extract_error_type_from_constructor(ctor);
+        let ffi_attr = self.emit_ffi_attr(&function_name);
+        let unsafe_token = quote_spanned! { Span::call_site() => unsafe };
 
         // For generic types, we need to use the concrete type with turbofish syntax
         let service_call = if self.generics.params.is_empty() {
@@ -287,6 +300,72 @@ impl ServiceModel {
         } else {
             quote_spanned! { ctor.name.span() => <#service_type>::#ctor_name }
         };
+
+        // Bare async ctors (`async fn new() -> Self`) emit a simpler body that just
+        // pushes the constructed service through the callback as a raw pointer; no
+        // Result wrapping, no error type, no Ok/Err/Panic/Null arms.
+        if self.is_bare_self_ctor(ctor) {
+            let callback_type = quote_spanned! { ctor.name.span() => *const #service_type };
+            let async_params = if ctor.inputs.is_empty() {
+                quote_spanned! { ctor.name.span() =>
+                    runtime: *const #runtime_type,
+                    callback: ::interoptopus::pattern::asynk::AsyncCallback<#callback_type>
+                }
+            } else {
+                quote_spanned! { ctor.name.span() =>
+                    runtime: *const #runtime_type,
+                    #params,
+                    callback: ::interoptopus::pattern::asynk::AsyncCallback<#callback_type>
+                }
+            };
+            let assert_service_send_sync = quote_spanned! { service_type.span() =>
+                const { ::interoptopus::lang::types::assert_send_sync::<#service_type>() }
+            };
+
+            return quote_spanned! { ctor.name.span() =>
+                #docs
+                #[allow(clippy::used_underscore_items, clippy::forget_non_drop)]
+                #ffi_attr
+                #unsafe_token fn #function_name #generics(
+                    #async_params
+                ) -> ::interoptopus::pattern::asynk::TaskHandle {
+                    #assert_service_send_sync
+
+                    #unsafe_token {
+                        use ::interoptopus::pattern::asynk::AsyncRuntime;
+
+                        let _runtime_arc = ::std::sync::Arc::from_raw(runtime);
+                        let _runtime_invoke = ::std::sync::Arc::clone(&_runtime_arc);
+                        let _runtime_inside = ::std::sync::Arc::clone(&_runtime_arc);
+                        ::std::mem::forget(_runtime_arc); // Don't drop the original
+
+                        let _guard = ::interoptopus::pattern::asynk::AsyncCallbackGuard::new(callback);
+
+                        _runtime_invoke.spawn(move |_ctx| async move {
+                            // Move the guard *into the future* (not just the outer closure).
+                            // `async move` only captures names it references; without this
+                            // shadow the guard would drop when the closure returns (right
+                            // after `spawn` constructs the future) and fire the cancel value
+                            // immediately. With it, the guard lives as long as the future
+                            // and only drops on completion or runtime shutdown.
+                            let _guard = _guard;
+                            let _async_runtime = ::interoptopus::pattern::asynk::Async::new(_runtime_inside, _ctx);
+                            let _service_instance = #service_call(_async_runtime, #param_names).await;
+                            _guard.mark_completed();
+                            let _cb_result: *const #service_type =
+                                ::std::sync::Arc::into_raw(::std::sync::Arc::new(_service_instance));
+                            // `call_ok` wraps the value in `AsyncOutcome::Ok` on the wire so the
+                            // foreign side can distinguish completion from cancellation. The
+                            // pointer payload is `Copy`, so no `mem::forget` is required.
+                            callback.call_ok(&raw const _cb_result);
+                        })
+                    }
+                }
+            };
+        }
+
+        // Extract error type from the constructor's return type
+        let error_type = Self::extract_error_type_from_constructor(ctor);
 
         // Callback type is Result<*const ServiceType, Error>
         let callback_type = quote_spanned! { ctor.name.span() =>
@@ -313,10 +392,6 @@ impl ServiceModel {
             const { ::interoptopus::lang::types::assert_send_sync::<#error_type>() }
         };
 
-        let ffi_attr = self.emit_ffi_attr(&function_name);
-
-        let unsafe_token = quote_spanned! { Span::call_site() => unsafe };
-
         quote_spanned! { ctor.name.span() =>
             #docs
             #[allow(clippy::used_underscore_items, clippy::forget_non_drop)]
@@ -338,6 +413,12 @@ impl ServiceModel {
                     let _guard = ::interoptopus::pattern::asynk::AsyncCallbackGuard::new(callback);
 
                     _runtime_invoke.spawn(move |_ctx| async move {
+                        // Move the guard *into the future* (not just the outer closure).
+                        // `async move` only captures names it references; without this
+                        // shadow the guard would drop when the closure returns (right
+                        // after `spawn` constructs the future) and fire the cancel value
+                        // immediately. With it, the guard lives as long as the future
+                        // and only drops on completion or runtime shutdown.
                         let _guard = _guard;
                         let _async_runtime = ::interoptopus::pattern::asynk::Async::new(_runtime_inside, _ctx);
                         let _result = #service_call(_async_runtime, #param_names).await;
@@ -347,22 +428,22 @@ impl ServiceModel {
                                 let _cb_result = ::interoptopus::ffi::Ok(
                                     ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
                                 );
-                                callback.call(&raw const _cb_result);
+                                callback.call_ok(&raw const _cb_result);
                                 ::std::mem::forget(_cb_result);
                             }
                             ::interoptopus::ffi::Err(err) => {
                                 let _cb_result = ::interoptopus::ffi::Err(err);
-                                callback.call(&raw const _cb_result);
+                                callback.call_ok(&raw const _cb_result);
                                 ::std::mem::forget(_cb_result);
                             }
                             ::interoptopus::ffi::Result::Panic => {
                                 let _cb_result: #callback_type = ::interoptopus::ffi::Result::Panic;
-                                callback.call(&raw const _cb_result);
+                                callback.call_ok(&raw const _cb_result);
                                 ::std::mem::forget(_cb_result);
                             }
                             ::interoptopus::ffi::Result::Null => {
                                 let _cb_result: #callback_type = ::interoptopus::ffi::Result::Null;
-                                callback.call(&raw const _cb_result);
+                                callback.call_ok(&raw const _cb_result);
                                 ::std::mem::forget(_cb_result);
                             }
                         }
@@ -518,7 +599,7 @@ impl ServiceModel {
 
         quote_spanned! { method.name.span() =>
             #docs
-            #[allow(clippy::used_underscore_items, clippy::forget_non_drop)]
+            #[allow(clippy::used_underscore_items, clippy::forget_non_drop, forgetting_copy_types)]
             #ffi_attr
             #unsafe_token fn #function_name #enhanced_generics(
                 #async_params
@@ -536,11 +617,17 @@ impl ServiceModel {
                     let _guard = ::interoptopus::pattern::asynk::AsyncCallbackGuard::new(callback);
 
                     _instance_invoke.spawn(move |_ctx| async move {
+                        // Move the guard *into the future* (not just the outer closure).
+                        // `async move` only captures names it references; without this
+                        // shadow the guard would drop when the closure returns (right
+                        // after `spawn` constructs the future) and fire the cancel value
+                        // immediately. With it, the guard lives as long as the future
+                        // and only drops on completion or runtime shutdown.
                         let _guard = _guard;
                         let _async_this = ::interoptopus::pattern::asynk::Async::new(_instance_inside, _ctx);
                         let _result = #service_type::#method_name(_async_this, #param_names).await;
                         _guard.mark_completed();
-                        callback.call(&raw const _result);
+                        callback.call_ok(&raw const _result);
                         // Prevent Rust from dropping owned data (e.g. ffi::String) after the
                         // callback, since the callee took ownership via ptr::read.
                         ::std::mem::forget(_result);
@@ -631,6 +718,20 @@ impl ServiceModel {
             }
             ReturnType::Default => quote_spanned! { ctor.name.span() => Error },
         }
+    }
+
+    /// Returns `true` if the constructor's return type is bare `Self` (or the service
+    /// type itself), as opposed to `ffi::Result<Self, _>`. Bare ctors emit a simpler
+    /// FFI body that returns `*const ServiceType` directly without Result wrapping.
+    fn is_bare_self_ctor(&self, ctor: &ServiceMethod) -> bool {
+        let ReturnType::Type(_, ty) = &ctor.output else { return false };
+        let Type::Path(p) = ty.as_ref() else { return false };
+        // Single-segment path matching `Self` or the service name.
+        if p.path.segments.len() != 1 {
+            return false;
+        }
+        let Some(seg) = p.path.segments.last() else { return false };
+        seg.ident == "Self" || seg.ident == self.service_name
     }
 
     pub fn emit_service_info_impl(&self) -> TokenStream {
@@ -742,24 +843,23 @@ impl ServiceModel {
             })
             .collect::<Result<Vec<_>, Error>>()?;
 
-        // Generate validation for async methods - they should have Async<Self> as first parameter
+        // Generate validation for async methods - they should have Async<Self> as first parameter,
+        // and their return type must implement `TypeInfo` (typically `ffi::Result<T, E>`, but
+        // bare returns such as `()` are also supported).
         let async_method_verification_blocks: Vec<TokenStream> = self
             .methods
             .iter()
             .filter(|method| method.is_async && matches!(method.receiver_kind, ReceiverKind::AsyncThis))
             .map(|method| {
                 let method_span = method.name.span();
-                // Create a validation that checks if Async<ServiceType> can be used
                 let method_rval = match &method.output {
                     ReturnType::Default => quote_spanned! { method_span => () },
                     ReturnType::Type(_, x) => quote_spanned! { x.span() => #x },
                 };
                 Ok(quote_spanned! { method_span =>
                     {
-                        const fn _assert_rval_result1<T: ::interoptopus::lang::types::TypeInfo, E: ::interoptopus::lang::types::TypeInfo>(_: &::interoptopus::ffi::Result<T, E>) {}
-                        const fn _assert_rval_result2(x: &#method_rval) {
-                            _assert_rval_result1(&x);
-                        }
+                        const fn _assert_async_rval_type_info<T: ::interoptopus::lang::types::TypeInfo>() {}
+                        _assert_async_rval_type_info::<#method_rval>();
                     }
                 })
             })
