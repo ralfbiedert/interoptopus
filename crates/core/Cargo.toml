@@ -18,12 +18,14 @@ workspace = true
 [features]
 default = ["macros"]
 macros = ["dep:interoptopus_proc"]
+tokio-ct = ["tokio", "tokio-util"]
 unstable-plugins = []
 
 [dependencies]
 interoptopus_proc = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "io-std"], optional = true }
+tokio-util = { workspace = true, optional = true }
 
 [dev-dependencies]
 trybuild.workspace = true

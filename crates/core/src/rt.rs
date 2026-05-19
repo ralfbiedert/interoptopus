@@ -39,6 +39,8 @@
 
 use crate::pattern::asynk::{AsyncRuntime, TaskHandle};
 use std::sync::Arc;
+#[cfg(feature = "tokio-ct")]
+use tokio_util::future::FutureExt;
 
 /// A ready-made [`AsyncRuntime`] backed by a multi-threaded Tokio runtime.
 ///
@@ -77,14 +79,26 @@ impl Tokio {
 }
 
 impl AsyncRuntime for Tokio {
+    #[cfg(not(feature = "tokio-ct"))]
     type T = ();
+    #[cfg(feature = "tokio-ct")]
+    type T = tokio_util::sync::CancellationToken;
 
     fn spawn<Fn, F>(&self, f: Fn) -> TaskHandle
     where
         Fn: FnOnce(Self::T) -> F + Send + 'static,
         F: Future<Output = ()> + Send + 'static,
     {
-        let join = self.rt.spawn(f(()));
-        TaskHandle::from_handle(join.abort_handle(), tokio::task::AbortHandle::abort)
+        #[cfg(not(feature = "tokio-ct"))]
+        {
+            let join = self.rt.spawn(f(()));
+            TaskHandle::from_handle(join.abort_handle(), tokio::task::AbortHandle::abort)
+        }
+        #[cfg(feature = "tokio-ct")]
+        {
+            let cancel = tokio_util::sync::CancellationToken::new();
+            let join = self.rt.spawn(f(cancel.clone())).with_cancellation_token_owned(cancel.clone());
+            TaskHandle::from_handle((join, cancel), |(_, cancel)| cancel.cancel())
+        }
     }
 }
