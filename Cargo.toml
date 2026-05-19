@@ -53,7 +53,7 @@ syn = "2.0.104"
 tar = "0.4.44"
 tempfile = "3"
 tera = "2.0.0-alpha.2"
-tokio = { version = "1.48.0" }
+tokio = "1.48.0"
 tokio-util = "0.7.18"
 trybuild = "1.0.111"
 
