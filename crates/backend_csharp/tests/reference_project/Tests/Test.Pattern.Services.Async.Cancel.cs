@@ -124,31 +124,6 @@ public class TestPatternServicesAsyncCancel
         Assert.Equal(counterAtCancel, counterAfterWait);
     }
 
-    /// The counter should stop incrementing after cancellation,
-    /// proving the Rust future was actually stopped via cancellation,
-    /// but should still return a result.
-    [Fact]
-    public async Task InfiniteCountingWorkStopsAfterCancel()
-    {
-        using var s = ServiceAsyncCancel.Create();
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(4));
-
-        var countBefore = s.Counter();
-
-        // Start counting work that would run forever, but the cancellation token
-        // is automatically canceled after 4 seconds. Because the cancellation is
-        // handled by the cancellation token, this function will not throw just
-        // because the token is canceled.
-        var finalCount = await s.CountingForever(20, cts.Token);
-
-        // Let it run for 500ms as a sanity check
-        await Task.Delay(500);
-
-        Assert.True(finalCount != 0);
-        Assert.True(countBefore < finalCount);
-        Assert.Equal(finalCount, s.Counter());
-    }
-
     /// Multiple cancellations in sequence on the same service.
     [Fact]
     public async Task RepeatedCancelAndReuse()

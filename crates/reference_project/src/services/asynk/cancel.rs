@@ -31,24 +31,6 @@ impl ServiceAsyncCancel {
         ffi::Ok(completed)
     }
 
-    /// Runs forever, sleeping `step_ms` each iteration. Returns the number of steps actually
-    /// completed, which will be greater than the starting number of steps if the task is
-    /// aborted.
-    pub async fn counting_forever(this: Async<Self>, step_ms: u64) -> ffi::Result<u64, Error> {
-        let cancel_token = this.context();
-        let counter = this.counter.clone();
-
-        match cancel_token.run_until_cancelled(async move {
-            loop {
-                tokio::time::sleep(std::time::Duration::from_millis(step_ms)).await;
-                counter.fetch_add(1, Ordering::Relaxed);
-            }
-        }).await {
-            Some(_) => panic!("The loop never ends and cannot return a result"),
-            None => ffi::Ok(this.counter.load(Ordering::Relaxed)),
-        }
-    }
-
     /// Increments the service's shared counter each step. The final
     /// counter value is observable via [`counter`](Self::counter) even
     /// after the task is aborted.
