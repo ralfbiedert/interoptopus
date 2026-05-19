@@ -4,4 +4,5 @@ use interoptopus::ffi;
 #[derive(Debug, PartialOrd, PartialEq, Copy, Clone)]
 pub enum Error {
     Fail,
+    TaskCancelled,
 }

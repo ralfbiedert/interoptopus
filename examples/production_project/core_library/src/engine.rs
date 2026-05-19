@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 /// A native vector type used in our game engine.
 #[derive(Copy, Clone, Debug)]
 pub struct Vec2 {
@@ -22,5 +24,17 @@ impl GameEngine {
 
     pub fn num_objects(&self) -> u32 {
         self.object_count
+    }
+
+    pub async fn update_async(&mut self, _delta_time_sec: f64) -> Duration {
+        let start_time = std::time::Instant::now();
+
+        // Simulate a long-running task
+        tokio::time::sleep(Duration::from_millis(3)).await;
+
+        // Simulate a game object being removed during the update
+        self.object_count -= 1;
+
+        start_time.elapsed()
     }
 }

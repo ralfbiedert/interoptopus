@@ -7,4 +7,5 @@ publish = false
 
 [dependencies]
 core_library = { path = "../core_library" }
-interoptopus = { workspace = true, features = ["macros"] }
+interoptopus = { workspace = true, features = ["macros", "tokio-ct"] }
+tokio = { workspace = true }
