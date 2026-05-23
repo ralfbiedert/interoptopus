@@ -182,6 +182,7 @@ macro_rules! impl_fnptr {
         }
     };
 }
+impl_fnptr!(R);
 impl_fnptr!(R, T1);
 impl_fnptr!(R, T1, T2);
 impl_fnptr!(R, T1, T2, T3);
