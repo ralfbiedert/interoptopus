@@ -38,10 +38,10 @@ fn no_consecutive_empty_lines() {
     use interoptopus::lang::meta::FileEmission;
 
     let mut inventory = RustInventory::new();
-    inventory.register(extra_type!(Vec2));
-    inventory.register(extra_type!(Vec3));
-    inventory.register(extra_type!(Color));
-    inventory.register(function!(ws_sum_u32));
+    let _ = inventory.register(extra_type!(Vec2));
+    let _ = inventory.register(extra_type!(Vec3));
+    let _ = inventory.register(extra_type!(Color));
+    let _ = inventory.register(function!(ws_sum_u32));
     let inventory = inventory.validate();
 
     let multibuf = RustLibrary::builder(inventory)
