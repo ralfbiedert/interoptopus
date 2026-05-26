@@ -2,6 +2,7 @@ mod functions;
 mod patterns;
 mod services;
 mod types;
+mod whitespace;
 mod wire;
 
 use interoptopus::inventory::RustInventory;

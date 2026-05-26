@@ -1,7 +1,7 @@
 //! Renders the final dotnet interop `.cs` file by composing intermediary output passes.
 
 use crate::output::FileType;
-use crate::pass::{OutputResult, PassInfo, output};
+use crate::pass::{OutputResult, PassInfo, output, normalize_blank_lines};
 use crate::pipeline::DotnetOutputPasses;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;
@@ -66,6 +66,7 @@ impl Pass {
             context.insert("trampolines", &trampolines);
 
             let rendered = templates.render("dotnet/all.cs", &context)?;
+            let rendered = normalize_blank_lines(&rendered);
             output.add_buffer_with_overwrite(file.target.file_name(), rendered, file.target.overwrite_policy());
         }
 

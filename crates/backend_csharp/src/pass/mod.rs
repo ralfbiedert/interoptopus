@@ -101,3 +101,36 @@ pub fn format_docs(lines: &[String]) -> String {
     }
     lines.iter().map(|line| format!("/// {line}")).collect::<Vec<_>>().join("\n")
 }
+
+/// Collapses runs of 3+ consecutive blank lines down to exactly one blank line
+/// and trims trailing whitespace from the output.
+///
+/// Handles both `\n` and `\r\n` line endings.
+#[must_use]
+pub fn normalize_blank_lines(input: &str) -> String {
+    let mut result = String::with_capacity(input.len());
+    let mut consecutive_newlines: usize = 0;
+
+    for ch in input.chars() {
+        if ch == '\n' {
+            consecutive_newlines += 1;
+            if consecutive_newlines <= 2 {
+                result.push(ch);
+            }
+        } else if ch == '\r' {
+            // Pass through \r only when we'd also keep the following \n
+            if consecutive_newlines < 2 {
+                result.push(ch);
+            }
+        } else {
+            consecutive_newlines = 0;
+            result.push(ch);
+        }
+    }
+
+    // Trim trailing whitespace
+    let trimmed = result.trim_end();
+    let mut out = trimmed.to_string();
+    out.push('\n');
+    out
+}

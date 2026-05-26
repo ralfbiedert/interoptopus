@@ -1,7 +1,7 @@
 //! Last output step where a buffer is fully materialized.
 
 use crate::output::FileType;
-use crate::pass::{OutputResult, PassInfo, meta, output};
+use crate::pass::{OutputResult, PassInfo, meta, output, normalize_blank_lines};
 use crate::pipeline::IntermediateOutputPasses;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;
@@ -81,6 +81,7 @@ impl Pass {
             context.insert("util", &util);
 
             let final_ = templates.render("rust/all.cs", &context)?;
+            let final_ = normalize_blank_lines(&final_);
             output.add_buffer_with_overwrite(file.target.file_name(), final_, file.target.overwrite_policy());
         }
 
