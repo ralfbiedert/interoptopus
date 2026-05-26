@@ -31,11 +31,11 @@ pub fn ws_sum_u32(a: u32, b: u32) -> u32 {
 #[test]
 fn no_consecutive_empty_lines() {
     use interoptopus::inventory::RustInventory;
+    use interoptopus::lang::meta::FileEmission;
     use interoptopus_csharp::RustLibrary;
     use interoptopus_csharp::config::HeaderConfig;
     use interoptopus_csharp::dispatch::Dispatch;
     use interoptopus_csharp::output::Target;
-    use interoptopus::lang::meta::FileEmission;
 
     let mut inventory = RustInventory::new();
     let _ = inventory.register(extra_type!(Vec2));

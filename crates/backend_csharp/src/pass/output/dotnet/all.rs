@@ -1,7 +1,7 @@
 //! Renders the final dotnet interop `.cs` file by composing intermediary output passes.
 
 use crate::output::FileType;
-use crate::pass::{OutputResult, PassInfo, output, normalize_blank_lines};
+use crate::pass::{OutputResult, PassInfo, normalize_blank_lines, output};
 use crate::pipeline::DotnetOutputPasses;
 use interoptopus_backends::output::Multibuf;
 use interoptopus_backends::template::Context;
