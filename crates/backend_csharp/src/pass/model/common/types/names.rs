@@ -82,6 +82,21 @@ impl Pass {
                     let element = resolve_name!(self, a.ty, pass_meta);
                     format!("{element}[]")
                 }
+                TypeKind::WireOnly(w) => match w {
+                    crate::lang::types::kind::wire::WireOnly::String => "string".to_string(),
+                    crate::lang::types::kind::wire::WireOnly::Vec(t) => {
+                        format!("List<{}>", resolve_name!(self, *t, pass_meta))
+                    }
+                    crate::lang::types::kind::wire::WireOnly::Map(k, v) => {
+                        let k_name = resolve_name!(self, *k, pass_meta).to_string();
+                        let v_name = resolve_name!(self, *v, pass_meta);
+                        format!("Dictionary<{k_name}, {v_name}>")
+                    }
+                    crate::lang::types::kind::wire::WireOnly::Nullable(t) => {
+                        format!("{}?", resolve_name!(self, *t, pass_meta))
+                    }
+                    crate::lang::types::kind::wire::WireOnly::Composite(_) => sanitize_rust_name(&ty.name),
+                },
                 TypeKind::TypePattern(p) => match p {
                     TypePattern::Bool => "Bool".to_string(),
                     TypePattern::CChar => "byte".to_string(),

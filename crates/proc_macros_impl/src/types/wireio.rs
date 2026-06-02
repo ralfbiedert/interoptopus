@@ -4,6 +4,37 @@ use syn::spanned::Spanned;
 
 use crate::types::model::{TypeData, TypeModel, VariantData};
 
+/// Compute the wire discriminant tag for each variant of an enum.
+/// Mirrors Rust auto-numbering: explicit discriminants reset the counter,
+/// auto-numbered variants are previous + 1. This matches what the C# backend
+/// uses on its side (unit variants use Rust auto/explicit values; tuple variants
+/// also fall out of auto-numbering when starting at 0 with no explicit values).
+fn compute_variant_tags(enum_data: &crate::types::model::EnumData) -> Vec<isize> {
+    let mut next_auto: isize = 0;
+    let mut tags = Vec::with_capacity(enum_data.variants.len());
+    for v in &enum_data.variants {
+        let value = if let Some(expr) = &v.discriminant {
+            match crate::types::discriminant::try_eval(expr) {
+                Some(val) => {
+                    next_auto = val + 1;
+                    val
+                }
+                None => {
+                    let val = next_auto;
+                    next_auto += 1;
+                    val
+                }
+            }
+        } else {
+            let val = next_auto;
+            next_auto += 1;
+            val
+        };
+        tags.push(value);
+    }
+    tags
+}
+
 impl TypeModel {
     pub fn emit_wireio_impl(&self) -> TokenStream {
         let name = &self.name;
@@ -20,10 +51,7 @@ impl TypeModel {
             TypeData::Enum(_) => false,
         };
 
-        let is_unsupported_enum = match &self.data {
-            TypeData::Enum(enum_data) => !enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)),
-            TypeData::Struct(_) => false,
-        };
+        let is_unsupported_enum = false;
 
         let use_underscore_params = is_unsupported_enum || self.args.opaque || self.args.service || has_skipped_fields;
 
@@ -94,9 +122,28 @@ impl TypeModel {
                     quote_spanned! { self.name.span() => where #(#field_bounds)* }
                 }
             }
-            TypeData::Enum(_) => {
-                // For enums, just use existing where clause
-                existing_where.map_or_else(|| quote_spanned! { self.name.span() => }, |w| quote_spanned! { self.name.span() => #w })
+            TypeData::Enum(enum_data) => {
+                let field_bounds: Vec<_> = enum_data
+                    .variants
+                    .iter()
+                    .filter_map(|v| match &v.data {
+                        VariantData::Unit => None,
+                        VariantData::Tuple(ty) => Some(quote_spanned! { v.name.span() => #ty: ::interoptopus::lang::types::WireIO, }),
+                    })
+                    .collect();
+
+                if let Some(existing_where) = existing_where {
+                    let existing_predicates = &existing_where.predicates;
+                    if field_bounds.is_empty() {
+                        quote_spanned! { self.name.span() => where #existing_predicates }
+                    } else {
+                        quote_spanned! { self.name.span() => where #existing_predicates #(#field_bounds)* }
+                    }
+                } else if field_bounds.is_empty() {
+                    quote_spanned! { self.name.span() => }
+                } else {
+                    quote_spanned! { self.name.span() => where #(#field_bounds)* }
+                }
             }
         }
     }
@@ -152,26 +199,32 @@ impl TypeModel {
                 }
             }
             TypeData::Enum(enum_data) => {
-                if enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)) {
-                    let name = &self.name;
-                    let wire_ty = crate::types::discriminant::wire_type_tokens(&enum_data.discriminant, self.name.span());
-                    let arms = enum_data.variants.iter().map(|v| {
-                        let vname = &v.name;
-                        quote_spanned! { vname.span() =>
-                            #name::#vname => #name::#vname as #wire_ty,
-                        }
-                    });
+                let name = &self.name;
+                let wire_ty = crate::types::discriminant::wire_type_tokens(&enum_data.discriminant, self.name.span());
+                let tags = compute_variant_tags(enum_data);
+                let arms = enum_data.variants.iter().zip(tags.iter()).map(|(v, tag)| {
+                    let vname = &v.name;
+                    let tag_lit = proc_macro2::Literal::isize_unsuffixed(*tag);
+                    match &v.data {
+                        VariantData::Unit => quote_spanned! { vname.span() =>
+                            #name::#vname => {
+                                <#wire_ty as ::interoptopus::lang::types::WireIO>::write(&(#tag_lit as #wire_ty), out)?;
+                            }
+                        },
+                        VariantData::Tuple(ty) => quote_spanned! { vname.span() =>
+                            #name::#vname(__inner) => {
+                                <#wire_ty as ::interoptopus::lang::types::WireIO>::write(&(#tag_lit as #wire_ty), out)?;
+                                <#ty as ::interoptopus::lang::types::WireIO>::write(__inner, out)?;
+                            }
+                        },
+                    }
+                });
 
-                    quote_spanned! { self.name.span() =>
-                        let __disc = match self {
-                            #(#arms)*
-                        };
-                        <#wire_ty as ::interoptopus::lang::types::WireIO>::write(&__disc, out)
+                quote_spanned! { self.name.span() =>
+                    match self {
+                        #(#arms)*
                     }
-                } else {
-                    quote_spanned! { self.name.span() =>
-                        ::interoptopus::bad_wire!()
-                    }
+                    ::std::result::Result::Ok(())
                 }
             }
         }
@@ -245,29 +298,33 @@ impl TypeModel {
                 }
             }
             TypeData::Enum(enum_data) => {
-                if enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)) {
-                    let name = &self.name;
-                    let wire_ty = crate::types::discriminant::wire_type_tokens(&enum_data.discriminant, self.name.span());
-                    let match_arms = enum_data.variants.iter().map(|variant| {
-                        let vname = &variant.name;
-                        quote_spanned! { vname.span() =>
-                            x if x == #name::#vname as #wire_ty => ::std::result::Result::Ok(#name::#vname),
-                        }
-                    });
-
-                    quote_spanned! { self.name.span() =>
-                        let __discriminant = <#wire_ty as ::interoptopus::lang::types::WireIO>::read(input)?;
-                        match __discriminant {
-                            #(#match_arms)*
-                            _ => ::std::result::Result::Err(::interoptopus::wire::SerializationError::invalid_discriminant(
-                                stringify!(#name),
-                                __discriminant as isize,
-                            )),
-                        }
+                let name = &self.name;
+                let wire_ty = crate::types::discriminant::wire_type_tokens(&enum_data.discriminant, self.name.span());
+                let tags = compute_variant_tags(enum_data);
+                let arms = enum_data.variants.iter().zip(tags.iter()).map(|(v, tag)| {
+                    let vname = &v.name;
+                    let tag_lit = proc_macro2::Literal::isize_unsuffixed(*tag);
+                    match &v.data {
+                        VariantData::Unit => quote_spanned! { vname.span() =>
+                            x if x == (#tag_lit as #wire_ty) => ::std::result::Result::Ok(#name::#vname),
+                        },
+                        VariantData::Tuple(ty) => quote_spanned! { vname.span() =>
+                            x if x == (#tag_lit as #wire_ty) => {
+                                let __inner = <#ty as ::interoptopus::lang::types::WireIO>::read(input)?;
+                                ::std::result::Result::Ok(#name::#vname(__inner))
+                            }
+                        },
                     }
-                } else {
-                    quote_spanned! { self.name.span() =>
-                        ::interoptopus::bad_wire!()
+                });
+
+                quote_spanned! { self.name.span() =>
+                    let __discriminant = <#wire_ty as ::interoptopus::lang::types::WireIO>::read(input)?;
+                    match __discriminant {
+                        #(#arms)*
+                        _ => ::std::result::Result::Err(::interoptopus::wire::SerializationError::invalid_discriminant(
+                            stringify!(#name),
+                            __discriminant as isize,
+                        )),
                     }
                 }
             }
@@ -327,14 +384,29 @@ impl TypeModel {
                 }
             }
             TypeData::Enum(enum_data) => {
-                if enum_data.variants.iter().all(|v| matches!(v.data, VariantData::Unit)) {
-                    let wire_ty = crate::types::discriminant::wire_type_tokens(&enum_data.discriminant, self.name.span());
+                let name = &self.name;
+                let wire_ty = crate::types::discriminant::wire_type_tokens(&enum_data.discriminant, self.name.span());
+                let has_tuple = enum_data.variants.iter().any(|v| matches!(v.data, VariantData::Tuple(_)));
+                if !has_tuple {
                     quote_spanned! { self.name.span() =>
                         ::std::mem::size_of::<#wire_ty>()
                     }
                 } else {
+                    let arms = enum_data.variants.iter().map(|v| {
+                        let vname = &v.name;
+                        match &v.data {
+                            VariantData::Unit => quote_spanned! { vname.span() =>
+                                #name::#vname => 0,
+                            },
+                            VariantData::Tuple(ty) => quote_spanned! { vname.span() =>
+                                #name::#vname(__inner) => <#ty as ::interoptopus::lang::types::WireIO>::live_size(__inner),
+                            },
+                        }
+                    });
                     quote_spanned! { self.name.span() =>
-                        ::interoptopus::bad_wire!()
+                        ::std::mem::size_of::<#wire_ty>() + match self {
+                            #(#arms)*
+                        }
                     }
                 }
             }

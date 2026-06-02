@@ -22,7 +22,7 @@ pub struct DiscriminantChoice {
 /// - Negated integer literals: `-1`
 ///
 /// Returns `None` for anything more complex (const generics, paths, arithmetic …).
-fn try_eval(expr: &syn::Expr) -> Option<isize> {
+pub fn try_eval(expr: &syn::Expr) -> Option<isize> {
     match expr {
         syn::Expr::Lit(lit) => {
             if let syn::Lit::Int(int_lit) = &lit.lit {

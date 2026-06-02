@@ -51,17 +51,31 @@ impl Pass {
             let name = &ty.name;
             let visibility = ty.visibility.to_string();
 
-            // Managed-only types (e.g. Result<Service, Error> siblings) have no Unmanaged representation.
-            let is_managed_only = match type_kind {
-                TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _) | TypePattern::Option(ok_ty, _)) => {
-                    types.get(*ok_ty).is_some_and(|t| matches!(&t.kind, TypeKind::Service))
-                }
+            // DataEnum carrying a WireOnly variant payload (e.g. `S(String)`) has no
+            // FFI-safe Unmanaged form — it only flows through `Wire<T>`. Such enums
+            // also hold no native resources (their payloads are GC-managed) so they
+            // are not disposable.
+            let has_wire_only_payload = match type_kind {
+                TypeKind::DataEnum(de) => de.variants.iter().any(|v| {
+                    v.ty.is_some_and(|t| matches!(types.get(t).map(|x| &x.kind), Some(TypeKind::WireOnly(_))))
+                }),
                 _ => false,
             };
 
+            // Managed-only types have no Unmanaged representation:
+            //   - Result/Option whose Ok side is a Service.
+            //   - DataEnum with WireOnly variant payloads.
+            let is_managed_only = has_wire_only_payload
+                || match type_kind {
+                    TypeKind::TypePattern(TypePattern::Result(ok_ty, _, _) | TypePattern::Option(ok_ty, _)) => {
+                        types.get(*ok_ty).is_some_and(|t| matches!(&t.kind, TypeKind::Service))
+                    }
+                    _ => false,
+                };
+
             let ty = *type_id;
             let struct_or_class = if struct_class.is_struct(ty) { "struct" } else { "class" };
-            let is_disposable = disposable.is_disposable(*type_id).unwrap_or(false);
+            let is_disposable = if has_wire_only_payload { false } else { disposable.is_disposable(*type_id).unwrap_or(false) };
 
             let unmanaged_variants = enum_body_unmanaged_variant.get(*type_id).unwrap_or(&[]);
             let unmanaged = enum_body_unmanaged.get(*type_id).map_or("", std::string::String::as_str);

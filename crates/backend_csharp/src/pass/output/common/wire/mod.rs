@@ -11,7 +11,7 @@ pub mod helper_classes;
 pub mod wire_type;
 
 use interoptopus::inventory::{TypeId, Types as RsTypes};
-use interoptopus::lang::types::{Array, Layout, Primitive, Struct, TypeKind as RsTypeKind, WireOnly};
+use interoptopus::lang::types::{Array, Layout, Primitive, Struct, TypeKind as RsTypeKind, VariantKind, WireOnly};
 
 /// Generates C# serialization code for the wire format by walking Rust types.
 ///
@@ -140,8 +140,8 @@ impl WireCodeGen<'_> {
                 self.emit_serialize(lines, arr.ty, &format!("{val}[{idx}]"), depth + 1, indent + 1);
                 lines.push(format!("{p}}}"));
             }
-            RsTypeKind::Enum(_) => {
-                lines.push(format!("{p}writer.Write({val}.ToUnmanaged()._variant);"));
+            RsTypeKind::Enum(e) => {
+                self.emit_enum_serialize(lines, ty_id, e, val, depth, indent);
             }
             RsTypeKind::Struct(s) => {
                 for f in &s.fields {
@@ -223,9 +223,7 @@ impl WireCodeGen<'_> {
                 lines.push(format!("{p}}}"));
             }
             RsTypeKind::Enum(e) => {
-                let enum_name = self.cs_type_name(ty_id);
-                let read_expr = cs_read_primitive(enum_repr_primitive(e));
-                lines.push(format!("{p}{{ var _u = new {enum_name}.Unmanaged(); _u._variant = {read_expr}; {target} = _u.ToManaged(); }}"));
+                self.emit_enum_deserialize(lines, ty_id, e, target, depth, indent);
             }
             RsTypeKind::Struct(s) => {
                 let struct_name = self.cs_type_name(ty_id);
@@ -291,8 +289,7 @@ impl WireCodeGen<'_> {
                 lines.push(format!("{p}}}"));
             }
             RsTypeKind::Enum(e) => {
-                let prim = enum_repr_primitive(e);
-                lines.push(format!("{p}_size += {};", cs_primitive_size(prim)));
+                self.emit_enum_size(lines, e, val, depth, indent);
             }
             RsTypeKind::Struct(s) => {
                 for f in &s.fields {
@@ -303,6 +300,109 @@ impl WireCodeGen<'_> {
                 self.emit_option_size(lines, *inner_id, val, depth, indent);
             }
             _ => {}
+        }
+    }
+
+    /// Wire-serialize an enum by branching on each variant (`IsX`), writing the
+    /// discriminant, then serializing the variant's payload (if any).
+    fn emit_enum_serialize(
+        &self,
+        lines: &mut Vec<String>,
+        _ty_id: TypeId,
+        e: &interoptopus::lang::types::Enum,
+        val: &str,
+        depth: usize,
+        indent: usize,
+    ) {
+        let prim = enum_repr_primitive(e);
+        let prim_cs = cs_primitive_name(prim);
+        let p = pad(indent);
+        let pi = pad(indent + 1);
+
+        for (index, variant) in e.variants.iter().enumerate() {
+            let kw = if index == 0 { "if" } else { "else if" };
+            let (tag, payload) = match &variant.kind {
+                VariantKind::Unit(t) => (*t, None),
+                VariantKind::Tuple(t) => (index.cast_signed(), Some(*t)),
+            };
+            lines.push(format!("{p}{kw} ({val}.Is{name})", name = variant.name));
+            lines.push(format!("{p}{{"));
+            lines.push(format!("{pi}writer.Write(({prim_cs}){tag});"));
+            if let Some(payload_id) = payload {
+                let payload_val = format!("{val}.As{}()", variant.name);
+                self.emit_serialize(lines, payload_id, &payload_val, depth + 1, indent + 1);
+            }
+            lines.push(format!("{p}}}"));
+        }
+        if !e.variants.is_empty() {
+            lines.push(format!("{p}else {{ throw new InvalidOperationException(\"Unknown variant\"); }}"));
+        }
+    }
+
+    /// Wire-deserialize an enum by reading the discriminant and constructing the
+    /// matching variant via the public `EnumName.VariantName(...)` factory.
+    fn emit_enum_deserialize(
+        &self,
+        lines: &mut Vec<String>,
+        ty_id: TypeId,
+        e: &interoptopus::lang::types::Enum,
+        target: &str,
+        depth: usize,
+        indent: usize,
+    ) {
+        let prim = enum_repr_primitive(e);
+        let read_expr = cs_read_primitive(prim);
+        let enum_name = self.cs_type_name(ty_id);
+        let p = pad(indent);
+        let pi = pad(indent + 1);
+        let pi2 = pad(indent + 2);
+        let tag_var = format!("_tag{depth}");
+
+        lines.push(format!("{p}{{"));
+        lines.push(format!("{pi}var {tag_var} = {read_expr};"));
+
+        for (index, variant) in e.variants.iter().enumerate() {
+            let kw = if index == 0 { "if" } else { "else if" };
+            let (tag, payload) = match &variant.kind {
+                VariantKind::Unit(t) => (*t, None),
+                VariantKind::Tuple(t) => (index.cast_signed(), Some(*t)),
+            };
+            lines.push(format!("{pi}{kw} ({tag_var} == ({prim_cs}){tag})", prim_cs = cs_primitive_name(prim)));
+            lines.push(format!("{pi}{{"));
+            if let Some(payload_id) = payload {
+                let payload_cs = self.cs_type_name(payload_id);
+                let payload_var = format!("_p{depth}");
+                lines.push(format!("{pi2}{payload_cs} {payload_var} = default;"));
+                self.emit_deserialize(lines, payload_id, &payload_var, depth + 1, indent + 2);
+                lines.push(format!("{pi2}{target} = {enum_name}.{}({payload_var});", variant.name));
+            } else {
+                lines.push(format!("{pi2}{target} = {enum_name}.{};", variant.name));
+            }
+            lines.push(format!("{pi}}}"));
+        }
+        if !e.variants.is_empty() {
+            lines.push(format!("{pi}else {{ throw new InvalidOperationException(\"Unknown variant tag\"); }}"));
+        }
+        lines.push(format!("{p}}}"));
+    }
+
+    /// Wire size of an enum: discriminant size plus payload size for the active variant.
+    fn emit_enum_size(&self, lines: &mut Vec<String>, e: &interoptopus::lang::types::Enum, val: &str, depth: usize, indent: usize) {
+        let prim = enum_repr_primitive(e);
+        let p = pad(indent);
+
+        lines.push(format!("{p}_size += {};", cs_primitive_size(prim)));
+
+        for variant in &e.variants {
+            let payload = match &variant.kind {
+                VariantKind::Unit(_) => continue,
+                VariantKind::Tuple(t) => *t,
+            };
+            lines.push(format!("{p}if ({val}.Is{name})", name = variant.name));
+            lines.push(format!("{p}{{"));
+            let payload_val = format!("{val}.As{}()", variant.name);
+            self.emit_size(lines, payload, &payload_val, depth + 1, indent + 1);
+            lines.push(format!("{p}}}"));
         }
     }
 
