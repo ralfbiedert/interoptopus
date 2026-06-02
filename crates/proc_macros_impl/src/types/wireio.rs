@@ -14,16 +14,13 @@ fn compute_variant_tags(enum_data: &crate::types::model::EnumData) -> Vec<isize>
     let mut tags = Vec::with_capacity(enum_data.variants.len());
     for v in &enum_data.variants {
         let value = if let Some(expr) = &v.discriminant {
-            match crate::types::discriminant::try_eval(expr) {
-                Some(val) => {
-                    next_auto = val + 1;
-                    val
-                }
-                None => {
-                    let val = next_auto;
-                    next_auto += 1;
-                    val
-                }
+            if let Some(val) = crate::types::discriminant::try_eval(expr) {
+                next_auto = val + 1;
+                val
+            } else {
+                let val = next_auto;
+                next_auto += 1;
+                val
             }
         } else {
             let val = next_auto;
@@ -387,11 +384,7 @@ impl TypeModel {
                 let name = &self.name;
                 let wire_ty = crate::types::discriminant::wire_type_tokens(&enum_data.discriminant, self.name.span());
                 let has_tuple = enum_data.variants.iter().any(|v| matches!(v.data, VariantData::Tuple(_)));
-                if !has_tuple {
-                    quote_spanned! { self.name.span() =>
-                        ::std::mem::size_of::<#wire_ty>()
-                    }
-                } else {
+                if has_tuple {
                     let arms = enum_data.variants.iter().map(|v| {
                         let vname = &v.name;
                         match &v.data {
@@ -407,6 +400,10 @@ impl TypeModel {
                         ::std::mem::size_of::<#wire_ty>() + match self {
                             #(#arms)*
                         }
+                    }
+                } else {
+                    quote_spanned! { self.name.span() =>
+                        ::std::mem::size_of::<#wire_ty>()
                     }
                 }
             }

@@ -305,15 +305,7 @@ impl WireCodeGen<'_> {
 
     /// Wire-serialize an enum by branching on each variant (`IsX`), writing the
     /// discriminant, then serializing the variant's payload (if any).
-    fn emit_enum_serialize(
-        &self,
-        lines: &mut Vec<String>,
-        _ty_id: TypeId,
-        e: &interoptopus::lang::types::Enum,
-        val: &str,
-        depth: usize,
-        indent: usize,
-    ) {
+    fn emit_enum_serialize(&self, lines: &mut Vec<String>, _ty_id: TypeId, e: &interoptopus::lang::types::Enum, val: &str, depth: usize, indent: usize) {
         let prim = enum_repr_primitive(e);
         let prim_cs = cs_primitive_name(prim);
         let p = pad(indent);
@@ -341,15 +333,7 @@ impl WireCodeGen<'_> {
 
     /// Wire-deserialize an enum by reading the discriminant and constructing the
     /// matching variant via the public `EnumName.VariantName(...)` factory.
-    fn emit_enum_deserialize(
-        &self,
-        lines: &mut Vec<String>,
-        ty_id: TypeId,
-        e: &interoptopus::lang::types::Enum,
-        target: &str,
-        depth: usize,
-        indent: usize,
-    ) {
+    fn emit_enum_deserialize(&self, lines: &mut Vec<String>, ty_id: TypeId, e: &interoptopus::lang::types::Enum, target: &str, depth: usize, indent: usize) {
         let prim = enum_repr_primitive(e);
         let read_expr = cs_read_primitive(prim);
         let enum_name = self.cs_type_name(ty_id);

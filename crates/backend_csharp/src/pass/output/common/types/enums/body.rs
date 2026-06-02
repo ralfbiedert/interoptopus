@@ -56,9 +56,10 @@ impl Pass {
             // also hold no native resources (their payloads are GC-managed) so they
             // are not disposable.
             let has_wire_only_payload = match type_kind {
-                TypeKind::DataEnum(de) => de.variants.iter().any(|v| {
-                    v.ty.is_some_and(|t| matches!(types.get(t).map(|x| &x.kind), Some(TypeKind::WireOnly(_))))
-                }),
+                TypeKind::DataEnum(de) => de
+                    .variants
+                    .iter()
+                    .any(|v| v.ty.is_some_and(|t| matches!(types.get(t).map(|x| &x.kind), Some(TypeKind::WireOnly(_))))),
                 _ => false,
             };
 
@@ -75,7 +76,11 @@ impl Pass {
 
             let ty = *type_id;
             let struct_or_class = if struct_class.is_struct(ty) { "struct" } else { "class" };
-            let is_disposable = if has_wire_only_payload { false } else { disposable.is_disposable(*type_id).unwrap_or(false) };
+            let is_disposable = if has_wire_only_payload {
+                false
+            } else {
+                disposable.is_disposable(*type_id).unwrap_or(false)
+            };
 
             let unmanaged_variants = enum_body_unmanaged_variant.get(*type_id).unwrap_or(&[]);
             let unmanaged = enum_body_unmanaged.get(*type_id).map_or("", std::string::String::as_str);
