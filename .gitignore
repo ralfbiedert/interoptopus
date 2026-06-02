@@ -17,7 +17,6 @@ bin
 __pycache__
 
 # Dependencies
-Cargo.lock
 node_modules
 
 # Generated files
