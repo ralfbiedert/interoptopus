@@ -8,7 +8,7 @@
 //!   the trampoline's `routing_id` (Result trampolines stay scoped to the
 //!   file that owns the Result type; stateless bare trampolines emit into
 //!   every file and dedupe by class name).
-//! - Renders [`templates/rust/types/asynk/trampoline.cs`] with a single
+//! - Renders `templates/rust/types/asynk/trampoline.cs` with a single
 //!   `shape` enum string plus the resolved payload, task and class names.
 
 use crate::output::{FileType, Output};
