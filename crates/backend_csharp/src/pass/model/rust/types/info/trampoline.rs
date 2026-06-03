@@ -174,10 +174,8 @@ impl Pass {
             let emit_in_every_output = matches!(shape, TrampolineShape::BareVoid | TrampolineShape::BareDirect | TrampolineShape::BareUnmanaged)
                 && !matches!(&result_ty.kind, TypeKind::Pointer(_));
 
-            self.trampolines.insert(
-                result_ty_id,
-                Trampoline { result_ty: result_ty_id, shape, task_inner, payload_inner, managed_conversion: mc, routing_id, emit_in_every_output },
-            );
+            self.trampolines
+                .insert(result_ty_id, Trampoline { result_ty: result_ty_id, shape, task_inner, payload_inner, managed_conversion: mc, routing_id, emit_in_every_output });
             outcome.changed();
         }
 
@@ -215,11 +213,19 @@ impl Pass {
                 let _ = types.get(*ok_ty)?;
 
                 let task_inner = if ok_is_void { None } else { Some(*ok_ty) };
-                let shape = if has_unmanaged { TrampolineShape::ResultUnmanaged } else { TrampolineShape::ResultDirect };
+                let shape = if has_unmanaged {
+                    TrampolineShape::ResultUnmanaged
+                } else {
+                    TrampolineShape::ResultDirect
+                };
                 Some((shape, task_inner, Some(result_ty_id)))
             }
             _ => {
-                let shape = if has_unmanaged { TrampolineShape::BareUnmanaged } else { TrampolineShape::BareDirect };
+                let shape = if has_unmanaged {
+                    TrampolineShape::BareUnmanaged
+                } else {
+                    TrampolineShape::BareDirect
+                };
                 Some((shape, Some(result_ty_id), Some(result_ty_id)))
             }
         }
@@ -243,4 +249,3 @@ impl Pass {
         self.trampolines.get(result_ty)
     }
 }
-

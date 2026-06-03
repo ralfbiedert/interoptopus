@@ -54,12 +54,15 @@ impl Pass {
             .collect();
 
         let (result_wraps, result_passthroughs): (HashMap<FunctionId, &str>, HashMap<FunctionId, &str>) =
-            service_interfaces.interfaces().iter().fold((HashMap::new(), HashMap::new()), |(mut acc_t, mut acc_p), iface| {
-                let (t, p) = split_result_kinds(&iface.methods, types);
-                acc_t.extend(t);
-                acc_p.extend(p);
-                (acc_t, acc_p)
-            });
+            service_interfaces
+                .interfaces()
+                .iter()
+                .fold((HashMap::new(), HashMap::new()), |(mut acc_t, mut acc_p), iface| {
+                    let (t, p) = split_result_kinds(&iface.methods, types);
+                    acc_t.extend(t);
+                    acc_p.extend(p);
+                    (acc_t, acc_p)
+                });
 
         for entry in trampoline_model.entries() {
             let TrampolineKind::ServiceMethod { service_id } = &entry.kind else { continue };
@@ -87,7 +90,8 @@ impl Pass {
                     if has_result_passthrough {
                         "ContinueWith(t => { if (t.IsCanceled) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })".to_string()
                     } else {
-                        "ContinueWith(t => { if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })".to_string()
+                        "ContinueWith(t => { if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })"
+                            .to_string()
                     }
                 } else {
                     async_continuation(inner_id, types, unmanaged_conversion, has_result_passthrough)

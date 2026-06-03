@@ -54,12 +54,15 @@ impl Pass {
         // Ctors currently only consume Try-style wraps; passthrough Results on ctors are
         // not generated today, so the second map is ignored here.
         let (result_wraps, _result_passthroughs): (HashMap<FunctionId, &str>, HashMap<FunctionId, &str>) =
-            service_interfaces.interfaces().iter().fold((HashMap::new(), HashMap::new()), |(mut acc_t, mut acc_p), iface| {
-                let (t, p) = split_result_kinds(&iface.methods, types);
-                acc_t.extend(t);
-                acc_p.extend(p);
-                (acc_t, acc_p)
-            });
+            service_interfaces
+                .interfaces()
+                .iter()
+                .fold((HashMap::new(), HashMap::new()), |(mut acc_t, mut acc_p), iface| {
+                    let (t, p) = split_result_kinds(&iface.methods, types);
+                    acc_t.extend(t);
+                    acc_p.extend(p);
+                    (acc_t, acc_p)
+                });
 
         for entry in trampoline_model.entries() {
             let TrampolineKind::ServiceCtor { service_id } = &entry.kind else { continue };

@@ -1,7 +1,8 @@
-//! Output passes that render Rust-sourced types. The shared `asynk_naming`
-//! helpers below derive C# identifiers from typed trampoline records and
-//! are used by the trampoline-emitting passes here as well as by the
-//! fn-overload and service-method body passes.
+//! Output passes that render Rust-sourced types.
+//!
+//! The shared `asynk_naming` helpers below derive C# identifiers from typed
+//! trampoline records and are used by the trampoline-emitting passes here as
+//! well as by the fn-overload and service-method body passes.
 
 pub mod asynk;
 
@@ -13,7 +14,7 @@ use crate::pass::model::rust::types::info::trampoline::{Trampoline, TrampolineSh
 /// Pure C#-identifier derivation for async trampoline records.
 ///
 /// The `model::rust::types::info::trampoline` pass owns the **typed** view
-/// of every async trampoline (shape + TypeIds + conversion category).
+/// of every async trampoline (shape + `TypeId`s + conversion category).
 /// This module is the **string** view: given that record plus a type-name
 /// lookup, it produces the C# identifiers consumed by templates. Lives
 /// next to the passes that consume it because Rust pass modules don't
@@ -71,8 +72,14 @@ pub mod asynk_naming {
         let Some(payload_ty) = types.get(payload_id) else {
             return String::new();
         };
-        let inner = if t.shape.payload_is_unmanaged() { format!("{}.Unmanaged", payload_ty.name) } else { payload_ty.name.clone() };
-        let outcome = types.get(csharp::UTIL_ASYNC_OUTCOME_PAYLOAD).map_or_else(|| "AsyncOutcomeOf".to_string(), |ty| ty.name.clone());
+        let inner = if t.shape.payload_is_unmanaged() {
+            format!("{}.Unmanaged", payload_ty.name)
+        } else {
+            payload_ty.name.clone()
+        };
+        let outcome = types
+            .get(csharp::UTIL_ASYNC_OUTCOME_PAYLOAD)
+            .map_or_else(|| "AsyncOutcomeOf".to_string(), |ty| ty.name.clone());
         format!("{outcome}<{inner}>")
     }
 
