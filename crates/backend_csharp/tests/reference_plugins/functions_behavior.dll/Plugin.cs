@@ -10,9 +10,19 @@ public class Plugin : IPlugin
         throw new Exception("Panic!");
     }
 
+    public static Task<uint> PanicAsyncWithRval(CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
     public static ResultVoidError PanicWithResult()
     {
         throw new Exception("Panic!");
+    }
+
+    public static uint PanicWithRval()
+    {
+        throw new NotImplementedException();
     }
 
     public static async Task PanicAsync(CancellationToken ct)

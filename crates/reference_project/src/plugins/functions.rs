@@ -18,6 +18,8 @@ interoptopus::plugin!(Primitives {
 interoptopus::plugin!(Behavior {
     fn panic();
     fn panic_with_result() -> ffi::Result<(), Error>;
+    fn panic_with_rval() -> u32;
     async fn panic_async();
     async fn panic_async_with_result() -> ffi::Result<(), Error>;
+    async fn panic_async_with_rval() -> u32;
 });

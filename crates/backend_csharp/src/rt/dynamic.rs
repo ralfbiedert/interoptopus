@@ -8,9 +8,10 @@
 //! constraint by exposing a single shared instance.
 
 use super::error::RuntimeError;
-use super::shared::{self, HandlerShim, PluginCache};
+use super::shared::PluginCache;
 
 use interoptopus::lang::plugin::{Plugin as PluginTrait, PluginLoadError};
+use interoptopus::plugin::exception;
 use interoptopus::trampoline::{TRAMPOLINE_UNCAUGHT_EXCEPTION, TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX};
 use netcorehost::hostfxr::{HostfxrContext, InitializedForRuntimeConfig};
 use netcorehost::nethost;
@@ -41,7 +42,6 @@ struct Inner {
 /// [`load`](Self::load).
 pub struct DotnetRuntime {
     inner: Mutex<Inner>,
-    exception_handler: OnceLock<Arc<dyn Fn(String) + Send + Sync>>,
     _temp_dir: tempfile::TempDir,
 }
 
@@ -63,16 +63,7 @@ impl DotnetRuntime {
 
         let inner = Mutex::new(Inner { context, plugins: PluginCache::new() });
 
-        Ok(Self { inner, exception_handler: OnceLock::new(), _temp_dir: temp_dir })
-    }
-
-    /// Sets the exception handler called when a plugin reports an uncaught exception.
-    ///
-    /// # Panics
-    /// May only be called once. Panics if called a second time.
-    pub fn exception_handler(&self, handler: impl Fn(String) + Send + Sync + 'static) {
-        // TODO: Should we allow multiple handlers that all get called?
-        assert!(self.exception_handler.set(Arc::new(handler)).is_ok(), "exception handler already set");
+        Ok(Self { inner, _temp_dir: temp_dir })
     }
 
     /// Loads a plugin of type `T` from the given DLL path.
@@ -124,12 +115,11 @@ impl DotnetRuntime {
             (register_fn)(id, ptr);
         });
 
-        // Register exception handler if set.
-        if let Some(handler) = self.exception_handler.get() {
-            let ctx = Box::into_raw(Box::new(HandlerShim { handler: Arc::clone(handler) })) as *const u8;
-            register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION, shared::uncaught_exception_callback as *const u8);
-            register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX, ctx);
-        }
+        // Register the uncaught-exception sink. The plugin's outer try/catch will call
+        // this on the calling thread; generated `plugin!` wrappers panic if the
+        // thread-local slot was set during the most recent invocation.
+        register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION, exception::callback_ptr());
+        register_fn(TRAMPOLINE_UNCAUGHT_EXCEPTION_CTX, std::ptr::null());
 
         // Verify API guard after trampolines are registered so the query function works.
         plugin.verify_api_guard()?;

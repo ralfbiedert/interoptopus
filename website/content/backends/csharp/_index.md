@@ -337,7 +337,7 @@ partial class AsyncBasic : IAsyncBasic<AsyncBasic>
 
 ### Exception Handling
 
-General exceptions are caught by the generated trampolines and forwarded to Rust via the global exception handler, preventing process crashes.
+Uncaught exceptions thrown from C# plugin code are caught by the generated trampolines and surface as a Rust `panic!` on the calling thread. This prevents the process from crashing silently on the .NET side and gives Rust callers the opportunity to use `std::panic::catch_unwind` if they want to recover.
 
 ```csharp
 public class Plugin : IPlugin
@@ -350,10 +350,13 @@ public class Plugin : IPlugin
 ```
 
 ```rust
-rt.exception_handler(|msg| eprintln!("C# exception: {msg}"));
+let result = std::panic::catch_unwind(|| plugin.panic());
+assert!(result.is_err());
 ```
 
 However, this is a last-resort mechanism and strongly discouraged. Instead, use `Try<T>` for structured exception handling. It is a type alias for `ffi::Result<T, ExceptionError>`. When the C# backend sees a function returning `Try<T>`, it generates typed `catch` blocks that automatically capture exceptions and convert them into an `ExceptionError`. The C# side just returns `T` directly — no wrapping needed.
+
+For plugin methods returning a user-defined `ffi::Result<T, E>`, uncaught C# exceptions are folded into `ffi::Result::Panic` instead of panicking the Rust thread, so callers can match on the result directly.
 
 Declare it in the plugin macro:
 

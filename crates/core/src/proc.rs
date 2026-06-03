@@ -313,7 +313,6 @@ pub use interoptopus_proc::AsyncRuntime;
 ///
 /// ```rust,ignore
 /// let plugin = aot::runtime()?
-///     .exception_handler(|msg| eprintln!("plugin error: {msg}"))
 ///     .load::<MyPlugin>("path/to/my_plugin.dll")?;
 /// ```
 ///

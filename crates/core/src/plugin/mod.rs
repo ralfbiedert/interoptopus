@@ -4,6 +4,7 @@
 //! to load foreign plugins (e.g., .NET DLLs) and call their functions
 //! from Rust.
 
+pub mod exception;
 mod service_map;
 pub mod trampoline;
 

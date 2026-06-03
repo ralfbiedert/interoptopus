@@ -470,7 +470,9 @@ fn emit_bare_method(
                     let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new_with_on_complete(
                         move || { _inst_cb.record_call(#index, _inst_start, _inst_cb.time_ns()); }
                     );
+                    ::interoptopus::plugin::exception::clear();
                     let _task_handle = (self.#fn_name)(#(#ffi_args,)* cb);
+                    ::interoptopus::plugin::exception::panic_on_uncaught();
                     #(#field_src_lets)*
                     #async_kw move {
                         let _th = _task_handle;
@@ -486,7 +488,9 @@ fn emit_bare_method(
                 pub fn #fn_name(&self, #(#params),*) -> #ret_ty {
                     #(#forget_stmts)*
                     let _inst_start = self.instrumentor.time_ns();
+                    ::interoptopus::plugin::exception::clear();
                     let raw = (self.#fn_name)(#(#ffi_args),*);
+                    ::interoptopus::plugin::exception::panic_on_uncaught();
                     let _inst_result = ::interoptopus::plugin::ServiceHandleMap::map_service_handle(raw, |handle| #svc_ident { handle, #(#field_copies,)* });
                     self.instrumentor.record_call(#index, _inst_start, self.instrumentor.time_ns());
                     _inst_result
@@ -507,7 +511,9 @@ fn emit_bare_method(
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new_with_on_complete(
                     move || { _inst.record_call(#index, _inst_start, _inst.time_ns()); }
                 );
+                ::interoptopus::plugin::exception::clear();
                 let _task_handle = (self.#fn_name)(#(#ffi_args,)* cb);
+                ::interoptopus::plugin::exception::panic_on_uncaught();
                 #async_kw move {
                     let _th = _task_handle;
                     future.await
@@ -522,7 +528,9 @@ fn emit_bare_method(
             pub fn #fn_name(&self, #(#params),*) #ret {
                 #(#forget_stmts)*
                 let _inst_start = self.instrumentor.time_ns();
+                ::interoptopus::plugin::exception::clear();
                 let _inst_result = (self.#fn_name)(#(#ffi_args),*);
+                ::interoptopus::plugin::exception::panic_on_uncaught();
                 self.instrumentor.record_call(#index, _inst_start, self.instrumentor.time_ns());
                 _inst_result
             }
@@ -575,7 +583,9 @@ fn emit_ctor_method(
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new_with_on_complete(
                     Box::new(move || { _inst_cb.record_call(#index, _inst_start, _inst_cb.time_ns()); })
                 );
+                ::interoptopus::plugin::exception::clear();
                 let _task_handle = (self.#ctor_field)(#(#ffi_args,)* cb);
+                ::interoptopus::plugin::exception::panic_on_uncaught();
                 #(#field_src_lets)*
                 #async_kw move {
                     let _th = _task_handle;
@@ -591,7 +601,9 @@ fn emit_ctor_method(
             pub fn #method_name(&self, #(#params),*) -> #user_ret_ty {
                 #(#forget_stmts)*
                 let _inst_start = self.instrumentor.time_ns();
+                ::interoptopus::plugin::exception::clear();
                 let raw: #ffi_ret_ty = (self.#ctor_field)(#(#ffi_args),*);
+                ::interoptopus::plugin::exception::panic_on_uncaught();
                 let _inst_result = ::interoptopus::plugin::ServiceHandleMap::map_service_handle(raw, |handle| #svc_name { handle, #(#field_copies,)* });
                 self.instrumentor.record_call(#index, _inst_start, self.instrumentor.time_ns());
                 _inst_result
@@ -726,7 +738,9 @@ fn emit_instance_method(
                     let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ffi_ret_ty>::new_with_on_complete(
                         move || { _inst_cb.record_call(#index, _inst_start, _inst_cb.time_ns()); }
                     );
+                    ::interoptopus::plugin::exception::clear();
                     let _task_handle = (self.#field)(self.handle, #(#ffi_args,)* cb);
+                    ::interoptopus::plugin::exception::panic_on_uncaught();
                     #(#field_src_lets)*
                     #async_kw move {
                         let _th = _task_handle;
@@ -742,7 +756,9 @@ fn emit_instance_method(
                 pub fn #method_name(&self, #(#params),*) -> #ret_ty {
                     #(#forget_stmts)*
                     let _inst_start = self.instrumentor.time_ns();
+                    ::interoptopus::plugin::exception::clear();
                     let raw: #ffi_ret_ty = (self.#field)(self.handle, #(#ffi_args),*);
+                    ::interoptopus::plugin::exception::panic_on_uncaught();
                     let _inst_result = ::interoptopus::plugin::ServiceHandleMap::map_service_handle(raw, |handle| #ret_svc_ident { handle, #(#field_copies,)* });
                     self.instrumentor.record_call(#index, _inst_start, self.instrumentor.time_ns());
                     _inst_result
@@ -762,7 +778,9 @@ fn emit_instance_method(
                 let (future, cb) = ::interoptopus::pattern::asynk::AsyncCallbackFuture::<#ret_ty>::new_with_on_complete(
                     move || { _inst.record_call(#index, _inst_start, _inst.time_ns()); }
                 );
+                ::interoptopus::plugin::exception::clear();
                 let _task_handle = (self.#field)(self.handle, #(#ffi_args,)* cb);
+                ::interoptopus::plugin::exception::panic_on_uncaught();
                 #async_kw move {
                     let _th = _task_handle;
                     future.await
@@ -776,7 +794,9 @@ fn emit_instance_method(
             pub fn #method_name(&self, #(#params),*) #ret {
                 #(#forget_stmts)*
                 let _inst_start = self.instrumentor.time_ns();
+                ::interoptopus::plugin::exception::clear();
                 let _inst_result = (self.#field)(self.handle, #(#ffi_args),*);
+                ::interoptopus::plugin::exception::panic_on_uncaught();
                 self.instrumentor.record_call(#index, _inst_start, self.instrumentor.time_ns());
                 _inst_result
             }

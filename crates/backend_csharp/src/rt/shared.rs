@@ -47,17 +47,3 @@ impl PluginCache {
         self.plugins.insert((type_id, path), Box::new(arc));
     }
 }
-
-/// Concrete `Sized` wrapper so we can store the trait-object handler behind a thin pointer.
-pub struct HandlerShim {
-    pub handler: Arc<dyn Fn(String) + Send + Sync>,
-}
-
-/// Callback registered with the managed plugin for uncaught exceptions.
-#[allow(clippy::cast_ptr_alignment)]
-pub unsafe extern "C" fn uncaught_exception_callback(ctx: *const u8, message: *const u8, len: i32) {
-    let shim = unsafe { &*ctx.cast::<HandlerShim>() };
-    let bytes = unsafe { std::slice::from_raw_parts(message, len.unsigned_abs() as usize) };
-    let msg = String::from_utf8_lossy(bytes).into_owned();
-    (shim.handler)(msg);
-}
