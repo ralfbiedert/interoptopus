@@ -55,15 +55,15 @@ impl Pass {
             for &fn_id in &svc.ctors {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
-                let (csharp_sig, rval_id, is_async, unwrapped_result_id) = resolve_method_info(&func.signature.arguments, func.signature.rval, types, unwrap_error_id);
-                methods.push(Method { name: method_name, kind: MethodKind::Static, base: fn_id, csharp: csharp_sig, rval_id, is_async, unwrapped_result_id });
+                let (csharp_sig, rval_id, is_async, result) = resolve_method_info(&func.signature.arguments, func.signature.rval, types, unwrap_error_id);
+                methods.push(Method { name: method_name, kind: MethodKind::Static, base: fn_id, csharp: csharp_sig, rval_id, is_async, result });
             }
 
             for &fn_id in &svc.methods {
                 let Some(func) = fns_all.get(fn_id) else { continue };
                 let method_name = service_method_name(type_name, &func.name);
-                let (csharp_sig, rval_id, is_async, unwrapped_result_id) = resolve_method_info(&func.signature.arguments, func.signature.rval, types, unwrap_error_id);
-                methods.push(Method { name: method_name, kind: MethodKind::Regular, base: fn_id, csharp: csharp_sig, rval_id, is_async, unwrapped_result_id });
+                let (csharp_sig, rval_id, is_async, result) = resolve_method_info(&func.signature.arguments, func.signature.rval, types, unwrap_error_id);
+                methods.push(Method { name: method_name, kind: MethodKind::Regular, base: fn_id, csharp: csharp_sig, rval_id, is_async, result });
             }
 
             interfaces.push(Interface { name: interface_name, emission: Emission::FileEmission(FileEmission::Default), kind: InterfaceKind::Service, methods });

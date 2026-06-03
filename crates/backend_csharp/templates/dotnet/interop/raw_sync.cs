@@ -7,6 +7,8 @@
             Plugin.{{ pascal_name }}({{ forward }}){{ rval_suffix }};
 {%- elif result_wrap_type %}
             return {{ result_wrap_type }}.FromCall(() => Plugin.{{ pascal_name }}({{ forward }})){{ rval_suffix }};
+{%- elif result_passthrough_type %}
+            return {{ result_passthrough_type }}.FromCallResult(() => Plugin.{{ pascal_name }}({{ forward }})){{ rval_suffix }};
 {%- else %}
             return Plugin.{{ pascal_name }}({{ forward }}){{ rval_suffix }};
 {%- endif %}

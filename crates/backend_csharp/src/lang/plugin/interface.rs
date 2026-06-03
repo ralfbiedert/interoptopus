@@ -15,6 +15,35 @@ pub enum MethodKind {
     Static,
 }
 
+/// Classification of how a method's `Result<T, E>` return type should be handled
+/// at the trampoline boundary.
+///
+/// The two variants are mutually exclusive by construction: a Result is either
+/// peeled off the user-facing signature (Try) or kept (Passthrough), never both.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ResultKind {
+    /// `Result<T, ExceptionError>` was unwrapped from the user-facing signature so
+    /// the plugin method returns just `T`. Trampoline wraps the call with
+    /// `FromCall` to map typed C# exceptions back to `Err` variants. Holds the
+    /// original Result `TypeId`.
+    Try(TypeId),
+    /// User-defined `Result<T, E>` was kept on the user-facing signature; the
+    /// plugin method returns the full Result. Trampoline wraps the call with
+    /// `FromCallResult` so that any uncaught C# exception is folded into the
+    /// `Panic` variant on the wire. Holds the Result `TypeId`.
+    Passthrough(TypeId),
+}
+
+impl ResultKind {
+    /// The Result's C# `TypeId`, regardless of variant.
+    #[must_use]
+    pub fn type_id(self) -> TypeId {
+        match self {
+            Self::Try(id) | Self::Passthrough(id) => id,
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Eq)]
 pub struct Method {
     /// C# method name (e.g. `"PrimitiveU32"`, `"ServiceaCreate"`).
@@ -29,10 +58,9 @@ pub struct Method {
     pub rval_id: TypeId,
     /// Whether this method is async (wraps return in `Task<>`).
     pub is_async: bool,
-    /// If the original return type was `Result<T, ErrorXXX>` (a `Try<T>`), stores the
-    /// Result's C# `TypeId` so trampolines can wrap calls with `FromCall`. When set,
-    /// `rval_id` holds the unwrapped `T` instead of the full Result type.
-    pub unwrapped_result_id: Option<TypeId>,
+    /// How the trampoline should treat this method's `Result<T, E>` return, if any.
+    /// `None` when the return is not a Result.
+    pub result: Option<ResultKind>,
 }
 
 #[derive(Debug, PartialEq, Eq)]

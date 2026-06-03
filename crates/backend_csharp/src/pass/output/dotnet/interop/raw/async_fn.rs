@@ -10,7 +10,7 @@
 use crate::lang::FunctionId;
 use crate::lang::plugin::TrampolineKind;
 use crate::pass::output::dotnet::interop::raw::resolve_ptr_to_service_name;
-use crate::pass::output::dotnet::interop::{async_callback_inner, async_continuation, unmanaged_args_except_last};
+use crate::pass::output::dotnet::interop::{async_callback_inner, async_continuation, split_result_kinds, unmanaged_args_except_last};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
@@ -47,19 +47,9 @@ impl Pass {
             .map(|iface| iface.methods.iter().map(|m| (m.base, m.name.as_str())).collect())
             .unwrap_or_default();
 
-        let result_wraps: HashMap<FunctionId, &str> = plugin_interface
+        let (result_wraps, result_passthroughs) = plugin_interface
             .interface()
-            .map(|iface| {
-                iface
-                    .methods
-                    .iter()
-                    .filter_map(|m| {
-                        let result_id = m.unwrapped_result_id?;
-                        let name = types.get(result_id).map(|t| t.name.as_str())?;
-                        Some((m.base, name))
-                    })
-                    .collect()
-            })
+            .map(|iface| split_result_kinds(&iface.methods, types))
             .unwrap_or_default();
 
         for entry in trampoline_model.entries() {
@@ -75,14 +65,22 @@ impl Pass {
 
             let ffi_name = &func.name;
             let result_wrap_type = result_wraps.get(&entry.fn_id).copied().unwrap_or("");
+            let result_passthrough_type = result_passthroughs.get(&entry.fn_id).copied().unwrap_or("");
+            let has_result_passthrough = !result_passthrough_type.is_empty();
 
             let (args, forward) = unmanaged_args_except_last(func, unmanaged_names, unmanaged_conversion);
 
             // Async service return: use .IntoUnmanaged() in continuation.
+            // When the passthrough helper is in play, faults are already converted to Panic
+            // inside the helper, so only cancellation reaches the continuation.
             let continuation = if resolve_ptr_to_service_name(inner_id, types).is_some() {
-                "ContinueWith(t => { if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })".to_string()
+                if has_result_passthrough {
+                    "ContinueWith(t => { if (t.IsCanceled) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })".to_string()
+                } else {
+                    "ContinueWith(t => { if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })".to_string()
+                }
             } else {
-                async_continuation(inner_id, types, unmanaged_conversion)
+                async_continuation(inner_id, types, unmanaged_conversion, has_result_passthrough)
             };
 
             let mut ctx = Context::new();
@@ -92,6 +90,7 @@ impl Pass {
             ctx.insert("forward", &forward);
             ctx.insert("continuation", &continuation);
             ctx.insert("result_wrap_type", result_wrap_type);
+            ctx.insert("result_passthrough_type", result_passthrough_type);
             let rendered = templates.render("dotnet/interop/raw_async.cs", &ctx)?;
 
             self.methods.insert(entry.fn_id, rendered.trim_end().to_string());

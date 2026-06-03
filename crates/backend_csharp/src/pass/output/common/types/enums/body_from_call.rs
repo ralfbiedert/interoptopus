@@ -97,6 +97,7 @@ impl Pass {
             ctx.insert("is_try_error", &is_try_error);
             ctx.insert("err_type", &err_type);
             ctx.insert("exceptions", &exceptions);
+            ctx.insert("mode_is_plugin", &(mode == crate::pass::OperationMode::Plugin));
 
             let rendered = templates.render("common/types/enums/body_from_call.cs", &ctx)?;
             self.body_from_call.insert(*type_id, rendered);

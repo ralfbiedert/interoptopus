@@ -2,11 +2,46 @@ pub mod all;
 pub mod raw;
 pub mod service;
 
+use crate::lang::FunctionId;
 use crate::lang::TypeId;
 use crate::lang::functions::{Argument, Function};
+use crate::lang::plugin::interface::{Method, ResultKind};
 use crate::lang::types::kind::Primitive;
 use crate::lang::types::kind::{TypeKind, TypePattern};
 use crate::pass::{model, output};
+use std::collections::HashMap;
+
+/// Splits an interface's methods into two lookup tables keyed by `FunctionId`:
+/// - `try_wraps`: methods whose return is `Result<T, ExceptionError>` (Try). Maps to the
+///   peeled Result's C# name; trampoline wraps the call with `FromCall`.
+/// - `passthrough_wraps`: methods whose return is a user-defined `Result<T, E>` kept on the
+///   user-facing signature. Maps to the Result's C# name; trampoline wraps the call with
+///   `FromCallResult` to fold uncaught exceptions into `Panic`.
+///
+/// The two tables are disjoint by construction (`ResultKind` variants are mutually exclusive).
+pub(super) fn split_result_kinds<'a, I>(methods: I, types: &'a model::common::types::all::Pass) -> (HashMap<FunctionId, &'a str>, HashMap<FunctionId, &'a str>)
+where
+    I: IntoIterator<Item = &'a Method>,
+{
+    let mut try_wraps = HashMap::new();
+    let mut passthrough_wraps = HashMap::new();
+    for m in methods {
+        match m.result {
+            Some(ResultKind::Try(id)) => {
+                if let Some(t) = types.get(id) {
+                    try_wraps.insert(m.base, t.name.as_str());
+                }
+            }
+            Some(ResultKind::Passthrough(id)) => {
+                if let Some(t) = types.get(id) {
+                    passthrough_wraps.insert(m.base, t.name.as_str());
+                }
+            }
+            None => {}
+        }
+    }
+    (try_wraps, passthrough_wraps)
+}
 
 /// Returns `(args_str, forward_str)` for a `[UnmanagedCallersOnly]` signature.
 ///
@@ -94,10 +129,16 @@ fn async_callback_inner_from_args(args: &[Argument], types: &model::common::type
 ///
 /// On a faulted or cancelled Task we send `AsyncOutcome::Cancelled` over the wire so the
 /// awaiting Rust future surfaces `Err(AsyncCancelled)` instead of hanging forever.
+///
+/// When `has_result_passthrough` is true the caller wraps the awaited expression in
+/// `FromCallResultAsync`, which converts faults to `Result::Panic` internally. The
+/// continuation then only needs to watch for cancellation; faults reach this point as
+/// normal completions carrying a `Panic` payload.
 pub(super) fn async_continuation(
     inner_id: TypeId,
     types: &model::common::types::all::Pass,
     unmanaged_conversion: &output::common::conversion::unmanaged_conversion::Pass,
+    has_result_passthrough: bool,
 ) -> String {
     let is_void = matches!(types.get(inner_id).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void)));
     let success = if is_void {
@@ -106,5 +147,9 @@ pub(super) fn async_continuation(
         let suffix = unmanaged_conversion.to_unmanaged_suffix(inner_id);
         format!("cb.UnsafeComplete(t.Result{suffix})")
     };
-    format!("ContinueWith(t => {{ if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else {success}; }})")
+    if has_result_passthrough {
+        format!("ContinueWith(t => {{ if (t.IsCanceled) cb.UnsafeCompleteCancelled(); else {success}; }})")
+    } else {
+        format!("ContinueWith(t => {{ if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else {success}; }})")
+    }
 }

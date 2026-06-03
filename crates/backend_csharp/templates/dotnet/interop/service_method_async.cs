@@ -8,6 +8,8 @@
             var obj = (I{{ type_name }}<{{ type_name }}>)handle.Target!;
 {%- if result_wrap_type %}
             _ = {{ result_wrap_type }}.FromCallAsync(() => obj.{{ method_name }}({{ forward }}{% if forward %}, {% endif %}cts.Token)).{{ continuation }};
+{%- elif result_passthrough_type %}
+            _ = {{ result_passthrough_type }}.FromCallResultAsync(() => obj.{{ method_name }}({{ forward }}{% if forward %}, {% endif %}cts.Token)).{{ continuation }};
 {%- else %}
             _ = obj.{{ method_name }}({{ forward }}{% if forward %}, {% endif %}cts.Token).{{ continuation }};
 {%- endif %}

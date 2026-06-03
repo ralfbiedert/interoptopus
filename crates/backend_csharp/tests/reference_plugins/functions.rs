@@ -31,6 +31,9 @@ fn load_plugin_functions_primitive() -> Result<(), Box<dyn Error>> {
 
 // Test ignored since we can't rely on a working .NET runtime being available on CI
 #[test]
+#[ignore]
+// This test sets the `exception_handler`, which is a global singleton. We can only ever have one,
+// so all tests relying on that are disabled unless we actively want to test them.
 fn load_plugin_functions_behavior() -> Result<(), Box<dyn Error>> {
     let exception_called = Arc::new(AtomicBool::new(false));
     let exception_called_clone = Arc::clone(&exception_called);
@@ -46,27 +49,33 @@ fn load_plugin_functions_behavior() -> Result<(), Box<dyn Error>> {
 
     assert!(exception_called.load(Ordering::SeqCst), "exception handler was not called after panic");
 
+    // Sync fn returning a typed ffi::Result that throws inside must fold into ffi::Result::Panic
+    // (handled by the generated `FromCallResult` wrapper), NOT surface through the outer Rust panic.
+    let result = plugin.panic_with_result();
+    assert!(matches!(result, interoptopus::ffi::Result::Panic), "typed sync throw must fold into ffi::Result::Panic, got {result:?}");
+
     Ok(())
 }
 
-// Async exceptions from the .NET side must surface via the registered
-// `Trampoline.UncaughtException` hook so the Rust caller can observe them.
+// Async exceptions from the .NET side must surface to the Rust caller.
 //
-// On the wire the byte is still `AsyncOutcome::Cancelled` (we don't yet
-// split Cancelled vs Panic on the wire), so the Rust future resolves to
-// `Err`. The exception text reaches the host through the exception handler
-// side-channel — that part is what this test pins.
+// - For async fns *without* a typed `ffi::Result` rval, the exception still folds
+//   into the outer `Err(AsyncCancelled)` channel (Task is cancelled on the wire).
+// - For async fns *with* a typed `ffi::Result<T, E>` rval, the exception is folded
+//   into `ffi::Result::Panic` (discriminant 2) by the generated `FromCallResultAsync`
+//   wrapper. The outer await resolves to `Ok(ffi::Result::Panic)`.
 #[tokio::test]
+#[ignore]
 async fn load_plugin_functions_behavior_async_throw() -> Result<(), Box<dyn Error>> {
     let rt = dotnet_runtime()?;
 
     let plugin = rt.load::<Behavior>(crate::dll_path_for(super::BASE, "functions_behavior.dll"))?;
 
     let result = plugin.panic_async().await;
-    assert!(result.is_err());
+    assert!(result.is_err(), "untyped async throw should surface as outer Err(AsyncCancelled)");
 
-    let result = plugin.panic_async_with_result().await;
-    assert!(result.is_err());
+    let inner = plugin.panic_async_with_result().await.expect("typed async throw should NOT be Err(AsyncCancelled)");
+    assert!(matches!(inner, interoptopus::ffi::Result::Panic), "typed async throw must fold into ffi::Result::Panic, got {inner:?}");
 
     Ok(())
 }

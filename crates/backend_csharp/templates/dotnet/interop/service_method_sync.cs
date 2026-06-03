@@ -9,6 +9,8 @@
             obj.{{ method_name }}({{ forward }});
 {%- elif result_wrap_type %}
             return {{ result_wrap_type }}.FromCall(() => obj.{{ method_name }}({{ forward }})){{ rval_suffix }};
+{%- elif result_passthrough_type %}
+            return {{ result_passthrough_type }}.FromCallResult(() => obj.{{ method_name }}({{ forward }})){{ rval_suffix }};
 {%- else %}
             return obj.{{ method_name }}({{ forward }}){{ rval_suffix }};
 {%- endif %}

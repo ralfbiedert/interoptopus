@@ -47,9 +47,9 @@ impl Pass {
             let Some(func) = fns_all.get(entry.fn_id) else { continue };
 
             let pascal_name = rust_to_pascal(&func.name);
-            let (csharp_sig, rval_id, is_async, unwrapped_result_id) = resolve_method_info(&func.signature.arguments, func.signature.rval, types, unwrap_error_id);
+            let (csharp_sig, rval_id, is_async, result) = resolve_method_info(&func.signature.arguments, func.signature.rval, types, unwrap_error_id);
 
-            methods.push(Method { name: pascal_name, kind: MethodKind::Static, base: entry.fn_id, csharp: csharp_sig, rval_id, is_async, unwrapped_result_id });
+            methods.push(Method { name: pascal_name, kind: MethodKind::Static, base: entry.fn_id, csharp: csharp_sig, rval_id, is_async, result });
         }
 
         let new_interface = if methods.is_empty() {

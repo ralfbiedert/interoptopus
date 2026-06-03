@@ -6,6 +6,8 @@
         {
 {%- if result_wrap_type %}
             _ = {{ result_wrap_type }}.FromCallAsync(() => Plugin.{{ pascal_name }}({{ forward }}{% if forward %}, {% endif %}cts.Token)).{{ continuation }};
+{%- elif result_passthrough_type %}
+            _ = {{ result_passthrough_type }}.FromCallResultAsync(() => Plugin.{{ pascal_name }}({{ forward }}{% if forward %}, {% endif %}cts.Token)).{{ continuation }};
 {%- else %}
             _ = Plugin.{{ pascal_name }}({{ forward }}{% if forward %}, {% endif %}cts.Token).{{ continuation }};
 {%- endif %}

@@ -13,7 +13,7 @@ use crate::lang::ServiceId;
 use crate::lang::plugin::TrampolineKind;
 use crate::lang::service::Service;
 use crate::pass::output::dotnet::interop::service::{resolve_ptr_to_service_name, service_aware_args, service_aware_args_except_last};
-use crate::pass::output::dotnet::interop::{async_callback_inner, async_continuation, rval_unmanaged_name};
+use crate::pass::output::dotnet::interop::{async_callback_inner, async_continuation, rval_unmanaged_name, split_result_kinds};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
@@ -53,17 +53,13 @@ impl Pass {
             .flat_map(|iface| iface.methods.iter().map(|m| (m.base, m.name.as_str())))
             .collect();
 
-        let result_wraps: HashMap<FunctionId, &str> = service_interfaces
-            .interfaces()
-            .iter()
-            .flat_map(|iface| {
-                iface.methods.iter().filter_map(|m| {
-                    let result_id = m.unwrapped_result_id?;
-                    let name = types.get(result_id).map(|t| t.name.as_str())?;
-                    Some((m.base, name))
-                })
-            })
-            .collect();
+        let (result_wraps, result_passthroughs): (HashMap<FunctionId, &str>, HashMap<FunctionId, &str>) =
+            service_interfaces.interfaces().iter().fold((HashMap::new(), HashMap::new()), |(mut acc_t, mut acc_p), iface| {
+                let (t, p) = split_result_kinds(&iface.methods, types);
+                acc_t.extend(t);
+                acc_p.extend(p);
+                (acc_t, acc_p)
+            });
 
         for entry in trampoline_model.entries() {
             let TrampolineKind::ServiceMethod { service_id } = &entry.kind else { continue };
@@ -73,6 +69,8 @@ impl Pass {
             let Some(&method_name) = method_names.get(&entry.fn_id) else { continue };
             let ffi_name = &func.name;
             let result_wrap_type = result_wraps.get(&entry.fn_id).copied().unwrap_or("");
+            let result_passthrough_type = result_passthroughs.get(&entry.fn_id).copied().unwrap_or("");
+            let has_result_passthrough = !result_passthrough_type.is_empty();
             let rval_type = types.get(func.signature.rval).map_or("void", |t| t.name.as_str());
             let rval_is_service = resolve_ptr_to_service_name(func.signature.rval, types).is_some();
             let async_inner = async_callback_inner(func, types);
@@ -86,9 +84,13 @@ impl Pass {
                 };
 
                 let continuation = if resolve_ptr_to_service_name(inner_id, types).is_some() {
-                    "ContinueWith(t => { if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })".to_string()
+                    if has_result_passthrough {
+                        "ContinueWith(t => { if (t.IsCanceled) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })".to_string()
+                    } else {
+                        "ContinueWith(t => { if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })".to_string()
+                    }
                 } else {
-                    async_continuation(inner_id, types, unmanaged_conversion)
+                    async_continuation(inner_id, types, unmanaged_conversion, has_result_passthrough)
                 };
 
                 let mut ctx = Context::new();
@@ -99,6 +101,7 @@ impl Pass {
                 ctx.insert("forward", &forward);
                 ctx.insert("continuation", &continuation);
                 ctx.insert("result_wrap_type", result_wrap_type);
+                ctx.insert("result_passthrough_type", result_passthrough_type);
                 templates.render("dotnet/interop/service_method_async.cs", &ctx)?
             } else if rval_is_service {
                 let ret_svc_name = resolve_ptr_to_service_name(func.signature.rval, types).unwrap();
@@ -139,6 +142,7 @@ impl Pass {
                 ctx.insert("rval_suffix", &rval_suffix);
                 ctx.insert("is_void", &is_void);
                 ctx.insert("result_wrap_type", result_wrap_type);
+                ctx.insert("result_passthrough_type", result_passthrough_type);
                 templates.render("dotnet/interop/service_method_sync.cs", &ctx)?
             };
 

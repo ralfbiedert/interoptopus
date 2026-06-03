@@ -11,7 +11,7 @@ use crate::lang::ServiceId;
 use crate::lang::plugin::TrampolineKind;
 use crate::lang::service::Service;
 use crate::pass::output::dotnet::interop::service::{resolve_ptr_to_service_name, service_aware_args, service_aware_args_except_last};
-use crate::pass::output::dotnet::interop::{async_callback_inner, async_continuation, rval_unmanaged_name};
+use crate::pass::output::dotnet::interop::{async_callback_inner, async_continuation, rval_unmanaged_name, split_result_kinds};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::Context;
 use std::collections::HashMap;
@@ -51,17 +51,15 @@ impl Pass {
             .flat_map(|iface| iface.methods.iter().map(|m| (m.base, m.name.as_str())))
             .collect();
 
-        let result_wraps: HashMap<FunctionId, &str> = service_interfaces
-            .interfaces()
-            .iter()
-            .flat_map(|iface| {
-                iface.methods.iter().filter_map(|m| {
-                    let result_id = m.unwrapped_result_id?;
-                    let name = types.get(result_id).map(|t| t.name.as_str())?;
-                    Some((m.base, name))
-                })
-            })
-            .collect();
+        // Ctors currently only consume Try-style wraps; passthrough Results on ctors are
+        // not generated today, so the second map is ignored here.
+        let (result_wraps, _result_passthroughs): (HashMap<FunctionId, &str>, HashMap<FunctionId, &str>) =
+            service_interfaces.interfaces().iter().fold((HashMap::new(), HashMap::new()), |(mut acc_t, mut acc_p), iface| {
+                let (t, p) = split_result_kinds(&iface.methods, types);
+                acc_t.extend(t);
+                acc_p.extend(p);
+                (acc_t, acc_p)
+            });
 
         for entry in trampoline_model.entries() {
             let TrampolineKind::ServiceCtor { service_id } = &entry.kind else { continue };
@@ -83,7 +81,7 @@ impl Pass {
                         "ContinueWith(t => { if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(t.Result.IntoUnmanaged()); })"
                             .to_string()
                     } else {
-                        async_continuation(inner_id, types, unmanaged_conversion)
+                        async_continuation(inner_id, types, unmanaged_conversion, false)
                     }
                 } else {
                     "ContinueWith(t => { if (t.IsCanceled || t.IsFaulted) cb.UnsafeCompleteCancelled(); else cb.UnsafeComplete(); })".to_string()
