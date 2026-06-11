@@ -87,3 +87,16 @@ pub fn pattern_ffi_slice_8(slice: &SliceMut<CharArray>, callback: CallbackCharAr
 pub fn pattern_ffi_slice_9(slice: Slice<UseString>) -> ffi::String {
     slice.as_slice()[0].s1.clone()
 }
+
+/// A composite embedding a blittable `Slice<u8>`. Its generated `AsUnmanaged()`
+/// calls `bytes.AsUnmanaged()`, so the `SliceByte` binding must expose that method.
+#[ffi]
+#[derive(Clone)]
+pub struct UseSliceByteInStruct<'a> {
+    pub bytes: ffi::Slice<'a, u8>,
+}
+
+#[ffi]
+pub fn pattern_ffi_slice_in_struct(x: UseSliceByteInStruct) -> u32 {
+    x.bytes.as_slice().len() as u32
+}
