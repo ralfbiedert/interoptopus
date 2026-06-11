@@ -98,6 +98,10 @@ public partial class {{ name }} : IEnumerable<{{ element_type }}>, IDisposable
         return unmanaged;
     }
 
+    {{ _fns_decorators_all | indent }}
+    {{ _fns_decorators_internal | indent }}
+    internal Unmanaged AsUnmanaged() => ToUnmanaged();
+
     [CustomMarshaller(typeof({{ name }}), MarshalMode.Default, typeof(Marshaller))]
     private struct MarshallerMeta { }
 
