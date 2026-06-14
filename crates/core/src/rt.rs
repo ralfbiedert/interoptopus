@@ -47,8 +47,9 @@ use std::sync::{Arc, Mutex};
 /// the task finishes cleaning up, the task's drop decrements the count to 0 — and
 /// that drop happens on a Tokio worker thread. Calling `Runtime::drop()` from within
 /// the runtime panics ("Cannot drop a runtime in a context where blocking is not
-/// allowed"). This wrapper detects the async-context case and defers the shutdown to
-/// a dedicated OS thread.
+/// allowed"). To avoid this we shut the runtime down via [`tokio::runtime::Runtime::shutdown_background`],
+/// which (unlike `drop`) never blocks and is safe to call from any context, including
+/// a Tokio worker thread.
 struct TokioInner {
     handle: tokio::runtime::Handle,
     rt: Mutex<Option<tokio::runtime::Runtime>>,
@@ -56,14 +57,9 @@ struct TokioInner {
 
 impl Drop for TokioInner {
     fn drop(&mut self) {
-        let rt = self.rt.get_mut().unwrap_or_else(|e| e.into_inner()).take();
-        let Some(rt) = rt else { return };
-        if tokio::runtime::Handle::try_current().is_ok() {
-            // We're inside a Tokio async context — blocking shutdown would deadlock.
-            // Move the runtime to a fresh OS thread where blocking is allowed.
-            std::thread::spawn(move || drop(rt));
+        if let Some(rt) = self.rt.get_mut().unwrap_or_else(|e| e.into_inner()).take() {
+            rt.shutdown_background();
         }
-        // If not in async context, `rt` drops normally at end of scope (blocking OK).
     }
 }
 
