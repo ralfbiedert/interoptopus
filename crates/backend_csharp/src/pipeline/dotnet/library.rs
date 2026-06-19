@@ -362,7 +362,7 @@ impl DotnetLibrary {
         o.enum_body_from_call.process(&mut pass_meta, &self.output_master, &m.type_all, &m.id_maps, &m.exceptions, OperationMode::Plugin)?;
         o.enum_body_exception_for_variant.process(&mut pass_meta, &self.output_master, &m.type_all, OperationMode::Plugin)?;
         o.enum_body_tostring.process(&mut pass_meta, &self.output_master, &m.type_all)?;
-        o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_from_call, &o.enum_body_exception_for_variant, &o.enum_body_tostring, &o.unmanaged_conversion)?;
+        o.enum_body.process(&mut pass_meta, &self.output_master, &m.type_all, &m.type_struct_class, &m.type_disposable, &o.enum_body_unmanaged_variant, &o.enum_body_unmanaged, &o.enum_body_to_unmanaged, &o.enum_body_as_unmanaged, &o.enum_body_ctors, &o.enum_body_from_call, &o.enum_body_exception_for_variant, &o.enum_body_tostring, &o.unmanaged_conversion, OperationMode::Plugin)?;
         o.enums.process(&mut pass_meta, &self.output_master, &m.type_all, &o.enum_ty, &o.enum_body)?;
         o.util.process(&mut pass_meta, &self.output_master, &m.type_all)?;
         o.delegates_class.process(&mut pass_meta, &self.output_master, &m.type_all, &o.unmanaged_names, &o.unmanaged_conversion)?;

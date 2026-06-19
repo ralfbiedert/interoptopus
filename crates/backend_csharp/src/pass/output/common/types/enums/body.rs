@@ -1,7 +1,7 @@
 //! Renders enum body definitions using the `enum_body.cs` template.
 
 use crate::lang::TypeId;
-use crate::lang::types::kind::{DataEnum, TypeKind, TypePattern, Variant};
+use crate::lang::types::kind::{DataEnum, Primitive, TypeKind, TypePattern, Variant};
 use crate::pass::{OutputResult, PassInfo, model, output};
 use interoptopus_backends::template::{Context, Value};
 use std::collections::HashMap;
@@ -36,6 +36,7 @@ impl Pass {
         enum_body_exception_for_variant: &output::common::types::enums::body_exception_for_variant::Pass,
         enum_body_tostring: &output::common::types::enums::body_tostring::Pass,
         managed: &output::common::conversion::unmanaged_conversion::Pass,
+        mode: crate::pass::OperationMode,
     ) -> OutputResult {
         let templates = output_master.templates();
 
@@ -115,6 +116,10 @@ impl Pass {
 
             let marshaller_to_unmanaged = managed.to_unmanaged_name(*type_id);
             let marshaller_to_managed = managed.to_managed_name(*type_id);
+            let (interfaces, result_interface_methods) = result_interfaces(type_kind, types, mode, is_disposable).unwrap_or_else(|| {
+                let interfaces = if is_disposable { " : IDisposable".to_string() } else { String::new() };
+                (interfaces, String::new())
+            });
 
             let mut context = Context::new();
             context.insert("name", name);
@@ -122,6 +127,7 @@ impl Pass {
             context.insert("is_disposable", &is_disposable);
             context.insert("is_managed_only", &is_managed_only);
             context.insert("visibility", &visibility);
+            context.insert("interfaces", &interfaces);
             context.insert("disposable_variants", &disposable_variants);
             context.insert("unmanaged_variants", &unmanaged_variants);
             context.insert("unmanaged", &unmanaged);
@@ -131,6 +137,7 @@ impl Pass {
             context.insert("from_call", &from_call);
             context.insert("exception_for_variant", &exception_for_variant);
             context.insert("to_string", &to_string);
+            context.insert("result_interface_methods", &result_interface_methods);
             context.insert("marshaller_to_unmanaged", marshaller_to_unmanaged);
             context.insert("marshaller_to_managed", marshaller_to_managed);
 
@@ -145,4 +152,45 @@ impl Pass {
     pub fn get(&self, type_id: TypeId) -> Option<&String> {
         self.enum_body.get(&type_id)
     }
+}
+
+fn result_interfaces(type_kind: &TypeKind, types: &model::common::types::all::Pass, mode: crate::pass::OperationMode, is_disposable: bool) -> Option<(String, String)> {
+    let TypeKind::TypePattern(TypePattern::Result(ok_ty, err_ty, _)) = type_kind else {
+        return None;
+    };
+
+    let ok_ty = super::resolve_service_variant(*ok_ty, types, mode);
+    let err_ty = super::resolve_service_variant(*err_ty, types, mode);
+    let ok_is_unit = is_unit_type(ok_ty, types);
+    let err_is_unit = is_unit_type(err_ty, types);
+    let ok_name = result_type_name(ok_ty, types);
+    let err_name = result_type_name(err_ty, types);
+    let interface = format!("IResult<{ok_name}, {err_name}>");
+
+    let mut interfaces = vec![interface.clone()];
+    if is_disposable {
+        interfaces.push("IDisposable".to_string());
+    }
+
+    let mut methods = Vec::new();
+    if ok_is_unit {
+        methods.push(format!("Unit {interface}.AsOk()\n{{\n    AsOk();\n    return Unit.Default;\n}}",));
+    }
+    if err_is_unit {
+        methods.push(format!("Unit {interface}.AsErr()\n{{\n    AsErr();\n    return Unit.Default;\n}}",));
+    }
+
+    Some((format!(" : {}", interfaces.join(", ")), methods.join("\n\n")))
+}
+
+fn result_type_name(type_id: TypeId, types: &model::common::types::all::Pass) -> String {
+    if is_unit_type(type_id, types) {
+        "Unit".to_string()
+    } else {
+        types.get(type_id).map_or_else(|| "Unit".to_string(), |t| t.name.clone())
+    }
+}
+
+fn is_unit_type(type_id: TypeId, types: &model::common::types::all::Pass) -> bool {
+    matches!(types.get(type_id).map(|t| &t.kind), Some(TypeKind::Primitive(Primitive::Void) | TypeKind::TypePattern(TypePattern::CVoid)))
 }
