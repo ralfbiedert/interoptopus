@@ -60,6 +60,9 @@ impl Pass {
                 ctx.insert("visibility", &visibility_of(csharp::UTIL_TASK_HANDLE, types));
                 parts.push(templates.render("common/types/util/task_handle.cs", &ctx)?.trim().to_string());
             }
+            if output_master.type_belongs_to(csharp::UTIL_RESULT, file) {
+                parts.push(templates.render("common/types/util/result.cs", &Context::new())?.trim().to_string());
+            }
 
             self.utils.insert(file.clone(), parts.join("\n\n"));
         }

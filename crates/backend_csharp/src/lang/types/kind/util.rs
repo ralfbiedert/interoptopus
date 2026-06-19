@@ -9,4 +9,5 @@ pub enum Util {
     TaskHandle,
     AsyncOutcome,
     AsyncOutcomePayload,
+    Result,
 }

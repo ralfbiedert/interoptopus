@@ -1,7 +1,7 @@
 {%- if not is_managed_only -%}
 [NativeMarshalling(typeof(MarshallerMeta))]
 {% endif -%}
-{{ visibility }} partial {{ struct_or_class }} {{ name }}{% if is_disposable %} : IDisposable{% endif %}
+{{ visibility }} partial {{ struct_or_class }} {{ name }}{{ interfaces }}
 {
 {%- if not is_managed_only %}
     {%- for item in unmanaged_variants %}
@@ -21,6 +21,9 @@
     {{ from_call | indent }}
 {% endif %}
     {{ to_string | indent }}
+{% if result_interface_methods %}
+    {{ result_interface_methods | indent }}
+{% endif %}
 {% if is_disposable %}
     public void Dispose()
     {

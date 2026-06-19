@@ -62,6 +62,7 @@ impl Pass {
                 (csharp::UTIL_TASK_HANDLE, "TaskHandle", Util::TaskHandle, Visibility::Internal),
                 (csharp::UTIL_ASYNC_OUTCOME, "AsyncOutcome", Util::AsyncOutcome, Visibility::Internal),
                 (csharp::UTIL_ASYNC_OUTCOME_PAYLOAD, "AsyncOutcomeOf", Util::AsyncOutcomePayload, Visibility::Internal),
+                (csharp::UTIL_RESULT, "IResult", Util::Result, Visibility::Public),
             ];
 
             for (id, name, variant, visibility) in utils {

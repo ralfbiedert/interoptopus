@@ -183,6 +183,7 @@ impl Pass {
                     Util::TaskHandle => ManagedConversion::AsIs,
                     Util::AsyncOutcome => ManagedConversion::AsIs,
                     Util::AsyncOutcomePayload => ManagedConversion::AsIs,
+                    Util::Result => ManagedConversion::AsIs,
                 },
                 TypeKind::WireOnly(_) => ManagedConversion::Into,
             };
