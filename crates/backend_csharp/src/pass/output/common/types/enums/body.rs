@@ -116,10 +116,7 @@ impl Pass {
 
             let marshaller_to_unmanaged = managed.to_unmanaged_name(*type_id);
             let marshaller_to_managed = managed.to_managed_name(*type_id);
-            let (interfaces, result_interface_methods) = result_interfaces(type_kind, types, mode, is_disposable).unwrap_or_else(|| {
-                let interfaces = if is_disposable { " : IDisposable".to_string() } else { String::new() };
-                (interfaces, String::new())
-            });
+            let result_interface = result_interface(type_kind, types, mode);
 
             let mut context = Context::new();
             context.insert("name", name);
@@ -127,7 +124,12 @@ impl Pass {
             context.insert("is_disposable", &is_disposable);
             context.insert("is_managed_only", &is_managed_only);
             context.insert("visibility", &visibility);
-            context.insert("interfaces", &interfaces);
+            context.insert("is_result", &result_interface.is_some());
+            context.insert("result_ok_name", result_interface.as_ref().map_or("", |r| r.ok_name.as_str()));
+            context.insert("result_err_name", result_interface.as_ref().map_or("", |r| r.err_name.as_str()));
+            context.insert("result_ok_is_unit", &result_interface.as_ref().is_some_and(|r| r.ok_is_unit));
+            context.insert("result_err_is_unit", &result_interface.as_ref().is_some_and(|r| r.err_is_unit));
+            context.insert("result_has_unit_methods", &result_interface.as_ref().is_some_and(|r| r.ok_is_unit || r.err_is_unit));
             context.insert("disposable_variants", &disposable_variants);
             context.insert("unmanaged_variants", &unmanaged_variants);
             context.insert("unmanaged", &unmanaged);
@@ -137,7 +139,6 @@ impl Pass {
             context.insert("from_call", &from_call);
             context.insert("exception_for_variant", &exception_for_variant);
             context.insert("to_string", &to_string);
-            context.insert("result_interface_methods", &result_interface_methods);
             context.insert("marshaller_to_unmanaged", marshaller_to_unmanaged);
             context.insert("marshaller_to_managed", marshaller_to_managed);
 
@@ -154,7 +155,14 @@ impl Pass {
     }
 }
 
-fn result_interfaces(type_kind: &TypeKind, types: &model::common::types::all::Pass, mode: crate::pass::OperationMode, is_disposable: bool) -> Option<(String, String)> {
+struct ResultInterface {
+    ok_name: String,
+    err_name: String,
+    ok_is_unit: bool,
+    err_is_unit: bool,
+}
+
+fn result_interface(type_kind: &TypeKind, types: &model::common::types::all::Pass, mode: crate::pass::OperationMode) -> Option<ResultInterface> {
     let TypeKind::TypePattern(TypePattern::Result(ok_ty, err_ty, _)) = type_kind else {
         return None;
     };
@@ -165,22 +173,8 @@ fn result_interfaces(type_kind: &TypeKind, types: &model::common::types::all::Pa
     let err_is_unit = is_unit_type(err_ty, types);
     let ok_name = result_type_name(ok_ty, types);
     let err_name = result_type_name(err_ty, types);
-    let interface = format!("IResult<{ok_name}, {err_name}>");
 
-    let mut interfaces = vec![interface.clone()];
-    if is_disposable {
-        interfaces.push("IDisposable".to_string());
-    }
-
-    let mut methods = Vec::new();
-    if ok_is_unit {
-        methods.push(format!("Unit {interface}.AsOk()\n{{\n    AsOk();\n    return Unit.Default;\n}}",));
-    }
-    if err_is_unit {
-        methods.push(format!("Unit {interface}.AsErr()\n{{\n    AsErr();\n    return Unit.Default;\n}}",));
-    }
-
-    Some((format!(" : {}", interfaces.join(", ")), methods.join("\n\n")))
+    Some(ResultInterface { ok_name, err_name, ok_is_unit, err_is_unit })
 }
 
 fn result_type_name(type_id: TypeId, types: &model::common::types::all::Pass) -> String {
