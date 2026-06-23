@@ -1,7 +1,7 @@
 {%- if not is_managed_only -%}
 [NativeMarshalling(typeof(MarshallerMeta))]
 {% endif -%}
-{{ visibility }} partial {{ struct_or_class }} {{ name }}{{ interfaces }}
+{{ visibility }} partial {{ struct_or_class }} {{ name }}{% if is_result or is_disposable %} : {% if is_result %}IResult<{{ result_ok_name }}, {{ result_err_name }}>{% if is_disposable %}, {% endif %}{% endif %}{% if is_disposable %}IDisposable{% endif %}{% endif %}
 {
 {%- if not is_managed_only %}
     {%- for item in unmanaged_variants %}
@@ -21,8 +21,21 @@
     {{ from_call | indent }}
 {% endif %}
     {{ to_string | indent }}
-{% if result_interface_methods %}
-    {{ result_interface_methods | indent }}
+{% if result_has_unit_methods -%}
+{% if result_ok_is_unit %}
+    Unit IResult<{{ result_ok_name }}, {{ result_err_name }}>.AsOk()
+    {
+        AsOk();
+        return Unit.Default;
+    }
+{% endif -%}
+{% if result_err_is_unit %}
+    Unit IResult<{{ result_ok_name }}, {{ result_err_name }}>.AsErr()
+    {
+        AsErr();
+        return Unit.Default;
+    }
+{% endif -%}
 {% endif %}
 {% if is_disposable %}
     public void Dispose()
