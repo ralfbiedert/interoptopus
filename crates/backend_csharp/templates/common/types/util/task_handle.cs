@@ -8,6 +8,16 @@
 
 {{ visibility }} partial struct TaskHandle : IDisposable
 {
+#if !NET5_0_OR_GREATER
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void AbortCallback(IntPtr value);
+    private static readonly AbortCallback _abortCallbackDelegate = TaskHandleAbort;
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void DropCallback(IntPtr value);
+    private static readonly DropCallback _dropCallbackDelegate = TaskHandleDrop;
+#endif
+
     /// Aborts the associated Rust async task. The spawned future will be
     /// dropped at its next <c>.await</c> point and the completion callback
     /// will fire with a <c>Panic</c> result.
@@ -47,12 +57,19 @@
         return new TaskHandle
         {
             _data = GCHandle.ToIntPtr(gcHandle),
+
+#if NET5_0_OR_GREATER
             _abort_fn = (IntPtr)(delegate* unmanaged[Cdecl]<IntPtr, void>)&TaskHandleAbort,
             _drop_fn = (IntPtr)(delegate* unmanaged[Cdecl]<IntPtr, void>)&TaskHandleDrop,
+#else
+            _abort_fn = Marshal.GetFunctionPointerForDelegate(_abortCallbackDelegate),
+            _drop_fn = Marshal.GetFunctionPointerForDelegate(_dropCallbackDelegate),
+#endif
         };
     }
-
+#if NET5_0_OR_GREATER
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+#endif
     private static void TaskHandleAbort(IntPtr data)
     {
         var handle = GCHandle.FromIntPtr(data);
@@ -62,7 +79,9 @@
         }
     }
 
+#if NET5_0_OR_GREATER
     [UnmanagedCallersOnly(CallConvs = new[] { typeof(System.Runtime.CompilerServices.CallConvCdecl) })]
+#endif
     private static void TaskHandleDrop(IntPtr data)
     {
         var handle = GCHandle.FromIntPtr(data);
