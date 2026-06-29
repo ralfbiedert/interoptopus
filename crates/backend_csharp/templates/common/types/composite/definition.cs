@@ -10,6 +10,9 @@
     {%- if field.docs %}
     {{ field.docs | indent }}
     {%- endif %}
-    public required {{ field.managed_name }} {{ field.name }};
+#if NET7_0_OR_GREATER
+    required
+#endif
+    public {{ field.managed_name }} {{ field.name }};
     {%- endfor %}
 }
