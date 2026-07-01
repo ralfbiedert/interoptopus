@@ -4,7 +4,7 @@
 {% include "common/pragma.cs" %}
 
 {{ usings }}
-namespace {{ namespace }};
+namespace {{ namespace }} {
 
 {%- if pattern_bools %}
 
@@ -64,3 +64,5 @@ public static class Interop
 
 {{ plugin_stub }}
 {%- endif %}
+
+}

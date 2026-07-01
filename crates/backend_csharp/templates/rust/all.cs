@@ -2,7 +2,7 @@
 {% include "common/pragma.cs" %}
 {{ using }}
 {{ search_path }}
-namespace {{ namespace }};
+namespace {{ namespace }} {
 
 public static partial class Interop {
 
@@ -81,3 +81,5 @@ public static partial class Interop {
 {%- endfor %}
 
 {{ util }}
+
+}
