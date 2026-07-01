@@ -1,1 +1,4 @@
-{{ visibility }} class InteropException(string text) : Exception(text) { }
+{{ visibility }} class InteropException : Exception
+{
+    public InteropException(string text) : base(text) { }
+}

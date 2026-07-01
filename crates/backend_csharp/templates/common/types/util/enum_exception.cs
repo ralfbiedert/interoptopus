@@ -1,6 +1,13 @@
-{{ visibility }} class EnumException() : InteropException($"Enum variant mismatch.")  { }
+{{ visibility }} class EnumException : InteropException {
+    public EnumException() : base($"Enum variant mismatch.")  { }
+}
 
-{{ visibility }} class EnumException<T>(T t) : InteropException($"Enum variant mismatch.")
+{{ visibility }} class EnumException<T> : InteropException
 {
-    public T Value { get; } = t;
+    public T Value { get; }
+
+    public EnumException(T t) : base("Enum variant mismatch.")
+    {
+        Value = t;
+    }
 }
