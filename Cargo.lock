@@ -189,7 +189,7 @@ version = "0.1.0"
 
 [[package]]
 name = "core_library_ffi"
-version = "0.16.0"
+version = "0.16.3"
 dependencies = [
  "core_library",
  "interoptopus",
@@ -197,7 +197,7 @@ dependencies = [
 
 [[package]]
 name = "core_library_ffi_build"
-version = "0.16.0"
+version = "0.16.3"
 dependencies = [
  "core_library_ffi",
  "interoptopus_csharp",
@@ -556,7 +556,7 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
 name = "hello_world"
-version = "0.16.0"
+version = "0.16.3"
 dependencies = [
  "interoptopus",
  "interoptopus_csharp",
@@ -741,7 +741,7 @@ dependencies = [
 
 [[package]]
 name = "interoptopus"
-version = "0.16.0"
+version = "0.16.3"
 dependencies = [
  "interoptopus_proc",
  "serde",
@@ -751,7 +751,7 @@ dependencies = [
 
 [[package]]
 name = "interoptopus_backends"
-version = "0.16.0"
+version = "0.16.3"
 dependencies = [
  "insta",
  "interoptopus",
@@ -761,21 +761,21 @@ dependencies = [
 
 [[package]]
 name = "interoptopus_c"
-version = "0.16.0"
+version = "0.16.3"
 dependencies = [
  "interoptopus",
 ]
 
 [[package]]
 name = "interoptopus_cpython"
-version = "0.16.0"
+version = "0.16.3"
 dependencies = [
  "interoptopus",
 ]
 
 [[package]]
 name = "interoptopus_csharp"
-version = "0.16.0"
+version = "0.16.3"
 dependencies = [
  "insta",
  "interoptopus",
@@ -791,14 +791,14 @@ dependencies = [
 
 [[package]]
 name = "interoptopus_proc"
-version = "0.16.0"
+version = "0.16.3"
 dependencies = [
  "interoptopus_proc_impl",
 ]
 
 [[package]]
 name = "interoptopus_proc_impl"
-version = "0.16.0"
+version = "0.16.3"
 dependencies = [
  "insta",
  "prettyplease",
@@ -1169,7 +1169,7 @@ dependencies = [
 
 [[package]]
 name = "reference_project"
-version = "0.16.0"
+version = "0.16.3"
 dependencies = [
  "interoptopus",
  "serde",
