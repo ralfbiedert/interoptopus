@@ -42,8 +42,8 @@ public class TestPatternSlices
             slice[1] = 100;
         });
 
-        Assert.Equal(data[0], 1);
-        Assert.Equal(data[1], 100);
+        Assert.Equal(1, data[0]);
+        Assert.Equal(100, data[1]);
     }
 
     [Fact]

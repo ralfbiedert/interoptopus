@@ -16,7 +16,7 @@ public class TestPatternStrings
     public void pattern_ascii_pointer_2()
     {
         var rval = Interop.pattern_ascii_pointer_2();
-        Assert.Equal(rval, "hello.world");
+        Assert.Equal("hello.world", rval);
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class TestPatternStrings
     public void pattern_string_12()
     {
         var rval = Interop.pattern_string_12(s1 => s1 + "world", "hello");
-        Assert.Equal(rval, "helloworld");
+        Assert.Equal("helloworld", rval);
     }
 
     [Fact]

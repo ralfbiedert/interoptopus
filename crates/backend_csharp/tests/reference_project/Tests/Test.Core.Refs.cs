@@ -28,7 +28,7 @@ public class TestRefs
     {
         var x = 123L;
         var rval = Interop.ref3(ref x);
-        Assert.Equal(true, rval.Is);
+        Assert.True(rval.Is);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class TestRefs
     {
         var x = 123L;
         var rval = Interop.ref4(ref x).Is;
-        Assert.Equal(true, rval);
+        Assert.True(rval);
     }
 
     [Fact]

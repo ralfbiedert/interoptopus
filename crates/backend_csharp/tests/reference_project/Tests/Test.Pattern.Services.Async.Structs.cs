@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using My.Company;
 using Xunit;
 using Array = My.Company.Array;
@@ -6,7 +7,7 @@ using Array = My.Company.Array;
 public class TestPatternServicesAsyncStructs
 {
     [Fact]
-    public async void ProcessStruct()
+    public async Task ProcessStruct()
     {
         using var s = ServiceAsyncStructs.Create();
         var a = new NestedArray
@@ -22,7 +23,7 @@ public class TestPatternServicesAsyncStructs
                 data = new byte[16]
             }
         };
-        var r = await s.ProcessStruct(a);
-        Assert.Equal(r.field_int, 124);
+        var r = await s.ProcessStruct(a, TestContext.Current.CancellationToken);
+        Assert.Equal(124, r.field_int);
     }
 }

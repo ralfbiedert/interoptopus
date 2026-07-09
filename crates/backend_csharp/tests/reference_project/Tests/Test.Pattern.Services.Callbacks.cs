@@ -14,7 +14,7 @@ public class TestPatternServicesCallbacks
         callbacks.CallbackSimple(x =>
         {
             called = true;
-            Assert.Equal(x, 0u);
+            Assert.Equal(0u, x);
             return x;
         });
 
@@ -30,8 +30,8 @@ public class TestPatternServicesCallbacks
 
         callbacks.CallbackWithSlice((x, y) =>
         {
-            Assert.Equal(x, 1);
-            Assert.Equal(y, 2);
+            Assert.Equal(1, x);
+            Assert.Equal(2, y);
             called = true;
             return ResultVoidError.Ok;
         }, slice);
