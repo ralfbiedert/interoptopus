@@ -1,3 +1,5 @@
+using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using My.Company;
 using Xunit;
@@ -5,23 +7,16 @@ using Interop = My.Company.Interop;
 
 public class TestBehavior
 {
-    [Fact]
+    public static bool SupportsSehPanicBoundary =>
+        OperatingSystem.IsWindows() && RuntimeFeature.IsDynamicCodeSupported;
+
+    [Fact(
+        Skip = "Requires a runtime that exposes Rust panics as catchable SEH exceptions (only managed windows).",
+        SkipUnless = nameof(SupportsSehPanicBoundary)
+    )]
     public void behavior_panics()
     {
-        // We must only run this on Windows as SEH is only supported there. On Linux this would abort the process
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return;
-
-        try
-        {
-            Interop.behavior_panics();
-        }
-        catch (SEHException)
-        {
-            return;
-        }
-
-        Assert.True(false);
+        Assert.Throws<SEHException>(Interop.behavior_panics);
     }
 
     [Fact]
