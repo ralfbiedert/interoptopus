@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using My.Company;
 using My.Company.Common;
 using Xunit;
@@ -5,15 +6,15 @@ using Xunit;
 public class TestPatternServicesAsyncVecString
 {
     [Fact]
-    public async void HandleString()
+    public async Task HandleString()
     {
         using var s = ServiceAsyncVecString.Create();
-        var r = await s.HandleString("abc".Utf8());
-        Assert.Equal(r.IntoString(), "abc");
+        var r = await s.HandleString("abc".Utf8(), TestContext.Current.CancellationToken);
+        Assert.Equal("abc", r.IntoString());
     }
 
     [Fact]
-    public async void HandleVecString()
+    public async Task HandleVecString()
     {
         using var s = ServiceAsyncVecString.Create();
         var v = new[]
@@ -21,17 +22,17 @@ public class TestPatternServicesAsyncVecString
             "abc".Utf8()
         }.IntoVec();
 
-        var r = await s.HandleVecString(v);
-        Assert.Equal(r[0].IntoString(), "abc");
+        var r = await s.HandleVecString(v, TestContext.Current.CancellationToken);
+        Assert.Equal("abc", r[0].IntoString());
     }
 
 
     [Fact]
-    public async void HandleNestedString()
+    public async Task HandleNestedString()
     {
         using var s = ServiceAsyncVecString.Create();
-        var r = await s.HandleNestedString("abc".Utf8());
-        Assert.Equal(r.s1.IntoString(), "abc");
-        Assert.Equal(r.s2.IntoString(), "abc");
+        var r = await s.HandleNestedString("abc".Utf8(), TestContext.Current.CancellationToken);
+        Assert.Equal("abc", r.s1.IntoString());
+        Assert.Equal("abc", r.s2.IntoString());
     }
 }

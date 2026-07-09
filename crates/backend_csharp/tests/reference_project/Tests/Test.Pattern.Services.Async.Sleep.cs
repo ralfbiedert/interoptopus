@@ -7,15 +7,15 @@ using Xunit;
 public class TestPatternServicesAsyncSleep
 {
     [Fact]
-    public async void ReturnAfterMs()
+    public async Task ReturnAfterMs()
     {
         using var s = ServiceAsyncSleep.Create();
-        var r = await s.ReturnAfterMs(123, 500);
-        Assert.Equal(r, 123u);
+        var r = await s.ReturnAfterMs(123, 500, TestContext.Current.CancellationToken);
+        Assert.Equal(123u, r);
     }
 
     [Fact]
-    public async void SupportsMultipleParallelCalls()
+    public async Task SupportsMultipleParallelCalls()
     {
         using var s = ServiceAsyncSleep.Create();
 
@@ -25,8 +25,8 @@ public class TestPatternServicesAsyncSleep
             var x = Random.Shared.Next(100, 1000);
             var ms = Random.Shared.Next(100, 1000);
 
-            var r = await s.ReturnAfterMs((ulong)x, (ulong)ms);
-            Assert.Equal((int)r, x);
+            var r = await s.ReturnAfterMs((ulong)x, (ulong)ms, TestContext.Current.CancellationToken);
+            Assert.Equal(x, (int)r);
         }).ToList();
 
         await Task.WhenAll(tasks);

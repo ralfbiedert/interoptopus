@@ -42,7 +42,7 @@ public class TestPatternDelegates
     {
         using var cb = new MyCallbackNamespaced(value => value);
         var y = Interop.pattern_callback_4(cb, 5);
-        Assert.Equal(y, 5u);
+        Assert.Equal(5u, y);
     }
 
     [Fact]
@@ -66,15 +66,15 @@ public class TestPatternDelegates
     {
         Interop.pattern_ffi_slice_delegate(x =>
         {
-            Assert.Equal(x.Count, 10);
-            Assert.Equal(x[0], 0);
-            Assert.Equal(x[5], 5);
+            Assert.Equal(10, x.Count);
+            Assert.Equal(0, x[0]);
+            Assert.Equal(5, x[5]);
 
             // Test IEnumerable using LINQ
             var arr = x.ToArray();
-            Assert.Equal(arr.Length, 10);
-            Assert.Equal(arr[0], 0);
-            Assert.Equal(arr[5], 5);
+            Assert.Equal(10, arr.Length);
+            Assert.Equal(0, arr[0]);
+            Assert.Equal(5, arr[5]);
 
             return x[0];
         });
@@ -94,7 +94,7 @@ public class TestPatternDelegates
         ResultVoidError C1(int x, int y)
         {
             // This should see `6` here, and it does, because the function has set that value.
-            Assert.Equal(rval, 6);
+            Assert.Equal(6, rval);
             called_c1 = true;
 
             // However, when we now throw we would expect .NET to unwind that exception back
@@ -112,7 +112,7 @@ public class TestPatternDelegates
             // in particular that any code that you would expect to run in Rust subsequent to the invocation
             // of this callback (esp. `drop` code and friends) will NOT fire, leading to unexpected
             // memory loss or worse.
-            Assert.Equal(rval, 6);
+            Assert.Equal(6, rval);
             called_c2 = true;
             throw new Exception("Unchecked callback which we didn't handle. Comment this out and see the test fail.");
         }
@@ -134,7 +134,7 @@ public class TestPatternDelegates
             // If everything works Rust code after invoking C1 and C2 is still executed,
             // setting this variable to `8`.
             called_exception = true;
-            Assert.Equal(rval, 8);
+            Assert.Equal(8, rval);
         }
 
         Assert.True(called_c1);

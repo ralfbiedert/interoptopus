@@ -1,12 +1,11 @@
 using My.Company;
-using My.Company.Common;
 using System.Threading.Tasks;
 using Xunit;
 
 public class TestPatternServicesAsyncPanic
 {
     [Fact]
-    public async void PanickingThrowsException()
+    public async Task PanickingThrowsException()
     {
         using var s = ServiceAsyncPanic.Create();
 
@@ -15,34 +14,34 @@ public class TestPatternServicesAsyncPanic
         // turns into a TaskCanceledException on the .NET side.
         await Assert.ThrowsAsync<TaskCanceledException>(async () =>
         {
-            await s.Panicking();
+            await s.Panicking(TestContext.Current.CancellationToken);
         });
     }
 
     [Fact]
-    public async void NotPanickingSucceeds()
+    public async Task NotPanickingSucceeds()
     {
         using var s = ServiceAsyncPanic.Create();
-        await s.NotPanicking();
+        await s.NotPanicking(TestContext.Current.CancellationToken);
     }
 
     [Fact]
-    public async void ServiceWorksAfterPanic()
+    public async Task ServiceWorksAfterPanic()
     {
         using var s = ServiceAsyncPanic.Create();
 
         // First call panics
         await Assert.ThrowsAsync<TaskCanceledException>(async () =>
         {
-            await s.Panicking();
+            await s.Panicking(TestContext.Current.CancellationToken);
         });
 
         // Service is still functional after the panic
-        await s.NotPanicking();
+        await s.NotPanicking(TestContext.Current.CancellationToken);
     }
 
     [Fact]
-    public async void ServiceWorksAfterRepeatedPanics()
+    public async Task ServiceWorksAfterRepeatedPanics()
     {
         using var s = ServiceAsyncPanic.Create();
 
@@ -50,11 +49,11 @@ public class TestPatternServicesAsyncPanic
         {
             await Assert.ThrowsAsync<TaskCanceledException>(async () =>
             {
-                await s.Panicking();
+                await s.Panicking(TestContext.Current.CancellationToken);
             });
         }
 
         // Service is still functional after repeated panics
-        await s.NotPanicking();
+        await s.NotPanicking(TestContext.Current.CancellationToken);
     }
 }

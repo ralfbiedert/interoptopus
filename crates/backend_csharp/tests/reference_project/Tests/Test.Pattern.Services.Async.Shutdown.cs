@@ -1,11 +1,7 @@
-using System;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using My.Company;
 using Xunit;
-using Xunit.Abstractions;
 
 public class TestPatternServicesAsyncShutdown
 {
@@ -19,14 +15,14 @@ public class TestPatternServicesAsyncShutdown
             Assert.Null(SynchronizationContext.Current);
 
             var s = ServiceAsyncSleep.Create();
-            await s.ReturnAfterMs(0, 100);
+            await s.ReturnAfterMs(0, 100, TestContext.Current.CancellationToken);
             s.Dispose();
-        });
+        }, TestContext.Current.CancellationToken);
 
-        var winner = await Task.WhenAny(task, Task.Delay(5000));
+        var winner = await Task.WhenAny(task, Task.Delay(5000, TestContext.Current.CancellationToken));
         if (winner != task)
         {
-            Assert.True(false, "DEADLOCK DETECTED: await + Dispose without SyncContext hung for 5s");
+            Assert.Fail("DEADLOCK DETECTED: await + Dispose without SyncContext hung for 5s");
         }
 
         Assert.True(winner == task, "Deadlock: await + Dispose without SyncContext timed out after 5s");

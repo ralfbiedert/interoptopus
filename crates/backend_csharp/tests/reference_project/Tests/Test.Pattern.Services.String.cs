@@ -34,6 +34,6 @@ public class TestPatternServicesString
     {
         using var s = ServiceStrings.Create();
         var result = s.ReturnCstr();
-        Assert.Equal(result, "hello.world");
+        Assert.Equal("hello.world", result);
     }
 }
