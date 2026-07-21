@@ -9,9 +9,13 @@
     {
         {% if is_async %}var (_cb, _cs) = Interop.{{ trampoline_field }}.NewCall();
         var _th = {{ name }}({% for arg in native_args %}{{arg.name}}, {% endfor %}_cb);
-        using var _cr = _ct.Register(() => { unsafe { _th.Abort(); } });
+        var _cr = _ct.Register(() => { unsafe { _th.Abort(); } });
         try { {% if is_task_void %}await _cs;{% else %}return await _cs;{% endif %} }
-        finally { unsafe { _th.Dispose(); } }{% else %}{% if not is_void %}return {% endif %}{{name}}({% for arg in native_args %}{{arg.name}}{% if not loop.last %}, {% endif %}{% endfor %});{% endif %}
+        finally
+        {
+            _cr.Dispose();
+            unsafe { _th.Dispose(); }
+        }{% else %}{% if not is_void %}return {% endif %}{{name}}({% for arg in native_args %}{{arg.name}}{% if not loop.last %}, {% endif %}{% endfor %});{% endif %}
 
     }
     finally
@@ -20,8 +24,12 @@
 {% endif %}{% endfor %}    }
 {% else %}{% if is_async %}    var (_cb, _cs) = Interop.{{ trampoline_field }}.NewCall();
     var _th = {{ name }}({% for arg in native_args %}{{arg.name}}, {% endfor %}_cb);
-    using var _cr = _ct.Register(() => { unsafe { _th.Abort(); } });
+    var _cr = _ct.Register(() => { unsafe { _th.Abort(); } });
     try { {% if is_task_void %}await _cs;{% else %}return await _cs;{% endif %} }
-    finally { unsafe { _th.Dispose(); } }
+    finally
+    {
+        _cr.Dispose();
+        unsafe { _th.Dispose(); }
+    }
 {% else %}    {% if not is_void %}return {% endif %}{{name}}({% for arg in native_args %}{{arg.name}}{% if not loop.last %}, {% endif %}{% endfor %});
 {% endif %}{% endif %}}
