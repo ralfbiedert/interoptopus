@@ -22,15 +22,18 @@ fn all_ui_tests() {
 
     // proc/svc
     t.pass("tests/ui/proc/svc/async_basic.rs");
+    t.pass("tests/ui/proc/svc/async_ctor_mutable_service.rs");
     t.pass("tests/ui/proc/svc/async_double.rs");
     t.compile_fail("tests/ui/proc/svc/async_non_send.rs");
     t.compile_fail("tests/ui/proc/svc/async_mut_self.rs");
+    t.compile_fail("tests/ui/proc/svc/async_mutable_runtime.rs");
     t.compile_fail("tests/ui/proc/svc/async_ref_self.rs");
     t.pass("tests/ui/proc/svc/basic.rs");
     t.pass("tests/ui/proc/svc/ctor.rs");
     t.compile_fail("tests/ui/proc/svc/ctor_forbidden_name.rs");
     t.compile_fail("tests/ui/proc/svc/ctor_rval_bad_self.rs");
     t.compile_fail("tests/ui/proc/svc/ctor_rval_omit.rs");
+    t.pass("tests/ui/proc/svc/explicit_mut_self.rs");
     t.pass("tests/ui/proc/svc/lifetime.rs");
     // t.compile_fail("tests/ui/proc/svc/module.rs"); TODO: later
     t.compile_fail("tests/ui/proc/svc/opaque.rs");
