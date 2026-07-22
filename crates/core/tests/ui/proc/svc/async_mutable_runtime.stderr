@@ -1,0 +1,21 @@
+error[E0277]: the trait bound `MutableRuntime: AsyncRuntimeService` is not satisfied
+  --> tests/ui/proc/svc/async_mutable_runtime.rs:41:34
+   |
+41 |     pub async fn create(_: Async<MutableRuntime>) -> ffi::Result<Self, Error> {
+   |                                  ^^^^^^^^^^^^^^ unsatisfied trait bound
+   |
+help: the trait `AsyncRuntimeService` is not implemented for `MutableRuntime`
+  --> tests/ui/proc/svc/async_mutable_runtime.rs:13:1
+   |
+13 | struct MutableRuntime;
+   | ^^^^^^^^^^^^^^^^^^^^^
+help: the trait `AsyncRuntimeService` is implemented for `Service`
+  --> tests/ui/proc/svc/async_mutable_runtime.rs:40:6
+   |
+40 | impl Service {
+   |      ^^^^^^^
+note: required by a bound in `_assert_async_ctor_runtime`
+  --> tests/ui/proc/svc/async_mutable_runtime.rs:41:18
+   |
+41 |     pub async fn create(_: Async<MutableRuntime>) -> ffi::Result<Self, Error> {
+   |                  ^^^^^^ required by this bound in `_assert_async_ctor_runtime`

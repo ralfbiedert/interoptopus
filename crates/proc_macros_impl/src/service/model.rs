@@ -15,7 +15,7 @@ pub struct ServiceModel {
     pub args: FfiServiceArgs,
     pub constructors: Vec<ServiceMethod>,
     pub methods: Vec<ServiceMethod>,
-    pub is_async: bool,
+    pub ownership: ServiceOwnership,
 }
 
 #[derive(Clone)]
@@ -50,6 +50,12 @@ pub enum ReceiverKind {
     AsyncCtor(Box<Type>), // Async<Runtime> where Runtime != Self — async constructor
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ServiceOwnership {
+    Unique,
+    Shared,
+}
+
 impl ServiceModel {
     #[allow(clippy::too_many_lines)]
     pub fn from_impl_item(input: ItemImpl, args: FfiServiceArgs) -> syn::Result<Self> {
@@ -70,8 +76,6 @@ impl ServiceModel {
 
         let mut constructors = Vec::new();
         let mut methods = Vec::new();
-        let mut has_async = false;
-
         // Process each method in the impl block
         for item in &input.items {
             if let ImplItem::Fn(method) = item {
@@ -85,10 +89,6 @@ impl ServiceModel {
                 let vis = method.vis.clone();
                 let span = method.span();
 
-                if is_async {
-                    has_async = true;
-                }
-
                 // Parse parameters and determine receiver kind
                 let mut inputs = Vec::new();
                 let mut receiver_kind = ReceiverKind::None;
@@ -97,12 +97,9 @@ impl ServiceModel {
                 for (i, input_arg) in method.sig.inputs.iter().enumerate() {
                     match input_arg {
                         FnArg::Receiver(receiver) => {
-                            receiver_kind = if receiver.mutability.is_some() {
-                                ReceiverKind::Mutable
-                            } else {
-                                ReceiverKind::Shared
-                            };
+                            receiver_kind = classify_receiver(receiver)?;
                         }
+
                         FnArg::Typed(typed_arg) => {
                             let param_type = (*typed_arg.ty).clone();
 
@@ -179,7 +176,13 @@ impl ServiceModel {
             }
         }
 
-        let model = Self { service_name, service_type, generics, args, constructors, methods, is_async: has_async };
+        let ownership = if methods.iter().any(|method| matches!(method.receiver_kind, ReceiverKind::Mutable)) {
+            ServiceOwnership::Unique
+        } else {
+            ServiceOwnership::Shared
+        };
+
+        let model = Self { service_name, service_type, generics, args, constructors, methods, ownership };
 
         Ok(model)
     }
@@ -268,6 +271,37 @@ impl ServiceModel {
 /// Returns [`ReceiverKind::AsyncThis`] when the inner type is `Self` (i.e. a
 /// regular async method), or [`ReceiverKind::AsyncCtor`] when it is any other
 /// type (i.e. an async constructor that borrows a foreign runtime).
+fn classify_receiver(receiver: &syn::Receiver) -> syn::Result<ReceiverKind> {
+    if receiver.reference.is_some() {
+        return Ok(if receiver.mutability.is_some() {
+            ReceiverKind::Mutable
+        } else {
+            ReceiverKind::Shared
+        });
+    }
+
+    if receiver.colon_token.is_some()
+        && let Type::Reference(reference) = receiver.ty.as_ref()
+        && is_self_type(reference.elem.as_ref())
+    {
+        return Ok(if reference.mutability.is_some() {
+            ReceiverKind::Mutable
+        } else {
+            ReceiverKind::Shared
+        });
+    }
+
+    Err(syn::Error::new_spanned(receiver, "Service methods must use &self or &mut self receivers"))
+}
+
+fn is_self_type(ty: &Type) -> bool {
+    let Type::Path(path) = ty else {
+        return false;
+    };
+
+    path.qself.is_none() && path.path.is_ident("Self")
+}
+
 fn receiver_kind_from_async_param(segment: &PathSegment) -> ReceiverKind {
     let Some(inner_type) = extract_async_inner_type(segment) else {
         // Could not extract a type argument — default to async method.

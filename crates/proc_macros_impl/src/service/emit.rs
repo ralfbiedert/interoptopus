@@ -1,4 +1,4 @@
-use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel};
+use crate::service::model::{ReceiverKind, ServiceMethod, ServiceModel, ServiceOwnership};
 use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, format_ident, quote, quote_spanned};
 use syn::spanned::Spanned;
@@ -227,11 +227,7 @@ impl ServiceModel {
             quote_spanned! { ctor.name.span() => <#service_type>::#ctor_name }
         };
 
-        // Every service uses Arc because a service without its own async methods
-        // can still provide the runtime for another service's async constructor.
-        let into_raw_call = quote_spanned! { ctor.name.span() =>
-            ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance)) as *mut _
-        };
+        let into_raw_call = self.emit_into_raw_call(quote! { service_instance }, ctor.name.span());
 
         let ffi_attr = self.emit_ffi_attr(&function_name);
 
@@ -288,6 +284,7 @@ impl ServiceModel {
 
         let ffi_attr = self.emit_ffi_attr(&function_name);
         let unsafe_token = quote_spanned! { Span::call_site() => unsafe };
+        let into_raw_call = self.emit_into_raw_call(quote! { _service_instance }, ctor.name.span());
 
         // For generic types, we need to use the concrete type with turbofish syntax
         let service_call = if self.generics.params.is_empty() {
@@ -347,8 +344,7 @@ impl ServiceModel {
                             let _async_runtime = ::interoptopus::pattern::asynk::Async::new(_runtime_inside, _ctx);
                             let _service_instance = #service_call(_async_runtime, #param_names).await;
                             _guard.mark_completed();
-                            let _cb_result: *const #service_type =
-                                ::std::sync::Arc::into_raw(::std::sync::Arc::new(_service_instance));
+                            let _cb_result: *const #service_type = #into_raw_call;
                             // `call_ok` wraps the value in `AsyncOutcome::Ok` on the wire so the
                             // foreign side can distinguish completion from cancellation. The
                             // pointer payload is `Copy`, so no `mem::forget` is required.
@@ -386,6 +382,7 @@ impl ServiceModel {
         let assert_error_send_sync = quote_spanned! { error_type.span() =>
             const { ::interoptopus::lang::types::assert_send_sync::<#error_type>() }
         };
+        let into_raw_call = self.emit_into_raw_call(quote! { service_instance }, ctor.name.span());
 
         quote_spanned! { ctor.name.span() =>
             #docs
@@ -420,8 +417,8 @@ impl ServiceModel {
                         _guard.mark_completed();
                         match _result {
                             ::interoptopus::ffi::Ok(service_instance) => {
-                                let _cb_result = ::interoptopus::ffi::Ok(
-                                    ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
+                                let _cb_result: #callback_type = ::interoptopus::ffi::Ok(
+                                    #into_raw_call
                                 );
                                 callback.call_ok(&raw const _cb_result);
                                 ::std::mem::forget(_cb_result);
@@ -457,16 +454,36 @@ impl ServiceModel {
 
         let ffi_attr = self.emit_ffi_attr(&function_name);
 
+        let reclaim_instance = match self.ownership {
+            ServiceOwnership::Unique => quote_spanned! { self.service_name.span() =>
+                let _ = ::std::boxed::Box::from_raw(instance.cast_mut());
+            },
+            ServiceOwnership::Shared => quote_spanned! { self.service_name.span() =>
+                let _ = ::std::sync::Arc::from_raw(instance);
+            },
+        };
+
         quote_spanned! { self.service_name.span() =>
             #[allow(clippy::ptr_cast_constness)]
             #ffi_attr
             fn #function_name #generics(instance: *const #service_type) {
                 if !instance.is_null() {
                     unsafe {
-                        let _ = ::std::sync::Arc::from_raw(instance);
+                        #reclaim_instance
                     }
                 }
             }
+        }
+    }
+
+    fn emit_into_raw_call(&self, instance: TokenStream, span: Span) -> TokenStream {
+        match self.ownership {
+            ServiceOwnership::Unique => quote_spanned! { span =>
+                ::std::boxed::Box::into_raw(::std::boxed::Box::new(#instance))
+            },
+            ServiceOwnership::Shared => quote_spanned! { span =>
+                ::std::sync::Arc::into_raw(::std::sync::Arc::new(#instance)) as *mut _
+            },
         }
     }
 
@@ -778,6 +795,19 @@ impl ServiceModel {
         }
     }
 
+    pub fn emit_async_runtime_service_impl(&self) -> TokenStream {
+        if self.ownership == ServiceOwnership::Unique {
+            return TokenStream::new();
+        }
+
+        let service_type = &self.service_type;
+        let (impl_generics, _, where_clause) = self.generics.split_for_impl();
+
+        quote_spanned! { self.service_name.span() =>
+            unsafe impl #impl_generics ::interoptopus::pattern::asynk::AsyncRuntimeService for #service_type #where_clause {}
+        }
+    }
+
     pub fn emit_const_verification_blocks(&self) -> Result<TokenStream, Error> {
         // Generate compile-time verification blocks
         let service_type = &self.service_type;
@@ -803,7 +833,10 @@ impl ServiceModel {
                     let ctor_span = ctor.name.span();
                     Some(quote_spanned! { ctor_span =>
                         {
-                            const fn _assert_async_ctor_runtime<T: ::interoptopus::pattern::asynk::AsyncRuntime>() {}
+                            const fn _assert_async_ctor_runtime<
+                                T: ::interoptopus::pattern::asynk::AsyncRuntime
+                                    + ::interoptopus::pattern::asynk::AsyncRuntimeService
+                            >() {}
                             _assert_async_ctor_runtime::<#runtime_type>();
                         }
                     })

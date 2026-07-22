@@ -27,6 +27,7 @@ pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
     // Generate FFI snippets
     let ffi_functions = model.emit_ffi_functions();
     let service_info_impl = model.emit_service_info_impl();
+    let async_runtime_service_impl = model.emit_async_runtime_service_impl();
     let validation_blocks = model.emit_const_verification_blocks()?;
 
     // Remove skip attributes from the impl block before outputting
@@ -42,6 +43,8 @@ pub fn ffi(attr: TokenStream, input: TokenStream) -> syn::Result<TokenStream> {
         #ffi_functions
 
         #service_info_impl
+
+        #async_runtime_service_impl
     };
 
     if args.debug {

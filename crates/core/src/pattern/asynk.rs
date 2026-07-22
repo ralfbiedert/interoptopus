@@ -416,6 +416,15 @@ pub trait AsyncRuntime {
         F: Future<Output = ()> + Send + 'static;
 }
 
+/// Marks an FFI service that can safely be retained as an async runtime.
+///
+/// # Safety
+///
+/// Implementors must use shared ownership for generated FFI handles and must
+/// not expose mutable service receivers that can alias retained async handles.
+#[doc(hidden)]
+pub unsafe trait AsyncRuntimeService {}
+
 /// FFI-safe handle that can abort a spawned async task.
 ///
 /// Returned by [`AsyncRuntime::spawn`]. The handle carries type-erased
