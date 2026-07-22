@@ -1,6 +1,8 @@
 mod args;
 mod emit;
 mod model;
+#[cfg(test)]
+mod tests;
 mod validation;
 
 use proc_macro2::TokenStream;

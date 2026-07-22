@@ -227,15 +227,10 @@ impl ServiceModel {
             quote_spanned! { ctor.name.span() => <#service_type>::#ctor_name }
         };
 
-        // Use Box for non-async services, Arc for async services
-        let into_raw_call = if self.is_async {
-            quote_spanned! { ctor.name.span() =>
-                ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
-            }
-        } else {
-            quote_spanned! { ctor.name.span() =>
-                ::std::boxed::Box::into_raw(::std::boxed::Box::new(service_instance))
-            }
+        // Every service uses Arc because a service without its own async methods
+        // can still provide the runtime for another service's async constructor.
+        let into_raw_call = quote_spanned! { ctor.name.span() =>
+            ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
         };
 
         let ffi_attr = self.emit_ffi_attr(&function_name);
@@ -460,13 +455,6 @@ impl ServiceModel {
         let service_type = &self.service_type;
         let generics = &self.generics;
 
-        // Use Box for non-async services, Arc for async services
-        let from_raw_call = if self.is_async {
-            quote_spanned! { self.service_name.span() => let _ = ::std::sync::Arc::from_raw(instance); }
-        } else {
-            quote_spanned! { self.service_name.span() => let _ = ::std::boxed::Box::from_raw(instance as *mut #service_type); }
-        };
-
         let ffi_attr = self.emit_ffi_attr(&function_name);
 
         quote_spanned! { self.service_name.span() =>
@@ -475,7 +463,7 @@ impl ServiceModel {
             fn #function_name #generics(instance: *const #service_type) {
                 if !instance.is_null() {
                     unsafe {
-                        #from_raw_call
+                        let _ = ::std::sync::Arc::from_raw(instance);
                     }
                 }
             }
