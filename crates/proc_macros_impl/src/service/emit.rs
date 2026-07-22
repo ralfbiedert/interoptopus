@@ -230,7 +230,7 @@ impl ServiceModel {
         // Every service uses Arc because a service without its own async methods
         // can still provide the runtime for another service's async constructor.
         let into_raw_call = quote_spanned! { ctor.name.span() =>
-            ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance))
+            ::std::sync::Arc::into_raw(::std::sync::Arc::new(service_instance)) as *mut _
         };
 
         let ffi_attr = self.emit_ffi_attr(&function_name);
