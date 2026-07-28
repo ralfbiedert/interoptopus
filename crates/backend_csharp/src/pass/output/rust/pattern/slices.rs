@@ -1,9 +1,10 @@
 //! Renders slice types (`Slice<T>` and `SliceMut<T>`) per output file.
 //!
-//! For each slice type, determines whether to use the "fast" (blittable) or
-//! "marshalling" template based on the element type's `ManagedConversion`.
-//! Elements with `AsIs` or `To` conversion are blittable and use `GCHandle` pinning;
-//! elements with `Into` conversion require per-element marshalling.
+//! For each slice type, determines whether to use the "fast" (representation-
+//! identical) or "marshalling" template based on the element type's
+//! `ManagedConversion`. Only `AsIs` elements can be projected directly over
+//! native memory. `To` elements require per-element conversion, while `Into`
+//! elements cannot be safely read from borrowed memory.
 
 use crate::lang::TypeId;
 use crate::lang::types::ManagedConversion;
@@ -54,11 +55,13 @@ impl Pass {
                 let Some(element_ty) = types.get(element_ty_id) else { continue };
                 let element_name = &element_ty.name;
 
-                let is_blittable = matches!(managed_conversion.managed_conversion(element_ty_id), Some(ManagedConversion::AsIs | ManagedConversion::To));
+                let Some(element_conversion) = managed_conversion.managed_conversion(element_ty_id) else {
+                    continue;
+                };
 
                 let method = if is_mut { "SliceMut" } else { "Slice" };
 
-                let rendered = if is_blittable {
+                let rendered = if element_conversion == ManagedConversion::AsIs {
                     let mut context = Context::new();
                     context.insert("name", &ty.name);
                     context.insert("element_type", element_name);
@@ -73,12 +76,12 @@ impl Pass {
                     context.insert("element_type", element_name);
                     context.insert("unmanaged_element_type", &unmanaged_name);
                     context.insert("method", method);
-                    // Element conversion method names for non-blittable elements.
-                    let element_to_managed = managed_conversion.managed_conversion(element_ty_id).map_or("ToManaged", |mc| match mc {
+                    let element_to_managed = match element_conversion {
                         ManagedConversion::Into => "IntoManaged",
                         _ => "ToManaged",
-                    });
+                    };
                     context.insert("element_to_managed", element_to_managed);
+                    context.insert("has_indexer", &(element_conversion == ManagedConversion::To));
                     templates.render("rust/pattern/slice/marshalling.cs", &context)?
                 };
 

@@ -31,8 +31,8 @@ public partial class {{ name }} : IDisposable
         {{ _fns_decorators_all | indent(width = 8) }}
         get
         {
-            if (i >= Count) throw new IndexOutOfRangeException();
             if (_ptr == IntPtr.Zero) throw new NullReferenceException();
+            if (i < 0 || (ulong)i >= _len) throw new IndexOutOfRangeException();
             return Marshal.PtrToStructure<{{ element_type }}>(new IntPtr(_ptr.ToInt64() + i * sizeof({{ element_type }})));
         }
     }

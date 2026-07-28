@@ -17,20 +17,22 @@ public partial class {{ name }} : IDisposable
     /// The number of elements in this slice.
     public int Count => (int) _len;
 
+{% if has_indexer %}
     /// Gets the element at the given index, marshalling from its unmanaged form.
     public unsafe {{ element_type }} this[int i]
     {
         {{ _fns_decorators_all | indent(width = 8) }}
         get
         {
-            if (i >= (int) _len) throw new IndexOutOfRangeException();
+            if (i < 0 || (ulong)i >= _len) throw new IndexOutOfRangeException();
             if (_data == IntPtr.Zero) { throw new NullReferenceException(); }
-            var size = sizeof({{ unmanaged_element_type }});
+            var size = Marshal.SizeOf<{{ unmanaged_element_type }}>();
             var ptr = IntPtr.Add(_data, i * size);
             var unmanaged = Marshal.PtrToStructure<{{ unmanaged_element_type }}>(ptr);
             return unmanaged.{{ element_to_managed }}();
         }
     }
+{% endif %}
 
     {{ _fns_decorators_all | indent }}
     {{ name }}() { }
@@ -40,7 +42,7 @@ public partial class {{ name }} : IDisposable
     public static unsafe {{ name }} From({{ element_type }}[] managed)
     {
         var rval = new {{ name }}();
-        var size = sizeof({{ unmanaged_element_type }});
+        var size = Marshal.SizeOf<{{ unmanaged_element_type }}>();
         rval._data = Marshal.AllocHGlobal(size * managed.Length);
         rval._len = (ulong) managed.Length;
         for (var i = 0; i < managed.Length; ++i)

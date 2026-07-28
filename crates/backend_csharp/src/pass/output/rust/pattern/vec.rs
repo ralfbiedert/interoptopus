@@ -1,11 +1,11 @@
 //! Renders `Vec<T>` pattern types per output file.
 //!
-//! For each Vec type, determines whether to use the "fast" (blittable) or
-//! "marshalling" template based on the element type's `ManagedConversion`.
-//! Elements with `AsIs` or `To` conversion are blittable; elements with `Into`
-//! conversion require per-element marshalling. The nested `InteropHelper` class
-//! embeds the `vec_create` / `vec_destroy` entry points discovered by the
-//! `model::rust::pattern::vec` pass.
+//! For each Vec type, determines whether to use the "fast" (representation-
+//! identical) or "marshalling" template based on the element type's
+//! `ManagedConversion`. Only `AsIs` elements can be projected directly over
+//! native memory; `To` and `Into` elements require per-element conversion. The
+//! nested `InteropHelper` class embeds the `vec_create` / `vec_destroy` entry
+//! points discovered by the `model::rust::pattern::vec` pass.
 
 use crate::lang::types::ManagedConversion;
 use crate::lang::types::kind::{TypeKind, TypePattern};
@@ -56,9 +56,11 @@ impl Pass {
                 let Some(element_ty) = types.get(element_ty_id) else { continue };
                 let element_name = &element_ty.name;
 
-                let is_blittable = matches!(managed_conversion.managed_conversion(element_ty_id), Some(ManagedConversion::AsIs | ManagedConversion::To));
+                let Some(element_conversion) = managed_conversion.managed_conversion(element_ty_id) else {
+                    continue;
+                };
 
-                let rendered = if is_blittable {
+                let rendered = if element_conversion == ManagedConversion::AsIs {
                     let mut context = Context::new();
                     context.insert("name", &ty.name);
                     context.insert("element_type", element_name);
@@ -74,6 +76,12 @@ impl Pass {
                     context.insert("unmanaged_element_type", &unmanaged_name);
                     context.insert("create_entry_point", &helpers.create_entry_point);
                     context.insert("destroy_entry_point", &helpers.destroy_entry_point);
+                    let (element_to_unmanaged, element_to_managed) = match element_conversion {
+                        ManagedConversion::Into => ("IntoUnmanaged", "IntoManaged"),
+                        _ => ("AsUnmanaged", "ToManaged"),
+                    };
+                    context.insert("element_to_unmanaged", element_to_unmanaged);
+                    context.insert("element_to_managed", element_to_managed);
                     templates.render("rust/pattern/vec/marshalling.cs", &context)?
                 };
 

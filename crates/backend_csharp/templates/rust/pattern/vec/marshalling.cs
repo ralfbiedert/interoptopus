@@ -17,7 +17,7 @@ public partial class {{ name }} : IDisposable
         var _temp = new {{ unmanaged_element_type }}[_data.Length];
         for (var i = 0; i < _data.Length; ++i)
         {
-            _temp[i] = _data[i].IntoUnmanaged();
+            _temp[i] = _data[i].{{ element_to_unmanaged }}();
         }
         fixed (void* _data_ptr = _temp)
         {
@@ -32,10 +32,10 @@ public partial class {{ name }} : IDisposable
         {{ _fns_decorators_all | indent(width = 8) }}
         get
         {
-            if (i >= Count) throw new IndexOutOfRangeException();
             if (_ptr == IntPtr.Zero) throw new NullReferenceException();
+            if (i < 0 || (ulong)i >= _len) throw new IndexOutOfRangeException();
             var _element = Marshal.PtrToStructure<{{ unmanaged_element_type }}>(new IntPtr(_ptr.ToInt64() + i * sizeof({{ unmanaged_element_type }})));
-            return _element.IntoManaged();
+            return _element.{{ element_to_managed }}();
         }
     }
 }
