@@ -11,6 +11,7 @@ callback!(CallbackSliceMut(slice: SliceMut<'_, u8>));
 callback!(CallbackU8(value: u8) -> u8);
 callback!(CallbackCharArray2(value: CharArray));
 callback!(CallbackFFISlice(slice: ffi::Slice<u8>) -> u8);
+callback!(CallbackSliceUseSliceByteInStruct(slice: ffi::Slice<UseSliceByteInStruct>));
 
 #[ffi]
 pub fn pattern_ffi_slice_1(ffi_slice: Slice<u32>) -> u32 {
@@ -99,4 +100,11 @@ pub struct UseSliceByteInStruct<'a> {
 #[ffi]
 pub fn pattern_ffi_slice_in_struct(x: UseSliceByteInStruct) -> u32 {
     x.bytes.as_slice().len() as u32
+}
+
+#[ffi]
+pub fn pattern_ffi_slice_of_structs_callback(callback: CallbackSliceUseSliceByteInStruct) {
+    let bytes = [1, 2, 3];
+    let values = [UseSliceByteInStruct { bytes: ffi::Slice::from_slice(&bytes) }];
+    callback.call(ffi::Slice::from_slice(&values));
 }

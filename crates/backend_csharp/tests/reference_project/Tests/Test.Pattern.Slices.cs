@@ -1,3 +1,4 @@
+using System;
 using My.Company;
 using My.Company.Common;
 using Xunit;
@@ -11,6 +12,24 @@ public class TestPatternSlices
         using var data = new uint[100_000].Slice();
         var result = Interop.pattern_ffi_slice_1(data);
         Assert.Equal(100_000u, result);
+    }
+
+    [Fact]
+    public void slice_rejects_negative_indices()
+    {
+        using var data = new byte[] { 1, 2, 3 }.Slice();
+        Assert.Throws<IndexOutOfRangeException>(() => _ = data[-1]);
+    }
+
+    [Fact]
+    public void pattern_ffi_slice_of_structs_from_native_memory()
+    {
+        Interop.pattern_ffi_slice_of_structs_callback(attributes =>
+        {
+            var attribute = attributes[0];
+            Assert.Equal(3, attribute.bytes.Count);
+            Assert.Equal(2, attribute.bytes[1]);
+        });
     }
 
 

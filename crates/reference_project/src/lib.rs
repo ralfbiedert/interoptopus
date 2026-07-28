@@ -155,6 +155,7 @@ pub fn inventory() -> RustInventory {
         .register(function!(patterns::slice::pattern_ffi_slice_8))
         .register(function!(patterns::slice::pattern_ffi_slice_9))
         .register(function!(patterns::slice::pattern_ffi_slice_in_struct))
+        .register(function!(patterns::slice::pattern_ffi_slice_of_structs_callback))
         .register(function!(patterns::slice::pattern_ffi_slice_delegate))
         .register(function!(patterns::slice::pattern_ffi_slice_delegate_huge))
         .register(function!(patterns::option::pattern_ffi_option_1))
