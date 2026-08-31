@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using My.Company;
 using My.Company.Common;
 using Xunit;
@@ -107,16 +108,48 @@ public class TestPatternSlices
         data.Dispose();
     }
 
-    // [Fact]
-    // public void pattern_ffi_slice7()
-    // {
-    //     var data = new CharArray { str = "test", str_2 = "test2" };
-    //     var slice = new SliceMut<CharArray>([data]);
-    //     Interop.pattern_ffi_slice_8(ref slice, (ca) => {
-    //         Assert.Equal("test", ca.str);
-    //         Assert.Equal("test2", ca.str_2);
-    //     });
-    // }
+    [Fact]
+    public void pattern_ffi_slice_8()
+    {
+        var slice = new[] { CharArrayOf("test", "test2") }.SliceMut();
+
+        var calls = 0;
+        Interop.pattern_ffi_slice_8(ref slice, ca =>
+        {
+            calls += 1;
+            Assert.Equal("test", AsString(ca.str));
+            Assert.Equal("test2", AsString(ca.str_2));
+        });
+
+        Assert.Equal(1, calls);
+    }
+
+    [Fact]
+    public void disposing_a_ref_round_tripped_slice_still_frees_it()
+    {
+        var slice = new[] { CharArrayOf("test", "test2") }.SliceMut();
+
+        Interop.pattern_ffi_slice_8(ref slice, _ => { });
+
+        // The `ref` write-back replaces the caller's wrapper. This one allocated its own
+        // buffer through `From(CharArray[])`, so the replacement must keep that ownership
+        // or the allocation can never be released.
+        slice.Dispose();
+        Assert.Throws<NullReferenceException>(() => _ = slice[0]);
+    }
+
+    private static CharArray CharArrayOf(string str, string str2) =>
+        new() { str = FixedStringOf(str), str_2 = FixedStringOf(str2) };
+
+    private static FixedString32 FixedStringOf(string s)
+    {
+        var data = new byte[32];
+        Encoding.UTF8.GetBytes(s).CopyTo(data, 0);
+        return new FixedString32 { data = data };
+    }
+
+    private static string AsString(FixedString32 s) =>
+        Encoding.UTF8.GetString(s.data).TrimEnd('\0');
 
     [Fact]
     public void pattern_ffi_slice_delegate_huge()
