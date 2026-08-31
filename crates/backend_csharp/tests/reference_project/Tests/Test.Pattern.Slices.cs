@@ -32,6 +32,23 @@ public class TestPatternSlices
         });
     }
 
+    [Fact]
+    public void disposing_a_rust_provided_slice_does_not_free_it()
+    {
+        Interop.pattern_ffi_slice_of_structs_callback(attributes =>
+        {
+            // `attributes` borrows Rust-owned memory. Disposing it must not call
+            // FreeHGlobal on a pointer the native allocator never returned, and
+            // must leave the borrowed view usable for the rest of the call.
+            attributes.Dispose();
+            attributes.Dispose();
+
+            Assert.Equal(1, attributes.Count);
+            Assert.Equal(3, attributes[0].bytes.Count);
+            Assert.Equal(2, attributes[0].bytes[1]);
+        });
+    }
+
 
     [Fact]
     public void pattern_ffi_slice_2()

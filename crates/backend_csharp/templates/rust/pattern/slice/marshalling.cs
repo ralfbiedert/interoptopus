@@ -2,14 +2,18 @@ public partial class {{ name }}
 {
     IntPtr _data;
     ulong _len;
+    bool _owned;
 }
 
 /// A read-only view into a contiguous region of <c>{{ element_type }}</c> elements,
 /// with marshalling support for non-blittable element types.
 ///
 /// Elements are marshalled from their unmanaged representation on each access.
-/// The slice allocates a temporary native copy via <c>Marshal.AllocHGlobal</c>;
-/// call <see cref="Dispose"/> to free it.
+///
+/// Slices created from a managed array via <see cref="From({{ element_type }}[])"/> own a
+/// temporary native copy allocated with <c>Marshal.AllocHGlobal</c>; call <see cref="Dispose"/>
+/// to free it. Slices received from Rust borrow Rust-owned memory and are only valid for the
+/// duration of the call; <see cref="Dispose"/> does nothing for those.
 {{ _types_docs_owned }}
 [NativeMarshalling(typeof(MarshallerMeta))]
 public partial class {{ name }} : IDisposable
@@ -45,6 +49,7 @@ public partial class {{ name }} : IDisposable
         var size = Marshal.SizeOf<{{ unmanaged_element_type }}>();
         rval._data = Marshal.AllocHGlobal(size * managed.Length);
         rval._len = (ulong) managed.Length;
+        rval._owned = true;
         for (var i = 0; i < managed.Length; ++i)
         {
             var unmanaged = managed[i].AsUnmanaged();
@@ -54,13 +59,15 @@ public partial class {{ name }} : IDisposable
         return rval;
     }
 
-    /// Frees the native copy. Safe to call multiple times.
+    /// Frees the native copy if this slice owns one. Safe to call multiple times.
+    /// Does nothing for a slice that borrows Rust-owned memory.
     {{ _fns_decorators_all | indent }}
     public void Dispose()
     {
-        if (_data == IntPtr.Zero) return;
+        if (!_owned || _data == IntPtr.Zero) return;
         Marshal.FreeHGlobal(_data);
         _data = IntPtr.Zero;
+        _owned = false;
     }
 
     {{ _fns_decorators_all | indent }}
@@ -90,6 +97,8 @@ public partial class {{ name }} : IDisposable
         {{ _fns_decorators_internal | indent(width = 8) }}
         internal {{ name }} ToManaged()
         {
+            // Borrowed view over Rust-owned memory: `_owned` stays false so
+            // `Dispose()` never frees a pointer this binding did not allocate.
             var _managed = new {{ name }}();
             _managed._data = _data;
             _managed._len = _len;
