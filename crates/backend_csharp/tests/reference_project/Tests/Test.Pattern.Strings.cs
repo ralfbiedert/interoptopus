@@ -62,7 +62,7 @@ public class TestPatternStrings
     [Fact]
     public void pattern_string_7()
     {
-        var slice = SliceUtf8String.From(["hello".Utf8(), "world".Utf8()]);
+        using var slice = SliceUtf8String.From(["hello".Utf8(), "world".Utf8()]);
         var r1 = Interop.pattern_string_7(slice, 0).AsOk();
         var r2 = Interop.pattern_string_7(slice, 1).AsOk();
         Assert.Equal("hello", r1.String);
@@ -78,7 +78,7 @@ public class TestPatternStrings
             new() { s1 = "hello2".Utf8(), s2 = "world2".Utf8() }
         };
 
-        var slice = SliceUseString.From(x);
+        using var slice = SliceUseString.From(x);
 
         var r1 = Interop.pattern_string_8(slice, 0).AsOk();
         var r2 = Interop.pattern_string_8(slice, 1).AsOk();
