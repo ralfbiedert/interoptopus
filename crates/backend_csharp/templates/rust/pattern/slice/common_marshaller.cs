@@ -21,7 +21,14 @@ public partial class {{ name }}
         public Unmanaged ToUnmanaged() { return _managed.ToUnmanaged(); }
 
         {{ _fns_decorators_all | indent(width = 8) }}
-        public {{ name }} ToManaged() { return _unmanaged.ToManaged(); }
+        public {{ name }} ToManaged()
+        {
+            if (_managed is not null)
+            {
+                return _managed.Matches(_unmanaged) ? _managed : _managed.Borrow(_unmanaged);
+            }
+            return _unmanaged.ToManaged();
+        }
 
         {{ _fns_decorators_all | indent(width = 8) }}
         public void Free() {}

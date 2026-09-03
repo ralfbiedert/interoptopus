@@ -57,7 +57,9 @@ pub fn pattern_ffi_slice_4(_slice: Slice<u8>, _slice2: SliceMut<u8>) {}
 #[ffi]
 pub fn pattern_ffi_slice_5(slice: &Slice<u8>, slice2: &mut SliceMut<u8>) {
     let _ = slice.as_slice().len();
-    let _ = slice2.as_slice().len();
+    let offset = usize::from(!slice2.as_slice().is_empty());
+    let tail = &mut slice2.as_slice_mut()[offset..];
+    *slice2 = SliceMut::from_slice(tail);
 }
 
 #[ffi]

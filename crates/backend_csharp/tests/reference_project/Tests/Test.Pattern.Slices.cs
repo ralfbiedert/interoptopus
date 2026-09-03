@@ -18,7 +18,35 @@ public class TestPatternSlices
     public void slice_rejects_negative_indices()
     {
         using var data = new byte[] { 1, 2, 3 }.Slice();
-        Assert.Throws<IndexOutOfRangeException>(() => _ = data[-1]);
+        Assert.Throws<IndexOutOfRangeException>(() => _ = data.Slice[-1]);
+    }
+
+    [Fact]
+    public void managed_slice_span_keeps_array_alive_without_the_lease()
+    {
+        var span = CreateManagedSliceSpan(out var managed);
+
+        GC.Collect(2, GCCollectionMode.Forced, true, true);
+        GC.WaitForPendingFinalizers();
+        GC.Collect(2, GCCollectionMode.Forced, true, true);
+
+        Assert.True(managed.IsAlive);
+        Assert.Equal(new byte[] { 1, 2, 3 }, span.ToArray());
+    }
+
+    private static ReadOnlySpan<byte> CreateManagedSliceSpan(out WeakReference managed)
+    {
+        var array = new byte[] { 1, 2, 3 };
+        var lease = array.Slice();
+        managed = new WeakReference(array);
+        return lease.Slice.ReadOnlySpan;
+    }
+
+    [Fact]
+    public void empty_managed_slice_is_not_disposed()
+    {
+        using var data = System.Array.Empty<uint>().Slice();
+        Assert.Equal(0u, Interop.pattern_ffi_slice_1(data));
     }
 
     [Fact]
@@ -26,6 +54,7 @@ public class TestPatternSlices
     {
         Interop.pattern_ffi_slice_of_structs_callback(attributes =>
         {
+            Assert.IsNotAssignableFrom<IDisposable>(attributes);
             var attribute = attributes[0];
             Assert.Equal(3, attribute.bytes.Count);
             Assert.Equal(2, attribute.bytes[1]);
@@ -61,25 +90,34 @@ public class TestPatternSlices
             slice[1] = 100;
         });
 
-        Assert.Equal(1, data[0]);
-        Assert.Equal(100, data[1]);
+        Assert.Equal(1, data.Slice[0]);
+        Assert.Equal(100, data.Slice[1]);
     }
 
     [Fact]
     public void pattern_ffi_slice_5()
     {
-        var data1 = new byte[100_000].Slice();
-        var data2 = new byte[100_000].SliceMut();
+        using var lease1 = new byte[100_000].Slice();
+        using var lease2 = new byte[100_000].SliceMut();
+        var data1 = lease1.Slice;
+        var data2 = lease2.Slice;
 
         Interop.pattern_ffi_slice_5(ref data1, ref data2);
-        data1.Dispose();
-        data2.Dispose();
+        Assert.Same(lease1.Slice, data1);
+        Assert.NotSame(lease2.Slice, data2);
+        Assert.Equal(100_000, lease2.Slice.Count);
+        Assert.Equal(99_999, data2.Count);
+
+        lease2.Dispose();
+        Assert.Equal(0, data2.Count);
+        Assert.Throws<ObjectDisposedException>(() => _ = data2[0]);
     }
 
     [Fact]
     public void pattern_ffi_slice_6()
     {
-        var data = new byte[] { 1, 2, 3 }.SliceMut();
+        using var lease = new byte[] { 1, 2, 3 }.SliceMut();
+        var data = lease.Slice;
 
         using var callback = new CallbackU8(x =>
         {
@@ -87,19 +125,35 @@ public class TestPatternSlices
             return 0;
         });
         Interop.pattern_ffi_slice_6(ref data, callback);
-        data.Dispose();
+        Assert.Same(lease.Slice, data);
     }
 
-    // [Fact]
-    // public void pattern_ffi_slice7()
-    // {
-    //     var data = new CharArray { str = "test", str_2 = "test2" };
-    //     var slice = new SliceMut<CharArray>([data]);
-    //     Interop.pattern_ffi_slice_8(ref slice, (ca) => {
-    //         Assert.Equal("test", ca.str);
-    //         Assert.Equal("test2", ca.str_2);
-    //     });
-    // }
+    [Fact]
+    public void non_blittable_slice_lease_owns_the_native_allocation()
+    {
+        var first = new byte[32];
+        var second = new byte[32];
+        first[0] = 1;
+        second[0] = 2;
+        var data = new CharArray
+        {
+            str = new FixedString32 { data = first },
+            str_2 = new FixedString32 { data = second }
+        };
+        var lease = new[] { data }.SliceMut();
+        var slice = lease.Slice;
+
+        Interop.pattern_ffi_slice_8(ref slice, ca =>
+        {
+            Assert.Equal(1, ca.str.data[0]);
+            Assert.Equal(2, ca.str_2.data[0]);
+        });
+
+        var ownedSlice = lease.Slice;
+        lease.Dispose();
+        Assert.Equal(0, ownedSlice.Count);
+        Assert.Throws<ObjectDisposedException>(() => _ = ownedSlice[0]);
+    }
 
     [Fact]
     public void pattern_ffi_slice_delegate_huge()
