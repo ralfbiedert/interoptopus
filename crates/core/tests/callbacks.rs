@@ -68,3 +68,16 @@ fn drop_noop_on_fn_ptr_callback() {
     let cb = Noop2 { callback: Some(nothing), data: std::ptr::null(), destructor: None };
     drop(cb); // must not crash or double-free
 }
+
+// A callback whose parameter count exceeds clippy's `too_many_arguments` threshold (7)
+// must lint cleanly and work. The generated `call` / `call_if_some` methods take `&self`
+// plus every parameter, so without the in-macro `#[allow(clippy::too_many_arguments)]`
+// this 7-parameter callback would trip the lint from inside the macro.
+#[test]
+fn wide_callback_with_many_params() {
+    callback!(Wide(a: i32, b: i32, c: i32, d: i32, e: i32, f: i32, g: i32) -> i32);
+
+    let cb = Wide::from_fn(|a, b, c, d, e, f, g| a + b + c + d + e + f + g);
+    assert_eq!(cb.call(1, 2, 3, 4, 5, 6, 7), 28);
+    assert_eq!(cb.call_if_some(1, 2, 3, 4, 5, 6, 7), Some(28));
+}
