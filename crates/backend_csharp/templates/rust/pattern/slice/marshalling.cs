@@ -1,9 +1,17 @@
+/// A read-only view into a contiguous region of <c>{{ element_type }}</c> elements,
+/// with marshalling support for non-blittable element types.
+///
+/// Elements are marshalled from their unmanaged representation on each access.
+/// Slices borrow data and never own or release the underlying memory. A slice received
+/// from Rust is only valid for the duration documented by the native API. Use
+/// <see cref="{{ name }}Lease"/> to marshal a managed array into owned native memory.
 public partial class {{ name }}
 {
     private readonly IntPtr _data;
     private readonly ulong _len;
     private readonly Lifetime? _lifetime;
 
+    /// Keeps the lease alive and shares disposal state with views created by Borrow.
     internal sealed class Lifetime
     {
         private object? _owner;
@@ -32,17 +40,10 @@ public partial class {{ name }}
     }
 }
 
-/// A read-only view into a contiguous region of <c>{{ element_type }}</c> elements,
-/// with marshalling support for non-blittable element types.
-///
-/// Elements are marshalled from their unmanaged representation on each access.
-/// Slices borrow data and never own or release the underlying memory. A slice received
-/// from Rust is only valid for the duration documented by the native API. Use
-/// <see cref="{{ name }}Lease"/> to marshal a managed array into owned native memory.
 [NativeMarshalling(typeof(MarshallerMeta))]
 public partial class {{ name }}
 {
-    /// The number of elements in this slice.
+    /// The number of elements, or zero after the owning lease is disposed.
     public int Count => _lifetime is { IsDisposed: true } ? 0 : (int) _len;
 
 {% if has_indexer %}
@@ -71,7 +72,7 @@ public partial class {{ name }}
         _lifetime = lifetime;
     }
 
-    /// Marshals a managed array into a native allocation owned by the returned lease.
+    /// Copies element representations, not referenced buffers. See <see cref="{{ name }}Lease"/>.
     {{ _fns_decorators_all | indent }}
     public static {{ name }}Lease From({{ element_type }}[] managed)
     {
@@ -130,9 +131,12 @@ public partial class {{ name }}
 
 {%- include "rust/pattern/slice/common_marshaller.cs" %}
 
-/// Owns the native allocation backing a <see cref="{{ name }}"/> view.
+/// Owns the outer native element array, not any referenced buffers.
+/// Nested owners must remain alive and undisposed while the slice is used.
+/// Nested lifetimes are not checked.
 public sealed class {{ name }}Lease : IDisposable
 {
+    /// Owns the outer native allocation and frees it even if the lease is not disposed.
     private sealed class Allocation : SafeHandle
     {
         internal Allocation(int bytes)
@@ -205,6 +209,6 @@ public sealed class {{ name }}Lease : IDisposable
 /// Convenience extension to marshal a <c>{{ element_type }}[]</c> array for use as a slice.
 public static class {{ name }}Extensions
 {
-    /// Owns the native allocation until the returned lease is disposed.
+    /// Copies element representations, not referenced buffers. See <see cref="{{ name }}Lease"/>.
     public static {{ name }}Lease {{ method }}(this {{ element_type }}[] s) { return {{ name }}.From(s); }
 }
