@@ -1,3 +1,9 @@
+/// A {% if is_mut %}read/write{% else %}read-only{% endif %} view into a contiguous region
+/// of <c>{{ element_type }}</c> elements.
+///
+/// Slices borrow data and never own or release the underlying memory. A slice received
+/// from Rust is only valid for the duration documented by the native API. Use
+/// <see cref="{{ name }}Lease"/> to pin a managed array for use as a slice.
 public partial class {{ name }}
 {
     private readonly IntPtr _data;
@@ -5,6 +11,7 @@ public partial class {{ name }}
     private readonly Lifetime? _lifetime;
     private readonly ReadOnlyMemory<{{ element_type }}>? _managedMemory;
 
+    /// Keeps the lease alive and shares disposal state with views created by Borrow.
     internal sealed class Lifetime
     {
         private object? _owner;
@@ -34,16 +41,10 @@ public partial class {{ name }}
 }
 
 
-/// A {% if is_mut %}read/write{% else %}read-only{% endif %} view into a contiguous region
-/// of <c>{{ element_type }}</c> elements.
-///
-/// Slices borrow data and never own or release the underlying memory. A slice received
-/// from Rust is only valid for the duration documented by the native API. Use
-/// <see cref="{{ name }}Lease"/> to pin a managed array for use as a slice.
 [NativeMarshalling(typeof(MarshallerMeta))]
 public partial class {{ name }} : IEnumerable<{{ element_type }}>
 {
-    /// The number of elements in this slice.
+    /// The number of elements, or zero after the owning lease is disposed.
     public int Count => _lifetime is { IsDisposed: true } ? 0 : (int) _len;
 
     /// Returns a <see cref="ReadOnlySpan{T}"/> over the underlying data without copying.
@@ -114,6 +115,8 @@ public partial class {{ name }} : IEnumerable<{{ element_type }}>
         return new {{ name }}(unmanaged._data, unmanaged._len, _lifetime, BorrowManagedMemory(unmanaged));
     }
 
+    /// Preserves managed backing for aligned subranges; otherwise returns null for native-pointer access.
+    /// An offset at the end is valid only for an empty slice.
     private unsafe ReadOnlyMemory<{{ element_type }}>? BorrowManagedMemory(Unmanaged unmanaged)
     {
         if (_managedMemory is not { } managedMemory)
@@ -162,6 +165,7 @@ public partial class {{ name }} : IEnumerable<{{ element_type }}>
         return new {{ name }}Lease(managed);
     }
 
+    /// Enumerates the elements. Enumeration ends when the owning lease is disposed.
     {{ _fns_decorators_all | indent }}
     public IEnumerator<{{ element_type }}> GetEnumerator()
     {
