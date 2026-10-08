@@ -100,7 +100,7 @@ the given type.
 - The list is ad-hoc, PRs adding more tests to `Benchmark.cs` are welcome.
 
 - Bindings were generated with the C# `use_unsafe` config, which dramatically (between 2x and 150x(!)) speeds
-  up slice access and copies in .NET and Unity, [see the FAQ for details](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#existing-backends).
+  up slice access and copies in .NET and Unity, [see the FAQ for details](https://github.com/ralfbiedert/interoptopus/blob/v0.14.27/FAQ.md#existing-backends).
 
 ## System
 

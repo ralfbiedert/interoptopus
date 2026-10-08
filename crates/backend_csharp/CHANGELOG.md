@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.16.4](https://github.com/ralfbiedert/interoptopus/compare/interoptopus_csharp-v0.16.3...interoptopus_csharp-v0.16.4)
+## [0.16.4](https://github.com/ralfbiedert/interoptopus/compare/interoptopus_csharp@0.16.3...interoptopus_csharp-v0.16.4)
 
 ### 🐛 Bug Fixes
 

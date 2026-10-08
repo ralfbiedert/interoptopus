@@ -83,7 +83,7 @@
 //!
 //! The output below is what this backend might generate. Have a look at the [`Interop`](crate::Interop) struct
 //! if you want to customize something. If you really don't like how something is generated it is
-//! easy to [**create your own**](https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends).
+//! easy to [**create your own**](https://github.com/ralfbiedert/interoptopus/blob/v0.14.27/FAQ.md#new-backends).
 //!
 //! ```csharp
 //!using System;

@@ -37,7 +37,7 @@ Its key features include:
 
 ## Getting Started 
 
-Read our [documentation here](https://interoptopus.rs/docs).
+Read our [getting started guide](https://interoptopus.rs/getting-started/).
 
 ## Feature Flags
 
@@ -97,20 +97,3 @@ PRs are very welcome!
 [interoptopus_csharp]: https://docs.rs/interoptopus_csharp
 [interoptopus_c]: https://docs.rs/interoptopus_c
 [interoptopus_cpython]: https://docs.rs/interoptopus_cpython
-[interop-cs]: https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/csharp_reference_project/Interop.cs
-[reference-project]: https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src
-[new-backends]: https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md#new-backends
-[hello-world]: https://github.com/ralfbiedert/interoptopus/tree/master/examples/hello_world
-[real-project-layout]: https://github.com/ralfbiedert/interoptopus/tree/master/examples/production_project
-[backend-c]: https://github.com/ralfbiedert/interoptopus/tree/master/crates/backend_c
-[ref-functions]: https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/functions
-[ref-types]: https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/types
-[ref-constants]: https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/constants.rs
-[ref-patterns]: https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/patterns
-[ref-services]: https://github.com/ralfbiedert/interoptopus/tree/master/crates/reference_project/src/services
-[csharp-benchmarks]: https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/csharp_benchmarks/RESULTS.md
-[cpython-benchmarks]: https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/cpython_benchmarks/RESULTS.md
-[csharp-callbacks]: https://github.com/ralfbiedert/interoptopus/blob/master/tests/tests/csharp_reference_project/Test.Pattern.Callbacks.cs
-[log-crate]: https://crates.io/crates/log
-[upgrade-instructions]: https://github.com/ralfbiedert/interoptopus/blob/master/UPGRADE_INSTRUCTIONS.md
-[faq]: https://github.com/ralfbiedert/interoptopus/blob/master/FAQ.md
