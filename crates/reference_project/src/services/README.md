@@ -9,7 +9,6 @@ shows various ways to author them.
 | [`dependent.rs`](dependent.rs)           | How to create services from other services.           |
 | [`ignored.rs`](ignored.rs)               | Ignoring methods.                                     |
 | [`multiple_ctors.rs`](multiple_ctors.rs) | Providing multiple constructors.                      |
-| [`on_panic.rs`](on_panic.rs)             | Specifying panic behavior.                            |
 | [`result.rs`](result.rs)                 | Error handling.                                       |
 | [`slice.rs`](slice.rs)                   | Sending and receiving slices.                         |
 | [`string.rs`](string.rs)                 | UTF8 and ASCII strings.                               |
