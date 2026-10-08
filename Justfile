@@ -55,7 +55,7 @@ lint:
 # Install all required tools, needs `binstall`, see https://github.com/cargo-bins/cargo-binstall
 binstall-deps force="":
     cargo binstall cargo-insta --disable-telemetry --no-confirm --secure {{ force }}
-    cargo binstall cargo-nextest --disable-telemetry --no-confirm --secure {{ force }}
+    cargo binstall cargo-nextest --locked --disable-telemetry --no-confirm --secure {{ force }}
 
 # Opens cargo docs using nightly for doc feature bubbles.
 docs open="":
