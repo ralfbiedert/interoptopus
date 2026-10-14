@@ -116,6 +116,10 @@ fn build_args(args: &[crate::lang::functions::Argument], types: &model::common::
                 Some(d) => format!("{d} {}", arg_type.name),
                 None => arg_type.name.clone(),
             };
+            let decorated = match &arg_type.decorators.rval {
+                Some(rv) => format!("{rv} {}", decorated),
+                None => decorated,
+            };
             let mut m = HashMap::new();
             m.insert("name", arg.name.clone());
             m.insert("ty", decorated);

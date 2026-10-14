@@ -56,6 +56,9 @@ impl Pass {
                 TypeKind::TypePattern(TypePattern::CStrPointer) => {
                     Decorators { param: Some(ParamDecorator::MarshalAs(MarshalAs::LPStr)), rval: Some(RvalDecorator::MarshalUsing("ConstCStrMarshaller".to_string())) }
                 }
+                TypeKind::Array(array) => {
+                    Decorators { param: None, rval: Some(RvalDecorator::MarshalUsing(format!("ConstantElementCount = {}", array.len))) }
+                }
                 _ => Decorators::default(),
             };
 

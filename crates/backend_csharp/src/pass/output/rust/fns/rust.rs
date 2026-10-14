@@ -53,6 +53,10 @@ impl Pass {
                         Some(d) => format!("{d} {}", arg_type.name),
                         None => arg_type.name.clone(),
                     };
+                    let decorated = match &arg_type.decorators.rval {
+                        Some(rv) => format!("{rv} {}", decorated),
+                        None => decorated,
+                    };
                     m.insert("ty", decorated);
                     args.push(m);
                 }
