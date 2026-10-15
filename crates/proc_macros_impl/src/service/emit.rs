@@ -482,7 +482,8 @@ impl ServiceModel {
                 ::std::boxed::Box::into_raw(::std::boxed::Box::new(#instance))
             },
             ServiceOwnership::Shared => quote_spanned! { span =>
-                ::std::sync::Arc::into_raw(::std::sync::Arc::new(#instance)) as *mut _
+                // Preserve pointee inference so invalid constructors only report the validation error.
+                ::std::sync::Arc::into_raw(::std::sync::Arc::new(#instance)).cast_mut().cast()
             },
         }
     }

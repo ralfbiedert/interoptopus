@@ -1,5 +1,6 @@
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::just_underscores_and_digits)]
+#![deny(clippy::ptr_cast_constness)]
 #![doc = include_str!("../README.md")]
 
 use interoptopus::inventory::RustInventory;
