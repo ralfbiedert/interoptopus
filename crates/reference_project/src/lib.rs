@@ -1,6 +1,5 @@
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::just_underscores_and_digits)]
-#![deny(clippy::ptr_cast_constness)]
 #![doc = include_str!("../README.md")]
 
 use interoptopus::inventory::RustInventory;
@@ -22,6 +21,7 @@ pub mod patterns {
     pub mod surrogate;
     pub mod vec;
 }
+#[deny(clippy::ptr_cast_constness)]
 pub mod services {
     pub mod asynk {
         pub mod async_ctor;
