@@ -164,11 +164,17 @@ macro_rules! callback {
             }
 
             /// Will call function if it exists, panic otherwise.
+            // The generated signature mirrors the user's callback, which may have more
+            // parameters than the `too_many_arguments` lint allows. The shape is dictated
+            // by the FFI boundary, so suppress the lint on this generated method.
+            #[allow(clippy::too_many_arguments)]
             pub fn call(&self, $($param: $ty),*) -> $rval {
                 self.callback.expect("Assumed function would exist but it didn't.")($($param,)* self.data)
             }
 
             /// Will call function only if it exists
+            // See `call` above: the parameter count is dictated by the user's callback.
+            #[allow(clippy::too_many_arguments)]
             pub fn call_if_some(&self, $($param: $ty,)*) -> ::std::option::Option<$rval> {
                 match self.callback {
                     Some(c) => Some(c($($param,)* self.data)),
