@@ -63,6 +63,12 @@ impl Pass {
                 continue;
             };
 
+            let Some(pointee_type) = types.get(pointee_id) else {
+                continue;
+            };
+
+            let pointee_rval = pointee_type.decorators.rval.clone();
+
             let pointee_name = pointee_name.clone();
 
             // Derive new TypeIds for ByRef and ByOut variants
@@ -86,7 +92,7 @@ impl Pass {
                     visibility: Visibility::Public,
                     docs: Vec::new(),
                     kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByRef, target: pointee_id }),
-                    decorators: Decorators { param: Some(ParamDecorator::Ref), ..Default::default() },
+                    decorators: Decorators { param: Some(ParamDecorator::Ref), rval: pointee_rval.clone() },
                 },
             );
             types.set(
@@ -97,7 +103,7 @@ impl Pass {
                     visibility: Visibility::Public,
                     docs: Vec::new(),
                     kind: TypeKind::Pointer(Pointer { kind: PointerKind::ByOut, target: pointee_id }),
-                    decorators: Decorators { param: Some(ParamDecorator::Out), ..Default::default() },
+                    decorators: Decorators { param: Some(ParamDecorator::Out), rval: pointee_rval },
                 },
             );
 

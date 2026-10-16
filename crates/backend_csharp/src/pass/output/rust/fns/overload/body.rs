@@ -176,6 +176,10 @@ fn resolve_args(
                     Some(d) => format!("{d} {}", arg_type.name),
                     None => arg_type.name.clone(),
                 };
+                let decorated = match &arg_type.decorators.rval {
+                    Some(rv) => format!("{rv} {}", decorated),
+                    None => decorated,
+                };
                 m.insert("ty", Value::normal_string(&decorated));
                 m.insert("is_ref", Value::normal_string("false"));
                 m.insert("is_wrap", Value::normal_string("false"));
@@ -190,6 +194,10 @@ fn resolve_args(
                 let decorated = match &arg_type.decorators.param {
                     Some(d) => format!("{d} {}", arg_type.name),
                     None => arg_type.name.clone(),
+                };
+                let decorated = match &arg_type.decorators.rval {
+                    Some(rv) => format!("{rv} {}", decorated),
+                    None => decorated,
                 };
                 m.insert("ty", Value::normal_string(&decorated));
                 m.insert("is_ref", Value::normal_string("true"));

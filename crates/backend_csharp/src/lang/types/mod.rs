@@ -55,6 +55,15 @@ pub enum RvalDecorator {
     MarshalUsing(String),
 }
 
+impl std::fmt::Display for RvalDecorator {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::MarshalUsing(m) => write!(f, "[MarshalUsing({m})]"),
+            Self::MarshalAs(m) => write!(f, "[MarshalAs({m})]"),
+        }
+    }
+}
+
 /// Can decorate a type with additional attributes in generated C# code.
 #[derive(Clone, Debug, Default)]
 pub struct Decorators {
